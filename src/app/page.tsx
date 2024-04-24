@@ -14,6 +14,7 @@ async function getTasks() {
     path.join(process.cwd(), "src/server/data/tasks.json"),
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const tasks = JSON.parse(data.toString());
 
   return z.array(taskSchema).parse(tasks);

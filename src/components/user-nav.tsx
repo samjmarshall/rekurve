@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
@@ -12,14 +14,16 @@ import {
 
 import { Button } from "~/components/ui/button";
 import { type User } from "next-auth";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function UserNav({ user }: { user: User }) {
+  const router = useRouter();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-11 w-11 rounded-full">
-          <Avatar className="h-10 w-10">
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+          <Avatar className="h-9 w-9">
             <AvatarImage
               src={user.image ?? undefined}
               alt={user.name ?? undefined}
@@ -48,26 +52,22 @@ export function UserNav({ user }: { user: User }) {
             Billing
             <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link
-              className="flex w-full items-center justify-between"
-              href={"/settings"}
-            >
-              Settings
-              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-            </Link>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => router.push("/settings")}
+          >
+            Settings
+            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>New Team</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link
-            className="flex w-full items-center justify-between"
-            href={"/api/auth/signout"}
-          >
-            Log out
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-          </Link>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onClick={() => router.push("/api/auth/signout")}
+        >
+          Log out
+          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { ClassAttributes, HTMLAttributes, JSX } from "react";
 import {
   Table,
   TableBody,
@@ -330,7 +331,11 @@ export default function Home() {
 //   );
 // }
 
-function LabelledpieChart(props) {
+function LabelledpieChart(
+  props: JSX.IntrinsicAttributes &
+    ClassAttributes<HTMLDivElement> &
+    HTMLAttributes<HTMLDivElement>,
+) {
   return (
     <div {...props}>
       <ResponsivePie

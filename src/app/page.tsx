@@ -111,7 +111,11 @@ export default function Home() {
     //     <DataTable data={tasks} columns={columns} />
     //   </div>
     // </div>
-    
+    <div className="flex h-full">
+      <SidebarNav
+        className="w-64 bg-white px-4 py-5 drop-shadow"
+        items={sidebarNavItems}
+      />
       <div className="flex flex-1 flex-col overflow-hidden bg-[#edf2f7]">
         <div className="flex flex-1 overflow-hidden">
           <div className="flex w-3/4 flex-col space-y-4 px-4 py-5">

@@ -34,9 +34,9 @@ export async function Header() {
           ) : (
             <Link
               href={"/api/auth/signin"}
-              className="rounded bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
+              className="rounded bg-gradient-to-r from-blue-400/20 to-[#2e026d]/20 px-6 py-2 font-semibold no-underline transition hover:bg-gradient-to-r hover:from-blue-400/40 hover:to-[#2e026d]/40"
             >
-              Sign in
+              Login
             </Link>
           )}
         </div>

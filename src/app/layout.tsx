@@ -22,11 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`font-sans antialiased ${fontSans.variable} min-h-screen`}
+        className={`font-sans antialiased ${fontSans.variable} h-screen w-screen overflow-hidden`}
       >
         <TRPCReactProvider>
           <Header />
-          <main className="h-screen max-h-full w-screen">{children}</main>
+          <main className="h-full">{children}</main>
         </TRPCReactProvider>
       </body>
     </html>

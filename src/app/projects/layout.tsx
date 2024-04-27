@@ -40,10 +40,9 @@ export default function ProjectsLayout({
 }) {
   return (
     <div className="flex h-full flex-col lg:flex-row">
-      <SidebarNav
-        className="w-64 min-w-full overflow-x-scroll px-4 py-5 drop-shadow lg:min-w-fit lg:bg-white"
-        items={sidebarNavItems}
-      />
+      <aside className="w-64 min-w-full px-4 py-5 drop-shadow lg:min-w-fit lg:bg-white">
+        <SidebarNav items={sidebarNavItems} />
+      </aside>
       <ScrollArea className="w-full bg-[#edf2f7]">{children}</ScrollArea>
     </div>
   );

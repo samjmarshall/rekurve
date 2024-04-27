@@ -9,7 +9,7 @@ export async function Header() {
 
   return (
     <header className="relative z-10">
-      <div className="flex w-full items-center justify-between bg-white">
+      <nav className="flex w-full items-center justify-between bg-white">
         <Link href={"/"}>
           <h1 className="z-50 py-2 pl-8 text-4xl font-extrabold tracking-tight text-blue-400">
             rekurve
@@ -47,7 +47,7 @@ export async function Header() {
             </Link>
           )}
         </div>
-      </div>
+      </nav>
       <div className="m-0 h-[3px] w-full bg-gradient-to-r from-blue-400 to-[#2e026d]"></div>
       <div className="absolute -z-10 m-0 h-[2px] w-full bg-gradient-to-r from-blue-400 to-[#2e026d] blur-sm"></div>
     </header>

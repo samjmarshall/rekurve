@@ -18,7 +18,7 @@ export async function Header() {
         <div className="ml-12 mr-auto w-full">
           <Link
             href={"/projects"}
-            className="mx-1 h-10 px-4 py-2 text-sm font-medium text-primary hover:underline hover:underline-offset-4"
+            className={`mx-1 ${buttonVariants({ variant: "link" })}`}
           >
             Projects
           </Link>

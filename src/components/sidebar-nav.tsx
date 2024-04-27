@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
-    href: string;
+    href?: string;
     title: string;
   }[];
 }
@@ -26,12 +26,15 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
       {items.map((item) => (
         <Link
           key={item.href}
-          href={item.href}
+          href={item.href ?? ""}
           className={cn(
             buttonVariants({ variant: "ghost" }),
             pathname === item.href
               ? "bg-muted hover:bg-muted"
               : "hover:bg-transparent hover:underline",
+            item.href
+              ? "cursor-pointer"
+              : "cursor-default text-gray-400 hover:text-gray-400 hover:no-underline",
             "justify-start",
           )}
         >

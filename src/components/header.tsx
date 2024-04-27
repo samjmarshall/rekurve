@@ -16,7 +16,7 @@ export async function Header() {
         </Link>
         <div className="ml-12 mr-auto w-full">
           <Link
-            href={"/"}
+            href={"/projects"}
             className="mx-1 h-10 px-4 py-2 text-sm font-medium text-primary hover:underline hover:underline-offset-4"
           >
             Projects
@@ -34,7 +34,7 @@ export async function Header() {
           ) : (
             <Link
               href={"/api/auth/signin"}
-              className="rounded bg-gradient-to-r from-blue-400/20 to-[#2e026d]/20 px-6 py-2 font-semibold no-underline transition hover:bg-gradient-to-r hover:from-blue-400/40 hover:to-[#2e026d]/40"
+              className="rounded bg-[#2e026d]/20 px-6 py-2 font-semibold no-underline transition hover:bg-[#2e026d]/40"
             >
               Login
             </Link>

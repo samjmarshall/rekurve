@@ -21,10 +21,16 @@ export async function Header() {
           >
             Projects
           </Link>
-          <Button className="mx-1" variant="link">
+          <Button
+            className="mx-1 cursor-default text-gray-400 hover:text-gray-400 hover:no-underline"
+            variant="link"
+          >
             Calendar
           </Button>
-          <Button className="mx-1" variant="link">
+          <Button
+            className="mx-1 cursor-default text-gray-400 hover:text-gray-400 hover:no-underline"
+            variant="link"
+          >
             View All
           </Button>
         </div>

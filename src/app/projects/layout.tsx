@@ -8,6 +8,7 @@ const sidebarNavItems = [
   },
   {
     title: "Estimate",
+    href: "/projects/estimate",
   },
   {
     title: "Schedule",

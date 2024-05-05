@@ -19,7 +19,7 @@ async function getTasks() {
   return z.array(taskSchema).parse(tasks);
 }
 
-export default async function Projects() {
+export default async function Tasks() {
   const tasks = await getTasks();
 
   return (

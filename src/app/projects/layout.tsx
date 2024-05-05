@@ -7,11 +7,24 @@ const sidebarNavItems = [
     href: "/projects",
   },
   {
+    title: "Plans",
+  },
+  {
     title: "Estimate",
     href: "/projects/estimate",
   },
   {
+    title: "Proposal",
+  },
+  {
     title: "Schedule",
+    href: "/projects/schedule",
+  },
+  {
+    title: "Request for Quotes",
+  },
+  {
+    title: "Selections and Allowances",
   },
   {
     title: "Purchase Orders",

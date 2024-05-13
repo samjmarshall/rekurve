@@ -20,6 +20,16 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `rekurve_${name}`);
 
+export const waitlist = createTable(
+  "waitlist",
+  {
+    email: varchar("email", { length: 256 }).primaryKey(),
+    name: varchar("name", { length: 256 }),
+    company: varchar("company", { length: 256 }),
+    message: text("message"),
+  }
+);
+
 export const posts = createTable(
   "post",
   {

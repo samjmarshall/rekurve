@@ -35,7 +35,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import Link from "next/link";
 import { Switch } from "~/components/ui/switch";
-import { toast } from "~/components/ui/use-toast";
+import { toast } from "sonner";
 
 const materialFormSchema = z.object({
   name: z.string().min(2).max(80),
@@ -53,14 +53,11 @@ export function MaterialFormDrawer() {
   // 2. Define a submit handler.
   function onSubmit(data: z.infer<typeof materialFormSchema>) {
     // Do something with the form values.
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    toast(
+      <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+        <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+      </pre>
+    );
   }
 
   return (

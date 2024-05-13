@@ -1,11 +1,11 @@
 import { type JSX, type SVGProps } from "react";
 
-import { Button } from "~/components/ui/button";
 import Image from "next/image";
-import { Input } from "~/components/ui/input";
 import Link from "next/link";
+import WaitlistForm from "./_components/waitlist-form";
+import { TRPCReactProvider } from "~/trpc/react";
 
-export default function Component() {
+export default function Page() {
   return (
     <div className="flex min-h-[100dvh] flex-col">
       <header className="flex h-14 items-center px-4 lg:px-6">
@@ -80,12 +80,12 @@ export default function Component() {
                 >
                   Watch Demo
                 </Link> */}
-                {/* <Link
+                <Link
                   className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
                   href="#features"
                 >
                   Learn More
-                </Link> */}
+                </Link>
               </div>
             </div>
           </div>
@@ -456,16 +456,15 @@ export default function Component() {
                     Testimonial
                   </div>
                   <blockquote className="text-lg font-semibold leading-snug lg:text-xl lg:leading-normal xl:text-2xl">
-                    “ConstructPro has completely transformed the way we manage
-                    our construction projects. The intuitive interface and
-                    powerful features have helped us stay on schedule and under
-                    budget, while keeping our clients in the loop every step of
-                    the way.“
+                    "Using rekurve allowed us to double our business. We can finally see
+                    exactly what&apos;s happening in our business, and see what&apos;s coming in
+                    the weeks ahead. The planning tools have reduced the time to accurately estimate
+                    and present a proposal from weeks to days.“
                   </blockquote>
                   <div>
-                    <div className="font-semibold">Jane Smith</div>
+                    <div className="font-semibold">Ben Makim</div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      Project Manager, Acme Construction
+                      Owner, Makim Bulders
                     </div>
                   </div>
                 </div>
@@ -791,27 +790,14 @@ export default function Component() {
                 Take Control of Your Construction Projects
               </h2>
               <p className="mx-auto max-w-[600px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Join the waitlist for the chance to trial rekurve before
-                it&apos;s released to the general public. See how it can
-                streamline your business, enabling you to grow.
+                Join the waitlist for early access rekurve before
+                it&apos;s released to the general public. We can only take on a few select customers at this time.
               </p>
             </div>
-            <div className="mx-auto w-full max-w-sm space-y-2">
-              <form className="flex space-x-2">
-                <Input
-                  className="max-w-lg flex-1"
-                  placeholder="Enter your email"
-                  type="email"
-                />
-                <Button type="submit">Join the Waitlist</Button>
-              </form>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                By signing up, you agree to our{" "}
-                <Link className="underline underline-offset-2" href="#">
-                  Terms & Conditions
-                </Link>
-              </p>
-            </div>
+
+            <TRPCReactProvider>
+              <WaitlistForm />
+            </TRPCReactProvider>
           </div>
         </section>
       </main>

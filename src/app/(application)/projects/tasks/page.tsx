@@ -1,5 +1,3 @@
-import { Card, CardContent } from "~/components/ui/card";
-
 import { DataTable } from "~/components/data-table";
 import { columns } from "~/components/data-table/columns";
 import { promises as fs } from "fs";
@@ -24,11 +22,7 @@ export default async function Tasks() {
 
   return (
     <div className="h-full w-full items-center justify-center px-4 py-5">
-      <Card>
-        <CardContent className="flex justify-center p-4">
-          <DataTable data={tasks} columns={columns} />
-        </CardContent>
-      </Card>
+      <DataTable data={tasks} columns={columns} />
     </div>
   );
 }

@@ -54,10 +54,10 @@ export default function ProjectsLayout({
 }) {
   return (
     <div className="flex h-full flex-col lg:flex-row">
-      <aside className="w-64 min-w-full px-4 py-5 drop-shadow lg:min-w-fit lg:bg-white">
+      <aside className="w-64 min-w-full px-4 py-5 lg:min-w-fit lg:bg-white">
         <SidebarNav items={sidebarNavItems} />
       </aside>
-      <ScrollArea className="w-full bg-[#edf2f7]">{children}</ScrollArea>
+      <ScrollArea className="w-full">{children}</ScrollArea>
     </div>
   );
 }

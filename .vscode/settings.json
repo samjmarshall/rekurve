@@ -1,0 +1,22 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "editor.tabSize": 2,
+  "cSpell.words": [
+    "colour",
+    "maxage",
+    "networkidle",
+    "nextjs",
+    "opengraph",
+    "Recaptcha",
+    "tailwindcss",
+    "testid",
+    "webp",
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": true,
+  "typescript.format.enable": false,
+  "javascript.format.enable": false,
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

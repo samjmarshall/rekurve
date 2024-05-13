@@ -9,6 +9,7 @@ import {
 } from "~/components/ui/table";
 
 import { Button } from "~/components/ui/button";
+import { Image } from "@radix-ui/react-avatar";
 import Link from "next/link";
 import { ScrollArea } from "~/components/ui/scroll-area";
 
@@ -175,7 +176,7 @@ export default function Projects() {
             </CardHeader>
             <CardContent className="p-4">
               <ScrollArea className="space-y-2">
-                <img
+                <Image
                   alt="File 1"
                   className="h-24 w-24"
                   height="100"
@@ -186,7 +187,7 @@ export default function Projects() {
                   }}
                   width="100"
                 />
-                <img
+                <Image
                   alt="File 2"
                   className="h-24 w-24"
                   height="100"

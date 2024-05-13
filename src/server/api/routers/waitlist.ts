@@ -8,6 +8,7 @@ import { waitlist } from "~/server/db/schema";
 import { z } from "zod";
 
 export const waitlistRouter = createTRPCRouter({
+  // TODO: Add Recapcha to prevent spam
   addEmail: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ ctx, input }) => {

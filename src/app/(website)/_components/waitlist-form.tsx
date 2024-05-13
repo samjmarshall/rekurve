@@ -25,6 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 export default function WaitlistForm() {
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
+  // TODO: Add Recapcha to prevent spam
 
   const addEmail = api.waitlist.addEmail.useMutation({
     onSuccess: () => {

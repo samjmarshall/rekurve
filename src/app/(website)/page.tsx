@@ -5,94 +5,48 @@ import Link from "next/link";
 import WaitlistForm from "./_components/waitlist-form";
 import { TRPCReactProvider } from "~/trpc/react";
 
-export default function Page() {
+export default function LandingPage() {
   return (
-    <div className="flex min-h-[100dvh] flex-col">
-      <header className="flex h-14 items-center px-4 lg:px-6">
-        <Link className="flex items-center justify-center" href="/">
-          <span className="text-4xl font-extrabold tracking-tight">
-            rekurve
-          </span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            href="#features"
-          >
-            Features
-          </Link>
-          {/* <Link
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            href="#pricing"
-          >
-            Pricing
-          </Link> */}
-          {/* <Link
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            href="#about"
-          >
-            About
-          </Link> */}
-          <Link
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            href="#testimonials"
-          >
-            Testimonials
-          </Link>
-          <Link
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            href="#contact"
-          >
-            Contact
-          </Link>
-          <Link
-            className="text-purple text-sm font-medium underline-offset-4 hover:underline"
-            href="/api/auth/signin?callbackUrl=/dashboard"
-          >
-            Login
-          </Link>
-        </nav>
-      </header>
-      <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-4">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Streamline Your Construction Projects
-                </h1>
-                <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl">
-                  Construction management software to stay organized, track
-                  progress, costs and payments, and collaborate with your
-                  customers.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Link
-                  className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-                  href="#contact"
-                >
-                  Join the Waitlist
-                </Link>
-                {/* <Link
+    <main className="flex-1">
+      <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center space-y-4 text-center">
+            <div className="space-y-4">
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+                Streamline Your Construction Projects
+              </h1>
+              <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl">
+                Construction management software to stay organized, track
+                progress, costs and payments, and collaborate with your
+                customers.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 min-[400px]:flex-row">
+              <Link
+                className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+                href="#contact"
+              >
+                Join the Waitlist
+              </Link>
+              {/* <Link
                   className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
                   href="#"
                 >
                   Watch Demo
                 </Link> */}
-                <Link
-                  className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
-                  href="#features"
-                >
-                  Learn More
-                </Link>
-              </div>
+              <Link
+                className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
+                href="#features"
+              >
+                Learn More
+              </Link>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Features - Option 1 */}
-        {/* <section
+      {/* Features - Option 1 */}
+      {/* <section
           className="w-full bg-gray-100 py-12 dark:bg-gray-800 md:py-24 lg:py-32"
           id="features"
         >
@@ -175,143 +129,142 @@ export default function Page() {
           </div>
         </section> */}
 
-        {/* Features - Option 2 */}
-        <section className="w-full py-12 md:py-24 lg:py-32" id="features">
-          <div className="container space-y-12 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold tracking-tighter sm:text-5xl">
-                  Key Features
-                </h2>
-                <p className="max-w-[900px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Tools to manage every aspect of your construction projects,
-                  from estimation and scheduling to client collaboration and
-                  proposals.
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
-              <div className="grid gap-1">
-                <CalendarIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-                <h3 className="text-lg font-bold">Project Scheduling</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Easily create and manage project schedules, action items, and
-                  track progress in real-time.
-                </p>
-              </div>
-              <div className="grid gap-1">
-                <WalletIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-                <h3 className="text-lg font-bold">Financial Tracking</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Stay on top of your project budgets, expenses and payment
-                  schedules with our comprehensive financial tracking tools.
-                </p>
-              </div>
-              <div className="grid gap-1">
-                <ClipboardIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-                <h3 className="text-lg font-bold">Task Management</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Assign tasks, set deadlines, and collaborate with your team,
-                  suppliers and contractors to ensure projects are completed on
-                  time.
-                </p>
-              </div>
-              <div className="grid gap-1">
-                <PercentIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-                <h3 className="text-lg font-bold">Project Estimation</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Accurately estimate project costs and materials with our
-                  advanced estimation tools.
-                </p>
-              </div>
-              <div className="grid gap-1">
-                <MergeIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-                <h3 className="text-lg font-bold">Client Collaboration</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Seamlessly collaborate with clients, provide proposals, share
-                  updates, and get real-time feedback on your projects.
-                </p>
-              </div>
-              <div className="grid gap-1">
-                <ViewIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-                <h3 className="text-lg font-bold">Comprehensive Reporting</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Generate detailed reports on project progress, financials and
-                  more. Keeping you informed.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col items-start justify-center gap-4 sm:flex-row">
-              <Link
-                className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-                href="#contact"
-              >
-                Contact Us
-              </Link>
-              <Link
-                className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
-                href="#about"
-              >
-                Learn More
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Logos/About - Option 1 */}
-        <section className="w-full py-12 md:py-24 lg:py-32" id="about">
-          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                Trusted by leading construction firms.
+      {/* Features - Option 2 */}
+      <section className="w-full py-12 md:py-24 lg:py-32" id="features">
+        <div className="container space-y-12 px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold tracking-tighter sm:text-5xl">
+                Key Features
               </h2>
-              <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                ConstructPro is used by construction companies of all sizes to
-                streamline their projects and deliver exceptional results.
+              <p className="max-w-[900px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Tools to manage every aspect of your construction projects, from
+                estimation and scheduling to client collaboration and proposals.
               </p>
             </div>
-            <div className="grid w-full grid-cols-2 items-center justify-center gap-8 lg:grid-cols-5 lg:gap-12 [&>img]:mx-auto">
-              <Image
-                alt="Logo"
-                className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
-                height="70"
-                src="/placeholder.svg"
-                width="140"
-              />
-              <Image
-                alt="Logo"
-                className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
-                height="70"
-                src="/placeholder.svg"
-                width="140"
-              />
-              <Image
-                alt="Logo"
-                className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
-                height="70"
-                src="/placeholder.svg"
-                width="140"
-              />
-              <Image
-                alt="Logo"
-                className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
-                height="70"
-                src="/placeholder.svg"
-                width="140"
-              />
-              <Image
-                alt="Logo"
-                className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
-                height="70"
-                src="/placeholder.svg"
-                width="140"
-              />
+          </div>
+          <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
+            <div className="grid gap-1">
+              <CalendarIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
+              <h3 className="text-lg font-bold">Project Scheduling</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Easily create and manage project schedules, action items, and
+                track progress in real-time.
+              </p>
+            </div>
+            <div className="grid gap-1">
+              <WalletIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
+              <h3 className="text-lg font-bold">Financial Tracking</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Stay on top of your project budgets, expenses and payment
+                schedules with our comprehensive financial tracking tools.
+              </p>
+            </div>
+            <div className="grid gap-1">
+              <ClipboardIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
+              <h3 className="text-lg font-bold">Task Management</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Assign tasks, set deadlines, and collaborate with your team,
+                suppliers and contractors to ensure projects are completed on
+                time.
+              </p>
+            </div>
+            <div className="grid gap-1">
+              <PercentIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
+              <h3 className="text-lg font-bold">Project Estimation</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Accurately estimate project costs and materials with our
+                advanced estimation tools.
+              </p>
+            </div>
+            <div className="grid gap-1">
+              <MergeIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
+              <h3 className="text-lg font-bold">Client Collaboration</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Seamlessly collaborate with clients, provide proposals, share
+                updates, and get real-time feedback on your projects.
+              </p>
+            </div>
+            <div className="grid gap-1">
+              <ViewIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
+              <h3 className="text-lg font-bold">Comprehensive Reporting</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Generate detailed reports on project progress, financials and
+                more. Keeping you informed.
+              </p>
             </div>
           </div>
-        </section>
+          <div className="flex flex-col items-start justify-center gap-4 sm:flex-row">
+            <Link
+              className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+              href="#contact"
+            >
+              Contact Us
+            </Link>
+            <Link
+              className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
+              href="#about"
+            >
+              Learn More
+            </Link>
+          </div>
+        </div>
+      </section>
 
-        {/* Logos/About - Option 2 */}
-        {/* <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800" id="about">
+      {/* Logos/About - Option 1 */}
+      <section className="w-full py-12 md:py-24 lg:py-32" id="about">
+        <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
+          <div className="space-y-3">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+              Trusted by leading construction firms.
+            </h2>
+            <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              ConstructPro is used by construction companies of all sizes to
+              streamline their projects and deliver exceptional results.
+            </p>
+          </div>
+          <div className="grid w-full grid-cols-2 items-center justify-center gap-8 lg:grid-cols-5 lg:gap-12 [&>img]:mx-auto">
+            <Image
+              alt="Logo"
+              className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
+              height="70"
+              src="/placeholder.svg"
+              width="140"
+            />
+            <Image
+              alt="Logo"
+              className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
+              height="70"
+              src="/placeholder.svg"
+              width="140"
+            />
+            <Image
+              alt="Logo"
+              className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
+              height="70"
+              src="/placeholder.svg"
+              width="140"
+            />
+            <Image
+              alt="Logo"
+              className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
+              height="70"
+              src="/placeholder.svg"
+              width="140"
+            />
+            <Image
+              alt="Logo"
+              className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
+              height="70"
+              src="/placeholder.svg"
+              width="140"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Logos/About - Option 2 */}
+      {/* <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800" id="about">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
@@ -374,8 +327,8 @@ export default function Page() {
           </div>
         </section> */}
 
-        {/* Logos/About - Option 3 */}
-        {/* <section className="w-full py-12 md:py-24 lg:py-32 border-t" id="about">
+      {/* Logos/About - Option 3 */}
+      {/* <section className="w-full py-12 md:py-24 lg:py-32 border-t" id="about">
           <div className="container grid items-center justify-center gap-4 px-4 md:px-6">
             <div className="space-y-3 text-center">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">About Construct Pro</h2>
@@ -436,45 +389,46 @@ export default function Page() {
           </div>
         </section> */}
 
-        {/* Testimonials - Option 1 */}
-        <section
-          className="w-full bg-gray-100 py-12 dark:bg-gray-800 md:py-24 lg:py-32"
-          id="testimonials"
-        >
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-12 xl:grid-cols-[1fr_550px]">
-              <Image
-                alt="Image"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
-                height="310"
-                src="/placeholder.svg"
-                width="550"
-              />
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">
-                    Testimonial
-                  </div>
-                  <blockquote className="text-lg font-semibold leading-snug lg:text-xl lg:leading-normal xl:text-2xl">
-                    "Using rekurve allowed us to double our business. We can finally see
-                    exactly what&apos;s happening in our business, and see what&apos;s coming in
-                    the weeks ahead. The planning tools have reduced the time to accurately estimate
-                    and present a proposal from weeks to days.“
-                  </blockquote>
-                  <div>
-                    <div className="font-semibold">Ben Makim</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      Owner, Makim Bulders
-                    </div>
+      {/* Testimonials - Option 1 */}
+      <section
+        className="w-full bg-gray-100 py-12 dark:bg-gray-800 md:py-24 lg:py-32"
+        id="testimonials"
+      >
+        <div className="container px-4 md:px-6">
+          <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-12 xl:grid-cols-[1fr_550px]">
+            <Image
+              alt="Image"
+              className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
+              height="310"
+              src="/placeholder.svg"
+              width="550"
+            />
+            <div className="flex flex-col justify-center space-y-4">
+              <div className="space-y-2">
+                <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">
+                  Testimonial
+                </div>
+                <blockquote className="text-lg font-semibold leading-snug lg:text-xl lg:leading-normal xl:text-2xl">
+                  "Using rekurve allowed us to double our business. We can
+                  finally see exactly what&apos;s happening in our business, and
+                  see what&apos;s coming in the weeks ahead. The planning tools
+                  have reduced the time to accurately estimate and present a
+                  proposal from weeks to days.“
+                </blockquote>
+                <div>
+                  <div className="font-semibold">Ben Makim</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Owner, Makim Bulders
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Testimonials - Option 2 */}
-        {/* <section className="w-full py-12 md:py-24 lg:py-32" id="testimonials">
+      {/* Testimonials - Option 2 */}
+      {/* <section className="w-full py-12 md:py-24 lg:py-32" id="testimonials">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -528,8 +482,8 @@ export default function Page() {
           </div>
         </section> */}
 
-        {/* Pricing - Option 1 */}
-        {/* <section className="w-full py-12 md:py-24 lg:py-32" id="pricing">
+      {/* Pricing - Option 1 */}
+      {/* <section className="w-full py-12 md:py-24 lg:py-32" id="pricing">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-3">
@@ -655,8 +609,8 @@ export default function Page() {
           </div>
         </section> */}
 
-        {/* Pricing - Option 2 */}
-        {/* <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800" id="pricing">
+      {/* Pricing - Option 2 */}
+      {/* <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800" id="pricing">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-3">
@@ -780,42 +734,25 @@ export default function Page() {
           </div>
         </section> */}
 
-        <section
-          id="contact"
-          className="w-full border-t py-12 md:py-24 lg:py-32"
-        >
-          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                Take Control of Your Construction Projects
-              </h2>
-              <p className="mx-auto max-w-[600px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Join the waitlist for early access rekurve before
-                it&apos;s released to the general public. We can only take on a few select customers at this time.
-              </p>
-            </div>
-
-            <TRPCReactProvider>
-              <WaitlistForm />
-            </TRPCReactProvider>
+      <section id="contact" className="w-full border-t py-12 md:py-24 lg:py-32">
+        <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+          <div className="space-y-3">
+            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
+              Take Control of Your Construction Projects
+            </h2>
+            <p className="mx-auto max-w-[600px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              Join the waitlist for early access rekurve before it&apos;s
+              released to the general public. We can only take on a few select
+              customers at this time.
+            </p>
           </div>
-        </section>
-      </main>
 
-      <footer className="flex w-full shrink-0 flex-col items-center gap-2 px-4 py-6 sm:flex-row md:px-6">
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          © 2024 rekurve. All rights reserved.
-        </p>
-        {/* <nav className="flex gap-4 sm:ml-auto sm:gap-6">
-          <Link className="text-xs underline-offset-4 hover:underline" href="#">
-            Terms of Service
-          </Link>
-          <Link className="text-xs underline-offset-4 hover:underline" href="#">
-            Privacy
-          </Link>
-        </nav> */}
-      </footer>
-    </div>
+          <TRPCReactProvider>
+            <WaitlistForm />
+          </TRPCReactProvider>
+        </div>
+      </section>
+    </main>
   );
 }
 

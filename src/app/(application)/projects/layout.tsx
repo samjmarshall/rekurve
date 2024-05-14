@@ -57,7 +57,9 @@ export default function ProjectsLayout({
       <aside className="w-64 min-w-full px-4 py-5 lg:min-w-fit lg:bg-white">
         <SidebarNav items={sidebarNavItems} />
       </aside>
-      <ScrollArea className="w-full">{children}</ScrollArea>
+      <ScrollArea className="w-full rounded-tl-lg border-t bg-gray-100 shadow-inner">
+        {children}
+      </ScrollArea>
     </div>
   );
 }

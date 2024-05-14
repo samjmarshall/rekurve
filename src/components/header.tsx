@@ -11,7 +11,7 @@ export async function Header() {
     <header>
       <nav className="flex w-full items-center justify-between bg-white">
         <Link href="/dashboard">
-          <h1 className="text-purple py-2 pl-4 text-4xl font-extrabold tracking-tight lg:pl-6">
+          <h1 className="py-2 pl-4 text-4xl font-extrabold tracking-tight text-purple lg:pl-6">
             rekurve
           </h1>
         </Link>
@@ -34,7 +34,7 @@ export async function Header() {
           >
             View All
           </Button>
-          <div className="mr-2">
+          <div className="mx-3">
             {session ? <UserNav user={session.user} /> : null}
           </div>
         </div>

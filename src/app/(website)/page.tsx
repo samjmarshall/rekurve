@@ -409,11 +409,11 @@ export default function LandingPage() {
                   Testimonial
                 </div>
                 <blockquote className="text-lg font-semibold leading-snug lg:text-xl lg:leading-normal xl:text-2xl">
-                  "Using rekurve allowed us to double our business. We can
+                  &quot;Using rekurve allowed us to double our business. We can
                   finally see exactly what&apos;s happening in our business, and
                   see what&apos;s coming in the weeks ahead. The planning tools
                   have reduced the time to accurately estimate and present a
-                  proposal from weeks to days.“
+                  proposal from weeks to days.&quot;
                 </blockquote>
                 <div>
                   <div className="font-semibold">Ben Makim</div>

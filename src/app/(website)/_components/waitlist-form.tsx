@@ -11,7 +11,6 @@ import {
 import { Button } from "~/components/ui/button";
 import FollowUpForm from "./followup-form";
 import { Input } from "~/components/ui/input";
-import Link from "next/link";
 import React from "react";
 import TermsAndConditions from "./terms-and-conditions";
 import { Toaster } from "~/components/ui/sonner";
@@ -78,11 +77,7 @@ export default function WaitlistForm() {
             {addEmail.isPending ? "Joining waitlist..." : "Join the Waitlist"}
           </Button>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            By signing up, you agree to our{" "}
-            {/* <Link className="underline underline-offset-2" href="#">
-              Terms & Conditions
-            </Link> */}
-            <TermsAndConditions />
+            By signing up, you agree to our <TermsAndConditions />
           </p>
         </form>
       </Form>

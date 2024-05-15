@@ -45,8 +45,8 @@ export const waitlistRouter = createTRPCRouter({
     .input(
       z.object({
         email: z.string().email(),
-        name: z.string().min(2).max(256),
-        company: z.string().min(2).max(256),
+        name: z.string().min(1).max(256),
+        company: z.string().min(1).max(256),
         problems: z.string().optional(),
         solutions: z.string().optional(),
         token: z.string(),

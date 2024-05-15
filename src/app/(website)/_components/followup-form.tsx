@@ -151,6 +151,7 @@ export default function FollowUpForm({
                           <Input
                             className="text-base sm:text-sm"
                             autoComplete="name"
+                            onPointerDown={(e) => e.stopPropagation()} // Disables scroll overlay when selecting input on mobile. See: https://github.com/shadcn-ui/ui/issues/2247
                             {...field}
                           />
                         </FormControl>
@@ -170,6 +171,7 @@ export default function FollowUpForm({
                           <Input
                             className="text-base sm:text-sm"
                             autoComplete="organization"
+                            onPointerDown={(e) => e.stopPropagation()}
                             {...field}
                           />
                         </FormControl>
@@ -190,6 +192,7 @@ export default function FollowUpForm({
                         <Textarea
                           className="resize-none text-base sm:text-sm"
                           placeholder="Tell us your problems, we're listening!"
+                          onPointerDown={(e) => e.stopPropagation()}
                           {...field}
                         />
                       </FormControl>
@@ -209,6 +212,7 @@ export default function FollowUpForm({
                         <Textarea
                           className="resize-none text-base sm:text-sm"
                           placeholder="Help us provide the best solution possible!"
+                          onPointerDown={(e) => e.stopPropagation()}
                           {...field}
                         />
                       </FormControl>

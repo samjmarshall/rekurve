@@ -119,7 +119,11 @@ export default function FollowUpForm({
                           Name *
                         </FormLabel>
                         <FormControl>
-                          <Input className="text-base sm:text-sm" {...field} />
+                          <Input
+                            className="text-base sm:text-sm"
+                            onPointerDown={(e) => e.stopPropagation()}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -134,7 +138,11 @@ export default function FollowUpForm({
                           Company *
                         </FormLabel>
                         <FormControl>
-                          <Input className="text-base sm:text-sm" {...field} />
+                          <Input
+                            className="text-base sm:text-sm"
+                            onPointerDown={(e) => e.stopPropagation()}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -153,6 +161,7 @@ export default function FollowUpForm({
                         <Textarea
                           className="resize-none text-base sm:text-sm"
                           placeholder="Tell us your problems, we're listening!"
+                          onPointerDown={(e) => e.stopPropagation()}
                           {...field}
                         />
                       </FormControl>
@@ -172,6 +181,7 @@ export default function FollowUpForm({
                         <Textarea
                           className="resize-none text-base sm:text-sm"
                           placeholder="Help us provide the best solution possible!"
+                          onPointerDown={(e) => e.stopPropagation()}
                           {...field}
                         />
                       </FormControl>

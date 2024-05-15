@@ -121,11 +121,7 @@ export default function FollowUpForm({
                           Name *
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            className="text-base sm:text-sm"
-                            placeholder="Enter your name"
-                            {...field}
-                          />
+                          <Input className="text-base sm:text-sm" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -140,11 +136,7 @@ export default function FollowUpForm({
                           Company *
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            className="text-base sm:text-sm"
-                            placeholder="Enter your company"
-                            {...field}
-                          />
+                          <Input className="text-base sm:text-sm" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -161,7 +153,6 @@ export default function FollowUpForm({
                       </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Tell us your problems, we're hear to listen!"
                           className="resize-none text-base sm:text-sm"
                           {...field}
                         />
@@ -176,31 +167,10 @@ export default function FollowUpForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-base sm:text-sm">
-                        What have you done in the past, or what are you doing
-                        now to try solve these pain points?
+                        How have you tried to solve this is the past?
                       </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="The more we understand about your situation, the better we can build the solution!"
-                          className="resize-none text-base sm:text-sm"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="budget"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base sm:text-sm">
-                        Have you already budgeted for a solution?
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="We'd like to know if you have already invested in finding a solution, or if you're simply exploring your options."
                           className="resize-none text-base sm:text-sm"
                           {...field}
                         />

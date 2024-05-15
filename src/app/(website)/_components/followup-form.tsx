@@ -4,7 +4,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "~/components/ui/dialog"
 import {
   Drawer,
@@ -22,17 +21,16 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form"
-import { useEffect, useState } from "react"
 
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
-import { ScrollArea } from "~/components/ui/scroll-area"
 import { Textarea } from "~/components/ui/textarea"
 import { api } from "~/trpc/react"
 import { executeRecaptcha } from "~/lib/recaptcha-client"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { useMediaQuery } from "~/hooks/use-media-query"
+import { useState } from "react"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -68,22 +66,6 @@ export default function FollowUpForm({
 }) {
   const [recaptchaLoading, setRecaptchaLoading] = useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
-  const [viewportHeight, setViewportHeight] = useState(
-    typeof window !== "undefined" ? window.visualViewport?.height : 0,
-  )
-
-  // Mobile devices have a visual viewport that changes when the keyboard is opened
-  // This effect listens to the visual viewport resize event and updates the viewport height for the Drawer <ScrollArea />
-  // See: https://github.com/shadcn-ui/ui/issues/2849, https://github.com/emilkowalski/vaul/issues/294
-  useEffect(() => {
-    function updateViewportHeight() {
-      setViewportHeight(window.visualViewport?.height ?? 0)
-    }
-
-    window.visualViewport?.addEventListener("resize", updateViewportHeight)
-    return () =>
-      window.visualViewport?.removeEventListener("resize", updateViewportHeight)
-  }, [])
 
   const addDetails = api.waitlist.addDetails.useMutation({
     onSuccess: () => {
@@ -240,25 +222,11 @@ export default function FollowUpForm({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
-        <ScrollArea
-          className="w-full" // This wild shit below resolves the input obstruction by mobile device keyboards.
-          // See: https://github.com/shadcn-ui/ui/issues/2849, https://github.com/emilkowalski/vaul/issues/294
-          style={{
-            height: `${
-              typeof window !== "undefined" &&
-              viewportHeight &&
-              window.innerHeight > viewportHeight
-                ? `${viewportHeight - 40}px`
-                : "100%"
-            }`,
-          }}
-        >
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
-          <DetailsForm />
-        </ScrollArea>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <DetailsForm />
       </DialogContent>
     </Dialog>
   )

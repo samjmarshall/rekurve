@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import React from "react";
 import { buttonVariants } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { usePathname } from "next/navigation";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
-    href?: string;
+    href?: unknown;
     title: string;
   }[];
 }
@@ -23,24 +24,23 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
       )}
       {...props}
     >
-      {items.map((item) => (
-        <Link
-          key={item.title}
-          href={item.href ?? ""}
-          className={cn(
-            buttonVariants({ variant: "ghost" }),
-            pathname === item.href
-              ? "bg-muted hover:bg-muted"
-              : "hover:bg-transparent hover:underline",
-            item.href
-              ? "cursor-pointer"
-              : "cursor-default text-gray-400 hover:text-gray-400 hover:no-underline",
-            "justify-start",
-          )}
-        >
-          {item.title}
-        </Link>
-      ))}
+      {items.map((item) =>
+        item.href ? (
+          <Link
+            key={item.title}
+            href={item.href}
+            className={cn(
+              buttonVariants({ variant: "ghost" }),
+              pathname === item.href
+                ? "bg-muted hover:bg-muted"
+                : "hover:bg-transparent hover:underline",
+              "cursor-pointer justify-start",
+            )}
+          >
+            {item.title}
+          </Link>
+        ) : null,
+      )}
     </nav>
   );
 }

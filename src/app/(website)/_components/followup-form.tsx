@@ -17,8 +17,10 @@ import {
 
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import React from "react";
 import { Textarea } from "~/components/ui/textarea";
 import { api } from "~/trpc/react";
+import { executeRecaptcha } from "~/lib/recaptcha-client";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -41,7 +43,9 @@ const FormSchema = z.object({
     .max(256, {
       message: "Company name must be less than 256 characters.",
     }),
-  message: z.string().optional(),
+  problems: z.string().optional(),
+  solutions: z.string().optional(),
+  budget: z.string().optional(),
 });
 
 export default function FollowUpForm({
@@ -53,6 +57,8 @@ export default function FollowUpForm({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
+  const [recaptchaLoading, setRecaptchaLoading] = React.useState(false);
+
   const addDetails = api.waitlist.addDetails.useMutation({
     onSuccess: () => {
       setOpen(false);
@@ -68,12 +74,23 @@ export default function FollowUpForm({
     defaultValues: {
       name: "",
       company: "",
-      message: "",
+      problems: "",
+      solutions: "",
+      budget: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    addDetails.mutate({ ...data, email });
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    setRecaptchaLoading(true);
+    const token = await executeRecaptcha("waitlist_add_details");
+    setRecaptchaLoading(false);
+
+    if (!token) {
+      toast.error("Failed to send information. Please try again later!");
+      return;
+    }
+
+    addDetails.mutate({ ...data, email, token });
   }
 
   return (
@@ -84,7 +101,7 @@ export default function FollowUpForm({
             <DrawerTitle>
               Your email has been added to the waitlist!
             </DrawerTitle>
-            <DrawerDescription>
+            <DrawerDescription className="text-base">
               If you&apos;d like to jump the queue, tell us more about you.
             </DrawerDescription>
           </DrawerHeader>
@@ -100,9 +117,15 @@ export default function FollowUpForm({
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Name *</FormLabel>
+                        <FormLabel className="text-base sm:text-sm">
+                          Name *
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your name" {...field} />
+                          <Input
+                            className="text-base sm:text-sm"
+                            placeholder="Enter your name"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -113,9 +136,15 @@ export default function FollowUpForm({
                     name="company"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Company *</FormLabel>
+                        <FormLabel className="text-base sm:text-sm">
+                          Company *
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your company" {...field} />
+                          <Input
+                            className="text-base sm:text-sm"
+                            placeholder="Enter your company"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -124,14 +153,16 @@ export default function FollowUpForm({
                 </div>
                 <FormField
                   control={form.control}
-                  name="message"
+                  name="problems"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>How can we help?</FormLabel>
+                      <FormLabel className="text-base sm:text-sm">
+                        What are your pain points right now?
+                      </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Tell us your problems, so we can better build the solution."
-                          className="resize-none"
+                          placeholder="Tell us your problems, we're hear to listen!"
+                          className="resize-none text-base sm:text-sm"
                           {...field}
                         />
                       </FormControl>
@@ -139,8 +170,53 @@ export default function FollowUpForm({
                     </FormItem>
                   )}
                 />
-                <Button className="w-full" type="submit">
-                  Submit
+                <FormField
+                  control={form.control}
+                  name="solutions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base sm:text-sm">
+                        What have you done in the past, or what are you doing
+                        now to try solve these pain points?
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="The more we understand about your situation, the better we can build the solution!"
+                          className="resize-none text-base sm:text-sm"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="budget"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base sm:text-sm">
+                        Have you already budgeted for a solution?
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="We'd like to know if you have already invested in finding a solution, or if you're simply exploring your options."
+                          className="resize-none text-base sm:text-sm"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  className="w-full"
+                  type="submit"
+                  disabled={addDetails.isPending || recaptchaLoading}
+                >
+                  {addDetails.isPending || recaptchaLoading
+                    ? "Submitting..."
+                    : "Submit"}
                 </Button>
               </form>
             </Form>

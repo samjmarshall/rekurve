@@ -12,8 +12,8 @@ const openGraph: OpenGraph = {
   images: [
     {
       alt: "rekurve",
-      url: `${env.BASE_URL}/assets/webp/logo-512x512.webp`,
-      secureUrl: `${env.BASE_URL}/assets/webp/logo-512x512.webp`,
+      url: `${env.BASE_URL}/logo-512x512.png`,
+      secureUrl: `${env.BASE_URL}/logo-512x512.png`,
       type: "image/png",
       width: 512,
       height: 512,

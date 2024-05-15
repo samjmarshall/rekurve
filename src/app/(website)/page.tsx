@@ -5,10 +5,22 @@ import Link from "next/link";
 import WaitlistForm from "./_components/waitlist-form";
 import { TRPCReactProvider } from "~/trpc/react";
 import Hero from "./_components/hero";
+import jsonLd from "~/lib/json-ld";
+import { env } from "~/env";
 
 export default function LandingPage() {
   return (
     <main className="flex-1">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            title: env.COMPANY_NAME,
+            description: "Home",
+          }),
+        }}
+      />
+
       <Hero />
 
       {/* Features - Option 1 */}

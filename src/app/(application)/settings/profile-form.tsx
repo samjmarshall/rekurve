@@ -20,7 +20,6 @@ import { useFieldArray, useForm } from "react-hook-form";
 
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import Link from "next/link";
 import { Textarea } from "~/components/ui/textarea";
 import { cn } from "~/lib/utils";
 import { toast } from "sonner";
@@ -78,7 +77,7 @@ export function ProfileForm() {
     toast(
       <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
         <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-      </pre>
+      </pre>,
     );
   }
 
@@ -122,7 +121,10 @@ export function ProfileForm() {
               </Select>
               <FormDescription>
                 You can manage verified email addresses in your{" "}
-                <Link href="/examples/forms">email settings</Link>.
+                <span className="underline underline-offset-2">
+                  email settings
+                </span>
+                {/* <Link href="/examples/forms">email settings</Link>. */}
               </FormDescription>
               <FormMessage />
             </FormItem>

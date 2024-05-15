@@ -13,7 +13,6 @@ import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import Link from "next/link";
 import { Switch } from "~/components/ui/switch";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -51,8 +50,8 @@ export function NotificationsForm() {
     toast(
       <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
         <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-      </pre>
-    )
+      </pre>,
+    );
   }
 
   return (
@@ -206,7 +205,10 @@ export function NotificationsForm() {
                 </FormLabel>
                 <FormDescription>
                   You can manage your mobile notifications in the{" "}
-                  <Link href="/examples/forms">mobile settings</Link> page.
+                  <span className="underline underline-offset-2">
+                    mobile settings
+                  </span>
+                  {/* <Link href="/examples/forms">mobile settings</Link> page. */}
                 </FormDescription>
               </div>
             </FormItem>

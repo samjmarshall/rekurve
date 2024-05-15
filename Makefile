@@ -2,13 +2,13 @@
 install:
 	yarn
 
-start: install
+start: clean install
 	yarn dev
 
 lint:
 	yarn lint
 
-build:
+build: clean install
 	yarn build
 
 clean:

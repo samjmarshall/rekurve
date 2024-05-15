@@ -1,6 +1,7 @@
 import { type Metadata } from "next";
 import Link from "next/link";
 import { env } from "~/env";
+import jsonLd from "~/lib/json-ld";
 import openGraph from "~/lib/open-graph";
 
 export const metadata: Metadata = {
@@ -19,6 +20,17 @@ export const metadata: Metadata = {
 export default function Privacy() {
   return (
     <main className="w-screen flex-1 justify-center">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            urlPath: "/privacy",
+            title: metadata.title as string,
+            description: metadata.description!,
+          }),
+        }}
+      />
+
       <article className="mx-auto max-w-6xl space-y-4 p-6 text-gray-800">
         <h1 className="text-2xl">
           <b>MR SAMUEL MARSHALL PRIVACY POLICY</b>
@@ -40,9 +52,9 @@ export default function Privacy() {
           Personal Information, please contact us at{" "}
           <Link
             className="underline-offset-4 hover:underline"
-            href="mailto:legal@rekurve.io"
+            href={`mailto:${env.CUSTOMER_CONTACT_EMAIL}`}
           >
-            legal@rekurve.io
+            {env.CUSTOMER_CONTACT_EMAIL}
           </Link>
           .
         </p>
@@ -412,9 +424,9 @@ export default function Privacy() {
         <p>
           <Link
             className="underline-offset-4 hover:underline"
-            href="mailto:legal@rekurve.io"
+            href={`mailto:${env.CUSTOMER_CONTACT_EMAIL}`}
           >
-            legal@rekurve.io
+            {env.CUSTOMER_CONTACT_EMAIL}
           </Link>
         </p>
         <h2>

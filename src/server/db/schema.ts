@@ -20,15 +20,14 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `rekurve_${name}`);
 
-export const waitlist = createTable(
-  "waitlist",
-  {
-    email: varchar("email", { length: 256 }).primaryKey(),
-    name: varchar("name", { length: 256 }),
-    company: varchar("company", { length: 256 }),
-    message: text("message"),
-  }
-);
+export const waitlist = createTable("waitlist", {
+  email: varchar("email", { length: 256 }).primaryKey(),
+  name: varchar("name", { length: 256 }),
+  company: varchar("company", { length: 256 }),
+  problems: text("problems"),
+  solutions: text("solutions"),
+  budget: text("budget"),
+});
 
 export const posts = createTable(
   "post",
@@ -45,29 +44,29 @@ export const posts = createTable(
   (example) => ({
     createdByIdIdx: index("createdById_idx").on(example.createdById),
     nameIndex: index("name_idx").on(example.name),
-  })
+  }),
 );
 
 // This is only in place until Drizzle timestamp with precision configured is fixed
-const precisionTimestamp = customType<
-{
+const precisionTimestamp = customType<{
   data: Date;
   driverData: string;
-}
->({
-dataType() {
-  return "timestamp(3)";
-},
-fromDriver(value: string): Date {
-  return new Date(value);
-},
-})
+}>({
+  dataType() {
+    return "timestamp(3)";
+  },
+  fromDriver(value: string): Date {
+    return new Date(value);
+  },
+});
 
 export const users = createTable("user", {
   id: varchar("id", { length: 255 }).notNull().primaryKey(),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: precisionTimestamp("emailVerified").default(sql`CURRENT_TIMESTAMP(3)`),
+  emailVerified: precisionTimestamp("emailVerified").default(
+    sql`CURRENT_TIMESTAMP(3)`,
+  ),
   image: varchar("image", { length: 255 }),
 });
 
@@ -98,7 +97,7 @@ export const accounts = createTable(
       columns: [account.provider, account.providerAccountId],
     }),
     userIdIdx: index("accounts_userId_idx").on(account.userId),
-  })
+  }),
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -116,7 +115,7 @@ export const sessions = createTable(
   },
   (session) => ({
     userIdIdx: index("session_userId_idx").on(session.userId),
-  })
+  }),
 );
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -132,5 +131,5 @@ export const verificationTokens = createTable(
   },
   (vt) => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  })
+  }),
 );

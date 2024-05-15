@@ -2,6 +2,7 @@ import "~/styles/globals.css";
 
 import { Inter as FontSans } from "next/font/google";
 import { Header } from "~/components/header";
+import { type Viewport, type Metadata } from "next";
 import { TRPCReactProvider } from "~/trpc/react";
 import { getServerAuthSession } from "~/server/auth";
 import { redirect } from "next/navigation";
@@ -11,7 +12,13 @@ const fontSans = FontSans({
   variable: "--font-sans",
 });
 
-export const metadata = {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  minimumScale: 1,
+};
+
+export const metadata: Metadata = {
   title: "rekurve",
   description: "Composite construction management system.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],

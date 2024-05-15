@@ -14,10 +14,11 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form"
+import React, { useEffect, useState } from "react"
 
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
-import React from "react"
+import { ScrollArea } from "~/components/ui/scroll-area"
 import { Textarea } from "~/components/ui/textarea"
 import { api } from "~/trpc/react"
 import { executeRecaptcha } from "~/lib/recaptcha-client"
@@ -57,6 +58,19 @@ export default function FollowUpForm({
   setOpen: (open: boolean) => void
 }) {
   const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
+  const [viewportHeight, setViewportHeight] = useState(
+    typeof window !== "undefined" ? window.visualViewport?.height : 0,
+  )
+
+  useEffect(() => {
+    function updateViewportHeight() {
+      setViewportHeight(window.visualViewport?.height || 0)
+    }
+
+    window.visualViewport?.addEventListener("resize", updateViewportHeight)
+    return () =>
+      window.visualViewport?.removeEventListener("resize", updateViewportHeight)
+  }, [])
 
   const addDetails = api.waitlist.addDetails.useMutation({
     onSuccess: () => {
@@ -94,7 +108,18 @@ export default function FollowUpForm({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerContent>
-        <div className="mx-auto w-full max-w-2xl">
+        <ScrollArea
+          className="mx-auto w-full max-w-2xl"
+          style={{
+            height: `${
+              typeof window !== "undefined"
+                ? window.innerHeight > (viewportHeight || 0)
+                  ? 20
+                  : 100
+                : 100
+            }%`,
+          }}
+        >
           <DrawerHeader>
             <DrawerTitle>
               Your email has been added to the waitlist!
@@ -103,6 +128,7 @@ export default function FollowUpForm({
               If you&apos;d like to jump the queue, tell us more about you.
             </DrawerDescription>
           </DrawerHeader>
+
           <DrawerFooter>
             <Form {...form}>
               <form
@@ -190,11 +216,15 @@ export default function FollowUpForm({
                 </Button>
               </form>
             </Form>
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
               Cancel
             </Button>
           </DrawerFooter>
-        </div>
+        </ScrollArea>
       </DrawerContent>
     </Drawer>
   )

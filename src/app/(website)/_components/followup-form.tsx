@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form"
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
@@ -57,7 +57,7 @@ export default function FollowUpForm({
   open: boolean
   setOpen: (open: boolean) => void
 }) {
-  const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
+  const [recaptchaLoading, setRecaptchaLoading] = useState(false)
   const [viewportHeight, setViewportHeight] = useState(
     typeof window !== "undefined" ? window.visualViewport?.height : 0,
   )
@@ -121,6 +121,7 @@ export default function FollowUpForm({
                 ? `${viewportHeight - 40}px`
                 : "100%"
             }`, // This wild shit resolves the input obstruction by mobile device keyboard slide outs. See: https://github.com/shadcn-ui/ui/issues/2849, https://github.com/emilkowalski/vaul/issues/294
+            bottom: `${Math.max(window.innerHeight - (viewportHeight ?? 0), 0)}px`,
           }}
         >
           <DrawerHeader>

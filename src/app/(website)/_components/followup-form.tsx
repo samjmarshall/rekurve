@@ -39,10 +39,10 @@ const FormSchema = z.object({
   company: z
     .string()
     .min(2, {
-      message: "Company name must be at least 2 characters.",
+      message: "Company must be at least 2 characters.",
     })
     .max(256, {
-      message: "Company name must be less than 256 characters.",
+      message: "Company must be less than 256 characters.",
     }),
   problems: z.string().optional(),
   solutions: z.string().optional(),
@@ -114,10 +114,10 @@ export default function FollowUpForm({
             height: `${
               typeof window !== "undefined"
                 ? window.innerHeight > (viewportHeight ?? 0)
-                  ? 20
-                  : 100
-                : 100
-            }%`,
+                  ? viewportHeight
+                  : "100%"
+                : "100%"
+            }`,
           }}
         >
           <DrawerHeader>

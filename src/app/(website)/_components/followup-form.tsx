@@ -114,7 +114,7 @@ export default function FollowUpForm({
             height: `${
               typeof window !== "undefined"
                 ? window.innerHeight > (viewportHeight ?? 0)
-                  ? viewportHeight
+                  ? `${viewportHeight ? viewportHeight - 50 : 100}px`
                   : "100%"
                 : "100%"
             }`,

@@ -64,7 +64,7 @@ export default function FollowUpForm({
 
   useEffect(() => {
     function updateViewportHeight() {
-      setViewportHeight(window.visualViewport?.height || 0)
+      setViewportHeight(window.visualViewport?.height ?? 0)
     }
 
     window.visualViewport?.addEventListener("resize", updateViewportHeight)
@@ -113,7 +113,7 @@ export default function FollowUpForm({
           style={{
             height: `${
               typeof window !== "undefined"
-                ? window.innerHeight > (viewportHeight || 0)
+                ? window.innerHeight > (viewportHeight ?? 0)
                   ? 20
                   : 100
                 : 100

@@ -118,7 +118,7 @@ export default function FollowUpForm({
               typeof window !== "undefined" &&
               viewportHeight &&
               window.innerHeight > viewportHeight
-                ? `${viewportHeight - 24}px`
+                ? `${viewportHeight - 100}px`
                 : "100%"
             }`, // This wild shit resolves the input obstruction by mobile device keyboard slide outs. See: https://github.com/shadcn-ui/ui/issues/2849, https://github.com/emilkowalski/vaul/issues/294
           }}

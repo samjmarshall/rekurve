@@ -53,7 +53,7 @@ const DrawerContent = React.forwardRef<
         Wrapping {children} in <div> with z-index: 50 resolves mobile webkit (iphone) issue with <Form> inside <Drawer>
         See: https://github.com/shadcn-ui/ui/issues/2247
       */}
-      <div className="z-50">{children}</div>
+      <div className="z-60">{children}</div>
     </DrawerPrimitive.Content>
   </DrawerPortal>
 ))

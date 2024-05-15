@@ -1,10 +1,10 @@
-import { type Metadata } from "next";
-import { env } from "~/env";
+import { type Metadata } from "next"
+import { env } from "~/env"
 
 interface JsonLdParams extends Metadata {
-  title: string;
-  description: string;
-  urlPath?: string;
+  title: string
+  description: string
+  urlPath?: string
 }
 
 const jsonLd = ({ urlPath, title, description }: JsonLdParams) =>
@@ -66,6 +66,6 @@ const jsonLd = ({ urlPath, title, description }: JsonLdParams) =>
         ],
       },
     ],
-  });
+  })
 
-export default jsonLd;
+export default jsonLd

@@ -1,9 +1,9 @@
-import { type MetadataRoute } from "next";
+import { type MetadataRoute } from "next"
 
-import { env } from "~/env";
+import { env } from "~/env"
 
 export default function robots(): MetadataRoute.Robots {
-  const allowRobots = env.ROBOTS_TXT === "Allow";
+  const allowRobots = env.ROBOTS_TXT === "Allow"
   return {
     rules: {
       userAgent: "*",
@@ -11,5 +11,5 @@ export default function robots(): MetadataRoute.Robots {
       disallow: allowRobots ? undefined : "/",
     },
     sitemap: `${env.BASE_URL}/sitemap.xml`,
-  };
+  }
 }

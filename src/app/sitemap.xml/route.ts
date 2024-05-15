@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
-import { env } from "~/env";
+import { NextResponse } from "next/server"
+import { env } from "~/env"
 
 interface Location {
-  loc: string;
-  lastmod?: unknown;
+  loc: string
+  lastmod?: unknown
 }
 
 export function GET(): NextResponse {
-  const locations: Location[] = [{ loc: new URL(env.BASE_URL).toString() }];
+  const locations: Location[] = [{ loc: new URL(env.BASE_URL).toString() }]
 
   return new NextResponse(
     `<?xml version="1.0" encoding="UTF-8"?>
@@ -32,5 +32,5 @@ export function GET(): NextResponse {
         "Content-Type": "application/xml; charset=utf-8",
       },
     },
-  );
+  )
 }

@@ -1,22 +1,22 @@
-import "~/styles/globals.css";
+import "~/styles/globals.css"
 
-import { type Metadata, type Viewport } from "next";
+import { type Metadata, type Viewport } from "next"
 
-import { Inter as FontSans } from "next/font/google";
-import WebsiteFooter from "./_components/footer";
-import WebsiteHeader from "./_components/header";
-import openGraph from "~/lib/open-graph";
+import { Inter as FontSans } from "next/font/google"
+import WebsiteFooter from "./_components/footer"
+import WebsiteHeader from "./_components/header"
+import openGraph from "~/lib/open-graph"
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
-});
+})
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   minimumScale: 1,
-};
+}
 
 export const metadata: Metadata = {
   title: {
@@ -28,12 +28,12 @@ export const metadata: Metadata = {
   publisher: "rekurve",
   openGraph,
   icons: [{ rel: "icon", url: "/favicon.ico" }],
-};
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="en">
@@ -45,5 +45,5 @@ export default function RootLayout({
         </div>
       </body>
     </html>
-  );
+  )
 }

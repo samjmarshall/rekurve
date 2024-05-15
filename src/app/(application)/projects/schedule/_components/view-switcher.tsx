@@ -1,10 +1,10 @@
-import { Button } from "~/components/ui/button";
-import React from "react";
-import { ViewMode } from "gantt-task-react";
+import { Button } from "~/components/ui/button"
+import React from "react"
+import { ViewMode } from "gantt-task-react"
 
 type ViewSwitcherProps = {
-  onViewModeChange: (viewMode: ViewMode) => void;
-};
+  onViewModeChange: (viewMode: ViewMode) => void
+}
 export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
   onViewModeChange,
 }) => {
@@ -22,5 +22,5 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
       <Button onClick={() => onViewModeChange(ViewMode.Month)}>Month</Button>
       <Button onClick={() => onViewModeChange(ViewMode.Year)}>Year</Button>
     </div>
-  );
-};
+  )
+}

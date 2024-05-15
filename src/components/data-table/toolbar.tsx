@@ -1,22 +1,22 @@
-"use client";
+"use client"
 
-import { priorities, statuses } from "~/server/data/data";
+import { priorities, statuses } from "~/server/data/data"
 
-import { Button } from "~/components/ui/button";
-import { Cross2Icon } from "@radix-ui/react-icons";
-import { DataTableFacetedFilter } from "./faceted-filter";
-import { DataTableViewOptions } from "./view-options";
-import { Input } from "~/components/ui/input";
-import { type Table } from "@tanstack/react-table";
+import { Button } from "~/components/ui/button"
+import { Cross2Icon } from "@radix-ui/react-icons"
+import { DataTableFacetedFilter } from "./faceted-filter"
+import { DataTableViewOptions } from "./view-options"
+import { Input } from "~/components/ui/input"
+import { type Table } from "@tanstack/react-table"
 
 interface DataTableToolbarProps<TData> {
-  table: Table<TData>;
+  table: Table<TData>
 }
 
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0;
+  const isFiltered = table.getState().columnFilters.length > 0
 
   return (
     <div className="flex items-center justify-between">
@@ -56,5 +56,5 @@ export function DataTableToolbar<TData>({
       </div>
       <DataTableViewOptions table={table} />
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import {
   Table,
   TableBody,
@@ -6,12 +6,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table";
+} from "~/components/ui/table"
 
-import { Button } from "~/components/ui/button";
-import Image from "next/image";
-import Link from "next/link";
-import { ScrollArea } from "~/components/ui/scroll-area";
+import { Button } from "~/components/ui/button"
+import Image from "next/image"
+import Link from "next/link"
+import { ScrollArea } from "~/components/ui/scroll-area"
 
 export default function Projects() {
   return (
@@ -204,5 +204,5 @@ export default function Projects() {
         </div>
       </div>
     </div>
-  );
+  )
 }

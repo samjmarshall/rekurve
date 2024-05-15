@@ -1,18 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import { type JSX, type SVGProps } from "react";
+} from "~/components/ui/dropdown-menu"
+import { type JSX, type SVGProps } from "react"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select";
+} from "~/components/ui/select"
 import {
   Table,
   TableBody,
@@ -20,12 +20,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table";
+} from "~/components/ui/table"
 
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import { Checkbox } from "~/components/ui/checkbox";
-import { MaterialFormDrawer } from "./_components/forms";
+import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
+import { Checkbox } from "~/components/ui/checkbox"
+import { MaterialFormDrawer } from "./_components/forms"
 
 export default function Estimate() {
   return (
@@ -166,7 +166,7 @@ export default function Estimate() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
 
 function BarChartIcon(
@@ -189,7 +189,7 @@ function BarChartIcon(
       <line x1="18" x2="18" y1="20" y2="4" />
       <line x1="6" x2="6" y1="20" y2="16" />
     </svg>
-  );
+  )
 }
 
 function CalculatorIcon(
@@ -219,7 +219,7 @@ function CalculatorIcon(
       <path d="M12 18h.01" />
       <path d="M8 18h.01" />
     </svg>
-  );
+  )
 }
 
 function CurrencyIcon(
@@ -244,7 +244,7 @@ function CurrencyIcon(
       <line x1="3" x2="6" y1="21" y2="18" />
       <line x1="21" x2="18" y1="21" y2="18" />
     </svg>
-  );
+  )
 }
 
 function TagIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
@@ -264,5 +264,5 @@ function TagIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
       <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z" />
       <path d="M7 7h.01" />
     </svg>
-  );
+  )
 }

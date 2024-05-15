@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { Button, buttonVariants } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button"
 import {
   Form,
   FormControl,
@@ -9,15 +9,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "~/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+} from "~/components/ui/form"
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
 
-import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { cn } from "~/lib/utils";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { ChevronDownIcon } from "@radix-ui/react-icons"
+import { cn } from "~/lib/utils"
+import { toast } from "sonner"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const appearanceFormSchema = z.object({
   theme: z.enum(["light", "dark"], {
@@ -27,26 +27,26 @@ const appearanceFormSchema = z.object({
     invalid_type_error: "Select a font",
     required_error: "Please select a font.",
   }),
-});
+})
 
-type AppearanceFormValues = z.infer<typeof appearanceFormSchema>;
+type AppearanceFormValues = z.infer<typeof appearanceFormSchema>
 
 // This can come from your database or API.
 const defaultValues: Partial<AppearanceFormValues> = {
   theme: "light",
-};
+}
 
 export function AppearanceForm() {
   const form = useForm<AppearanceFormValues>({
     resolver: zodResolver(appearanceFormSchema),
     defaultValues,
-  });
+  })
 
   function onSubmit(data: AppearanceFormValues) {
     toast(
       <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
         <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-      </pre>
+      </pre>,
     )
   }
 
@@ -157,5 +157,5 @@ export function AppearanceForm() {
         <Button type="submit">Update preferences</Button>
       </form>
     </Form>
-  );
+  )
 }

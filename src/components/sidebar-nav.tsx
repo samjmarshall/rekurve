@@ -1,20 +1,20 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import React from "react";
-import { buttonVariants } from "~/components/ui/button";
-import { cn } from "~/lib/utils";
-import { usePathname } from "next/navigation";
+import Link from "next/link"
+import React from "react"
+import { buttonVariants } from "~/components/ui/button"
+import { cn } from "~/lib/utils"
+import { usePathname } from "next/navigation"
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
-    href?: unknown;
-    title: string;
-  }[];
+    href?: unknown
+    title: string
+  }[]
 }
 
 export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
-  const pathname = usePathname();
+  const pathname = usePathname()
 
   return (
     <nav
@@ -42,5 +42,5 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
         ) : null,
       )}
     </nav>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "next/link"
 
 export default function WebsiteHeader() {
   return (
@@ -45,5 +45,5 @@ export default function WebsiteHeader() {
         </Link>
       </nav>
     </header>
-  );
+  )
 }

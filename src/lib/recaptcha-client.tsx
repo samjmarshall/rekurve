@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import Script from "next/script";
-import { env } from "~/env";
+import Script from "next/script"
+import { env } from "~/env"
 
 declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    grecaptcha: any;
+    grecaptcha: any
   }
 }
 
@@ -20,20 +20,20 @@ export const executeRecaptcha = async (
         window.grecaptcha.enterprise
           .execute(env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, { action })
           .then((token: string) => {
-            resolve(token);
+            resolve(token)
           })
           .catch(() => {
-            resolve(null);
-          });
-      });
+            resolve(null)
+          })
+      })
     } else {
-      console.error("window.grecaptcha.enterprise => undefined");
-      resolve(null);
+      console.error("window.grecaptcha.enterprise => undefined")
+      resolve(null)
     }
-  });
+  })
 
 export const loadRecaptcha = () => (
   <Script
     src={`https://www.google.com/recaptcha/enterprise.js?render=${env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
   />
-);
+)

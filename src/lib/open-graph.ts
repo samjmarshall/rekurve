@@ -1,5 +1,5 @@
-import { type OpenGraph } from "next/dist/lib/metadata/types/opengraph-types";
-import { env } from "~/env";
+import { type OpenGraph } from "next/dist/lib/metadata/types/opengraph-types"
+import { env } from "~/env"
 
 const openGraph: OpenGraph = {
   type: "website",
@@ -19,6 +19,6 @@ const openGraph: OpenGraph = {
       height: 512,
     },
   ],
-};
+}
 
-export default openGraph;
+export default openGraph

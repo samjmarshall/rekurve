@@ -1,5 +1,5 @@
-import { ScrollArea } from "~/components/ui/scroll-area";
-import { SidebarNav } from "~/components/sidebar-nav";
+import { ScrollArea } from "~/components/ui/scroll-area"
+import { SidebarNav } from "~/components/sidebar-nav"
 
 const sidebarNavItems = [
   {
@@ -45,12 +45,12 @@ const sidebarNavItems = [
   {
     title: "Files",
   },
-];
+]
 
 export default function ProjectsLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <div className="flex h-full flex-col lg:flex-row">
@@ -61,5 +61,5 @@ export default function ProjectsLayout({
         {children}
       </ScrollArea>
     </div>
-  );
+  )
 }

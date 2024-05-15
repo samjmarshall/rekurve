@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   Form,
@@ -6,69 +6,69 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from "~/components/ui/form";
-import { executeRecaptcha, loadRecaptcha } from "~/lib/recaptcha-client";
+} from "~/components/ui/form"
+import { executeRecaptcha, loadRecaptcha } from "~/lib/recaptcha-client"
 
-import { Button } from "~/components/ui/button";
-import FollowUpForm from "./followup-form";
-import { Input } from "~/components/ui/input";
-import React from "react";
-import TermsAndConditions from "./terms-and-conditions";
-import { Toaster } from "~/components/ui/sonner";
-import { api } from "~/trpc/react";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { useInView } from "react-intersection-observer";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "~/components/ui/button"
+import FollowUpForm from "./followup-form"
+import { Input } from "~/components/ui/input"
+import React from "react"
+import TermsAndConditions from "./terms-and-conditions"
+import { Toaster } from "~/components/ui/sonner"
+import { api } from "~/trpc/react"
+import { toast } from "sonner"
+import { useForm } from "react-hook-form"
+import { useInView } from "react-intersection-observer"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const FormSchema = z.object({
   email: z.string().email({
     message: "Invalid email address.",
   }),
-});
+})
 
 export default function WaitlistForm() {
-  const [open, setOpen] = React.useState(false);
-  const [email, setEmail] = React.useState("");
-  const [recaptchaLoading, setRecaptchaLoading] = React.useState(false);
+  const [open, setOpen] = React.useState(false)
+  const [email, setEmail] = React.useState("")
+  const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
   const { ref, inView } = useInView({
     /* Optional options */
     triggerOnce: true,
     threshold: 0,
     fallbackInView: true,
-  });
+  })
   const addEmail = api.waitlist.addEmail.useMutation({
     onSuccess: () => {
-      setOpen(true);
+      setOpen(true)
     },
     onError: (error) => {
-      toast.error("Failed to add email to waitlist. Please try again later!");
-      console.log(error.message);
+      toast.error("Failed to add email to waitlist. Please try again later!")
+      console.log(error.message)
     },
-  });
+  })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       email: "",
     },
-  });
+  })
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    setEmail(data.email);
+    setEmail(data.email)
 
-    setRecaptchaLoading(true);
-    const token = await executeRecaptcha("waitlist_add_email");
-    setRecaptchaLoading(false);
+    setRecaptchaLoading(true)
+    const token = await executeRecaptcha("waitlist_add_email")
+    setRecaptchaLoading(false)
 
     if (!token) {
-      toast.error("Failed to add email to waitlist. Please try again later!");
-      toast.error(JSON.stringify(token));
-      return;
+      toast.error("Failed to add email to waitlist. Please try again later!")
+      toast.error(JSON.stringify(token))
+      return
     }
 
-    addEmail.mutate({ ...data, token });
+    addEmail.mutate({ ...data, token })
   }
 
   return (
@@ -108,5 +108,5 @@ export default function WaitlistForm() {
       <FollowUpForm email={email} open={open} setOpen={setOpen} />
       <Toaster />
     </div>
-  );
+  )
 }

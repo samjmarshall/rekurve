@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   Form,
@@ -8,16 +8,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "~/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+} from "~/components/ui/form"
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
 
-import { Button } from "~/components/ui/button";
-import { Checkbox } from "~/components/ui/checkbox";
-import { Switch } from "~/components/ui/switch";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "~/components/ui/button"
+import { Checkbox } from "~/components/ui/checkbox"
+import { Switch } from "~/components/ui/switch"
+import { toast } from "sonner"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const notificationsFormSchema = z.object({
   type: z.enum(["all", "mentions", "none"], {
@@ -28,9 +28,9 @@ const notificationsFormSchema = z.object({
   social_emails: z.boolean().default(false).optional(),
   marketing_emails: z.boolean().default(false).optional(),
   security_emails: z.boolean(),
-});
+})
 
-type NotificationsFormValues = z.infer<typeof notificationsFormSchema>;
+type NotificationsFormValues = z.infer<typeof notificationsFormSchema>
 
 // This can come from your database or API.
 const defaultValues: Partial<NotificationsFormValues> = {
@@ -38,20 +38,20 @@ const defaultValues: Partial<NotificationsFormValues> = {
   marketing_emails: false,
   social_emails: true,
   security_emails: true,
-};
+}
 
 export function NotificationsForm() {
   const form = useForm<NotificationsFormValues>({
     resolver: zodResolver(notificationsFormSchema),
     defaultValues,
-  });
+  })
 
   function onSubmit(data: NotificationsFormValues) {
     toast(
       <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
         <code className="text-white">{JSON.stringify(data, null, 2)}</code>
       </pre>,
-    );
+    )
   }
 
   return (
@@ -217,5 +217,5 @@ export function NotificationsForm() {
         <Button type="submit">Update notifications</Button>
       </form>
     </Form>
-  );
+  )
 }

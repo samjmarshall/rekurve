@@ -1,11 +1,11 @@
-import { Button, buttonVariants } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button"
 
-import Link from "next/link";
-import { UserNav } from "./user-nav";
-import { getServerAuthSession } from "~/server/auth";
+import Link from "next/link"
+import { UserNav } from "./user-nav"
+import { getServerAuthSession } from "~/server/auth"
 
 export async function Header() {
-  const session = await getServerAuthSession();
+  const session = await getServerAuthSession()
 
   return (
     <header>
@@ -40,5 +40,5 @@ export async function Header() {
         </div>
       </nav>
     </header>
-  );
+  )
 }

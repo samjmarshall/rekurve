@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   Form,
@@ -8,23 +8,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "~/components/ui/form";
+} from "~/components/ui/form"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select";
-import { useFieldArray, useForm } from "react-hook-form";
+} from "~/components/ui/select"
+import { useFieldArray, useForm } from "react-hook-form"
 
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Textarea } from "~/components/ui/textarea";
-import { cn } from "~/lib/utils";
-import { toast } from "sonner";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import { Textarea } from "~/components/ui/textarea"
+import { cn } from "~/lib/utils"
+import { toast } from "sonner"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const profileFormSchema = z.object({
   username: z
@@ -48,9 +48,9 @@ const profileFormSchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type ProfileFormValues = z.infer<typeof profileFormSchema>
 
 // This can come from your database or API.
 const defaultValues: Partial<ProfileFormValues> = {
@@ -59,26 +59,26 @@ const defaultValues: Partial<ProfileFormValues> = {
     { value: "https://shadcn.com" },
     { value: "http://twitter.com/shadcn" },
   ],
-};
+}
 
 export function ProfileForm() {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues,
     mode: "onChange",
-  });
+  })
 
   const { fields, append } = useFieldArray({
     name: "urls",
     control: form.control,
-  });
+  })
 
   function onSubmit(data: ProfileFormValues) {
     toast(
       <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
         <code className="text-white">{JSON.stringify(data, null, 2)}</code>
       </pre>,
-    );
+    )
   }
 
   return (
@@ -186,5 +186,5 @@ export function ProfileForm() {
         <Button type="submit">Update profile</Button>
       </form>
     </Form>
-  );
+  )
 }

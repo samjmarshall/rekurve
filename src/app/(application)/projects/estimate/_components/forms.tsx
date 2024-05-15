@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   Sheet,
@@ -7,20 +7,20 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "~/components/ui/sheet";
+} from "~/components/ui/sheet"
 
-import { type JSX, type SVGProps } from "react";
+import { type JSX, type SVGProps } from "react"
 import {
   Select,
   SelectContent,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select";
+} from "~/components/ui/select"
 
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Button } from "~/components/ui/button";
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { Button } from "~/components/ui/button"
 import {
   Form,
   FormControl,
@@ -29,17 +29,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Textarea } from "~/components/ui/textarea";
-import Link from "next/link";
-import { Switch } from "~/components/ui/switch";
-import { toast } from "sonner";
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
+import { Textarea } from "~/components/ui/textarea"
+import Link from "next/link"
+import { Switch } from "~/components/ui/switch"
+import { toast } from "sonner"
 
 const materialFormSchema = z.object({
   name: z.string().min(2).max(80),
-});
+})
 
 export function MaterialFormDrawer() {
   // 1. Define your form.
@@ -48,7 +48,7 @@ export function MaterialFormDrawer() {
     defaultValues: {
       name: "",
     },
-  });
+  })
 
   // 2. Define a submit handler.
   function onSubmit(data: z.infer<typeof materialFormSchema>) {
@@ -56,8 +56,8 @@ export function MaterialFormDrawer() {
     toast(
       <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
         <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-      </pre>
-    );
+      </pre>,
+    )
   }
 
   return (
@@ -228,7 +228,7 @@ export function MaterialFormDrawer() {
         </Form>
       </SheetContent>
     </Sheet>
-  );
+  )
 }
 
 function BriefcaseIcon(
@@ -250,5 +250,5 @@ function BriefcaseIcon(
       <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
       <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
     </svg>
-  );
+  )
 }

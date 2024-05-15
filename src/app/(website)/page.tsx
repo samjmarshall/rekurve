@@ -1,12 +1,12 @@
-import { type JSX, type SVGProps } from "react";
+import { type JSX, type SVGProps } from "react"
 
-import Image from "next/image";
-import Link from "next/link";
-import WaitlistForm from "./_components/waitlist-form";
-import { TRPCReactProvider } from "~/trpc/react";
-import Hero from "./_components/hero";
-import jsonLd from "~/lib/json-ld";
-import { env } from "~/env";
+import Image from "next/image"
+import Link from "next/link"
+import WaitlistForm from "./_components/waitlist-form"
+import { TRPCReactProvider } from "~/trpc/react"
+import Hero from "./_components/hero"
+import jsonLd from "~/lib/json-ld"
+import { env } from "~/env"
 
 export default function LandingPage() {
   return (
@@ -731,7 +731,7 @@ export default function LandingPage() {
         </div>
       </section>
     </main>
-  );
+  )
 }
 
 // function CheckIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
@@ -774,7 +774,7 @@ function CalendarIcon(
       <rect width="18" height="18" x="3" y="4" rx="2" />
       <path d="M3 10h18" />
     </svg>
-  );
+  )
 }
 
 function ClipboardIcon(
@@ -796,7 +796,7 @@ function ClipboardIcon(
       <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
       <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
     </svg>
-  );
+  )
 }
 
 function MergeIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
@@ -817,7 +817,7 @@ function MergeIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
       <path d="M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22" />
       <path d="m20 22-5-5" />
     </svg>
-  );
+  )
 }
 
 function PercentIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
@@ -838,7 +838,7 @@ function PercentIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
       <circle cx="6.5" cy="6.5" r="2.5" />
       <circle cx="17.5" cy="17.5" r="2.5" />
     </svg>
-  );
+  )
 }
 
 function ViewIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
@@ -860,7 +860,7 @@ function ViewIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
       <path d="M21 17v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2" />
       <path d="M21 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2" />
     </svg>
-  );
+  )
 }
 
 function WalletIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
@@ -880,5 +880,5 @@ function WalletIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
       <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
       <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
     </svg>
-  );
+  )
 }

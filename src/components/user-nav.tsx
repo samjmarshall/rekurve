@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,14 +10,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
+} from "~/components/ui/dropdown-menu"
 
-import { Button } from "~/components/ui/button";
-import { type User } from "next-auth";
-import { useRouter } from "next/navigation";
+import { Button } from "~/components/ui/button"
+import { type User } from "next-auth"
+import { useRouter } from "next/navigation"
 
 export function UserNav({ user }: { user: User }) {
-  const router = useRouter();
+  const router = useRouter()
 
   return (
     <DropdownMenu>
@@ -70,5 +70,5 @@ export function UserNav({ user }: { user: User }) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

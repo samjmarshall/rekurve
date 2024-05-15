@@ -1,8 +1,8 @@
-import { type Metadata } from "next";
-import Link from "next/link";
-import { env } from "~/env";
-import jsonLd from "~/lib/json-ld";
-import openGraph from "~/lib/open-graph";
+import { type Metadata } from "next"
+import Link from "next/link"
+import { env } from "~/env"
+import jsonLd from "~/lib/json-ld"
+import openGraph from "~/lib/open-graph"
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
       "By using our services and products, you agree to us collecting, holding, using, and disclosing your Personal Information in accordance with this Policy",
     url: `${env.BASE_URL}/privacy`,
   },
-};
+}
 
 export default function Privacy() {
   return (
@@ -443,5 +443,5 @@ export default function Privacy() {
         </p>
       </article>
     </main>
-  );
+  )
 }

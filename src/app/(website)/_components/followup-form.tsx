@@ -113,6 +113,8 @@ export default function FollowUpForm({
       <DrawerContent>
         <ScrollArea
           className="mx-auto w-full max-w-2xl"
+          // This wild shit below resolves the input obstruction by mobile device keyboards.
+          // See: https://github.com/shadcn-ui/ui/issues/2849, https://github.com/emilkowalski/vaul/issues/294
           style={{
             height: `${
               typeof window !== "undefined" &&
@@ -120,11 +122,8 @@ export default function FollowUpForm({
               window.innerHeight > viewportHeight
                 ? `${viewportHeight - 40}px`
                 : "100%"
-            }`, // This wild shit resolves the input obstruction by mobile device keyboard slide outs. See: https://github.com/shadcn-ui/ui/issues/2849, https://github.com/emilkowalski/vaul/issues/294
-            bottom:
-              typeof window !== "undefined" && viewportHeight
-                ? `${Math.max(window.innerHeight - viewportHeight, 0)}px`
-                : 0,
+            }`,
+            bottom: 0,
           }}
         >
           <DrawerHeader>

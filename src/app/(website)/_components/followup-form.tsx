@@ -145,7 +145,11 @@ export default function FollowUpForm({
                           Name *
                         </FormLabel>
                         <FormControl>
-                          <Input className="text-base sm:text-sm" {...field} />
+                          <Input
+                            className="text-base sm:text-sm"
+                            autoComplete="name"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -160,7 +164,11 @@ export default function FollowUpForm({
                           Company *
                         </FormLabel>
                         <FormControl>
-                          <Input className="text-base sm:text-sm" {...field} />
+                          <Input
+                            className="text-base sm:text-sm"
+                            autoComplete="organization"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

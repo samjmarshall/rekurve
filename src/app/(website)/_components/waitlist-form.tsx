@@ -85,6 +85,7 @@ export default function WaitlistForm() {
                   <Input
                     className="flex-1 text-base sm:text-sm"
                     placeholder="Enter your email"
+                    autoComplete="email"
                     {...field}
                   />
                 </FormControl>

@@ -154,6 +154,7 @@ export default function FollowUpForm({
                       <FormControl>
                         <Textarea
                           className="resize-none text-base sm:text-sm"
+                          placeholder="Tell us your problems, we're listening!"
                           {...field}
                         />
                       </FormControl>
@@ -172,6 +173,7 @@ export default function FollowUpForm({
                       <FormControl>
                         <Textarea
                           className="resize-none text-base sm:text-sm"
+                          placeholder="Help us provide the best solution possible!"
                           {...field}
                         />
                       </FormControl>

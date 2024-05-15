@@ -13,7 +13,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "~/components/ui/drawer"
-import { FormEvent, useState } from "react"
+import { type FormEvent, useState } from "react"
 
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
@@ -52,7 +52,7 @@ export default function FollowUpForm({
 
   function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    submit()
+    void submit()
   }
 
   async function submit() {

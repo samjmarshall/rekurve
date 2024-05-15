@@ -110,8 +110,15 @@ export default function FollowUpForm({
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent>
-        <ScrollArea
+      <DrawerContent
+        style={{
+          bottom:
+            typeof window !== "undefined" && viewportHeight
+              ? `${Math.max(window.innerHeight - viewportHeight, 0)}px`
+              : 0,
+        }}
+      >
+        <div
           className="mx-auto w-full max-w-2xl"
           // This wild shit below resolves the input obstruction by mobile device keyboards.
           // See: https://github.com/shadcn-ui/ui/issues/2849, https://github.com/emilkowalski/vaul/issues/294
@@ -123,7 +130,6 @@ export default function FollowUpForm({
                 ? `${viewportHeight - 40}px` // 40px offset so the little grab bar thing at the top of the drawer is still visible
                 : "100%"
             }`,
-            bottom: 0,
           }}
         >
           <DrawerHeader>
@@ -242,7 +248,7 @@ export default function FollowUpForm({
               Cancel
             </Button>
           </DrawerFooter>
-        </ScrollArea>
+        </div>
       </DrawerContent>
     </Drawer>
   )

@@ -5,7 +5,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-} from "~/components/ui/drawer";
+} from "~/components/ui/drawer"
 import {
   Form,
   FormControl,
@@ -13,18 +13,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "~/components/ui/form";
+} from "~/components/ui/form"
 
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import React from "react";
-import { Textarea } from "~/components/ui/textarea";
-import { api } from "~/trpc/react";
-import { executeRecaptcha } from "~/lib/recaptcha-client";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import React from "react"
+import { Textarea } from "~/components/ui/textarea"
+import { api } from "~/trpc/react"
+import { executeRecaptcha } from "~/lib/recaptcha-client"
+import { toast } from "sonner"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const FormSchema = z.object({
   name: z
@@ -45,28 +45,28 @@ const FormSchema = z.object({
     }),
   problems: z.string().optional(),
   solutions: z.string().optional(),
-});
+})
 
 export default function FollowUpForm({
   email,
   open,
   setOpen,
 }: {
-  email: string;
-  open: boolean;
-  setOpen: (open: boolean) => void;
+  email: string
+  open: boolean
+  setOpen: (open: boolean) => void
 }) {
-  const [recaptchaLoading, setRecaptchaLoading] = React.useState(false);
+  const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
 
   const addDetails = api.waitlist.addDetails.useMutation({
     onSuccess: () => {
-      setOpen(false);
-      toast.success(`Your information has been submitted!`);
+      setOpen(false)
+      toast.success(`Your information has been submitted!`)
     },
     onError: () => {
-      toast.error("Failed to send information. Please try again!");
+      toast.error("Failed to send information. Please try again!")
     },
-  });
+  })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -76,19 +76,19 @@ export default function FollowUpForm({
       problems: "",
       solutions: "",
     },
-  });
+  })
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    setRecaptchaLoading(true);
-    const token = await executeRecaptcha("waitlist_add_details");
-    setRecaptchaLoading(false);
+    setRecaptchaLoading(true)
+    const token = await executeRecaptcha("waitlist_add_details")
+    setRecaptchaLoading(false)
 
     if (!token) {
-      toast.error("Failed to send information. Please try again later!");
-      return;
+      toast.error("Failed to send information. Please try again later!")
+      return
     }
 
-    addDetails.mutate({ ...data, email, token });
+    addDetails.mutate({ ...data, email, token })
   }
 
   return (
@@ -119,11 +119,7 @@ export default function FollowUpForm({
                           Name *
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            className="text-base sm:text-sm"
-                            onPointerDown={(e) => e.stopPropagation()}
-                            {...field}
-                          />
+                          <Input className="text-base sm:text-sm" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -138,11 +134,7 @@ export default function FollowUpForm({
                           Company *
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            className="text-base sm:text-sm"
-                            onPointerDown={(e) => e.stopPropagation()}
-                            {...field}
-                          />
+                          <Input className="text-base sm:text-sm" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -161,7 +153,6 @@ export default function FollowUpForm({
                         <Textarea
                           className="resize-none text-base sm:text-sm"
                           placeholder="Tell us your problems, we're listening!"
-                          onPointerDown={(e) => e.stopPropagation()}
                           {...field}
                         />
                       </FormControl>
@@ -181,7 +172,6 @@ export default function FollowUpForm({
                         <Textarea
                           className="resize-none text-base sm:text-sm"
                           placeholder="Help us provide the best solution possible!"
-                          onPointerDown={(e) => e.stopPropagation()}
                           {...field}
                         />
                       </FormControl>
@@ -207,5 +197,5 @@ export default function FollowUpForm({
         </div>
       </DrawerContent>
     </Drawer>
-  );
+  )
 }

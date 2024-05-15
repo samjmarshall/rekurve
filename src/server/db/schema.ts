@@ -26,7 +26,6 @@ export const waitlist = createTable("waitlist", {
   company: varchar("company", { length: 256 }),
   problems: text("problems"),
   solutions: text("solutions"),
-  budget: text("budget"),
 });
 
 export const posts = createTable(

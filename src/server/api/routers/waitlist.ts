@@ -49,7 +49,6 @@ export const waitlistRouter = createTRPCRouter({
         company: z.string().min(2).max(256),
         problems: z.string().optional(),
         solutions: z.string().optional(),
-        budget: z.string().optional(),
         token: z.string(),
       }),
     )
@@ -68,7 +67,6 @@ export const waitlistRouter = createTRPCRouter({
             company: input.company,
             problems: input.problems,
             solutions: input.solutions,
-            budget: input.budget,
           })
           .where(eq(waitlist.email, input.email.toLowerCase().trim()));
       } catch (error: unknown) {

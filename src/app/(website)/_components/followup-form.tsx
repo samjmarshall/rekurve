@@ -45,7 +45,6 @@ const FormSchema = z.object({
     }),
   problems: z.string().optional(),
   solutions: z.string().optional(),
-  budget: z.string().optional(),
 });
 
 export default function FollowUpForm({
@@ -76,7 +75,6 @@ export default function FollowUpForm({
       company: "",
       problems: "",
       solutions: "",
-      budget: "",
     },
   });
 

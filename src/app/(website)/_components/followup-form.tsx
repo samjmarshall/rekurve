@@ -62,6 +62,9 @@ export default function FollowUpForm({
     typeof window !== "undefined" ? window.visualViewport?.height : 0,
   )
 
+  // Mobile devices have a visual viewport that changes when the keyboard is opened
+  // This effect listens to the visual viewport resize event and updates the viewport height for the Drawer <ScrollArea />
+  // See: https://github.com/shadcn-ui/ui/issues/2849, https://github.com/emilkowalski/vaul/issues/294
   useEffect(() => {
     function updateViewportHeight() {
       setViewportHeight(window.visualViewport?.height ?? 0)
@@ -115,9 +118,9 @@ export default function FollowUpForm({
               typeof window !== "undefined" &&
               viewportHeight &&
               window.innerHeight > viewportHeight
-                ? `${viewportHeight}px`
+                ? `${viewportHeight - 24}px`
                 : "100%"
-            }`,
+            }`, // This wild shit resolves the input obstruction by mobile device keyboard slide outs. See: https://github.com/shadcn-ui/ui/issues/2849, https://github.com/emilkowalski/vaul/issues/294
           }}
         >
           <DrawerHeader>

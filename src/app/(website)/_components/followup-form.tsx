@@ -112,10 +112,10 @@ export default function FollowUpForm({
           className="mx-auto w-full max-w-2xl"
           style={{
             height: `${
-              typeof window !== "undefined"
-                ? window.innerHeight > (viewportHeight ?? 0)
-                  ? `${viewportHeight ? viewportHeight - 50 : 100}px`
-                  : "100%"
+              typeof window !== "undefined" &&
+              viewportHeight &&
+              window.innerHeight > viewportHeight
+                ? `${viewportHeight}px`
                 : "100%"
             }`,
           }}

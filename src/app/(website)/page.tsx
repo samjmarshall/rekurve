@@ -2,7 +2,7 @@ import { type JSX, type SVGProps } from "react"
 
 import Image from "next/image"
 import Link from "next/link"
-import WaitlistForm from "./_components/waitlist-form"
+import Waitlist from "./_components/waitlist"
 import { TRPCReactProvider } from "~/trpc/react"
 import Hero from "./_components/hero"
 import jsonLd from "~/lib/json-ld"
@@ -726,7 +726,7 @@ export default function LandingPage() {
           </div>
 
           <TRPCReactProvider>
-            <WaitlistForm />
+            <Waitlist />
           </TRPCReactProvider>
         </div>
       </section>

@@ -10,8 +10,8 @@ import {
 import { executeRecaptcha, loadRecaptcha } from "~/lib/recaptcha-client"
 
 import { Button } from "~/components/ui/button"
-import FollowUpForm from "./followup-form"
 import { Input } from "~/components/ui/input"
+import LeadFunnel from "./lead-funnel"
 import React from "react"
 import TermsAndConditions from "./terms-and-conditions"
 import { Toaster } from "~/components/ui/sonner"
@@ -28,16 +28,18 @@ const FormSchema = z.object({
   }),
 })
 
-export default function WaitlistForm() {
+export default function Waitlist() {
   const [open, setOpen] = React.useState(false)
   const [email, setEmail] = React.useState("")
   const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
+
   const { ref, inView } = useInView({
     /* Optional options */
     triggerOnce: true,
     threshold: 0,
     fallbackInView: true,
   })
+
   const addEmail = api.waitlist.addEmail.useMutation({
     onSuccess: () => {
       setOpen(true)
@@ -106,7 +108,7 @@ export default function WaitlistForm() {
           </p>
         </form>
       </Form>
-      <FollowUpForm email={email} open={open} setOpen={setOpen} />
+      <LeadFunnel email={email} open={open} setOpen={setOpen} />
       <Toaster />
     </div>
   )

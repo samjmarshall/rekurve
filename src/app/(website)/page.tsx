@@ -383,9 +383,6 @@ export default function LandingPage() {
             />
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">
-                  Testimonial
-                </div>
                 <blockquote className="text-lg font-semibold leading-snug lg:text-xl lg:leading-normal xl:text-2xl">
                   &quot;Using rekurve allowed us to double our business. We can
                   finally see exactly what&apos;s happening in our business, and
@@ -395,7 +392,7 @@ export default function LandingPage() {
                 </blockquote>
                 <div>
                   <div className="font-semibold">Ben Makim</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
                     Owner, Makim Bulders
                   </div>
                 </div>

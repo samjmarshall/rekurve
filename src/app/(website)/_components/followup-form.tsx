@@ -185,14 +185,6 @@ export default function FollowUpForm({
               ? "Submitting..."
               : "Submit"}
           </Button>
-          <Button
-            className="w-full"
-            type="button"
-            variant="outline"
-            onClick={() => setOpen(false)}
-          >
-            Cancel
-          </Button>
         </form>
       </Form>
     )

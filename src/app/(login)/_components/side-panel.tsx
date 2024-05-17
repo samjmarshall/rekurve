@@ -10,12 +10,14 @@ export function SidePanel() {
 
   return (
     <div className="relative hidden h-screen flex-col overflow-hidden bg-muted p-10 text-white dark:border-r lg:flex">
+      <div className="absolute inset-0 bg-black" />
       <Image
         src="/assets/login-background.webp"
         width={width / 2}
         height={height}
         alt="background image"
-        className="absolute inset-0"
+        className="absolute inset-0 opacity-0 transition-opacity duration-300 ease-linear"
+        onLoad={(e) => e.target.classList.remove("opacity-0")}
         priority
       />
 

@@ -3,6 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Logo } from "~/components/logo"
+import { type SyntheticEvent } from "react"
 import { useWindowSize } from "~/hooks/use-window-size"
 
 export function SidePanel() {
@@ -17,7 +18,9 @@ export function SidePanel() {
         height={height}
         alt="background image"
         className="absolute inset-0 opacity-0 transition-opacity duration-300 ease-linear"
-        onLoad={(e) => e.target.classList.remove("opacity-0")}
+        onLoad={(e: SyntheticEvent) =>
+          (e.target as HTMLImageElement).classList.remove("opacity-0")
+        }
         priority
       />
 

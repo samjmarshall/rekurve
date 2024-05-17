@@ -42,8 +42,6 @@ export const env = createEnv({
     RECAPTCHA_SECRET_KEY: z.string(),
     RECAPTCHA_THRESHOLD: z.number().default(0.5),
     ROBOTS_TXT: z.string().default("Disallow"),
-    WORKOS_API_KEY: z.string(),
-    WORKOS_CLIENT_ID: z.string(),
   },
 
   /**
@@ -75,8 +73,6 @@ export const env = createEnv({
     RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
     RECAPTCHA_THRESHOLD: process.env.RECAPTCHA_THRESHOLD,
     ROBOTS_TXT: process.env.ROBOTS_TXT,
-    WORKOS_API_KEY: process.env.WORKOS_API_KEY,
-    WORKOS_CLIENT_ID: process.env.WORKOS_CLIENT_ID,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

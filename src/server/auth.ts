@@ -7,7 +7,6 @@ import {
 } from "next-auth"
 import { type Adapter } from "next-auth/adapters"
 import GoogleProvider from "next-auth/providers/google"
-import WorkOSProvider from "next-auth/providers/workos"
 
 import { env } from "~/env"
 import { db } from "~/server/db"
@@ -54,13 +53,6 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
-    }),
-    WorkOSProvider({
-      clientId: env.WORKOS_CLIENT_ID,
-      clientSecret: env.WORKOS_API_KEY,
-      client: {
-        token_endpoint_auth_method: "client_secret_post",
-      },
     }),
   ],
   pages: {

@@ -1,7 +1,6 @@
 import { type Metadata } from "next"
 import { Separator } from "~/components/ui/separator"
 import { SidebarNav } from "~/components/sidebar-nav"
-import { ScrollArea } from "~/components/ui/scroll-area"
 
 export const metadata: Metadata = {
   title: "Forms",

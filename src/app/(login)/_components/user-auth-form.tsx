@@ -1,6 +1,4 @@
-"use client"
-
-import { ChangeEvent, HTMLAttributes, SyntheticEvent } from "react"
+import { type HTMLAttributes, type SyntheticEvent } from "react"
 
 import { Button } from "~/components/ui/button"
 import { Icons } from "~/components/icons"

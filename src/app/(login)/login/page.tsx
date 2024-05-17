@@ -38,13 +38,13 @@ export default function Login() {
           <UserAuthForm isLoading={isLoading} googleSubmit={googleLogin} />
           <p className="px-8 text-center text-sm text-muted-foreground">
             By continuing, you agree to our{" "}
-            <Link
+            {/* <Link
               href="/terms"
               className="underline underline-offset-4 hover:text-primary"
             >
               Terms of Service
             </Link>{" "}
-            and{" "}
+            and{" "} */}
             <Link
               href="/privacy"
               className="underline underline-offset-4 hover:text-primary"

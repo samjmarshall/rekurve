@@ -2,7 +2,7 @@ import { type JSX, type SVGProps } from "react"
 
 import Image from "next/image"
 import Link from "next/link"
-import Waitlist from "./_components/waitlist"
+import { Waitlist } from "./_components/waitlist"
 import { TRPCReactProvider } from "~/trpc/react"
 import Hero from "./_components/hero"
 import jsonLd from "~/lib/json-ld"
@@ -49,7 +49,7 @@ export default function LandingPage() {
                 alt="Image"
                 className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
                 height="310"
-                src="/placeholder.svg"
+                src="/assets/placeholder.svg"
                 width="550"
               />
               <div className="flex flex-col justify-center space-y-4">
@@ -112,7 +112,7 @@ export default function LandingPage() {
         <div className="container space-y-12 px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold tracking-tighter sm:text-5xl">
+              <h2 className="text-2xl font-bold tracking-tighter dark:text-gray-50 sm:text-5xl">
                 Key Features
               </h2>
               <p className="max-w-[900px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -124,7 +124,9 @@ export default function LandingPage() {
           <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
             <div className="grid gap-1">
               <CalendarIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold">Project Scheduling</h3>
+              <h3 className="text-lg font-bold dark:text-gray-50">
+                Project Scheduling
+              </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Easily create and manage project schedules, action items, and
                 track progress in real-time.
@@ -132,7 +134,9 @@ export default function LandingPage() {
             </div>
             <div className="grid gap-1">
               <WalletIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold">Financial Tracking</h3>
+              <h3 className="text-lg font-bold dark:text-gray-50">
+                Financial Tracking
+              </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Stay on top of your project budgets, expenses and payment
                 schedules with our comprehensive financial tracking tools.
@@ -140,7 +144,9 @@ export default function LandingPage() {
             </div>
             <div className="grid gap-1">
               <ClipboardIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold">Task Management</h3>
+              <h3 className="text-lg font-bold dark:text-gray-50">
+                Task Management
+              </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Assign tasks, set deadlines, and collaborate with your team,
                 suppliers and contractors to ensure projects are completed on
@@ -149,7 +155,9 @@ export default function LandingPage() {
             </div>
             <div className="grid gap-1">
               <PercentIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold">Project Estimation</h3>
+              <h3 className="text-lg font-bold dark:text-gray-50">
+                Project Estimation
+              </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Accurately estimate project costs and materials with our
                 advanced estimation tools.
@@ -157,7 +165,9 @@ export default function LandingPage() {
             </div>
             <div className="grid gap-1">
               <MergeIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold">Client Collaboration</h3>
+              <h3 className="text-lg font-bold dark:text-gray-50">
+                Client Collaboration
+              </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Seamlessly collaborate with clients, provide proposals, share
                 updates, and get real-time feedback on your projects.
@@ -165,7 +175,9 @@ export default function LandingPage() {
             </div>
             <div className="grid gap-1">
               <ViewIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold">Comprehensive Reporting</h3>
+              <h3 className="text-lg font-bold dark:text-gray-50">
+                Comprehensive Reporting
+              </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Generate detailed reports on project progress, financials and
                 more. Keeping you informed.
@@ -180,7 +192,7 @@ export default function LandingPage() {
               Contact Us
             </Link>
             <Link
-              className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
+              className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
               href="#about"
             >
               Learn More
@@ -193,7 +205,7 @@ export default function LandingPage() {
       <section className="w-full py-12 md:py-24 lg:py-32" id="about">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
           <div className="space-y-3">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            <h2 className="text-3xl font-bold tracking-tighter dark:text-gray-50 sm:text-4xl md:text-5xl">
               Trusted by leading construction firms.
             </h2>
             <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -206,35 +218,35 @@ export default function LandingPage() {
               alt="Logo"
               className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
               height="70"
-              src="/placeholder.svg"
+              src="/assets/placeholder.svg"
               width="140"
             />
             <Image
               alt="Logo"
               className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
               height="70"
-              src="/placeholder.svg"
+              src="/assets/placeholder.svg"
               width="140"
             />
             <Image
               alt="Logo"
               className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
               height="70"
-              src="/placeholder.svg"
+              src="/assets/placeholder.svg"
               width="140"
             />
             <Image
               alt="Logo"
               className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
               height="70"
-              src="/placeholder.svg"
+              src="/assets/placeholder.svg"
               width="140"
             />
             <Image
               alt="Logo"
               className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
               height="70"
-              src="/placeholder.svg"
+              src="/assets/placeholder.svg"
               width="140"
             />
           </div>
@@ -260,7 +272,7 @@ export default function LandingPage() {
                     alt="Logo"
                     className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
                     height="70"
-                    src="/placeholder.svg"
+                    src="/assets/placeholder.svg"
                     width="140"
                   />
                 </div>
@@ -269,7 +281,7 @@ export default function LandingPage() {
                     alt="Logo"
                     className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
                     height="70"
-                    src="/placeholder.svg"
+                    src="/assets/placeholder.svg"
                     width="140"
                   />
                 </div>
@@ -278,7 +290,7 @@ export default function LandingPage() {
                     alt="Logo"
                     className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
                     height="70"
-                    src="/placeholder.svg"
+                    src="/assets/placeholder.svg"
                     width="140"
                   />
                 </div>
@@ -287,7 +299,7 @@ export default function LandingPage() {
                     alt="Logo"
                     className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
                     height="70"
-                    src="/placeholder.svg"
+                    src="/assets/placeholder.svg"
                     width="140"
                   />
                 </div>
@@ -296,7 +308,7 @@ export default function LandingPage() {
                     alt="Logo"
                     className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
                     height="70"
-                    src="/placeholder.svg"
+                    src="/assets/placeholder.svg"
                     width="140"
                   />
                 </div>
@@ -321,7 +333,7 @@ export default function LandingPage() {
                 alt="Image"
                 className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
                 height="310"
-                src="/placeholder.svg"
+                src="/assets/placeholder.svg"
                 width="550"
               />
               <div className="flex flex-col justify-center space-y-4">
@@ -337,28 +349,28 @@ export default function LandingPage() {
                     alt="Logo"
                     className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
                     height="70"
-                    src="/placeholder.svg"
+                    src="/assets/placeholder.svg"
                     width="140"
                   />
                   <Image
                     alt="Logo"
                     className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
                     height="70"
-                    src="/placeholder.svg"
+                    src="/assets/placeholder.svg"
                     width="140"
                   />
                   <Image
                     alt="Logo"
                     className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
                     height="70"
-                    src="/placeholder.svg"
+                    src="/assets/placeholder.svg"
                     width="140"
                   />
                   <Image
                     alt="Logo"
                     className="aspect-[2/1] overflow-hidden rounded-lg object-contain object-center"
                     height="70"
-                    src="/placeholder.svg"
+                    src="/assets/placeholder.svg"
                     width="140"
                   />
                 </div>
@@ -378,12 +390,12 @@ export default function LandingPage() {
               alt="Image"
               className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
               height="310"
-              src="/placeholder.svg"
+              src="/assets/placeholder.svg"
               width="550"
             />
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
-                <blockquote className="text-lg font-semibold leading-snug lg:text-xl lg:leading-normal xl:text-2xl">
+                <blockquote className="text-lg font-semibold leading-snug dark:text-gray-200 lg:text-xl lg:leading-normal xl:text-2xl">
                   &quot;Using rekurve allowed us to double our business. We can
                   finally see exactly what&apos;s happening in our business, and
                   see what&apos;s coming in the weeks ahead. The planning tools
@@ -391,7 +403,9 @@ export default function LandingPage() {
                   proposal from weeks to days.&quot;
                 </blockquote>
                 <div>
-                  <div className="font-semibold">Ben Makim</div>
+                  <div className="font-semibold dark:text-gray-400">
+                    Ben Makim
+                  </div>
                   <div className="text-sm text-gray-600 dark:text-gray-300">
                     Owner, Makim Bulders
                   </div>
@@ -438,7 +452,7 @@ export default function LandingPage() {
                 alt="Testimonial"
                 className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
                 height="310"
-                src="/placeholder.svg"
+                src="/assets/placeholder.svg"
                 width="550"
               />
             </div>
@@ -447,7 +461,7 @@ export default function LandingPage() {
                 alt="Testimonial"
                 className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full"
                 height="310"
-                src="/placeholder.svg"
+                src="/assets/placeholder.svg"
                 width="550"
               />
               <div className="flex flex-col justify-center space-y-4">
@@ -709,10 +723,10 @@ export default function LandingPage() {
           </div>
         </section> */}
 
-      <section id="contact" className="w-full border-t py-12 md:py-24 lg:py-32">
+      <section id="contact" className="w-full py-12 md:py-24 lg:py-32">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
           <div className="space-y-3">
-            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
+            <h2 className="text-3xl font-bold tracking-tighter dark:text-gray-50 md:text-4xl/tight">
               Take Control of Your Construction Projects
             </h2>
             <p className="mx-auto max-w-[600px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">

@@ -37,7 +37,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased ${fontSans.variable}`}>
+      <body
+        className={`font-sans antialiased dark:bg-slate-950 ${fontSans.variable}`}
+      >
         <div className="flex min-h-[100dvh] flex-col">
           <WebsiteHeader />
           {children}

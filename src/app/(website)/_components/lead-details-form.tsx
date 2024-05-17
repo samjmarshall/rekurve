@@ -90,7 +90,7 @@ export default function LeadDetailsForm({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name *</FormLabel>
+                <FormLabel className="dark:text-gray-50">Name *</FormLabel>
                 <FormControl>
                   <Input
                     className="text-base sm:text-sm"
@@ -107,7 +107,7 @@ export default function LeadDetailsForm({
             name="company"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company *</FormLabel>
+                <FormLabel className="dark:text-gray-50">Company *</FormLabel>
                 <FormControl>
                   <Input
                     className="text-base sm:text-sm"
@@ -125,7 +125,9 @@ export default function LeadDetailsForm({
           name="problems"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>What are your pain points right now?</FormLabel>
+              <FormLabel className="dark:text-gray-50">
+                What are your pain points right now?
+              </FormLabel>
               <FormControl>
                 <Textarea
                   className="resize-none text-base sm:text-sm"
@@ -142,7 +144,7 @@ export default function LeadDetailsForm({
           name="solutions"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
+              <FormLabel className="dark:text-gray-50">
                 How have you tried to solve this is the past?
               </FormLabel>
               <FormControl>
@@ -157,7 +159,7 @@ export default function LeadDetailsForm({
           )}
         />
         <Button
-          className="w-full"
+          className="w-full dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
           type="submit"
           disabled={addDetails.isPending || recaptchaLoading}
         >

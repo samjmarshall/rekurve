@@ -27,7 +27,7 @@ const jsonLd = ({ urlPath, title, description }: JsonLdParams) =>
           "@type": "ImageObject",
           "@id": new URL("#logo", env.BASE_URL).toString(),
           inLanguage: "en-US",
-          url: new URL("logo-512x512.png", env.BASE_URL).toString(),
+          url: new URL("assets/logo-512x512.png", env.BASE_URL).toString(),
           width: 512,
           height: 512,
           caption: "V2",

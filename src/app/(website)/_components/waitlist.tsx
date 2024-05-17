@@ -28,7 +28,7 @@ const FormSchema = z.object({
   }),
 })
 
-export default function Waitlist() {
+export function Waitlist() {
   const [open, setOpen] = React.useState(false)
   const [email, setEmail] = React.useState("")
   const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
@@ -97,6 +97,7 @@ export default function Waitlist() {
           />
           <Button
             type="submit"
+            className="dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
             disabled={addEmail.isPending || recaptchaLoading}
           >
             {addEmail.isPending || recaptchaLoading

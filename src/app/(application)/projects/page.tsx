@@ -180,7 +180,7 @@ export default function Projects() {
                   alt="File 1"
                   className="h-24 w-24"
                   height="100"
-                  src="/placeholder.svg"
+                  src="/assets/placeholder.svg"
                   style={{
                     aspectRatio: "100/100",
                     objectFit: "cover",
@@ -191,7 +191,7 @@ export default function Projects() {
                   alt="File 2"
                   className="h-24 w-24"
                   height="100"
-                  src="/placeholder.svg"
+                  src="/assets/placeholder.svg"
                   style={{
                     aspectRatio: "100/100",
                     objectFit: "cover",

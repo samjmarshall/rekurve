@@ -1,6 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc"
 
 import { TRPCError } from "@trpc/server"
+import { env } from "~/env"
 import { eq } from "drizzle-orm"
 import logger from "~/server/logger"
 import { verifyRecaptcha } from "~/server/recaptcha"
@@ -14,7 +15,7 @@ export const waitlistRouter = createTRPCRouter({
       const recaptcha = await verifyRecaptcha(input.token)
       logger.debug({ request: "waitlist.addEmail", recaptcha })
 
-      if (!recaptcha.success || recaptcha.score < 0.8) {
+      if (!recaptcha.success || recaptcha.score < env.RECAPTCHA_THRESHOLD) {
         throw new TRPCError({ code: "UNAUTHORIZED" })
       }
 
@@ -55,7 +56,7 @@ export const waitlistRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const recaptcha = await verifyRecaptcha(input.token)
 
-      if (!recaptcha.success || recaptcha.score < 0.8) {
+      if (!recaptcha.success || recaptcha.score < env.RECAPTCHA_THRESHOLD) {
         throw new TRPCError({ code: "UNAUTHORIZED" })
       }
 

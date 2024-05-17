@@ -15,6 +15,7 @@ import {
 import { Button } from "~/components/ui/button"
 import { type User } from "next-auth"
 import { useRouter } from "next/navigation"
+import { signOut } from "next-auth/react"
 
 export function UserNav({ user }: { user: User }) {
   const router = useRouter()
@@ -63,7 +64,7 @@ export function UserNav({ user }: { user: User }) {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"
-          onClick={() => router.push("/api/auth/signout")}
+          onClick={() => signOut({ callbackUrl: "/" })}
         >
           Log out
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

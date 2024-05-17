@@ -2,7 +2,7 @@
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
  */
-await import("./src/env.js");
+await import("./src/env.js")
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -43,8 +43,8 @@ const config = {
             "default-src 'self';",
             "base-uri 'none';",
             "form-action 'none';",
-            "frame-src 'self' https://www.google.com/;",
-            "img-src 'self' data:;",
+            "frame-src 'self' https://www.google.com;",
+            "img-src 'self' data: https://lh3.googleusercontent.com;",
             "object-src 'none';",
             "script-src 'self' 'unsafe-eval';",
             "script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/releases/;",
@@ -55,6 +55,6 @@ const config = {
       ],
     },
   ],
-};
+}
 
-export default config;
+export default config

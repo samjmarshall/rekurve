@@ -1,6 +1,7 @@
 import { Button, buttonVariants } from "./ui/button"
 
 import Link from "next/link"
+import { Logo } from "./logo"
 import { UserNav } from "./user-nav"
 import { getServerAuthSession } from "~/server/auth"
 
@@ -10,10 +11,11 @@ export async function Header() {
   return (
     <header>
       <nav className="flex w-full items-center justify-between bg-white">
-        <Link href="/dashboard">
-          <h1 className="py-2 pl-4 text-4xl font-extrabold tracking-tight text-purple lg:pl-6">
-            rekurve
-          </h1>
+        <Link
+          href="/dashboard"
+          className="py-2 pl-4 text-3xl text-purple lg:pl-6"
+        >
+          <Logo />
         </Link>
         <div className="flex w-full gap-x-1">
           <Link

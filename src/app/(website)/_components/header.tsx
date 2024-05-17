@@ -38,13 +38,12 @@ export default function WebsiteHeader() {
         >
           Contact
         </Link>
-        <Link
+        {/* <Link
           className="text-sm font-medium text-gray-500 underline-offset-4 hover:underline dark:text-gray-400"
           href="/login"
         >
           Login
-        </Link>
-        {/* <Login /> */}
+        </Link> */}
       </nav>
     </header>
   )

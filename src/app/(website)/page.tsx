@@ -125,21 +125,21 @@ export default function LandingPage() {
             <div className="grid gap-1">
               <CalendarIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
               <h3 className="text-lg font-bold dark:text-gray-50">
-                Project Scheduling
+                Smart Scheduling
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Easily create and manage project schedules, action items, and
-                track progress in real-time.
+                AI assisted project schedules and action items to track progress
+                in real-time, prevent problems before they hit.
               </p>
             </div>
             <div className="grid gap-1">
               <WalletIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
               <h3 className="text-lg font-bold dark:text-gray-50">
-                Financial Tracking
+                Cashflow Forecasting
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Stay on top of your project budgets, expenses and payment
-                schedules with our comprehensive financial tracking tools.
+                Xero and Reckon integration to sync past and future project
+                expenses, including project payments to forecast your cashflow.
               </p>
             </div>
             <div className="grid gap-1">

@@ -5,8 +5,8 @@ import { useEffect, useState } from "react"
 function getWindowDimensions() {
   const { window } = globalThis
   return {
-    width: window?.innerWidth ?? 1920,
-    height: window?.innerHeight ?? 1080,
+    width: window?.innerWidth,
+    height: window?.innerHeight,
   }
 }
 

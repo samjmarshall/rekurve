@@ -17,7 +17,7 @@ export function SidePanel() {
         width={width / 2}
         height={height}
         alt="background image"
-        className="absolute inset-0 opacity-0 transition-opacity duration-300 ease-linear"
+        className="absolute inset-0 w-full opacity-0 transition-opacity duration-300 ease-linear"
         onLoad={(e: SyntheticEvent) =>
           (e.target as HTMLImageElement).classList.remove("opacity-0")
         }

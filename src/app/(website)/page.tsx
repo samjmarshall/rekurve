@@ -129,7 +129,7 @@ export default function LandingPage() {
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 AI assisted project schedules and action items to track progress
-                in real-time, prevent problems before they hit.
+                in real-time, helping prevent problems before they hit.
               </p>
             </div>
             <div className="grid gap-1">

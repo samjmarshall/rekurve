@@ -112,10 +112,10 @@ export default function LandingPage() {
         <div className="container space-y-12 px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold tracking-tighter dark:text-gray-50 sm:text-5xl">
+              <h2 className="text-2xl font-bold tracking-tighter sm:text-5xl dark:text-gray-50">
                 Key Features
               </h2>
-              <p className="max-w-[900px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
                 Tools to manage every aspect of your construction projects, from
                 estimation and scheduling to client collaboration and proposals.
               </p>
@@ -205,11 +205,11 @@ export default function LandingPage() {
       <section className="w-full py-12 md:py-24 lg:py-32" id="about">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
           <div className="space-y-3">
-            <h2 className="text-3xl font-bold tracking-tighter dark:text-gray-50 sm:text-4xl md:text-5xl">
-              Trusted by leading construction firms.
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl dark:text-gray-50">
+              Trusted by leading organizations.
             </h2>
-            <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              ConstructPro is used by construction companies of all sizes to
+            <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+              rekurve is used by construction companies of all sizes to
               streamline their projects and deliver exceptional results.
             </p>
           </div>
@@ -381,7 +381,7 @@ export default function LandingPage() {
 
       {/* Testimonials - Option 1 */}
       <section
-        className="w-full bg-gray-100 py-12 dark:bg-gray-800 md:py-24 lg:py-32"
+        className="w-full bg-gray-100 py-12 md:py-24 lg:py-32 dark:bg-gray-800"
         id="testimonials"
       >
         <div className="container px-4 md:px-6">
@@ -395,7 +395,7 @@ export default function LandingPage() {
             />
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
-                <blockquote className="text-lg font-semibold leading-snug dark:text-gray-200 lg:text-xl lg:leading-normal xl:text-2xl">
+                <blockquote className="text-lg font-semibold leading-snug lg:text-xl lg:leading-normal xl:text-2xl dark:text-gray-200">
                   &quot;Using rekurve allowed us to double our business. We can
                   finally see exactly what&apos;s happening in our business, and
                   see what&apos;s coming in the weeks ahead. The planning tools
@@ -726,10 +726,10 @@ export default function LandingPage() {
       <section id="contact" className="w-full py-12 md:py-24 lg:py-32">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
           <div className="space-y-3">
-            <h2 className="text-3xl font-bold tracking-tighter dark:text-gray-50 md:text-4xl/tight">
+            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight dark:text-gray-50">
               Take Control of Your Construction Projects
             </h2>
-            <p className="mx-auto max-w-[600px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
               Join the waitlist for early access rekurve before it&apos;s
               released to the general public. We can only take on a few select
               customers at this time.

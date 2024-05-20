@@ -1,6 +1,5 @@
 import { type JSX, type SVGProps } from "react"
 
-import Link from "next/link"
 import { Waitlist } from "./_components/waitlist"
 import { TRPCReactProvider } from "~/trpc/react"
 import Hero from "./_components/hero"

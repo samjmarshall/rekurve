@@ -4,7 +4,10 @@ import { Logo } from "~/components/logo"
 export default function WebsiteHeader() {
   return (
     <header className="flex h-14 items-center px-4 lg:px-6">
-      <Link className="flex items-center justify-center text-3xl" href="/">
+      <Link
+        className="flex items-center justify-center text-xl font-extrabold tracking-tighter md:text-2xl lg:text-3xl"
+        href="/"
+      >
         <Logo />
       </Link>
       <nav className="ml-auto flex gap-4 sm:gap-6 dark:text-gray-50">

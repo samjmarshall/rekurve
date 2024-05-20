@@ -66,13 +66,13 @@ export function Waitlist() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-sm">
+    <div className="mx-auto mt-8 w-full max-w-sm sm:mt-0">
       <Form {...form}>
         <form
           aria-label="Join the waitlist"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0">
+          <div className="flex flex-col sm:flex-row">
             <FormField
               control={form.control}
               name="email"
@@ -80,7 +80,7 @@ export function Waitlist() {
                 <FormItem>
                   <FormControl>
                     <Input
-                      className="min-w-64 flex-1 text-base focus-visible:border-slate-950 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-slate-950 focus-visible:ring-offset-0 sm:rounded-r-none sm:text-sm"
+                      className="min-w-64 flex-1 rounded-b-none text-base focus-visible:border-slate-950 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-slate-950 focus-visible:ring-offset-0 sm:rounded-r-none sm:rounded-bl-sm sm:text-sm"
                       placeholder="Enter your email"
                       autoComplete="email"
                       {...field}
@@ -92,7 +92,7 @@ export function Waitlist() {
             />
             <Button
               type="submit"
-              className="mx-auto sm:rounded-l-none dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+              className="rounded-t-none sm:rounded-l-none sm:rounded-tr-sm dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
               disabled={addEmail.isPending || recaptchaLoading}
             >
               {addEmail.isPending || recaptchaLoading

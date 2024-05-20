@@ -7,7 +7,7 @@ export default function WebsiteHeader() {
       <Link className="flex items-center justify-center text-3xl" href="/">
         <Logo />
       </Link>
-      <nav className="ml-auto flex gap-4 dark:text-gray-50 sm:gap-6">
+      <nav className="ml-auto flex gap-4 sm:gap-6 dark:text-gray-50">
         <Link
           className="hidden text-sm font-medium underline-offset-4 hover:underline sm:block"
           href="#features"
@@ -26,12 +26,12 @@ export default function WebsiteHeader() {
           >
             About
           </Link> */}
-        <Link
+        {/* <Link
           className="hidden text-sm font-medium underline-offset-4 hover:underline sm:block"
           href="#testimonials"
         >
           Testimonials
-        </Link>
+        </Link> */}
         <Link
           className="hidden text-sm font-medium underline-offset-4 hover:underline sm:block"
           href="#contact"

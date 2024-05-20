@@ -77,7 +77,11 @@ export function Waitlist() {
     <div className="mx-auto w-full max-w-sm" ref={ref}>
       {inView && loadRecaptcha()}
       <Form {...form}>
-        <form className="space-y-2" onSubmit={form.handleSubmit(onSubmit)}>
+        <form
+          aria-label="Join the waitlist"
+          className="space-y-2"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
           <FormField
             control={form.control}
             name="email"

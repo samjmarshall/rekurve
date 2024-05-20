@@ -83,7 +83,11 @@ export default function LeadDetailsForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-1">
+      <form
+        aria-label="Add your details"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 px-1"
+      >
         <div className="mt-2 grid grid-cols-2 gap-4 sm:mt-0">
           <FormField
             control={form.control}

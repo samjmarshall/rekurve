@@ -6,13 +6,28 @@ export default function Hero() {
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="space-y-4">
-            <h1 className="text-3xl font-bold tracking-tighter dark:text-gray-50 sm:text-4xl md:text-5xl lg:text-6xl/none">
-              Streamline Your Construction Projects
+            <h1
+              aria-label="Construction Projects On Schedule & On Budget"
+              className="text-3xl/none font-extrabold tracking-tighter sm:text-4xl/none md:text-5xl/none lg:text-6xl/none dark:text-gray-50"
+            >
+              <span>Construction Projects</span>
+              <span className="mt-2 flex flex-col items-center justify-center sm:mt-3 sm:flex-row">
+                <span className="mx-1 bg-purple p-1 text-white lg:mx-2">
+                  On Schedule
+                </span>{" "}
+                <span className="mt-3 sm:mt-0">
+                  &amp;{" "}
+                  <span className="bg-purple px-1 text-white sm:mt-0">
+                    On Budget
+                  </span>
+                </span>
+              </span>
             </h1>
 
-            <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl">
+            <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
               Construction management software to stay organized, track
-              progress, costs and payments, and collaborate with your customers.
+              progress, monitor costs and payments, and collaborate with your
+              customers.
             </p>
           </div>
           <div className="flex flex-col gap-4 min-[400px]:flex-row">

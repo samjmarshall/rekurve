@@ -27,13 +27,13 @@ export const executeRecaptcha = async (
           })
       })
     } else {
-      console.error("window.grecaptcha.enterprise => undefined")
       resolve(null)
     }
   })
 
 export const loadRecaptcha = () => (
   <Script
+    id="recaptcha-enterprise"
     src={`https://www.google.com/recaptcha/enterprise.js?render=${env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
   />
 )

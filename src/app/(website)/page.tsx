@@ -12,6 +12,7 @@ export default function LandingPage() {
   return (
     <main className="flex-1">
       <Script
+        id="json-ld"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLd({

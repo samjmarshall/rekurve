@@ -31,6 +31,7 @@ const config = {
             "default-src 'self';",
             "base-uri 'none';",
             "form-action 'none';",
+            "frame-ancestors 'none';",
             "frame-src 'self' https://www.google.com;",
             "img-src 'self' data: https://lh3.googleusercontent.com;",
             "object-src 'none';",

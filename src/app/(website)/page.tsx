@@ -1,17 +1,18 @@
 import { type JSX, type SVGProps } from "react"
 
-import Image from "next/image"
 import Link from "next/link"
 import { Waitlist } from "./_components/waitlist"
 import { TRPCReactProvider } from "~/trpc/react"
 import Hero from "./_components/hero"
 import jsonLd from "~/lib/json-ld"
 import { env } from "~/env"
+import Script from "next/script"
+import { loadRecaptcha } from "~/lib/recaptcha-client"
 
 export default function LandingPage() {
   return (
     <main className="flex-1">
-      <script
+      <Script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLd({
@@ -20,6 +21,7 @@ export default function LandingPage() {
           }),
         }}
       />
+      {loadRecaptcha()}
 
       <Hero />
 
@@ -184,7 +186,7 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row md:hidden">
             <Link
               className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
               href="#contact"

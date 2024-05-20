@@ -7,7 +7,6 @@ import {
   FormItem,
   FormMessage,
 } from "~/components/ui/form"
-import { executeRecaptcha, loadRecaptcha } from "~/lib/recaptcha-client"
 
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
@@ -16,9 +15,9 @@ import React from "react"
 import TermsAndConditions from "./terms-and-conditions"
 import { Toaster } from "~/components/ui/sonner"
 import { api } from "~/trpc/react"
+import { executeRecaptcha } from "~/lib/recaptcha-client"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
-import { useInView } from "react-intersection-observer"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -32,13 +31,6 @@ export function Waitlist() {
   const [open, setOpen] = React.useState(false)
   const [email, setEmail] = React.useState("")
   const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
-
-  const { ref, inView } = useInView({
-    /* Optional options */
-    triggerOnce: true,
-    threshold: 0,
-    fallbackInView: true,
-  })
 
   const addEmail = api.waitlist.addEmail.useMutation({
     onSuccess: () => {
@@ -74,42 +66,42 @@ export function Waitlist() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-sm" ref={ref}>
-      {inView && loadRecaptcha()}
+    <div className="mx-auto w-full max-w-sm">
       <Form {...form}>
         <form
           aria-label="Join the waitlist"
-          className="space-y-2"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    className="flex-1 text-base sm:text-sm"
-                    placeholder="Enter your email"
-                    autoComplete="email"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button
-            type="submit"
-            className="dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-            disabled={addEmail.isPending || recaptchaLoading}
-          >
-            {addEmail.isPending || recaptchaLoading
-              ? "Joining waitlist..."
-              : "Join the Waitlist"}
-          </Button>
+          <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      className="min-w-64 flex-1 text-base focus-visible:border-slate-950 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-slate-950 focus-visible:ring-offset-0 sm:rounded-r-none sm:text-sm"
+                      placeholder="Enter your email"
+                      autoComplete="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              className="mx-auto sm:rounded-l-none dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+              disabled={addEmail.isPending || recaptchaLoading}
+            >
+              {addEmail.isPending || recaptchaLoading
+                ? "Joining waitlist..."
+                : "Join the Waitlist"}
+            </Button>
+          </div>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            By signing up, you agree to our <TermsAndConditions />
+            By joining, you agree to our <TermsAndConditions />
           </p>
         </form>
       </Form>

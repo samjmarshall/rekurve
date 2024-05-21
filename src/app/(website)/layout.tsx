@@ -6,7 +6,7 @@ import { Inter as FontSans } from "next/font/google"
 import WebsiteFooter from "./_components/footer"
 import WebsiteHeader from "./_components/header"
 import openGraph from "~/lib/open-graph"
-import { GoogleTagManager } from "~/components/gtm"
+import { GoogleTagManager } from "./_components/gtm"
 
 const fontSans = FontSans({
   subsets: ["latin"],

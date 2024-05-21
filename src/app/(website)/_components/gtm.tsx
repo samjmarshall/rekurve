@@ -1,6 +1,13 @@
 import Script from "next/script"
 import { env } from "~/env"
 
+declare global {
+  interface Window {
+    dataLayer?: object[]
+    [key: string]: unknown
+  }
+}
+
 export function GoogleTagManager() {
   if (env.NODE_ENV !== "production") {
     return null
@@ -24,4 +31,10 @@ export function GoogleTagManager() {
       />
     </>
   )
+}
+
+export const sendGTMEvent = (data: object) => {
+  if (window.dataLayer) {
+    window.dataLayer.push(data)
+  }
 }

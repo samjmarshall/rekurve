@@ -16,6 +16,7 @@ import TermsAndConditions from "./terms-and-conditions"
 import { Toaster } from "~/components/ui/sonner"
 import { api } from "~/trpc/react"
 import { executeRecaptcha } from "~/lib/recaptcha-client"
+import { sendGTMEvent } from "./gtm"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -31,14 +32,16 @@ export function Waitlist() {
   const [open, setOpen] = React.useState(false)
   const [email, setEmail] = React.useState("")
   const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
+  const eventName = "waitlist_addEmail"
 
   const addEmail = api.waitlist.addEmail.useMutation({
     onSuccess: () => {
       setOpen(true)
+      sendGTMEvent({ event: eventName, success: true })
     },
-    onError: (error) => {
+    onError: () => {
       toast.error("Failed to add email to waitlist. Please try again later!")
-      console.log(error.message)
+      sendGTMEvent({ event: eventName, success: false })
     },
   })
 
@@ -53,7 +56,7 @@ export function Waitlist() {
     setEmail(data.email)
 
     setRecaptchaLoading(true)
-    const token = await executeRecaptcha("waitlist_add_email")
+    const token = await executeRecaptcha(eventName)
     setRecaptchaLoading(false)
 
     if (!token) {

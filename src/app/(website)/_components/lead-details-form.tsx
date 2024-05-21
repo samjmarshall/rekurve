@@ -12,6 +12,7 @@ import { Input } from "~/components/ui/input"
 import { Textarea } from "~/components/ui/textarea"
 import { api } from "~/trpc/react"
 import { executeRecaptcha } from "~/lib/recaptcha-client"
+import { sendGTMEvent } from "./gtm"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
@@ -47,6 +48,7 @@ export default function LeadDetailsForm({
   setOpen: (open: boolean) => void
 }) {
   const [recaptchaLoading, setRecaptchaLoading] = useState(false)
+  const eventName = "waitlist_addDetails"
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -62,15 +64,17 @@ export default function LeadDetailsForm({
     onSuccess: () => {
       setOpen(false)
       toast.success(`Your information has been submitted!`)
+      sendGTMEvent({ event: eventName, success: true })
     },
     onError: () => {
       toast.error("Failed to send information. Please try again!")
+      sendGTMEvent({ event: eventName, success: false })
     },
   })
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setRecaptchaLoading(true)
-    const token = await executeRecaptcha("waitlist_add_details")
+    const token = await executeRecaptcha(eventName)
     setRecaptchaLoading(false)
 
     if (!token) {

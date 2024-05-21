@@ -42,7 +42,7 @@ export default function RootLayout({
         <GoogleTagManager />
       </head>
       <body
-        className={`scroll-smooth font-sans antialiased dark:bg-slate-950 ${fontSans.variable}`}
+        className={`font-sans antialiased dark:bg-slate-950 ${fontSans.variable}`}
       >
         <div className="flex min-h-[100dvh] flex-col">
           <WebsiteHeader />

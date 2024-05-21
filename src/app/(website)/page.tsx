@@ -732,9 +732,8 @@ export default function LandingPage() {
               Take Control of Your Construction Projects
             </h2>
             <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
-              Join the waitlist for early access rekurve before it&apos;s
-              released to the general public. We can only take on a few select
-              customers at this time.
+              Join the waitlist for early access. There are limited spots
+              available.
             </p>
           </div>
 

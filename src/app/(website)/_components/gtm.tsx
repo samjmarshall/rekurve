@@ -9,9 +9,9 @@ declare global {
 }
 
 export function GoogleTagManager() {
-  if (env.NODE_ENV !== "production") {
-    return null
-  }
+  // if (env.NODE_ENV !== "production") {
+  //   return null
+  // }
 
   return (
     <>

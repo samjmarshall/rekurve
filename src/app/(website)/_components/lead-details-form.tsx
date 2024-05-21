@@ -64,11 +64,11 @@ export default function LeadDetailsForm({
     onSuccess: () => {
       setOpen(false)
       toast.success(`Your information has been submitted!`)
-      sendGTMEvent({ event: eventName, success: true })
+      sendGTMEvent({ event: eventName, value: "success" })
     },
     onError: () => {
       toast.error("Failed to send information. Please try again!")
-      sendGTMEvent({ event: eventName, success: false })
+      sendGTMEvent({ event: eventName, value: "error" })
     },
   })
 

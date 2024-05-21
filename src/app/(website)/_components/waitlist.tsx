@@ -37,11 +37,11 @@ export function Waitlist() {
   const addEmail = api.waitlist.addEmail.useMutation({
     onSuccess: () => {
       setOpen(true)
-      sendGTMEvent({ event: eventName, success: true })
+      sendGTMEvent({ event: eventName, value: "success" })
     },
     onError: () => {
       toast.error("Failed to add email to waitlist. Please try again later!")
-      sendGTMEvent({ event: eventName, success: false })
+      sendGTMEvent({ event: eventName, value: "error" })
     },
   })
 

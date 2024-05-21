@@ -25,14 +25,14 @@ export function AnalyticsHead() {
 
   return (
     <>
-      <link rel="dns-prefetch" href="https://www.googletagmanager.com/" />
       <Script
         id="gtm-script"
         strategy="afterInteractive"
         async
         src={`https://www.googletagmanager.com/gtm/js?id=${env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID}`}
       />
-      <script
+      <Script
+        id="gtm-config"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];

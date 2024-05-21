@@ -14,7 +14,7 @@ const config = {
   outputFileTracing: true,
   poweredByHeader: false,
   reactStrictMode: true,
-  compress: true, // This is enabled by default, but we'd like to disable it we migrate to AWS Lambda with the Web Adapter.
+  compress: true, // This is enabled by default, but we'd like to disable it if we migrate to AWS Lambda with the Web Adapter.
   logging: {
     fetches: {
       fullUrl: true,
@@ -32,11 +32,11 @@ const config = {
             "base-uri 'none';",
             "form-action 'none';",
             "frame-ancestors 'none';",
-            "frame-src 'self' https://www.google.com;",
+            "frame-src 'self' https://www.google.com/recaptcha/ https://www.googletagmanager.com/ns.html;",
             "img-src 'self' data: https://lh3.googleusercontent.com;",
             "object-src 'none';",
             "script-src 'self' 'unsafe-eval';",
-            "script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/releases/;",
+            `script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/releases/ https://www.googletagmanager.com/gtm/js;`,
             "style-src 'self' 'unsafe-inline';",
             "report-uri /api/csp-reports;",
           ].join(" "),

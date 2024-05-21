@@ -6,6 +6,7 @@ import { Inter as FontSans } from "next/font/google"
 import WebsiteFooter from "./_components/footer"
 import WebsiteHeader from "./_components/header"
 import openGraph from "~/lib/open-graph"
+import { AnalyticsHead, AnalyticsBody } from "~/components/analytics"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -37,9 +38,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <AnalyticsHead />
+      </head>
       <body
-        className={`font-sans antialiased dark:bg-slate-950 ${fontSans.variable}`}
+        className={`scroll-smooth font-sans antialiased dark:bg-slate-950 ${fontSans.variable}`}
       >
+        <AnalyticsBody />
         <div className="flex min-h-[100dvh] flex-col">
           <WebsiteHeader />
           {children}

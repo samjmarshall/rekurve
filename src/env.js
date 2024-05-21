@@ -50,6 +50,7 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
+    NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID: z.string(),
     NEXT_PUBLIC_RECAPTCHA_SITE_KEY: z.string(),
   },
 
@@ -69,6 +70,8 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID:
+      process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID,
     NEXT_PUBLIC_RECAPTCHA_SITE_KEY: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
     RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
     RECAPTCHA_THRESHOLD: process.env.RECAPTCHA_THRESHOLD,

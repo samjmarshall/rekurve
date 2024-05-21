@@ -7,11 +7,7 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    BASE_URL: z.preprocess(
-      (str) =>
-        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : str,
-      z.string().url(),
-    ),
+    BASE_URL: z.string().url(),
     COMPANY_NAME: z.string().default("rekurve"),
     COMPANY_LEGAL_NAME: z.string().default("REKURVE PTY LTD"),
     CUSTOMER_CONTACT_EMAIL: z.string().email().default("info@rekurve.io"),

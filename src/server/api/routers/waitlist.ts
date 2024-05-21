@@ -13,9 +13,13 @@ export const waitlistRouter = createTRPCRouter({
     .input(z.object({ email: z.string().email(), token: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const recaptcha = await verifyRecaptcha(input.token)
-      logger.debug({ request: "waitlist.addEmail", recaptcha })
 
       if (!recaptcha.success || recaptcha.score < env.RECAPTCHA_THRESHOLD) {
+        logger.warn({
+          request: "waitlist.addEmail",
+          code: "UNAUTHORIZED",
+          recaptcha,
+        })
         throw new TRPCError({ code: "UNAUTHORIZED" })
       }
 

@@ -58,7 +58,7 @@ export default function Privacy() {
           </Link>
           .
         </p>
-        <p>Last Updated: 14 May 2024</p>
+        <p>Last Updated: 21 May 2024</p>
         <h2>
           <b>What is Personal Information?</b>
         </h2>
@@ -85,9 +85,9 @@ export default function Privacy() {
           </li>
           <li className="ml-6 space-y-2">
             <b>Usage Data</b> - We may collect information about how you access,
-            use and interact with the website. [We do this by using a range of
-            tools such as Google Analytics and AdWords and Salesforce (Sales
-            Cloud and Marketing Cloud). This information may include:
+            use and interact with the website. We do this by using a range of
+            tools such as Google Analytics and AdWords. This information may
+            include:
             <ol className="list-disc space-y-2">
               <li className="ml-6">
                 the location from which you have come to the site and the pages
@@ -249,8 +249,7 @@ export default function Privacy() {
           <li>
             <p>
               third parties to collect and process data, such as Google
-              Analytics and AdWords, Salesforce (Sales Cloud and Marketing
-              Cloud);
+              Analytics and AdWords;
             </p>
           </li>
           <li>

@@ -13,19 +13,19 @@ export default function WebsiteHeader() {
       <nav className="ml-auto flex gap-4 sm:gap-6 dark:text-gray-50">
         <Link
           className="hidden text-sm font-medium underline-offset-4 hover:underline sm:block"
-          href="#features"
+          href="/#features"
         >
           Features
         </Link>
         {/* <Link
             className="text-sm font-medium underline-offset-4 hover:underline"
-            href="#pricing"
+            href="/#pricing"
           >
             Pricing
           </Link> */}
         {/* <Link
             className="text-sm font-medium underline-offset-4 hover:underline"
-            href="#about"
+            href="/#about"
           >
             About
           </Link> */}
@@ -37,7 +37,7 @@ export default function WebsiteHeader() {
         </Link> */}
         <Link
           className="hidden text-sm font-medium underline-offset-4 hover:underline sm:block"
-          href="#contact"
+          href="/#contact"
         >
           Contact
         </Link>

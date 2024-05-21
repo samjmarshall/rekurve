@@ -23,6 +23,7 @@ const config = {
   headers: async () => [
     {
       // Apply these headers to all routes in your application.
+      // NODE_ENV values for local development only e.g. Google Tag Manager - Preview Debug Tag Assistant
       source: "/:path*",
       headers: [
         {

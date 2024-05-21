@@ -30,6 +30,7 @@ const config = {
           value: [
             "default-src 'self';",
             "base-uri 'none';",
+            "connect-src 'self' https://www.google-analytics.com/g/collect;",
             "form-action 'none';",
             "frame-ancestors 'none';",
             "frame-src 'self' https://www.google.com/recaptcha/ https://www.googletagmanager.com/ns.html;",

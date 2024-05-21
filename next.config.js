@@ -36,7 +36,7 @@ const config = {
             "img-src 'self' data: https://lh3.googleusercontent.com;",
             "object-src 'none';",
             "script-src 'self' 'unsafe-eval';",
-            `script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/releases/ https://www.googletagmanager.com/gtm/js;`,
+            `script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/releases/ https://www.googletagmanager.com/gtm.js;`,
             "style-src 'self' 'unsafe-inline';",
             "report-uri /api/csp-reports;",
           ].join(" "),

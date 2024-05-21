@@ -48,7 +48,7 @@ export default function LeadDetailsForm({
   setOpen: (open: boolean) => void
 }) {
   const [recaptchaLoading, setRecaptchaLoading] = useState(false)
-  const eventName = "waitlist_addDetails"
+  const eventName = "waitlist_add_details"
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),

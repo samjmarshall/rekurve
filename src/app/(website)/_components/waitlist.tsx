@@ -32,7 +32,7 @@ export function Waitlist() {
   const [open, setOpen] = React.useState(false)
   const [email, setEmail] = React.useState("")
   const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
-  const eventName = "waitlist_addEmail"
+  const eventName = "waitlist_add_email"
 
   const addEmail = api.waitlist.addEmail.useMutation({
     onSuccess: () => {

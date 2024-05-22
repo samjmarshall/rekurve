@@ -39,7 +39,6 @@ export function middleware(request: NextRequest) {
     frame-ancestors 'none';
     img-src 'self' data: https://lh3.googleusercontent.com ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};
     script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : ""};
-    script-src-elem 'self' 'nonce-${nonce}';
     style-src 'self' 'nonce-${nonce}';
     style-src-elem 'self' 'unsafe-inline' ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.googleapis.com" : ""};
     upgrade-insecure-requests;

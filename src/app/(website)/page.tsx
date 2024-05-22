@@ -7,7 +7,6 @@ import jsonLd from "~/lib/json-ld"
 import { env } from "~/env"
 import Script from "next/script"
 import { headers } from "next/headers"
-import { GoogleRecaptcha } from "./_components/recaptcha"
 
 export default function LandingPage() {
   const nonce = headers().get("x-nonce")

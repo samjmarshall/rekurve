@@ -2,25 +2,25 @@ import { type NextRequest, NextResponse } from "next/server"
 
 import { env } from "~/env"
 
-export const config = {
-  matcher: [
-    /*
-     Vercel recommend ignoring matching prefetches (from next/link) and static assets that don't need the CSP header.
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    {
-      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
-      missing: [
-        { type: "header", key: "next-router-prefetch" },
-        { type: "header", key: "purpose", value: "prefetch" },
-      ],
-    },
-  ],
-}
+// export const config = {
+//   matcher: [
+//     /*
+//      Vercel recommend ignoring matching prefetches (from next/link) and static assets that don't need the CSP header.
+//      * Match all request paths except for the ones starting with:
+//      * - api (API routes)
+//      * - _next/static (static files)
+//      * - _next/image (image optimization files)
+//      * - favicon.ico (favicon file)
+//      */
+//     {
+//       source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+//       missing: [
+//         { type: "header", key: "next-router-prefetch" },
+//         { type: "header", key: "purpose", value: "prefetch" },
+//       ],
+//     },
+//   ],
+// }
 
 export function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64")
@@ -31,10 +31,13 @@ export function middleware(request: NextRequest) {
     connect-src 'self' https://www.google-analytics.com/g/collect;
     font-src 'self' ${env.NODE_ENV === "development" ? "https://fonts.gstatic.com" : ""};
     form-action 'none';
+    frame-src https://www.google.com/recaptcha/;
     frame-ancestors 'none';
     img-src 'self' data: https://lh3.googleusercontent.com ${env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${env.NODE_ENV === "development" ? "'unsafe-eval' https://www.googletagmanager.com" : ""};
-    style-src 'self' 'nonce-${nonce}' 'unsafe-inline' ${env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.googleapis.com" : ""};
+    script-src 'self' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : `'nonce-${nonce}' 'strict-dynamic'`};
+    script-src-elem 'self' ${env.NODE_ENV === "development" ? "'unsafe-inline' https://www.googletagmanager.com https://www.google.com/ https://www.gstatic.com/" : `'nonce-${nonce}'`};
+    style-src 'self' ${env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.googleapis.com" : `'nonce-${nonce}'`};
+    style-src-elem 'self' 'unsafe-inline';
     upgrade-insecure-requests;
     report-uri /api/csp-reports;
 `

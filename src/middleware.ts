@@ -24,31 +24,27 @@ import { env } from "~/env"
 
 export function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64")
-  // When NODE_ENV is "development", allow additional sources for development tools e.g. Google Tag Manager Preview and Debug Tag Assistant
+
+  // Allow Google Tag Manager preview and debug sources in development
+  const gtmPreviewAndDebugSources = env.NODE_ENV === "development"
+
+  // When NODE_ENV is "development", allow 'unsafe-eval' for webpack HMR
   const cspHeader = `
     default-src 'none';
     base-uri 'none';
     connect-src 'self' https://www.google-analytics.com/g/collect;
-    font-src 'self' ${env.NODE_ENV === "development" ? "https://fonts.gstatic.com" : ""};
+    font-src 'self' ${gtmPreviewAndDebugSources ? "https://fonts.gstatic.com" : ""};
     form-action 'none';
     frame-src https://www.google.com/recaptcha/;
     frame-ancestors 'none';
-    img-src 'self' data: https://lh3.googleusercontent.com ${env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};
-    script-src 'self' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : `'nonce-${nonce}' 'strict-dynamic'`};
-    script-src-elem 'self' ${env.NODE_ENV === "development" ? "'unsafe-inline' https://www.googletagmanager.com https://www.google.com/ https://www.gstatic.com/" : `'nonce-${nonce}'`};
-    style-src 'self' ${env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.googleapis.com" : `'nonce-${nonce}'`};
-    style-src-elem 'self' 'unsafe-inline';
+    img-src 'self' data: https://lh3.googleusercontent.com ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : ""};
+    script-src-elem 'self' 'nonce-${nonce}';
+    style-src 'self' 'nonce-${nonce}';
+    style-src-elem 'self' 'unsafe-inline' ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.googleapis.com" : ""};
     upgrade-insecure-requests;
     report-uri /api/csp-reports;
 `
-
-  /*
-  "frame-src 'self' https://www.google.com/recaptcha/ https://www.googletagmanager.com/ns.html;"
-  "script-src 'self' 'unsafe-eval';",
-  `script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/releases/ ${env.NODE_ENV === "development" ? "https://www.googletagmanager.com" : "https://www.googletagmanager.com/gtm.js https://www.googletagmanager.com/gtag/js"};`,
-  `style-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.googleapis.com" : ""};`,
-  "report-uri /api/csp-reports;",
-*/
 
   // Replace newline characters and spaces
   const contentSecurityPolicyHeaderValue = cspHeader

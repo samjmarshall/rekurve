@@ -34,7 +34,7 @@ export function middleware(request: NextRequest) {
     frame-ancestors 'none';
     img-src 'self' data: https://lh3.googleusercontent.com ${env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};
     script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${env.NODE_ENV === "development" ? "'unsafe-eval' https://www.googletagmanager.com" : ""};
-    style-src 'self' 'nonce-${nonce}' ${env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.googleapis.com" : ""};
+    style-src 'self' 'nonce-${nonce}' 'unsafe-inline' ${env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.googleapis.com" : ""};
     upgrade-insecure-requests;
     report-uri /api/csp-reports;
 `

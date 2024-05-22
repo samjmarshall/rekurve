@@ -1,22 +1,12 @@
 import Script from "next/script"
 import { env } from "~/env"
 
-declare global {
-  interface Window {
-    dataLayer?: object[]
-    [key: string]: unknown
-  }
-}
-
-export function GoogleTagManager() {
-  // if (env.NODE_ENV !== "production") {
-  //   return null
-  // }
-
+export function GoogleTagManager({ nonce }: { nonce?: string }) {
   return (
     <>
       <Script
         id="gtm-init"
+        nonce={nonce}
         dangerouslySetInnerHTML={{
           __html: `
       (function(w,l){
@@ -27,14 +17,9 @@ export function GoogleTagManager() {
       />
       <Script
         id="gtm"
-        src={`https://www.googletagmanager.com/gtm.js?id=${env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID}`}
+        nonce={nonce}
+        src={`https://www.googletagmanager.com/gtm.js?id=${env.GOOGLE_TAG_MANAGER_ID}`}
       />
     </>
   )
-}
-
-export const sendGTMEvent = (data: object) => {
-  if (window.dataLayer) {
-    window.dataLayer.push(data)
-  }
 }

@@ -7,6 +7,8 @@ import WebsiteFooter from "./_components/footer"
 import WebsiteHeader from "./_components/header"
 import openGraph from "~/lib/open-graph"
 import { GoogleTagManager } from "./_components/gtm"
+import { headers } from "next/headers"
+import { GoogleRecaptcha } from "./_components/recaptcha"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -36,10 +38,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const nonce = headers().get("x-nonce")
+
+  if (!nonce) {
+    throw new Error("Missing nonce header")
+  }
+
   return (
     <html lang="en">
       <head>
-        <GoogleTagManager />
+        <GoogleTagManager nonce={nonce} />
+        <GoogleRecaptcha nonce={nonce} />
       </head>
       <body
         className={`font-sans antialiased dark:bg-slate-950 ${fontSans.variable}`}

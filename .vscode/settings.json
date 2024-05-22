@@ -10,6 +10,7 @@
     "nextjs",
     "opengraph",
     "Recaptcha",
+    "grecaptcha",
     "tailwindcss",
     "testid",
     "webp",

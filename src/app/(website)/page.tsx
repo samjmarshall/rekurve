@@ -6,14 +6,22 @@ import Hero from "./_components/hero"
 import jsonLd from "~/lib/json-ld"
 import { env } from "~/env"
 import Script from "next/script"
-import { loadRecaptcha } from "~/lib/recaptcha-client"
+import { headers } from "next/headers"
+import { GoogleRecaptcha } from "./_components/recaptcha"
 
 export default function LandingPage() {
+  const nonce = headers().get("x-nonce")
+
+  if (!nonce) {
+    throw new Error("Missing nonce header")
+  }
+
   return (
     <main className="flex-1">
       <Script
         id="json-ld"
         type="application/ld+json"
+        nonce={nonce}
         dangerouslySetInnerHTML={{
           __html: jsonLd({
             title: env.COMPANY_NAME,
@@ -21,7 +29,6 @@ export default function LandingPage() {
           }),
         }}
       />
-      {loadRecaptcha()}
 
       <Hero />
 

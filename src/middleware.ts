@@ -2,25 +2,25 @@ import { type NextRequest, NextResponse } from "next/server"
 
 import { env } from "~/env"
 
-// export const config = {
-//   matcher: [
-//     /*
-//      Vercel recommend ignoring matching prefetches (from next/link) and static assets that don't need the CSP header.
-//      * Match all request paths except for the ones starting with:
-//      * - api (API routes)
-//      * - _next/static (static files)
-//      * - _next/image (image optimization files)
-//      * - favicon.ico (favicon file)
-//      */
-//     {
-//       source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
-//       missing: [
-//         { type: "header", key: "next-router-prefetch" },
-//         { type: "header", key: "purpose", value: "prefetch" },
-//       ],
-//     },
-//   ],
-// }
+export const config = {
+  matcher: [
+    /*
+     Vercel recommend ignoring matching prefetches (from next/link) and static assets that don't need the CSP header.
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    {
+      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
+  ],
+}
 
 export function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64")

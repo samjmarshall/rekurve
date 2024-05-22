@@ -35,8 +35,8 @@ export default function Privacy() {
         dangerouslySetInnerHTML={{
           __html: jsonLd({
             urlPath: "/privacy",
-            title: metadata.title as string,
-            description: metadata.description!,
+            title: metadata.title,
+            description: metadata.description,
           }),
         }}
       />

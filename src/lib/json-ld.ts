@@ -2,8 +2,6 @@ import { type Metadata } from "next"
 import { env } from "~/env"
 
 interface JsonLdParams extends Metadata {
-  title: string
-  description: string
   urlPath?: string
 }
 

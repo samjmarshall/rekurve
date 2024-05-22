@@ -6,9 +6,9 @@ import { Inter as FontSans } from "next/font/google"
 import WebsiteFooter from "./_components/footer"
 import WebsiteHeader from "./_components/header"
 import openGraph from "~/lib/open-graph"
-import { GoogleTagManager } from "./_components/gtm"
 import { headers } from "next/headers"
-import { GoogleRecaptcha } from "./_components/recaptcha"
+import Script from "next/script"
+import { env } from "~/env"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -47,8 +47,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <GoogleTagManager nonce={nonce} />
-        <GoogleRecaptcha nonce={nonce} />
+        <Script
+          id="gtm-init"
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: `
+        (function(w,l){
+          w[l]=w[l]||[];
+          w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+        })(window,'dataLayer');`,
+          }}
+        />
+        <Script
+          id="gtm"
+          nonce={nonce}
+          src={`https://www.googletagmanager.com/gtm.js?id=${env.GOOGLE_TAG_MANAGER_ID}`}
+        />
       </head>
       <body
         className={`font-sans antialiased dark:bg-slate-950 ${fontSans.variable}`}

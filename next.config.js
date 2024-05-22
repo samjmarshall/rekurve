@@ -29,15 +29,11 @@ const config = {
         {
           key: "Content-Security-Policy",
           value: [
-            "default-src 'self';",
-            "base-uri 'none';",
+            "default-src 'none';",
             "connect-src 'self' https://www.google-analytics.com/g/collect;",
             `font-src 'self' ${process.env.NODE_ENV === "development" ? "https://fonts.gstatic.com" : ""};`,
-            "form-action 'none';",
-            "frame-ancestors 'none';",
             "frame-src 'self' https://www.google.com/recaptcha/ https://www.googletagmanager.com/ns.html;",
             `img-src 'self' data: https://lh3.googleusercontent.com ${process.env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};`,
-            "object-src 'none';",
             "script-src 'self' 'unsafe-eval';",
             `script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/releases/ ${process.env.NODE_ENV === "development" ? "https://www.googletagmanager.com" : "https://www.googletagmanager.com/gtm.js https://www.googletagmanager.com/gtag/js"};`,
             `style-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === "development" ? "https://www.googletagmanager.com https://fonts.googleapis.com" : ""};`,

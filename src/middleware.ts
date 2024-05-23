@@ -32,9 +32,7 @@ export function middleware(request: NextRequest) {
     base-uri 'none';
     connect-src 'self' https://www.google-analytics.com/g/collect;
     font-src 'self' ${gtmPreviewAndDebugSources ? "https://fonts.gstatic.com" : ""};
-    form-action 'none';
     frame-src https://www.google.com/recaptcha/;
-    frame-ancestors 'none';
     img-src 'self' data: https://lh3.googleusercontent.com ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};
     script-src 'self' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : ""};
     script-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com/gtm.js https://www.googletagmanager.com/gtag/js https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/releases/;
@@ -52,9 +50,7 @@ export function middleware(request: NextRequest) {
   //   base-uri 'none';
   //   connect-src 'self' https://www.google-analytics.com/g/collect;
   //   font-src 'self' ${gtmPreviewAndDebugSources ? "https://fonts.gstatic.com" : ""};
-  //   form-action 'none';
   //   frame-src https://www.google.com/recaptcha/;
-  //   frame-ancestors 'none';
   //   img-src 'self' data: https://lh3.googleusercontent.com ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};
   //   script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : ""};
   //   style-src 'self' 'nonce-${nonce}';

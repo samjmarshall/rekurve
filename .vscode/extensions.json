@@ -9,5 +9,6 @@
     "amatiasq.sort-imports",
     "austenc.tailwind-docs",
     "bradlc.vscode-tailwindcss",
+    "clinyong.vscode-css-modules",
   ]
 }

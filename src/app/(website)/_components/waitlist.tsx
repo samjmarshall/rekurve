@@ -32,9 +32,9 @@ export function Waitlist() {
   const [open, setOpen] = React.useState(false)
   const [email, setEmail] = React.useState("")
   const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
-  const eventName = "waitlist_add_email"
+  const eventName = "waitlist_signup"
 
-  const addEmail = api.waitlist.addEmail.useMutation({
+  const signUp = api.waitlist.signUp.useMutation({
     onSuccess: () => {
       setOpen(true)
       sendGTMEvent({ event: eventName, value: "success" })
@@ -65,7 +65,7 @@ export function Waitlist() {
       return
     }
 
-    addEmail.mutate({ ...data, token })
+    signUp.mutate({ ...data, token })
   }
 
   return (
@@ -96,9 +96,9 @@ export function Waitlist() {
             <Button
               type="submit"
               className="rounded-t-none sm:rounded-l-none sm:rounded-tr-sm dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-              disabled={addEmail.isPending || recaptchaLoading}
+              disabled={signUp.isPending || recaptchaLoading}
             >
-              {addEmail.isPending || recaptchaLoading
+              {signUp.isPending || recaptchaLoading
                 ? "Joining waitlist..."
                 : "Join the Waitlist"}
             </Button>

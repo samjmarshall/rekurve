@@ -9,14 +9,14 @@ import { waitlist } from "~/server/db/schema"
 import { z } from "zod"
 
 export const waitlistRouter = createTRPCRouter({
-  addEmail: publicProcedure
+  signUp: publicProcedure
     .input(z.object({ email: z.string().email(), token: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const recaptcha = await verifyRecaptcha(input.token)
 
       if (!recaptcha.success || recaptcha.score < env.RECAPTCHA_THRESHOLD) {
         logger.warn({
-          request: "waitlist.addEmail",
+          request: "waitlist.signUp",
           code: "UNAUTHORIZED",
           recaptcha,
         })
@@ -38,7 +38,7 @@ export const waitlistRouter = createTRPCRouter({
         })
       } catch (error: unknown) {
         logger.error({
-          request: "waitlist.addEmail",
+          request: "waitlist.signUp",
           message: error instanceof Error ? error.message : "Unknown error",
           data: error,
         })

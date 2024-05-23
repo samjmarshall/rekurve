@@ -36,7 +36,7 @@ export const env = createEnv({
       process.env.VERCEL ? z.string() : z.string().url(),
     ),
     RECAPTCHA_SECRET_KEY: z.string(),
-    RECAPTCHA_THRESHOLD: z.number().default(0.5),
+    RECAPTCHA_THRESHOLD: z.number().default(0.7),
     ROBOTS_TXT: z.string().default("Disallow"),
   },
 

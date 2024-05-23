@@ -61,6 +61,7 @@ export default function RootLayout({
         <Script
           id="gtm"
           nonce={nonce}
+          async
           src="https://www.googletagmanager.com/gtm.js?id=GTM-KQSV96ST"
         />
       </head>

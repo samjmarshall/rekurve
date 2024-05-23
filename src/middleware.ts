@@ -43,7 +43,7 @@ export function middleware(request: NextRequest) {
     upgrade-insecure-requests;
     report-uri /api/csp-reports;
   `
-
+  // TODO: Try implementing a nonce-based CSP header for (login) and (application) pages only. Leaving (website) pages without a nonce-based CSP header, like above. See: https://nextjs.org/docs/app/building-your-application/routing/middleware#conditional-statements
   // CSP header when using 'nonce' - WARNING: Using 'nonce' will prevent index/page caching as each request will have a unique nonce
   // const nonce = Buffer.from(crypto.randomUUID()).toString("base64")
   //

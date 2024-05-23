@@ -33,6 +33,9 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 }
 
+export const dynamic = "force-static"
+export const revalidate = 60
+
 export default function RootLayout({
   children,
 }: {

@@ -64,12 +64,12 @@ export default function RootLayout({
           w[l]=w[l]||[];
           w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
         })(window,'dataLayer');`,
-          }}
+        }}
       />
       <Script
         id="gtm"
         nonce={nonce}
-        strategy="lazyOnload"
+        strategy="worker"
         src="https://www.googletagmanager.com/gtm.js?id=GTM-KQSV96ST"
       />
     </html>

@@ -12,7 +12,7 @@ import { Input } from "~/components/ui/input"
 import { Textarea } from "~/components/ui/textarea"
 import { api } from "~/trpc/react"
 import { executeRecaptcha } from "~/lib/recaptcha-client"
-import { sendGTMEvent } from '~/lib/gtm-client'
+import { sendGTMEvent } from "~/lib/gtm-client"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
@@ -64,11 +64,11 @@ export default function LeadDetailsForm({
     onSuccess: () => {
       setOpen(false)
       toast.success(`Your information has been submitted!`)
-      sendGTMEvent({ event: eventName, value: "success" })
+      sendGTMEvent({ event: eventName, result: "success" })
     },
     onError: () => {
       toast.error("Failed to send information. Please try again!")
-      sendGTMEvent({ event: eventName, value: "error" })
+      sendGTMEvent({ event: eventName, result: "error" })
     },
   })
 

@@ -7,7 +7,7 @@ import WebsiteFooter from "./_components/footer"
 import WebsiteHeader from "./_components/header"
 import openGraph from "~/lib/open-graph"
 import { headers } from "next/headers"
-import Script from "next/script"
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { env } from "~/env"
 
 const fontSans = FontSans({
@@ -23,12 +23,12 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "rekurve",
-    template: "%s | rekurve",
+    default: env.COMPANY_NAME,
+    template: `%s | ${env.COMPANY_NAME}`,
   },
   description:
     "Construction management software to stay organized, track progress, costs and payments, and collaborate with your customers.",
-  publisher: "rekurve",
+  publisher: env.COMPANY_NAME,
   openGraph,
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 }
@@ -46,24 +46,6 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <head>
-        <Script
-          id="gtm-init"
-          nonce={nonce}
-          dangerouslySetInnerHTML={{
-            __html: `
-        (function(w,l){
-          w[l]=w[l]||[];
-          w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-        })(window,'dataLayer');`,
-          }}
-        />
-        <Script
-          id="gtm"
-          nonce={nonce}
-          src={`https://www.googletagmanager.com/gtm.js?id=${env.GOOGLE_TAG_MANAGER_ID}`}
-        />
-      </head>
       <body
         className={`font-sans antialiased dark:bg-slate-950 ${fontSans.variable}`}
       >
@@ -73,6 +55,7 @@ export default function RootLayout({
           <WebsiteFooter />
         </div>
       </body>
+      <GoogleAnalytics gaId="G-GCJF8E67ZL" />
     </html>
   )
 }

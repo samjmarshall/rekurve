@@ -4,10 +4,11 @@ import { Waitlist } from "./_components/waitlist"
 import { TRPCReactProvider } from "~/trpc/react"
 import Hero from "./_components/hero"
 import jsonLd from "~/lib/json-ld"
-import { env } from "~/env"
 import Script from "next/script"
 import { headers } from "next/headers"
 import { GoogleRecaptcha } from "./_components/recaptcha"
+import { metadata } from "./layout"
+import { env } from "~/env"
 
 export default function LandingPage() {
   const nonce = headers().get("x-nonce")
@@ -25,14 +26,12 @@ export default function LandingPage() {
         dangerouslySetInnerHTML={{
           __html: jsonLd({
             title: env.COMPANY_NAME,
-            description: "Home",
+            description: metadata.description,
           }),
         }}
       />
       <GoogleRecaptcha nonce={nonce} />
-
       <Hero />
-
       {/* Features - Option 1 */}
       {/* <section
           className="w-full bg-gray-100 py-12 dark:bg-gray-800 md:py-24 lg:py-32"

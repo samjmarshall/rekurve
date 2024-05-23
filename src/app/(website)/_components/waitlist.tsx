@@ -30,7 +30,8 @@ const FormSchema = z.object({
   }),
 })
 
-export function Waitlist({ nonce }: { nonce: string }) {
+// export function Waitlist({ nonce }: { nonce: string }) {
+export function Waitlist() {
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState("")
   const [loadRecaptcha, setLoadRecaptcha] = useState(false)
@@ -76,7 +77,7 @@ export function Waitlist({ nonce }: { nonce: string }) {
     <div className="mx-auto mt-8 w-full max-w-sm sm:mt-0">
       {loadRecaptcha && (
         <GoogleRecaptcha
-          nonce={nonce}
+          // nonce={nonce}
           siteKey={env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
         />
       )}
@@ -106,7 +107,7 @@ export function Waitlist({ nonce }: { nonce: string }) {
             />
             <Button
               type="submit"
-              className="rounded-t-none sm:rounded-l-none sm:rounded-tr-sm dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+              className="rounded-t-none sm:rounded-l-none sm:rounded-tr-sm"
               disabled={signUp.isPending || recaptchaLoading}
             >
               {signUp.isPending || recaptchaLoading
@@ -114,7 +115,7 @@ export function Waitlist({ nonce }: { nonce: string }) {
                 : "Join the Waitlist"}
             </Button>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-gray-500">
             By joining, you agree to our <TermsAndConditions />
           </p>
         </form>

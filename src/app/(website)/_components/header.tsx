@@ -10,7 +10,7 @@ export default function WebsiteHeader() {
       >
         <Logo />
       </Link>
-      <nav className="ml-auto flex gap-4 sm:gap-6 dark:text-gray-50">
+      <nav className="ml-auto flex gap-4 sm:gap-6">
         <Link
           className="hidden text-sm font-medium underline-offset-4 hover:underline sm:block"
           href="/#features"
@@ -42,7 +42,7 @@ export default function WebsiteHeader() {
           Contact
         </Link>
         {/* <Link
-          className="text-sm font-medium text-gray-500 underline-offset-4 hover:underline dark:text-gray-400"
+          className="text-sm font-medium text-gray-500 underline-offset-4 hover:underline"
           href="/login"
         >
           Login

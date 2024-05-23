@@ -1,16 +1,16 @@
 import Script from "next/script"
 
 export function GoogleRecaptcha({
-  nonce,
+  // nonce,
   siteKey,
 }: {
-  nonce?: string
+  // nonce: string
   siteKey: string
 }) {
   return (
     <Script
       id="recaptcha-enterprise"
-      nonce={nonce}
+      // nonce={nonce}
       src={`https://www.google.com/recaptcha/enterprise.js?render=${siteKey}`}
     />
   )

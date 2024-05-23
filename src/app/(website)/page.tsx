@@ -4,24 +4,24 @@ import { Waitlist } from "./_components/waitlist"
 import { TRPCReactProvider } from "~/trpc/react"
 import jsonLd from "~/lib/json-ld"
 import Script from "next/script"
-import { headers } from "next/headers"
+// import { headers } from "next/headers"
 import { metadata } from "./layout"
 import { env } from "~/env"
 import Link from "next/link"
 
 export default function LandingPage() {
-  const nonce = headers().get("x-nonce")
+  // const nonce = headers().get("x-nonce")
 
-  if (!nonce) {
-    throw new Error("Missing nonce header")
-  }
+  // if (!nonce) {
+  //   throw new Error("Missing nonce header")
+  // }
 
   return (
     <main className="flex-1">
       <Script
         id="json-ld"
         type="application/ld+json"
-        nonce={nonce}
+        // nonce={nonce}
         dangerouslySetInnerHTML={{
           __html: jsonLd({
             title: env.COMPANY_NAME,
@@ -35,7 +35,7 @@ export default function LandingPage() {
           <div className="flex flex-col items-center space-y-5 text-center">
             <h1
               aria-label="Construction Projects On Schedule & On Budget"
-              className="text-3xl/none font-extrabold tracking-tighter sm:text-4xl/none md:text-5xl/none lg:text-6xl/none dark:text-gray-50"
+              className="text-3xl/none font-extrabold tracking-tighter sm:text-4xl/none md:text-5xl/none lg:text-6xl/none"
             >
               <span>Construction Projects</span>
               <span className="mt-2 flex flex-col items-center justify-center sm:mt-3 sm:flex-row">
@@ -50,28 +50,30 @@ export default function LandingPage() {
                 </span>
               </span>
             </h1>
-            <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
+            <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl">
               Stay organized, track progress, monitor costs and payments, and
               collaborate with your customers.
             </p>
             <div className="flex flex-col gap-4">
               {/* <Link
-              className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+              className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50"
               href="#contact"
             >
               Join the Waitlist
             </Link> */}
               <TRPCReactProvider>
-                <Waitlist nonce={nonce} />
+                <Waitlist
+                // nonce={nonce}
+                />
               </TRPCReactProvider>
               {/* <Link
-                  className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
+                  className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50"
                   href="#"
                 >
                   Watch Demo
                 </Link> */}
               <Link
-                className="mx-auto inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
+                className="mx-auto inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50"
                 href="#features"
               >
                 Learn More
@@ -83,19 +85,19 @@ export default function LandingPage() {
 
       {/* Features - Option 1 */}
       {/* <section
-          className="w-full bg-gray-100 py-12 dark:bg-gray-800 md:py-24 lg:py-32"
+          className="w-full bg-gray-100 py-12 md:py-24 lg:py-32"
           id="features"
         >
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">
+                <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm">
                   Key Features
                 </div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                   Everything you need to manage construction projects.
                 </h2>
-                <p className="max-w-[900px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed">
                   From initial estimation to final handover, ConstructPro has
                   the tools to keep your projects on track and your clients
                   happy.
@@ -115,7 +117,7 @@ export default function LandingPage() {
                   <li>
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">Project Estimation</h3>
-                      <p className="text-gray-500 dark:text-gray-400">
+                      <p className="text-gray-500">
                         Accurately estimate project costs and timelines with our
                         powerful estimation tools.
                       </p>
@@ -124,7 +126,7 @@ export default function LandingPage() {
                   <li>
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">Scheduling</h3>
-                      <p className="text-gray-500 dark:text-gray-400">
+                      <p className="text-gray-500">
                         Create and manage detailed project schedules with
                         drag-and-drop ease.
                       </p>
@@ -133,7 +135,7 @@ export default function LandingPage() {
                   <li>
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">Financial Tracking</h3>
-                      <p className="text-gray-500 dark:text-gray-400">
+                      <p className="text-gray-500">
                         Keep an eye on project budgets and expenses with
                         real-time financial tracking.
                       </p>
@@ -142,7 +144,7 @@ export default function LandingPage() {
                   <li>
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">Task Management</h3>
-                      <p className="text-gray-500 dark:text-gray-400">
+                      <p className="text-gray-500">
                         Assign tasks, set deadlines, and track progress with our
                         intuitive task management tools.
                       </p>
@@ -153,7 +155,7 @@ export default function LandingPage() {
                       <h3 className="text-xl font-bold">
                         Client Collaboration
                       </h3>
-                      <p className="text-gray-500 dark:text-gray-400">
+                      <p className="text-gray-500">
                         Keep clients in the loop with real-time updates and
                         secure file sharing.
                       </p>
@@ -170,10 +172,10 @@ export default function LandingPage() {
         <div className="container space-y-12 px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold tracking-tighter sm:text-5xl dark:text-gray-50">
+              <h2 className="text-2xl font-bold tracking-tighter sm:text-5xl">
                 Key Features
               </h2>
-              <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+              <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed">
                 Tools to manage every aspect of your construction projects, from
                 estimation and scheduling to client collaboration and proposals.
               </p>
@@ -181,62 +183,50 @@ export default function LandingPage() {
           </div>
           <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
             <div className="grid gap-1">
-              <CalendarIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold dark:text-gray-50">
-                Smart Scheduling
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <CalendarIcon className="h-8 w-8 text-gray-900" />
+              <h3 className="text-lg font-bold">Smart Scheduling</h3>
+              <p className="text-sm text-gray-500">
                 AI assisted project schedules and action items to track progress
                 in real-time, helping prevent problems before they hit.
               </p>
             </div>
             <div className="grid gap-1">
-              <WalletIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold dark:text-gray-50">
-                Cashflow Forecasting
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <WalletIcon className="h-8 w-8 text-gray-900" />
+              <h3 className="text-lg font-bold">Cashflow Forecasting</h3>
+              <p className="text-sm text-gray-500">
                 Xero and Reckon integration to sync past and future project
                 expenses, including project payments to forecast your cashflow.
               </p>
             </div>
             <div className="grid gap-1">
-              <ClipboardIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold dark:text-gray-50">
-                Task Management
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <ClipboardIcon className="h-8 w-8 text-gray-900" />
+              <h3 className="text-lg font-bold">Task Management</h3>
+              <p className="text-sm text-gray-500">
                 Assign tasks, set deadlines, and collaborate with your team,
                 suppliers and contractors to ensure projects are completed on
                 time.
               </p>
             </div>
             <div className="grid gap-1">
-              <PercentIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold dark:text-gray-50">
-                Project Estimation
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <PercentIcon className="h-8 w-8 text-gray-900" />
+              <h3 className="text-lg font-bold">Project Estimation</h3>
+              <p className="text-sm text-gray-500">
                 Accurately estimate project costs and materials with our
                 advanced estimation tools.
               </p>
             </div>
             <div className="grid gap-1">
-              <MergeIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold dark:text-gray-50">
-                Client Collaboration
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <MergeIcon className="h-8 w-8 text-gray-900" />
+              <h3 className="text-lg font-bold">Client Collaboration</h3>
+              <p className="text-sm text-gray-500">
                 Seamlessly collaborate with clients, provide proposals, share
                 updates, and get real-time feedback on your projects.
               </p>
             </div>
             <div className="grid gap-1">
-              <ViewIcon className="h-8 w-8 text-gray-900 dark:text-gray-50" />
-              <h3 className="text-lg font-bold dark:text-gray-50">
-                Comprehensive Reporting
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <ViewIcon className="h-8 w-8 text-gray-900" />
+              <h3 className="text-lg font-bold">Comprehensive Reporting</h3>
+              <p className="text-sm text-gray-500">
                 Generate detailed reports on project progress, financials and
                 more. Keeping you informed.
               </p>
@@ -244,13 +234,13 @@ export default function LandingPage() {
           </div>
           {/* <div className="flex flex-col items-center justify-center gap-4 sm:flex-row md:hidden">
             <Link
-              className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+              className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50"
               href="#contact"
             >
               Contact Us
             </Link>
             <Link
-              className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
+              className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50"
               href="#about"
             >
               Learn More
@@ -263,10 +253,10 @@ export default function LandingPage() {
       {/* <section className="w-full py-12 md:py-24 lg:py-32" id="about">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
           <div className="space-y-3">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl dark:text-gray-50">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
               Trusted by leading organizations.
             </h2>
-            <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+            <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed">
               rekurve is used by construction companies of all sizes to
               streamline their projects and deliver exceptional results.
             </p>
@@ -312,13 +302,13 @@ export default function LandingPage() {
       </section> */}
 
       {/* Logos/About - Option 2 */}
-      {/* <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800" id="about">
+      {/* <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100" id="about">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
                 Trusted by Leading Construction Companies
               </h2>
-              <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+              <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed">
                 Construct Pro is the preferred construction project management solution for top companies in the
                 industry.
               </p>
@@ -380,7 +370,7 @@ export default function LandingPage() {
           <div className="container grid items-center justify-center gap-4 px-4 md:px-6">
             <div className="space-y-3 text-center">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">About Construct Pro</h2>
-              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed">
                 Construct Pro was founded with the mission to help construction teams work more efficiently and
                 profitably. Our platform is designed by industry experts to streamline every aspect of your construction
                 projects, from planning to completion.
@@ -397,7 +387,7 @@ export default function LandingPage() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold">Trusted by Leading Contractors</h3>
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <p className="text-gray-500">
                     Construct Pro is used by some of the largest construction companies in the industry, helping them
                     streamline their operations and improve profitability.
                   </p>
@@ -439,7 +429,7 @@ export default function LandingPage() {
 
       {/* Testimonials - Option 1 */}
       {/* <section
-        className="w-full bg-gray-100 py-12 md:py-24 lg:py-32 dark:bg-gray-800"
+        className="w-full bg-gray-100 py-12 md:py-24 lg:py-32"
         id="testimonials"
       >
         <div className="container px-4 md:px-6">
@@ -453,7 +443,7 @@ export default function LandingPage() {
             />
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
-                <blockquote className="text-lg font-semibold leading-snug lg:text-xl lg:leading-normal xl:text-2xl dark:text-gray-200">
+                <blockquote className="text-lg font-semibold leading-snug lg:text-xl lg:leading-normal xl:text-2xl">
                   &quot;Using rekurve allowed us to double our business. We can
                   finally see exactly what&apos;s happening in our business, and
                   see what&apos;s coming in the weeks ahead. The planning tools
@@ -461,10 +451,10 @@ export default function LandingPage() {
                   proposal from weeks to days.&quot;
                 </blockquote>
                 <div>
-                  <div className="font-semibold dark:text-gray-400">
+                  <div className="font-semibold">
                     Ben Makim
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                  <div className="text-sm text-gray-600">
                     Owner, Makim Bulders
                   </div>
                 </div>
@@ -479,13 +469,13 @@ export default function LandingPage() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">
+                <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm">
                   Customer Testimonials
                 </div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                   What Our Customers Say
                 </h2>
-                <p className="max-w-[900px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed">
                   Hear from the construction professionals who have streamlined
                   their workflows with Construct Pro.
                 </p>
@@ -501,7 +491,7 @@ export default function LandingPage() {
                 </blockquote>
                 <div>
                   <div className="font-semibold">John Doe</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="text-sm text-gray-500">
                     Project Manager, ABC Construction
                   </div>
                 </div>
@@ -535,7 +525,7 @@ export default function LandingPage() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-3">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Pricing</h2>
-                <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+                <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed">
                   Choose the plan that fits your construction business. No hidden fees, cancel anytime.
                 </p>
               </div>
@@ -551,7 +541,7 @@ export default function LandingPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-1">
                     <p className="text-4xl font-bold">$29</p>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-gray-500">
                       per month
                     </p>
                   </div>
@@ -584,7 +574,7 @@ export default function LandingPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-1">
                     <p className="text-4xl font-bold">$49</p>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-gray-500">
                       per month
                     </p>
                   </div>
@@ -621,7 +611,7 @@ export default function LandingPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-1">
                     <p className="text-4xl font-bold">$99</p>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-gray-500">
                       per month
                     </p>
                   </div>
@@ -657,12 +647,12 @@ export default function LandingPage() {
         </section> */}
 
       {/* Pricing - Option 2 */}
-      {/* <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800" id="pricing">
+      {/* <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100" id="pricing">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-3">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Simple, transparent pricing.</h2>
-                <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+                <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed">
                   Choose the plan that's right for your business. No hidden fees, no surprises.
                 </p>
               </div>
@@ -696,12 +686,12 @@ export default function LandingPage() {
                 <CardFooter>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold">$49</span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">/month</span>
+                    <span className="text-sm text-gray-500">/month</span>
                   </div>
                   <Button className="w-full mt-4">Get Started</Button>
                 </CardFooter>
               </Card>
-              <Card className="bg-gray-900 text-gray-50 dark:bg-gray-50 dark:text-gray-900">
+              <Card className="bg-gray-900 text-gray-50">
                 <CardHeader>
                   <CardTitle>Pro</CardTitle>
                   <CardDescription>For medium-sized projects and teams</CardDescription>
@@ -733,9 +723,9 @@ export default function LandingPage() {
                 <CardFooter>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold">$99</span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">/month</span>
+                    <span className="text-sm text-gray-500">/month</span>
                   </div>
-                  <Button className="w-full mt-4 bg-gray-50 text-gray-900 hover:bg-gray-50/90 dark:bg-gray-900 dark:text-gray-50 dark:hover:bg-gray-900/90">
+                  <Button className="w-full mt-4 bg-gray-50 text-gray-900 hover:bg-gray-50/90">
                     Get Started
                   </Button>
                 </CardFooter>
@@ -772,7 +762,7 @@ export default function LandingPage() {
                 <CardFooter>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold">$199</span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">/month</span>
+                    <span className="text-sm text-gray-500">/month</span>
                   </div>
                   <Button className="w-full mt-4">Get Started</Button>
                 </CardFooter>
@@ -784,17 +774,19 @@ export default function LandingPage() {
       <section id="contact" className="w-full py-12 md:py-24 lg:py-32">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
           <div className="space-y-3">
-            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight dark:text-gray-50">
+            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
               Take Control of Your Construction Projects
             </h2>
-            <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
-              Join the waitlist for early access. There are limited spots
-              available.
+            <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed">
+              Join the waitlist for early access. There is a limited number of
+              spots available.
             </p>
           </div>
 
           <TRPCReactProvider>
-            <Waitlist nonce={nonce} />
+            <Waitlist
+            // nonce={nonce}
+            />
           </TRPCReactProvider>
         </div>
       </section>

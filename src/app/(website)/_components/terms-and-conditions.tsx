@@ -13,10 +13,7 @@ export default function TermsAndConditions() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          variant="link"
-          className="p-0 text-xs text-gray-500 dark:text-gray-400"
-        >
+        <Button variant="link" className="p-0 text-xs text-gray-500">
           Terms &amp; Conditions
         </Button>
       </DialogTrigger>
@@ -24,7 +21,7 @@ export default function TermsAndConditions() {
         <DialogHeader>
           <DialogTitle>Terms &amp; Conditions</DialogTitle>
         </DialogHeader>
-        <article className="space-y-4 text-gray-500 dark:text-gray-400">
+        <article className="space-y-4 text-gray-500">
           <p>
             You may unsubscribe from any communications at any time. For more
             information on how to unsubscribe, our privacy practices, and how we

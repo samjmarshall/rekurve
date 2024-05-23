@@ -1,5 +1,5 @@
 import { type Metadata } from "next"
-import { headers } from "next/headers"
+// import { headers } from "next/headers"
 import Link from "next/link"
 import Script from "next/script"
 import { env } from "~/env"
@@ -20,18 +20,18 @@ export const metadata: Metadata = {
 }
 
 export default function Privacy() {
-  const nonce = headers().get("x-nonce")
+  // const nonce = headers().get("x-nonce")
 
-  if (!nonce) {
-    throw new Error("Missing nonce header")
-  }
+  // if (!nonce) {
+  //   throw new Error("Missing nonce header")
+  // }
 
   return (
     <main className="w-screen flex-1 justify-center">
       <Script
         id="json-ld"
         type="application/ld+json"
-        nonce={nonce}
+        // nonce={nonce}
         dangerouslySetInnerHTML={{
           __html: jsonLd({
             urlPath: "/privacy",

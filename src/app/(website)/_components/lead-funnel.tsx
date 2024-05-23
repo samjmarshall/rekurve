@@ -33,13 +33,11 @@ export default function LeadFunnel({
   if (isDesktop) {
     return (
       <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerContent className="dark:border-gray-900 dark:bg-gray-800">
+        <DrawerContent>
           <div className="mx-auto w-full max-w-2xl">
             <DrawerHeader>
-              <DrawerTitle className="dark:text-gray-50">{title}</DrawerTitle>
-              <DrawerDescription className="dark:text-gray-400">
-                {description}
-              </DrawerDescription>
+              <DrawerTitle>{title}</DrawerTitle>
+              <DrawerDescription>{description}</DrawerDescription>
             </DrawerHeader>
             <DrawerFooter>
               <LeadDetailsForm email={email} setOpen={setOpen} />
@@ -54,10 +52,8 @@ export default function LeadFunnel({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="dark:text-gray-50">{title}</DialogTitle>
-          <DialogDescription className="dark:text-gray-400">
-            {description}
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <LeadDetailsForm email={email} setOpen={setOpen} />
       </DialogContent>

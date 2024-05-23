@@ -6,7 +6,7 @@ import { Inter as FontSans } from "next/font/google"
 import WebsiteFooter from "./_components/footer"
 import WebsiteHeader from "./_components/header"
 import openGraph from "~/lib/open-graph"
-import { headers } from "next/headers"
+// import { headers } from "next/headers"
 import { env } from "~/env"
 import Script from "next/script"
 
@@ -38,18 +38,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const nonce = headers().get("x-nonce")
+  // const nonce = headers().get("x-nonce")
 
-  if (!nonce) {
-    throw new Error("Missing nonce header")
-  }
+  // if (!nonce) {
+  //   throw new Error("Missing nonce header")
+  // }
 
   return (
     <html lang="en">
       <head>
         <Script
           id="gtm-init"
-          nonce={nonce}
+          // nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `
           (function(w,l){
@@ -60,15 +60,12 @@ export default function RootLayout({
         />
         <Script
           id="gtm"
-          nonce={nonce}
-          strategy="lazyOnload"
-          defer
+          // nonce={nonce}
+          async
           src="https://www.googletagmanager.com/gtm.js?id=GTM-KQSV96ST"
         />
       </head>
-      <body
-        className={`font-sans antialiased dark:bg-slate-950 ${fontSans.variable}`}
-      >
+      <body className={`font-sans antialiased ${fontSans.variable}`}>
         <div className="flex min-h-[100dvh] flex-col">
           <WebsiteHeader />
           {children}

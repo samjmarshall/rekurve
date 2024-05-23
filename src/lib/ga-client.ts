@@ -1,7 +1,6 @@
 declare global {
   interface Window {
     dataLayer?: object[]
-    [key: string]: unknown
   }
 }
 

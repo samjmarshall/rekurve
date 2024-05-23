@@ -7,8 +7,8 @@ import WebsiteFooter from "./_components/footer"
 import WebsiteHeader from "./_components/header"
 import openGraph from "~/lib/open-graph"
 import { headers } from "next/headers"
-import { GoogleAnalytics } from '@next/third-parties/google'
 import { env } from "~/env"
+import Script from "next/script"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -44,6 +44,9 @@ export default function RootLayout({
     throw new Error("Missing nonce header")
   }
 
+  // Google Analytics ID - Using an env is unnecessary
+  const gaId = 'G-GCJF8E67ZL'
+
   return (
     <html lang="en">
       <body
@@ -55,7 +58,21 @@ export default function RootLayout({
           <WebsiteFooter />
         </div>
       </body>
-      <GoogleAnalytics gaId="G-GCJF8E67ZL" />
+      <Script
+        id="ga-init"
+        dangerouslySetInnerHTML={{
+          __html: `
+          window['dataLayer'] = window['dataLayer'] || [];
+          function gtag(){window['dataLayer'].push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', '${gaId}');`,
+        }}
+      />
+      <Script
+        id="ga"
+        src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+      />
     </html>
   )
 }

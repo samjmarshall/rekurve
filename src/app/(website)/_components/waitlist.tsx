@@ -16,7 +16,7 @@ import TermsAndConditions from "./terms-and-conditions"
 import { Toaster } from "~/components/ui/sonner"
 import { api } from "~/trpc/react"
 import { executeRecaptcha } from "~/lib/recaptcha-client"
-import { sendGAEvent } from '@next/third-parties/google'
+import { sendGAEvent } from '~/lib/ga-client'
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { z } from "zod"

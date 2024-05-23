@@ -46,6 +46,24 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <Script
+          id="gtm-init"
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: `
+          (function(w,l){
+            w[l]=w[l]||[];
+            w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+          })(window,'dataLayer');`,
+          }}
+        />
+        <Script
+          id="gtm"
+          nonce={nonce}
+          src="https://www.googletagmanager.com/gtm.js?id=GTM-KQSV96ST"
+        />
+      </head>
       <body
         className={`font-sans antialiased dark:bg-slate-950 ${fontSans.variable}`}
       >
@@ -55,23 +73,6 @@ export default function RootLayout({
           <WebsiteFooter />
         </div>
       </body>
-      <Script
-        id="gtm-init"
-        nonce={nonce}
-        dangerouslySetInnerHTML={{
-          __html: `
-        (function(w,l){
-          w[l]=w[l]||[];
-          w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-        })(window,'dataLayer');`,
-        }}
-      />
-      <Script
-        id="gtm"
-        nonce={nonce}
-        strategy="worker"
-        src="https://www.googletagmanager.com/gtm.js?id=GTM-KQSV96ST"
-      />
     </html>
   )
 }

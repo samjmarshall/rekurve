@@ -9,7 +9,6 @@ const config = {
   experimental: {
     typedRoutes: true,
     optimizeCss: true,
-    nextScriptWorkers: true,
   },
   swcMinify: true,
   outputFileTracing: true,

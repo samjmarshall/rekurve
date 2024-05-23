@@ -3,13 +3,13 @@
 import "gantt-task-react/dist/index.css"
 
 import { Gantt, ViewMode, type Task } from "gantt-task-react"
-import React from "react"
+import { useState } from "react"
 import { ViewSwitcher } from "./_components/view-switcher"
 import { getStartEndDateForProject, initTasks } from "./_helpers"
 
 export default function Schedule() {
-  const [view, setView] = React.useState<ViewMode>(ViewMode.Day)
-  const [tasks, setTasks] = React.useState<Task[]>(initTasks())
+  const [view, setView] = useState<ViewMode>(ViewMode.Day)
+  const [tasks, setTasks] = useState<Task[]>(initTasks())
   let columnWidth = 65
   if (view === ViewMode.Year) {
     columnWidth = 350

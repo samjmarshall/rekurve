@@ -9,16 +9,18 @@ import {
 } from "~/components/ui/form"
 
 import { Button } from "~/components/ui/button"
+import { GoogleRecaptcha } from "./recaptcha"
 import { Input } from "~/components/ui/input"
 import LeadFunnel from "./lead-funnel"
-import React from "react"
 import TermsAndConditions from "./terms-and-conditions"
 import { Toaster } from "~/components/ui/sonner"
 import { api } from "~/trpc/react"
+import { env } from "~/env"
 import { executeRecaptcha } from "~/lib/recaptcha-client"
 import { sendGTMEvent } from "~/lib/gtm-client"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
+import { useState } from "react"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -28,10 +30,11 @@ const FormSchema = z.object({
   }),
 })
 
-export function Waitlist() {
-  const [open, setOpen] = React.useState(false)
-  const [email, setEmail] = React.useState("")
-  const [recaptchaLoading, setRecaptchaLoading] = React.useState(false)
+export function Waitlist({ nonce }: { nonce: string }) {
+  const [open, setOpen] = useState(false)
+  const [email, setEmail] = useState("")
+  const [loadRecaptcha, setLoadRecaptcha] = useState(false)
+  const [recaptchaLoading, setRecaptchaLoading] = useState(false)
   const eventName = "waitlist_signup"
 
   const signUp = api.waitlist.signUp.useMutation({
@@ -70,6 +73,12 @@ export function Waitlist() {
 
   return (
     <div className="mx-auto mt-8 w-full max-w-sm sm:mt-0">
+      {loadRecaptcha && (
+        <GoogleRecaptcha
+          nonce={nonce}
+          siteKey={env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+        />
+      )}
       <Form {...form}>
         <form
           aria-label="Join the waitlist"
@@ -86,6 +95,7 @@ export function Waitlist() {
                       className="min-w-64 flex-1 rounded-b-none text-base focus-visible:border-slate-950 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-slate-950 focus-visible:ring-offset-0 sm:rounded-r-none sm:rounded-bl-sm sm:text-sm"
                       placeholder="Enter your email"
                       autoComplete="email"
+                      onFocus={() => setLoadRecaptcha(true)}
                       {...field}
                     />
                   </FormControl>

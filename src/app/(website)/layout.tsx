@@ -62,7 +62,7 @@ export default function RootLayout({
           id="gtm"
           nonce={nonce}
           strategy="lazyOnload"
-          async
+          defer
           src="https://www.googletagmanager.com/gtm.js?id=GTM-KQSV96ST"
         />
       </head>

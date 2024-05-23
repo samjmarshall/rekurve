@@ -43,6 +43,7 @@ export function Waitlist({ nonce }: { nonce: string }) {
       sendGTMEvent({ event: eventName, result: "success" })
     },
     onError: () => {
+      // TODO: Add error type to GTM Event for error analytics
       toast.error("Failed to add email to waitlist. Please try again later!")
       sendGTMEvent({ event: eventName, result: "error" })
     },

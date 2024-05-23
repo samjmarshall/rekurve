@@ -67,6 +67,7 @@ export default function LeadDetailsForm({
       sendGTMEvent({ event: eventName, result: "success" })
     },
     onError: () => {
+      // TODO: Add error type to GTM Event for error analytics
       toast.error("Failed to send information. Please try again!")
       sendGTMEvent({ event: eventName, result: "error" })
     },

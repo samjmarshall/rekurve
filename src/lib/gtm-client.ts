@@ -4,12 +4,12 @@ declare global {
   }
 }
 
-interface GAEvent {
+interface GTMEvent {
   event: string
   [key: string]: unknown
 }
 
-export function sendGAEvent(data: GAEvent) {
+export function sendGTMEvent(data: GTMEvent) {
   if (window.dataLayer) {
     window.dataLayer.push(data)
   }

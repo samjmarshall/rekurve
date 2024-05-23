@@ -44,9 +44,6 @@ export default function RootLayout({
     throw new Error("Missing nonce header")
   }
 
-  // Google Analytics ID - Using an env is unnecessary
-  const gaId = 'G-GCJF8E67ZL'
-
   return (
     <html lang="en">
       <body
@@ -59,19 +56,21 @@ export default function RootLayout({
         </div>
       </body>
       <Script
-        id="ga-init"
+        id="gtm-init"
+        nonce={nonce}
         dangerouslySetInnerHTML={{
           __html: `
-          window['dataLayer'] = window['dataLayer'] || [];
-          function gtag(){window['dataLayer'].push(arguments);}
-          gtag('js', new Date());
-
-          gtag('config', '${gaId}');`,
-        }}
+        (function(w,l){
+          w[l]=w[l]||[];
+          w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+        })(window,'dataLayer');`,
+          }}
       />
       <Script
-        id="ga"
-        src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+        id="gtm"
+        nonce={nonce}
+        strategy="lazyOnload"
+        src="https://www.googletagmanager.com/gtm.js?id=GTM-KQSV96ST"
       />
     </html>
   )

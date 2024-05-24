@@ -1,5 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "assignees": ["samjmarshall"],
-  "extends": ["github>V2-Digital/renovate-config"]
+  "extends": ["github>V2-Digital/renovate-config"],
+  "packageRules": [
+    {
+      "groupName": "NextJS",
+      "matchPackagePrefixes": [
+        "next",
+        "@next/bundle-analyzer",
+        "eslint-config-next"
+      ]
+    }
+  ]
 }

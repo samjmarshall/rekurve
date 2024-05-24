@@ -2,7 +2,7 @@ import "~/styles/globals.css"
 
 import { type Metadata, type Viewport } from "next"
 
-import { Inter as FontSans } from "next/font/google"
+import { Inter } from "next/font/google"
 import WebsiteHeader from "./_components/header"
 import openGraph from "~/lib/open-graph"
 // import { headers } from "next/headers"
@@ -10,9 +10,13 @@ import { env } from "~/env"
 import Script from "next/script"
 import WebsiteFooter from "./_components/footer"
 
-const fontSans = FontSans({
+export const runtime = "edge"
+
+const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
+  fallback: ["system-ui", "sans-serif"],
 })
 
 export const viewport: Viewport = {

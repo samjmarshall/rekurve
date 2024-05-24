@@ -15,7 +15,6 @@ export const runtime = "edge"
 const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
-  display: "swap",
   fallback: ["system-ui", "sans-serif"],
 })
 

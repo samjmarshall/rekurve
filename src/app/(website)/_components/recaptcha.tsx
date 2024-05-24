@@ -1,6 +1,6 @@
 import Script from "next/script"
 
-export function GoogleRecaptcha({
+export default function GoogleRecaptcha({
   // nonce,
   siteKey,
 }: {

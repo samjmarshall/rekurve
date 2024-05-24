@@ -3,12 +3,12 @@ import "~/styles/globals.css"
 import { type Metadata, type Viewport } from "next"
 
 import { Inter as FontSans } from "next/font/google"
-import WebsiteFooter from "./_components/footer"
 import WebsiteHeader from "./_components/header"
 import openGraph from "~/lib/open-graph"
 // import { headers } from "next/headers"
 import { env } from "~/env"
 import Script from "next/script"
+import WebsiteFooter from "./_components/footer"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -32,9 +32,6 @@ export const metadata: Metadata = {
   openGraph,
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 }
-
-export const dynamic = "force-static"
-export const revalidate = 60
 
 export default function RootLayout({
   children,

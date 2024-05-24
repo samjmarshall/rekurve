@@ -9,7 +9,7 @@ import {
 } from "~/components/ui/form"
 
 import { Button } from "~/components/ui/button"
-import { GoogleRecaptcha } from "./recaptcha"
+import GoogleRecaptcha from "./recaptcha"
 import { Input } from "~/components/ui/input"
 import LeadFunnel from "./lead-funnel"
 import TermsAndConditions from "./terms-and-conditions"
@@ -31,7 +31,7 @@ const FormSchema = z.object({
 })
 
 // export function Waitlist({ nonce }: { nonce: string }) {
-export function Waitlist() {
+export default function Waitlist() {
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState("")
   const [loadRecaptcha, setLoadRecaptcha] = useState(false)

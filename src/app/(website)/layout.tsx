@@ -11,8 +11,6 @@ import Script from "next/script"
 import WebsiteFooter from "./_components/footer"
 
 export const runtime = "edge"
-export const dynamic = "force-static"
-export const revalidate = 300
 
 const fontSans = Inter({
   subsets: ["latin"],

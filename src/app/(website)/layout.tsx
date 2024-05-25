@@ -10,7 +10,7 @@ import { env } from "~/env"
 import Script from "next/script"
 import WebsiteFooter from "./_components/footer"
 
-export const runtime = "edge"
+// export const runtime = "edge"
 
 const fontSans = Inter({
   subsets: ["latin"],

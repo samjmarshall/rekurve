@@ -10,9 +10,6 @@ import jsonLd from "~/lib/json-ld"
 // import { headers } from "next/headers"
 import { metadata } from "./layout"
 
-export const dynamic = "force-static"
-export const revalidate = 300
-
 export default function LandingPage() {
   // const nonce = headers().get("x-nonce")
 

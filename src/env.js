@@ -10,7 +10,7 @@ export const env = createEnv({
     BASE_URL: z.string().url(),
     COMPANY_NAME: z.string().default("rekurve"),
     COMPANY_LEGAL_NAME: z.string().default("REKURVE PTY LTD"),
-    CUSTOMER_CONTACT_EMAIL: z.string().email().default("info@rekurve.io"),
+    CUSTOMER_CONTACT_EMAIL: z.string().email().default("info@rekurve.co"),
     DATABASE_URL: z
       .string()
       .url()

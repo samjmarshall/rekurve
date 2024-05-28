@@ -27,7 +27,11 @@ export default function TermsAndConditions() {
             information on how to unsubscribe, our privacy practices, and how we
             are committed to protecting and respecting your privacy, please
             visit the{" "}
-            <Link className="underline underline-offset-2" href="/privacy">
+            <Link
+              className="underline underline-offset-2"
+              href="/privacy"
+              title="Privacy Policy"
+            >
               Privacy Policy
             </Link>
             .
@@ -37,6 +41,7 @@ export default function TermsAndConditions() {
             <Link
               className="underline underline-offset-2"
               href="https://policies.google.com/privacy"
+              title="Google Privacy Policy"
             >
               Privacy Policy
             </Link>{" "}
@@ -44,6 +49,7 @@ export default function TermsAndConditions() {
             <Link
               className="underline underline-offset-2"
               href="https://policies.google.com/terms"
+              title="Google Terms of Service"
             >
               Terms of Service
             </Link>{" "}

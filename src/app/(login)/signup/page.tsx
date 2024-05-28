@@ -27,6 +27,7 @@ export default function SignUp() {
     <div className="grid h-screen items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
       <Link
         href="/login"
+        title="Login"
         className={cn(
           buttonVariants({ variant: "ghost" }),
           "absolute right-4 top-4 md:right-8 md:top-8",
@@ -61,6 +62,7 @@ export default function SignUp() {
             and{" "} */}
             <Link
               href="/privacy"
+              title="Privacy Policy"
               className="underline underline-offset-4 hover:text-primary"
             >
               Privacy Policy

@@ -43,7 +43,7 @@ export default function Pricing() {
                     <span className="text-2xl font-bold">$49</span>
                     <span className="text-sm text-gray-500">/month</span>
                   </div>
-                  <Button className="w-full mt-4">Get Started</Button>
+                  <Button className="w-full mt-4" title="Get Started">Get Started</Button>
                 </CardFooter>
               </Card>
               <Card className="bg-gray-900 text-gray-50">
@@ -80,7 +80,7 @@ export default function Pricing() {
                     <span className="text-2xl font-bold">$99</span>
                     <span className="text-sm text-gray-500">/month</span>
                   </div>
-                  <Button className="w-full mt-4 bg-gray-50 text-gray-900 hover:bg-gray-50/90">
+                  <Button className="w-full mt-4 bg-gray-50 text-gray-900 hover:bg-gray-50/90" title="Get Started">
                     Get Started
                   </Button>
                 </CardFooter>
@@ -119,7 +119,7 @@ export default function Pricing() {
                     <span className="text-2xl font-bold">$199</span>
                     <span className="text-sm text-gray-500">/month</span>
                   </div>
-                  <Button className="w-full mt-4">Get Started</Button>
+                  <Button className="w-full mt-4" title="Get Started">Get Started</Button>
                 </CardFooter>
               </Card>
             </div>

@@ -53,8 +53,7 @@ export default function Privacy() {
           disclose your Personal Information.
         </p>
         <p>
-          <b>”We”, “us” and “our”</b> means Mr SAMUEL MARSHALL ABN 24 219 541
-          361.
+          <b>”We”, “us” and “our”</b> means REKURVE ABN 24 219 541 361.
         </p>
         <p>
           By using our services and products, you agree to us collecting,
@@ -64,6 +63,7 @@ export default function Privacy() {
           <Link
             className="underline-offset-4 hover:underline"
             href={`mailto:${env.CUSTOMER_CONTACT_EMAIL}`}
+            title="Customer Contact Email"
           >
             {env.CUSTOMER_CONTACT_EMAIL}
           </Link>
@@ -435,6 +435,7 @@ export default function Privacy() {
           <Link
             className="underline-offset-4 hover:underline"
             href={`mailto:${env.CUSTOMER_CONTACT_EMAIL}`}
+            title="Customer Contact Email"
           >
             {env.CUSTOMER_CONTACT_EMAIL}
           </Link>

@@ -34,7 +34,11 @@ export function SidePanel() {
         />
       )}
 
-      <Link className="relative z-20 flex items-center text-3xl" href="/">
+      <Link
+        className="relative z-20 flex items-center text-3xl"
+        title="Home"
+        href="/"
+      >
         <Logo />
       </Link>
       <div className="relative z-20 mt-auto">

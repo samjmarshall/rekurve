@@ -38,7 +38,11 @@ export function UserAuthForm({
                 disabled={isLoading}
               />
             </div>
-            <Button disabled={isLoading}>
+            <Button
+              disabled={isLoading}
+              title="Continue with Email"
+              rel="nofollow"
+            >
               {isLoading && (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
               )}
@@ -62,6 +66,8 @@ export function UserAuthForm({
         type="button"
         onClick={googleSubmit}
         disabled={isLoading}
+        title="Login with Google"
+        rel="nofollow"
       >
         {isLoading ? (
           <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />

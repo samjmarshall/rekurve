@@ -169,6 +169,7 @@ export default function LeadDetailsForm({
           className="w-full"
           type="submit"
           disabled={addDetails.isPending || recaptchaLoading}
+          title="Submit"
         >
           {addDetails.isPending || recaptchaLoading
             ? "Submitting..."

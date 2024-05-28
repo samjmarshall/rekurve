@@ -107,7 +107,7 @@ export default function Waitlist() {
             />
             <Button
               type="submit"
-              title="Join the waitlist"
+              title="Join the Waitlist"
               className="rounded-t-none sm:rounded-l-none sm:rounded-tr-sm"
               disabled={signUp.isPending || recaptchaLoading}
             >

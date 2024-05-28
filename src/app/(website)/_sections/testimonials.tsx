@@ -135,7 +135,7 @@ export default function Testimonials() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button>Get Started</Button>
+                  <Button title="Get Started">Get Started</Button>
                 </CardFooter>
               </Card>
               <Card>
@@ -172,7 +172,7 @@ export default function Testimonials() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button>Get Started</Button>
+                  <Button title="Get Started">Get Started</Button>
                 </CardFooter>
               </Card>
               <Card>
@@ -213,7 +213,7 @@ export default function Testimonials() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button>Get Started</Button>
+                  <Button title="Get Started">Get Started</Button>
                 </CardFooter>
               </Card>
             </div>

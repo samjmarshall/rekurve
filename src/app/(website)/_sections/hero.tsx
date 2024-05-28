@@ -32,6 +32,7 @@ export default function Hero() {
             {/* <Link
               className="inline-flex h-10 items-center justify-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50"
               href="#contact"
+              title="Join the Waitlist"
             >
               Join the Waitlist
             </Link> */}
@@ -43,12 +44,14 @@ export default function Hero() {
             {/* <Link
                   className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50"
                   href="#"
+                  title="Watch Demo"
                 >
                   Watch Demo
                 </Link> */}
             <Link
               className="mx-auto inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50"
               href="#features"
+              title="Learn More"
             >
               Learn More
             </Link>

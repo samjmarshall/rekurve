@@ -31,9 +31,10 @@ export const metadata: Metadata = {
   },
   description:
     "Construction management software to stay organized, track progress, costs and payments, and collaborate with your customers.",
-  publisher: env.COMPANY_NAME,
-  openGraph,
   icons: [{ rel: "icon", url: "/favicon.ico" }],
+  keywords: ["construction", "management", "software", "australia"],
+  openGraph,
+  publisher: env.COMPANY_NAME,
 }
 
 export default function RootLayout({

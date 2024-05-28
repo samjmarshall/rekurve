@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "By using our services and products, you agree to us collecting, holding, using, and disclosing your Personal Information in accordance with this Policy",
     url: `${env.BASE_URL}/privacy`,
   },
+  robots: { index: false, follow: false },
 }
 
 export default function Privacy() {

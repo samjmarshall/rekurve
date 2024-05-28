@@ -8,12 +8,18 @@ import Testimonials from "./_sections/testimonials"
 import { env } from "~/env"
 import jsonLd from "~/lib/json-ld"
 // import { headers } from "next/headers"
-import { metadata as rootMetadata } from "./layout"
+import openGraph from "~/lib/open-graph"
 
 export const metadata = {
   title: "Home",
   description:
     "Construction management software with tools to manage every aspect of your construction projects, from estimation, scheduling, invoices and cashflow, to client collaboration and proposals.",
+  openGraph: {
+    ...openGraph,
+    title: "Home | rekurve",
+    description:
+      "Construction management software with tools to manage every aspect of your construction projects, from estimation, scheduling, invoices and cashflow, to client collaboration and proposals.",
+  },
 }
 
 export default function LandingPage() {

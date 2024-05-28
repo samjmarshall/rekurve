@@ -8,7 +8,13 @@ import Testimonials from "./_sections/testimonials"
 import { env } from "~/env"
 import jsonLd from "~/lib/json-ld"
 // import { headers } from "next/headers"
-import { metadata } from "./layout"
+import { metadata as rootMetadata } from "./layout"
+
+export const metadata = {
+  title: "Home",
+  description:
+    "Construction management software with tools to manage every aspect of your construction projects, from estimation, scheduling, invoices and cashflow, to client collaboration and proposals.",
+}
 
 export default function LandingPage() {
   // const nonce = headers().get("x-nonce")
@@ -24,10 +30,7 @@ export default function LandingPage() {
         type="application/ld+json"
         // nonce={nonce}
         dangerouslySetInnerHTML={{
-          __html: jsonLd({
-            title: env.COMPANY_NAME,
-            description: metadata.description,
-          }),
+          __html: jsonLd(metadata),
         }}
       />
       <Hero />

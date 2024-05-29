@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   description:
     "Construction management software to stay organized, track progress, costs and payments, and collaborate with your customers.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
-  keywords: ["construction", "management", "software", "australia"],
+  keywords: ["construction", "management", "software"],
   openGraph,
   publisher: env.COMPANY_NAME,
 }

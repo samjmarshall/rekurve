@@ -5,13 +5,12 @@ import Hero from "./_sections/hero"
 import Pricing from "./_sections/pricing"
 import Script from "next/script"
 import Testimonials from "./_sections/testimonials"
-import { env } from "~/env"
 import jsonLd from "~/lib/json-ld"
 // import { headers } from "next/headers"
 import openGraph from "~/lib/open-graph"
 
 export const metadata = {
-  title: "Home",
+  title: "Home | rekurve",
   description:
     "Construction management software with tools to manage every aspect of your construction projects, from estimation, scheduling, invoices and cashflow, to client collaboration and proposals.",
   openGraph: {

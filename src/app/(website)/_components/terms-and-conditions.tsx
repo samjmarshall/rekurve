@@ -13,7 +13,11 @@ export default function TermsAndConditions() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="link" className="p-0 text-xs text-gray-500">
+        <Button
+          variant="link"
+          className="p-0 text-xs text-gray-500"
+          title="Terms & Conditions"
+        >
           Terms &amp; Conditions
         </Button>
       </DialogTrigger>

@@ -112,10 +112,11 @@ export default function Features() {
             </div>
             <div className="grid gap-1">
               <WalletIcon className="h-8 w-8 text-gray-900" />
-              <h3 className="text-lg font-bold">Cashflow Forecasting</h3>
+              <h3 className="text-lg font-bold">Financial Tracking</h3>
               <p className="text-sm text-gray-500">
-                Xero and Reckon integration to sync past and future project
-                expenses, including project payments to forecast your cashflow.
+                Project budget and cost tracking. Xero and Reckon integration to
+                sync past and future project expenses/invoices, forecasting your
+                cashflow.
               </p>
             </div>
             <div className="grid gap-1">

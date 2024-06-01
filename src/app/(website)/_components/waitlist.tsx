@@ -15,6 +15,7 @@ import LeadFunnel from "./lead-funnel"
 import TermsAndConditions from "./terms-and-conditions"
 import { Toaster } from "~/components/ui/sonner"
 import { api } from "~/trpc/react"
+import { cn } from "~/lib/utils"
 import { env } from "~/env"
 import { executeRecaptcha } from "~/lib/recaptcha-client"
 import { sendGTMEvent } from "~/lib/gtm-client"
@@ -31,7 +32,9 @@ const FormSchema = z.object({
 })
 
 // export function Waitlist({ nonce }: { nonce: string }) {
-export default function Waitlist() {
+export default function Waitlist({
+  className,
+}: React.HTMLAttributes<HTMLDivElement>) {
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState("")
   const [loadRecaptcha, setLoadRecaptcha] = useState(false)
@@ -74,7 +77,7 @@ export default function Waitlist() {
   }
 
   return (
-    <div className="mx-auto mt-8 w-full max-w-sm sm:mt-0">
+    <div className={cn("mx-auto w-full max-w-sm", className)}>
       {loadRecaptcha && (
         <GoogleRecaptcha
           // nonce={nonce}
@@ -85,6 +88,7 @@ export default function Waitlist() {
         <form
           aria-label="Join the waitlist"
           onSubmit={form.handleSubmit(onSubmit)}
+          className="mx-auto max-w-72 sm:max-w-none"
         >
           <div className="flex flex-col sm:flex-row">
             <FormField
@@ -116,8 +120,8 @@ export default function Waitlist() {
                 : "Join the Waitlist"}
             </Button>
           </div>
-          <p className="text-xs text-gray-500">
-            By joining, you agree to our <TermsAndConditions />
+          <p className="mx-auto py-3 text-xs text-gray-500">
+            By joining the waitlist, you agree to our <TermsAndConditions />
           </p>
         </form>
       </Form>

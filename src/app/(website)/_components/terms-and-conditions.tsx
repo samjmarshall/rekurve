@@ -15,7 +15,7 @@ export default function TermsAndConditions() {
       <DialogTrigger asChild>
         <Button
           variant="link"
-          className="p-0 text-xs text-gray-500"
+          className="h-fit p-0 text-xs text-gray-500"
           title="Terms & Conditions"
         >
           Terms &amp; Conditions

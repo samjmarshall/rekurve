@@ -38,7 +38,8 @@ export default function Hero() {
             </Link> */}
             <TRPCReactProvider>
               <Waitlist
-              // nonce={nonce}
+                className="mt-8 sm:mt-0"
+                // nonce={nonce}
               />
             </TRPCReactProvider>
             {/* <Link

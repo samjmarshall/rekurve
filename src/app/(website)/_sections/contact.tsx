@@ -17,7 +17,8 @@ export default function Contact() {
 
         <TRPCReactProvider>
           <Waitlist
-          // nonce={nonce}
+            className="mt-4 sm:mt-0"
+            // nonce={nonce}
           />
         </TRPCReactProvider>
       </div>

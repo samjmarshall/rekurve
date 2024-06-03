@@ -41,7 +41,7 @@ export function middleware(request: NextRequest) {
         default-src 'none';
         base-uri 'none';
         connect-src 'self' https://www.google-analytics.com/g/collect;
-        font-src 'self' ${gtmPreviewAndDebugSources ? "https://fonts.gstatic.com" : ""};
+        font-src 'self' https://fonts.gstatic.com/s/figtree/v5/ ${gtmPreviewAndDebugSources ? "https://fonts.gstatic.com" : ""};
         frame-src https://www.google.com/recaptcha/;
         img-src 'self' data: ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};
         script-src 'self' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : ""};
@@ -56,15 +56,15 @@ export function middleware(request: NextRequest) {
       // Protected application pages with a nonce-based CSP header, where security is critical.
       // WARNING: Using CSP header 'nonce' will prevent index/page caching as each request will have a unique nonce.
       /* Docs:
-        - img-src https://lh3.googleusercontent.com - Google auth user profile images
-        - font-src https://fonts.gstatic.com/s/figtree/v5/ - TODO: Figure out why this is loaded so you can remove it from the CSP header.
+        - https://lh3.googleusercontent.com - Google auth user profile images
+        - https://fonts.gstatic.com/s/figtree/v5/ - TODO: Figure out why this is loaded so you can remove it from the CSP header.
       */
       const nonce = Buffer.from(crypto.randomUUID()).toString("base64")
       cspHeader = `
         default-src 'none';
         base-uri 'none';
         connect-src 'self';
-        font-src 'self' https://fonts.gstatic.com;
+        font-src 'self' https://fonts.gstatic.com/s/figtree/v5/;
         img-src 'self' data: https://lh3.googleusercontent.com;
         script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : ""};
         style-src 'self' 'nonce-${nonce}';

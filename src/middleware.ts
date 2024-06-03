@@ -26,6 +26,17 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers)
   let cspHeader: string
 
+  /* Docs:
+    - img-src https://lh3.googleusercontent.com - Google auth user profile images
+    - Figtree font - TODO: Figure out why this is loaded so you can remove it from the CSP header.
+      - font-src https://fonts.gstatic.com/s/figtree/v5/
+      - style-src-elem https://fonts.googleapis.com/css2
+    - HubSpot sources:
+      - connect-src https://forms.hscollectedforms.net
+      - img-src https://track.hubspot.com, https://forms.hsforms.com
+      - script-src-elem https://js.hs-scripts.com https://js.hs-banner.com https://js.hs-analytics.net https://js.hscollectedforms.net
+  */
+
   switch (request.nextUrl.pathname) {
     // Public whitelist for cached SEO crawlable pages.
     case "/":
@@ -46,7 +57,7 @@ export function middleware(request: NextRequest) {
         script-src 'self' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : ""};
         script-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com/gtm.js https://www.googletagmanager.com/gtag/js https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/releases/ https://js.hs-scripts.com/46219156.js https://js.hs-banner.com/v2/46219156/banner.js https://js.hs-analytics.net/analytics/ https://js.hscollectedforms.net/collectedforms.js;
         style-src 'self';
-        style-src-elem 'self' 'unsafe-inline' ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.googleapis.com" : ""};
+        style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com/css2 ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.googleapis.com" : ""};
         upgrade-insecure-requests;
         report-uri /api/csp-reports;
       `
@@ -54,10 +65,6 @@ export function middleware(request: NextRequest) {
     default:
       // Protected application pages with a nonce-based CSP header, where security is critical.
       // WARNING: Using CSP header 'nonce' will prevent index/page caching as each request will have a unique nonce.
-      /* Docs:
-        - https://lh3.googleusercontent.com - Google auth user profile images
-        - https://fonts.gstatic.com/s/figtree/v5/ - TODO: Figure out why this is loaded so you can remove it from the CSP header.
-      */
       const nonce = Buffer.from(crypto.randomUUID()).toString("base64")
       cspHeader = `
         default-src 'none';

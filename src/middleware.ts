@@ -56,15 +56,15 @@ export function middleware(request: NextRequest) {
       // Protected application pages with a nonce-based CSP header, where security is critical.
       // WARNING: Using CSP header 'nonce' will prevent index/page caching as each request will have a unique nonce.
       /* Docs:
-        - https://lh3.googleusercontent.com - Google auth user profile images
-        - https://fonts.gstatic.com/s/figtree/v5/ - TODO: Figure out why this is loaded so you can remove it from the CSP header.
+        - img-src https://lh3.googleusercontent.com - Google auth user profile images
+        - font-src https://fonts.gstatic.com/s/figtree/v5/ - TODO: Figure out why this is loaded so you can remove it from the CSP header.
       */
       const nonce = Buffer.from(crypto.randomUUID()).toString("base64")
       cspHeader = `
         default-src 'none';
         base-uri 'none';
         connect-src 'self';
-        font-src 'self' https://fonts.gstatic.com/s/figtree/v5/;
+        font-src 'self' https://fonts.gstatic.com;
         img-src 'self' data: https://lh3.googleusercontent.com;
         script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : ""};
         style-src 'self' 'nonce-${nonce}';

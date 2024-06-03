@@ -34,7 +34,7 @@ export default function Privacy() {
         // nonce={nonce}
         dangerouslySetInnerHTML={{
           __html: jsonLd({
-            urlPath: "/privacy",
+            urlPath: "privacy",
             title: metadata.title,
             description: metadata.description,
           }),

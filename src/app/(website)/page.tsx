@@ -36,7 +36,7 @@ export default function LandingPage() {
         // nonce={nonce}
         dangerouslySetInnerHTML={{
           __html: jsonLd({
-            urlPath: "/",
+            urlPath: "",
             title: metadata.title,
             description: metadata.description,
           }),

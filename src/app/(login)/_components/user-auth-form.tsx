@@ -1,27 +1,39 @@
-import { type HTMLAttributes, type SyntheticEvent } from "react"
+"use client"
 
+import { type HTMLAttributes, type SyntheticEvent } from "react"
 import { Button } from "~/components/ui/button"
 import { Icons } from "~/components/icons"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { cn } from "~/lib/utils"
+import { signIn } from "next-auth/react"
+import { useState } from "react"
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {
-  googleSubmit: () => void
-  emailSubmit?: (event: SyntheticEvent) => void
-  isLoading: boolean
+  email?: boolean
 }
 
 export function UserAuthForm({
   className,
-  isLoading,
-  googleSubmit,
-  emailSubmit,
+  email = false,
   ...props
 }: UserAuthFormProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  async function emailSubmit(event: SyntheticEvent) {
+    event.preventDefault()
+  }
+
+  async function googleSubmit() {
+    setIsLoading(true)
+    await signIn("google", {
+      callbackUrl: "/dashboard",
+    })
+  }
+
   return (
     <div className={cn("grid gap-6", className)} {...props}>
-      {emailSubmit && (
+      {email && (
         <form onSubmit={emailSubmit}>
           <div className="grid gap-2">
             <div className="grid gap-1">
@@ -57,7 +69,7 @@ export function UserAuthForm({
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-background px-2 text-muted-foreground">
-            {emailSubmit ? "Or " : null}continue with
+            {email ? "Or " : null}continue with
           </span>
         </div>
       </div>

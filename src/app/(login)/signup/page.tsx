@@ -1,30 +1,41 @@
-"use client"
-
-import { buttonVariants } from "~/components/ui/button"
-import { type SyntheticEvent, useState } from "react"
-
 import Link from "next/link"
+import Script from "next/script"
 import { SidePanel } from "../_components/side-panel"
 import { UserAuthForm } from "../_components/user-auth-form"
+import { buttonVariants } from "~/components/ui/button"
 import { cn } from "~/lib/utils"
-import { signIn } from "next-auth/react"
+import { env } from "~/env"
+import jsonLd from "~/lib/json-ld"
+import openGraph from "~/lib/open-graph"
+
+export const metadata = {
+  title: "Sign Up",
+  description:
+    "Sign up for a free account. See for yourself how rekurve can help you manage and grow your construction business.",
+  openGraph: {
+    ...openGraph,
+    title: "Sign Up | rekurve",
+    description:
+      "Sign up for a free account. See for yourself how rekurve can help you manage and grow your construction business.",
+    url: `${env.BASE_URL}/login`,
+  },
+  robots: { index: false, follow: false },
+}
 
 export default function SignUp() {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  async function emailSignUp(event: SyntheticEvent) {
-    event.preventDefault()
-  }
-
-  async function googleSignUp() {
-    setIsLoading(true)
-    await signIn("google", {
-      callbackUrl: "/dashboard",
-    })
-  }
-
   return (
     <div className="grid h-screen items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
+      <Script
+        id="json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            urlPath: "signup",
+            title: metadata.title,
+            description: metadata.description,
+          }),
+        }}
+      />
       <Link
         href="/login"
         title="Login"
@@ -46,11 +57,7 @@ export default function SignUp() {
               Enter your email below to create your account
             </p>
           </div>
-          <UserAuthForm
-            isLoading={isLoading}
-            emailSubmit={emailSignUp}
-            googleSubmit={googleSignUp}
-          />
+          <UserAuthForm email />
           <p className="px-8 text-center text-sm text-muted-foreground">
             By continuing, you agree to our{" "}
             {/* <Link

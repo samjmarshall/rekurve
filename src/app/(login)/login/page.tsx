@@ -1,25 +1,41 @@
-"use client"
-
 import Link from "next/link"
+import Script from "next/script"
 import { SidePanel } from "../_components/side-panel"
 import { UserAuthForm } from "../_components/user-auth-form"
 import { buttonVariants } from "~/components/ui/button"
 import { cn } from "~/lib/utils"
-import { signIn } from "next-auth/react"
-import { useState } from "react"
+import { env } from "~/env"
+import jsonLd from "~/lib/json-ld"
+import openGraph from "~/lib/open-graph"
+
+export const metadata = {
+  title: "Login",
+  description:
+    "Login to your account to manage your construction projects, estimates, invoices, and more.",
+  openGraph: {
+    ...openGraph,
+    title: "Login | rekurve",
+    description:
+      "Login to your account to manage your construction projects, estimates, invoices, and more.",
+    url: `${env.BASE_URL}/login`,
+  },
+  robots: { index: false, follow: false },
+}
 
 export default function Login() {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  async function googleLogin() {
-    setIsLoading(true)
-    await signIn("google", {
-      callbackUrl: "/dashboard",
-    })
-  }
-
   return (
     <div className="grid h-screen items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
+      <Script
+        id="json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            urlPath: "login",
+            title: metadata.title,
+            description: metadata.description,
+          }),
+        }}
+      />
       <Link
         href="/signup"
         title="Sign Up"
@@ -36,7 +52,7 @@ export default function Login() {
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">Login</h1>
           </div>
-          <UserAuthForm isLoading={isLoading} googleSubmit={googleLogin} />
+          <UserAuthForm />
           <p className="px-8 text-center text-sm text-muted-foreground">
             By continuing, you agree to our{" "}
             {/* <Link

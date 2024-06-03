@@ -5,12 +5,11 @@ import { type Metadata, type Viewport } from "next"
 import { Inter } from "next/font/google"
 import WebsiteHeader from "./_components/header"
 import openGraph from "~/lib/open-graph"
-// import { headers } from "next/headers"
 import { env } from "~/env"
 import Script from "next/script"
 import WebsiteFooter from "./_components/footer"
 
-// export const runtime = "edge"
+export const runtime = "edge"
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -42,18 +41,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // const nonce = headers().get("x-nonce")
-
-  // if (!nonce) {
-  //   throw new Error("Missing nonce header")
-  // }
-
   return (
     <html lang="en">
       <head>
         <Script
           id="gtm-init"
-          // nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `
           (function(w,l){
@@ -64,9 +56,15 @@ export default function RootLayout({
         />
         <Script
           id="gtm"
-          // nonce={nonce}
           async
+          defer
           src="https://www.googletagmanager.com/gtm.js?id=GTM-KQSV96ST"
+        />
+        <Script
+          id="hs-script-loader"
+          async
+          defer
+          src="https://js.hs-scripts.com/46219156.js"
         />
       </head>
       <body className={`font-sans antialiased ${fontSans.variable}`}>

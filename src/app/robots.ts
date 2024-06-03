@@ -2,6 +2,8 @@ import { type MetadataRoute } from "next"
 
 import { env } from "~/env"
 
+export const runtime = "edge"
+
 export default function robots(): MetadataRoute.Robots {
   const allowRobots = env.ROBOTS_TXT === "Allow"
   return {

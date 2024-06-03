@@ -1,8 +1,9 @@
-import { type Metadata } from "next"
 import { env } from "~/env"
 
-interface JsonLdParams extends Metadata {
-  urlPath?: string
+interface JsonLdParams {
+  urlPath: string
+  title: string
+  description: string
 }
 
 const jsonLd = ({ urlPath, title, description }: JsonLdParams) =>
@@ -49,7 +50,7 @@ const jsonLd = ({ urlPath, title, description }: JsonLdParams) =>
       {
         "@type": "WebPage",
         "@id": new URL(`${urlPath}/#webpage`, env.BASE_URL).toString(),
-        url: new URL(urlPath!, env.BASE_URL).toString(),
+        url: new URL(urlPath, env.BASE_URL).toString(),
         name: title,
         isPartOf: {
           "@id": new URL("#webpage", env.BASE_URL).toString(),
@@ -59,7 +60,7 @@ const jsonLd = ({ urlPath, title, description }: JsonLdParams) =>
         potentialAction: [
           {
             "@type": "ReadAction",
-            target: [new URL(urlPath!, env.BASE_URL).toString()],
+            target: [new URL(urlPath, env.BASE_URL).toString()],
           },
         ],
       },

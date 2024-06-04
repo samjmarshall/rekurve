@@ -35,6 +35,14 @@ export default async function RootLayout({
     redirect("/")
   }
 
+  // FYI: In the event you need to add an inline or third-party script that requires. This is how to add the CSP nonce.
+  // import { headers } from "next/headers"
+  // const nonce = headers().get("x-nonce")
+  // if (!nonce) {
+  //   throw new Error("Missing nonce header")
+  // }
+  // <Script nonce={nonce} />
+
   return (
     <html lang="en">
       <body

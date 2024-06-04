@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Script from "next/script"
 import { env } from "~/env"
-import jsonLd from "~/lib/json-ld"
+import jsonLd from "./json-ld"
 import openGraph from "~/lib/open-graph"
 
 export const metadata = {

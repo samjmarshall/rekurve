@@ -5,8 +5,7 @@ import Hero from "./_sections/hero"
 import Pricing from "./_sections/pricing"
 import Script from "next/script"
 import Testimonials from "./_sections/testimonials"
-import jsonLd from "~/lib/json-ld"
-// import { headers } from "next/headers"
+import jsonLd from "./json-ld"
 import openGraph from "~/lib/open-graph"
 
 export const metadata = {
@@ -22,18 +21,11 @@ export const metadata = {
 }
 
 export default function LandingPage() {
-  // const nonce = headers().get("x-nonce")
-
-  // if (!nonce) {
-  //   throw new Error("Missing nonce header")
-  // }
-
   return (
     <main className="flex-1">
       <Script
         id="json-ld"
         type="application/ld+json"
-        // nonce={nonce}
         dangerouslySetInnerHTML={{
           __html: jsonLd({
             urlPath: "",

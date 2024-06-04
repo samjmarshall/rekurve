@@ -68,11 +68,18 @@ const jsonLd = ({ title, description }: JsonLdParams) =>
           },
           {
             "@type": "RegisterAction",
-            target: [new URL(env.BASE_URL).toString()],
+            target: [new URL("#contact", env.BASE_URL).toString()],
             object: {
               "@id": new URL("#offer-waitlist", env.BASE_URL).toString(),
             },
           },
+          // {
+          //   "@type": "RegisterAction",
+          //   target: [new URL("signup", env.BASE_URL).toString()],
+          //   object: {
+          //     "@id": new URL("signup", env.BASE_URL).toString(),
+          //   },
+          // },
           // {
           //   "@type": "SearchAction",
           //   target: {

@@ -127,7 +127,7 @@ const jsonLd = ({ title, description }: JsonLdParams) =>
           ],
         },
         description:
-          "rekurve provide software tools to manage every aspect of your construction projects, from estimation and scheduling to client collaboration and proposals. Supporting builders, remodellers, renovators, contractors and trades for construction and maintenance work.",
+          "rekurve provide software tools to manage every aspect of your construction projects, from estimation and scheduling to client collaboration and proposals. Supporting builders, remodelers, renovators, contractors and trades for construction and maintenance work.",
         email: `mailto:${env.CUSTOMER_CONTACT_EMAIL}`,
         founder: {
           "@context": "https://schema.org/",

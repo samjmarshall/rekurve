@@ -127,7 +127,7 @@ const jsonLd = ({ title, description }: JsonLdParams) =>
           ],
         },
         description:
-          "rekurve provide software tools to manage every aspect of your construction projects, from estimation and scheduling to client collaboration and proposals. Supporting builders, remodelers, renovators, contractors and trades for construction and maintenance work.",
+          "rekurve is a Software-as-a-Service company that provides construction scheduling, estimating, client collaboration and proposal solutions for residential builders, renovators and trades. Founded by leaders in the tech community that were tired of seeing family and friends in the construction industry continually let down by aging software solutions. The company & software was named after the "Recurve Bow", a simple, well-design tool used by skilled operators that built an unstoppable empire.",
         email: `mailto:${env.CUSTOMER_CONTACT_EMAIL}`,
         founder: {
           "@context": "https://schema.org/",

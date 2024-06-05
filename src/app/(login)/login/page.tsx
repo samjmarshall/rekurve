@@ -1,11 +1,9 @@
 import Link from "next/link"
-import Script from "next/script"
 import { SidePanel } from "../_components/side-panel"
 import { UserAuthForm } from "../_components/user-auth-form"
 import { buttonVariants } from "~/components/ui/button"
 import { cn } from "~/lib/utils"
 import { env } from "~/env"
-import jsonLd from "~/lib/json-ld"
 import openGraph from "~/lib/open-graph"
 
 export const metadata = {
@@ -25,17 +23,6 @@ export const metadata = {
 export default function Login() {
   return (
     <div className="grid h-screen items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <Script
-        id="json-ld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: jsonLd({
-            urlPath: "login",
-            title: metadata.title,
-            description: metadata.description,
-          }),
-        }}
-      />
       <Link
         href="/signup"
         title="Sign Up"

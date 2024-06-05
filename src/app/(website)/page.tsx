@@ -5,7 +5,7 @@ import Hero from "./_sections/hero"
 import Pricing from "./_sections/pricing"
 import Script from "next/script"
 import Testimonials from "./_sections/testimonials"
-import jsonLd from "./json-ld"
+import jsonLd from "./_components/json-ld"
 import openGraph from "~/lib/open-graph"
 
 export const metadata = {
@@ -24,7 +24,7 @@ export default function LandingPage() {
   return (
     <main className="flex-1">
       <Script
-        id="json-ld"
+        id="json-ld-website-org"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLd({

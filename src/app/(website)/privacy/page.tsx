@@ -1,7 +1,5 @@
 import Link from "next/link"
-import Script from "next/script"
 import { env } from "~/env"
-import jsonLd from "~/lib/json-ld"
 import openGraph from "~/lib/open-graph"
 
 export const metadata = {
@@ -20,18 +18,6 @@ export const metadata = {
 export default function Privacy() {
   return (
     <main className="w-screen flex-1 justify-center">
-      <Script
-        id="json-ld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: jsonLd({
-            urlPath: "privacy",
-            title: metadata.title,
-            description: metadata.description,
-          }),
-        }}
-      />
-
       <article className="mx-auto max-w-6xl space-y-4 p-6 text-gray-800">
         <h1 className="text-2xl">
           <b>MR SAMUEL MARSHALL PRIVACY POLICY</b>

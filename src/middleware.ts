@@ -50,10 +50,10 @@ export function middleware(request: NextRequest) {
       cspHeader = `
         default-src 'none';
         base-uri 'none';
-        connect-src 'self' https://www.google-analytics.com/g/collect https://forms.hscollectedforms.net/collected-forms/v1/config/json;
+        connect-src 'self' https://www.google-analytics.com/g/collect https://forms.hscollectedforms.net/collected-forms/submit/form https://forms.hscollectedforms.net/collected-forms/v1/config/json;
         font-src 'self' https://fonts.gstatic.com/s/figtree/v5/ ${gtmPreviewAndDebugSources ? "https://fonts.gstatic.com" : ""};
         frame-src https://www.google.com/recaptcha/;
-        img-src 'self' data: https://track.hubspot.com/__ptq.gif https://forms.hsforms.com/embed/v3/counters.gif ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};
+        img-src 'self' data: https://track.hubspot.com/__ptq.gif https://forms.hsforms.com/embed/v3/counters.gif https://forms.hscollectedforms.net/collected-forms/submit/form/submit.gif ${gtmPreviewAndDebugSources ? "https://www.googletagmanager.com https://fonts.gstatic.com" : ""};
         script-src 'self' ${env.NODE_ENV === "development" ? "'unsafe-eval'" : ""};
         script-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com/gtm.js https://www.googletagmanager.com/gtag/js https://www.google.com/recaptcha/enterprise.js https://www.gstatic.com/recaptcha/releases/ https://js.hs-scripts.com/46219156.js https://js.hs-banner.com/v2/46219156/banner.js https://js.hs-analytics.net/analytics/ https://js.hscollectedforms.net/collectedforms.js;
         style-src 'self';

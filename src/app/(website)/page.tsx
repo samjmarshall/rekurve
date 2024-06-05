@@ -28,7 +28,6 @@ export default function LandingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLd({
-            title: metadata.title,
             description: metadata.description,
           }),
         }}

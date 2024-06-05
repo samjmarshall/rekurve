@@ -1,30 +1,18 @@
 import { env } from "~/env"
 
 interface JsonLdParams {
-  title: string
   description: string
 }
 
-const jsonLd = ({ title, description }: JsonLdParams) =>
+const jsonLd = ({ description }: JsonLdParams) =>
   JSON.stringify({
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "WebPage",
-        "@id": new URL("#webpage", env.BASE_URL).toString(),
+        "@type": "WebSite",
+        "@id": new URL("#website", env.BASE_URL).toString(),
         url: new URL(env.BASE_URL).toString(),
-        name: title,
-        isPartOf: {
-          "@type": "WebSite",
-          "@id": new URL("#website", env.BASE_URL).toString(),
-          url: new URL(env.BASE_URL).toString(),
-          name: env.COMPANY_NAME,
-          inLanguage: "en-AU",
-          description,
-          publisher: {
-            "@id": new URL("#organization", env.BASE_URL).toString(),
-          },
-        },
+        name: env.COMPANY_NAME,
         about: {
           "@type": "WebApplication",
           "@id": new URL("#webapplication", env.BASE_URL).toString(),
@@ -35,61 +23,46 @@ const jsonLd = ({ title, description }: JsonLdParams) =>
           //   ratingValue: "4.5",
           //   reviewCount: "1"
           // },
-          operatingSystem: "all",
-          url: new URL("/dashboard", env.BASE_URL).toString(),
           browserRequirements: [
             "requires HTML5 support",
             "requires JavaScript",
           ],
-          sameAs: [
-            new URL("/projects", env.BASE_URL).toString(),
-            new URL("/settings", env.BASE_URL).toString(),
-          ],
-          permissions: "may run only with an active internet connection",
-          // releaseNotes: new URL("/release-notes", env.BASE_URL).toString(), // Or maybe a public GitHub Pages URL
-          // screenshot: new URL("assets/app-screenshot.png", env.BASE_URL).toString(),
+          creator: { "@id": new URL("#organization", env.BASE_URL).toString() },
           copyrightHolder: {
             "@id": new URL("#organization", env.BASE_URL).toString(),
           },
-          creator: { "@id": new URL("#organization", env.BASE_URL).toString() },
+          operatingSystem: "all",
           maintainer: {
             "@id": new URL("#organization", env.BASE_URL).toString(),
           },
           offers: {
             "@id": new URL("#offer-waitlist", env.BASE_URL).toString(),
           },
+          permissions: "may run only with an active internet connection",
+          // releaseNotes: new URL("/release-notes", env.BASE_URL).toString(), // Or maybe a public GitHub Pages URL
+          sameAs: [
+            new URL("/projects", env.BASE_URL).toString(),
+            new URL("/settings", env.BASE_URL).toString(),
+          ],
+          // screenshot: new URL("assets/app-screenshot.png", env.BASE_URL).toString(),
+          url: new URL("/dashboard", env.BASE_URL).toString(),
         },
-        inLanguage: "en-AU",
         description,
-        potentialAction: [
-          {
-            "@type": "ReadAction",
-            target: [new URL(env.BASE_URL).toString()],
-          },
-          {
-            "@type": "RegisterAction",
-            target: [new URL("#contact", env.BASE_URL).toString()],
-            object: {
-              "@id": new URL("#offer-waitlist", env.BASE_URL).toString(),
-            },
-          },
-          // {
-          //   "@type": "RegisterAction",
-          //   target: [new URL("signup", env.BASE_URL).toString()],
-          //   object: {
-          //     "@id": new URL("signup", env.BASE_URL).toString(),
-          //   },
-          // },
-          // {
-          //   "@type": "SearchAction",
-          //   target: {
-          //     "@type": "EntryPoint",
-          //     urlTemplate: new URL("?s={search_term_string}", env.BASE_URL).toString()
-          //   },
-          //   "query-input": "required name=search_term_string",
-          // },
-        ],
-        publisher: { "@id": new URL("#organization", env.BASE_URL).toString() },
+        inLanguage: "en-AU",
+        keywords: ["construction management software"],
+        // potentialAction: [
+        //   {
+        //     "@type": "SearchAction",
+        //     target: {
+        //       "@type": "EntryPoint",
+        //       urlTemplate: new URL("?s={search_term_string}", env.BASE_URL).toString()
+        //     },
+        //     "query-input": "required name=search_term_string",
+        //   },
+        // ],
+        publisher: {
+          "@id": new URL("#organization", env.BASE_URL).toString(),
+        },
       },
       {
         "@type": "Offer",
@@ -180,7 +153,7 @@ const jsonLd = ({ title, description }: JsonLdParams) =>
           ],
         },
         iso6523Code: "0151:24219541361",
-        keywords: "construction management software",
+        keywords: ["construction management software"],
         location: {
           "@type": "PostalAddress",
           addressLocality: "Brisbane",

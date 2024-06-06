@@ -12,12 +12,12 @@ import openGraph from "~/lib/open-graph"
 export const metadata = {
   title: "Home | rekurve",
   description:
-    "Construction management software with tools to manage every aspect of your construction projects, from estimation, scheduling, invoices and cashflow, to client collaboration and proposals.",
+    "Construction management software to manage every aspect of your projects, from estimation, scheduling, finances, to client collaboration and proposals.",
   openGraph: {
     ...openGraph,
     title: "Home | rekurve",
     description:
-      "Construction management software with tools to manage every aspect of your construction projects, from estimation, scheduling, invoices and cashflow, to client collaboration and proposals.",
+      "Construction management software to manage every aspect of your projects, from estimation, scheduling, finances, to client collaboration and proposals.",
   },
 }
 

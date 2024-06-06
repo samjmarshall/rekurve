@@ -8,6 +8,7 @@ import openGraph from "~/lib/open-graph"
 import { env } from "~/env"
 import Script from "next/script"
 import WebsiteFooter from "./_components/footer"
+import CanonicalLink from "./_components/canonical-link"
 
 export const runtime = "edge"
 
@@ -31,9 +32,10 @@ export const metadata: Metadata = {
   description:
     "Construction management software to stay organized, track progress, costs and payments, and collaborate with your customers.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
-  keywords: ["construction", "management", "software"],
+  keywords: ["construction management software"],
   openGraph,
   publisher: env.COMPANY_NAME,
+  robots: { index: true, follow: true },
 }
 
 export default function RootLayout({
@@ -66,6 +68,7 @@ export default function RootLayout({
           defer
           src="https://js.hs-scripts.com/46219156.js"
         />
+        <CanonicalLink />
       </head>
       <body className={`font-sans antialiased ${fontSans.variable}`}>
         <div className="flex min-h-[100dvh] flex-col">

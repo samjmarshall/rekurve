@@ -1,3 +1,4 @@
+import CanonicalLink from "~/components/canonical-link"
 import Link from "next/link"
 import { env } from "~/env"
 import openGraph from "~/lib/open-graph"
@@ -18,6 +19,7 @@ export const metadata = {
 export default function Privacy() {
   return (
     <main className="w-screen flex-1 justify-center">
+      <CanonicalLink pathname="/privacy" />
       <article className="mx-auto max-w-6xl space-y-4 p-6 text-gray-800">
         <h1 className="text-2xl">
           <b>MR SAMUEL MARSHALL PRIVACY POLICY</b>

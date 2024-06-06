@@ -8,7 +8,7 @@ import openGraph from "~/lib/open-graph"
 import { env } from "~/env"
 import Script from "next/script"
 import WebsiteFooter from "./_components/footer"
-import CanonicalLink from "./_components/canonical-link"
+import CanonicalLink from "../../components/canonical-link"
 
 export const runtime = "edge"
 
@@ -68,7 +68,6 @@ export default function RootLayout({
           defer
           src="https://js.hs-scripts.com/46219156.js"
         />
-        <CanonicalLink />
       </head>
       <body className={`font-sans antialiased ${fontSans.variable}`}>
         <div className="flex min-h-[100dvh] flex-col">

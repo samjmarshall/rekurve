@@ -92,9 +92,6 @@ export function middleware(request: NextRequest) {
     contentSecurityPolicyHeaderValue,
   )
 
-  // Set the 'x-pathname' header to the current request pathname for the <CanonicalLink /> tag
-  requestHeaders.set("x-pathname", request.nextUrl.pathname)
-
   const response = NextResponse.next({
     request: {
       headers: requestHeaders,

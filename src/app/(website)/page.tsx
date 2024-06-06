@@ -1,4 +1,5 @@
 import About from "./_sections/about"
+import CanonicalLink from "~/components/canonical-link"
 import Contact from "./_sections/contact"
 import Features from "./_sections/features"
 import Hero from "./_sections/hero"
@@ -23,6 +24,7 @@ export const metadata = {
 export default function LandingPage() {
   return (
     <main className="flex-1">
+      <CanonicalLink pathname="/" />
       <Script
         id="json-ld-website-org"
         type="application/ld+json"

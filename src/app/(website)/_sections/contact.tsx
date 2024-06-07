@@ -10,8 +10,8 @@ export default function Contact() {
             Take Control of Your Construction Projects
           </h2>
           <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed">
-            Join the waitlist for early access. There is a limited number of
-            spots available.
+            Join the waitlist for free early access. There is a limited number
+            of spots available.
           </p>
         </div>
 

@@ -89,6 +89,7 @@ export default function LeadDetailsForm({
   return (
     <Form {...form}>
       <form
+        id={eventName}
         aria-label="Add your details"
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4 px-1"

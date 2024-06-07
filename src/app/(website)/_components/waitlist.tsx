@@ -86,6 +86,7 @@ export default function Waitlist({
       )}
       <Form {...form}>
         <form
+          id={eventName}
           aria-label="Join the waitlist"
           onSubmit={form.handleSubmit(onSubmit)}
           className="mx-auto max-w-72 sm:max-w-none"

@@ -8,7 +8,6 @@ import openGraph from "~/lib/open-graph"
 import { env } from "~/env"
 import Script from "next/script"
 import WebsiteFooter from "./_components/footer"
-import CanonicalLink from "../../components/canonical-link"
 
 export const runtime = "edge"
 

@@ -1,9 +1,12 @@
-import CanonicalLink from "~/components/canonical-link"
 import Link from "next/link"
 import { env } from "~/env"
 import openGraph from "~/lib/open-graph"
+import { type Metadata } from "next"
+import { canonicalUrl } from "~/lib/canonical-url"
 
-export const metadata = {
+const canonical = canonicalUrl("/privacy")
+
+export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "By using our services and products, you agree to us collecting, holding, using, and disclosing your Personal Information in accordance with this Policy",
@@ -12,14 +15,16 @@ export const metadata = {
     title: "Privacy Policy | rekurve",
     description:
       "By using our services and products, you agree to us collecting, holding, using, and disclosing your Personal Information in accordance with this Policy",
-    url: `${env.BASE_URL}/privacy`,
+    url: canonical,
+  },
+  alternates: {
+    canonical,
   },
 }
 
 export default function Privacy() {
   return (
     <main className="w-screen flex-1 justify-center">
-      <CanonicalLink pathname="/privacy" />
       <article className="mx-auto max-w-6xl space-y-4 p-6 text-gray-800">
         <h1 className="text-2xl">
           <b>MR SAMUEL MARSHALL PRIVACY POLICY</b>

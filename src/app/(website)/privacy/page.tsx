@@ -25,10 +25,8 @@ export const metadata: Metadata = {
 export default function Privacy() {
   return (
     <main className="w-screen flex-1 justify-center">
-      <article className="mx-auto max-w-6xl space-y-4 p-6 text-gray-800">
-        <h1 className="text-2xl">
-          <b>MR SAMUEL MARSHALL PRIVACY POLICY</b>
-        </h1>
+      <article className="prose prose-slate mx-auto max-w-6xl p-6">
+        <h1>REKURVE PRIVACY POLICY</h1>
         <p>
           We are bound by the <i>Privacy Act 1988 </i>(Cth) (<b>Privacy Act</b>)
           and the Australian Privacy Principles (<b>APPs</b>). This privacy
@@ -44,7 +42,6 @@ export default function Privacy() {
           with this Policy. If you have any questions about our Policy or your
           Personal Information, please contact us at{" "}
           <Link
-            className="underline-offset-4 hover:underline"
             href={`mailto:${env.CUSTOMER_CONTACT_EMAIL}`}
             title="Customer Contact Email"
           >
@@ -53,9 +50,7 @@ export default function Privacy() {
           .
         </p>
         <p>Last Updated: 21 May 2024</p>
-        <h2>
-          <b>What is Personal Information?</b>
-        </h2>
+        <h2>What is Personal Information?</h2>
         <p>
           Personal information is any information or an opinion about an
           identified individual or an individual who can be reasonably
@@ -63,9 +58,7 @@ export default function Privacy() {
           <b>Personal Information</b>). Information or an opinion may be
           Personal Information regardless of whether it is true.
         </p>
-        <h2>
-          <b>What Personal Information do we collect and hold?&nbsp;</b>
-        </h2>
+        <h2>What Personal Information do we collect and hold?&nbsp;</h2>
         <p>
           We collect different types of Personal Information for various
           purposes to provide and improve our products and services. The types
@@ -109,10 +102,7 @@ export default function Privacy() {
           </li>
         </ol>
         <h2>
-          <b>
-            Why do we collect, hold and use your Personal
-            Information?&nbsp;&nbsp;
-          </b>
+          Why do we collect, hold and use your Personal Information?&nbsp;&nbsp;
         </h2>
         <p>
           &nbsp;We collect, hold and use your Personal Information so that we
@@ -149,9 +139,7 @@ export default function Privacy() {
           able to provide you with our services, communicate with you or respond
           to your enquiries.
         </p>
-        <h2>
-          <b>How do we collect your Personal Information?&nbsp;&nbsp;</b>
-        </h2>
+        <h2>How do we collect your Personal Information?&nbsp;&nbsp;</h2>
         <p>
           We will collect your Personal Information directly from you whenever
           you interact with us.
@@ -165,9 +153,7 @@ export default function Privacy() {
             </p>
           </li>
         </ol>
-        <h2>
-          <b>How do we store and hold Personal Information?&nbsp;&nbsp;</b>
-        </h2>
+        <h2>How do we store and hold Personal Information?&nbsp;&nbsp;</h2>
         <p>
           We store most information about you in computer systems and databases
           operated by either us or our external service providers.
@@ -204,10 +190,7 @@ export default function Privacy() {
           was collected or for any secondary purpose permitted under the APPs.
         </p>
         <h2>
-          <b>
-            Who do we disclose your Personal Information to, and
-            why?&nbsp;&nbsp;
-          </b>
+          Who do we disclose your Personal Information to, and why?&nbsp;&nbsp;
         </h2>
         <p>
           We may transfer or disclose your Personal Information to our related
@@ -283,9 +266,7 @@ export default function Privacy() {
           If the ownership or control of all or part of our business changes, we
           may transfer your Personal Information to the new owner.
         </p>
-        <h2>
-          <b>Do we use your Personal Information for marketing?&nbsp;&nbsp;</b>
-        </h2>
+        <h2>Do we use your Personal Information for marketing?&nbsp;&nbsp;</h2>
         <p>
           We will use your Personal Information to offer you products and
           services we believe may interest you, but we will not do so if you
@@ -299,9 +280,7 @@ export default function Privacy() {
           opt-out instructions provided in the communication.
         </p>
         <h2>
-          <b>
-            Access to and correction of your Personal Information&nbsp;&nbsp;
-          </b>
+          Access to and correction of your Personal Information&nbsp;&nbsp;
         </h2>
         <p>
           You may access or request correction of the Personal Information that
@@ -321,9 +300,7 @@ export default function Privacy() {
           ensure that the Personal Information we hold about you remains
           accurate and up to date.
         </p>
-        <h2>
-          <b>Your rights under the EU GDPR</b>
-        </h2>
+        <h2>Your rights under the EU GDPR</h2>
         <p>
           Under the European Union (<b>EU</b>) General Data Protection
           Regulation (<b>GDPR</b>), as a data subject you have the right to:
@@ -355,9 +332,7 @@ export default function Privacy() {
             </p>
           </li>
         </ol>
-        <h3>
-          (<b>Data Subject Rights</b>)
-        </h3>
+        <h3>(Data Subject Rights)</h3>
         <p>
           We have processes in place to deal with Data Subject Rights requests.
           Our actions and responsibilities will depend on whether we are the
@@ -368,9 +343,7 @@ export default function Privacy() {
           would like to make a Data Subject Rights request <b>OR</b> have a
           specific need for assistance with a Data Subject Rights request.
         </p>
-        <h2>
-          <b>Links to third party sites</b>
-        </h2>
+        <h2>Links to third party sites</h2>
         <p>
           Our website may contain links to websites operated by third parties.
           If you access a third party website through our website, Personal
@@ -386,9 +359,7 @@ export default function Privacy() {
           privacy practices. We recommend that you examine each website’s
           privacy policy.
         </p>
-        <h2>
-          <b>Complaints</b>
-        </h2>
+        <h2>Complaints</h2>
         <p>
           If you have a complaint about the way in which we have handled any
           privacy issue, including your request for access or correction of your
@@ -407,25 +378,20 @@ export default function Privacy() {
           (www.oaic.gov.au) for guidance on alternative courses of action which
           may be available.
         </p>
-        <h2>
-          <b>Contact Details</b>
-        </h2>
+        <h2>Contact Details</h2>
         <p>
           If you have any questions, comments, requests or concerns, please
           contact us at:
         </p>
         <p>
           <Link
-            className="underline-offset-4 hover:underline"
             href={`mailto:${env.CUSTOMER_CONTACT_EMAIL}`}
             title="Customer Contact Email"
           >
             {env.CUSTOMER_CONTACT_EMAIL}
           </Link>
         </p>
-        <h2>
-          <b>Changes to the Policy</b>
-        </h2>
+        <h2>Changes to the Policy</h2>
         <p>
           From time to time, we may change our Policy on how we handle Personal
           Information or the types of Personal Information which we hold. Any

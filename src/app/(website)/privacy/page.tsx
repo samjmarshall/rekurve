@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export default function Privacy() {
   return (
     <main className="w-screen flex-1 justify-center">
-      <article className="prose prose-slate mx-auto max-w-6xl p-6">
+      <article className="prose prose-zinc mx-auto max-w-6xl p-6">
         <h1>REKURVE PRIVACY POLICY</h1>
         <p>
           We are bound by the <i>Privacy Act 1988 </i>(Cth) (<b>Privacy Act</b>)

@@ -2,13 +2,11 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card"
 
 import { CreatePost } from "~/components/create-post"
-import { Separator } from "~/components/ui/separator"
 import { api } from "~/trpc/server"
 import { getServerAuthSession } from "~/server/auth"
 import { stripePriceMap } from "~/server/stripe"

@@ -38,25 +38,22 @@ export default async function RootLayout({
 }) {
   const session = await getServerAuthSession()
 
-  if (session?.user) {
+  if (!session?.user) {
     redirect("/signup")
   }
 
-  const hasSub = await api.billing.userHasSubscription()
+  const hasSubscription = await api.billing.userHasSubscription()
+
+  // Don't allow users to access onboarding if they already have a subscription
+  // Users with a subscription should upgrade or downgrade their plan via the billing portal
+  if (hasSubscription) {
+    redirect("/dashboard")
+  }
+
   return (
     <html lang="en">
       <body className={`font-sans antialiased ${fontSans.variable}`}>
-        <div className="flex min-h-[100dvh]">
-          {hasSub ? (
-            <div className="flex h-full w-full items-center justify-center">
-              <h2 className="mb-6 text-4xl font-bold">
-                You&apos;re already onboard!
-              </h2>
-            </div>
-          ) : (
-            children
-          )}
-        </div>
+        <div className="flex min-h-[100dvh]">{children}</div>
       </body>
     </html>
   )

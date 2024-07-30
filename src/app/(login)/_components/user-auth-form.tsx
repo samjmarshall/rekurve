@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, type HTMLAttributes, type SyntheticEvent } from "react"
+import { type HTMLAttributes, type SyntheticEvent } from "react"
 import { Button } from "~/components/ui/button"
 import { Icons } from "~/components/icons"
 import { Input } from "~/components/ui/input"

@@ -67,6 +67,7 @@ export const users = createTable("user", {
     sql`CURRENT_TIMESTAMP(3)`,
   ),
   image: varchar("image", { length: 255 }),
+  stripe_customer_id: varchar("stripe_customer_id", { length: 255 }),
 })
 
 export const usersRelations = relations(users, ({ many }) => ({

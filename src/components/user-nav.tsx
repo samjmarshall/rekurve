@@ -16,9 +16,25 @@ import { Button } from "~/components/ui/button"
 import { type User } from "next-auth"
 import { useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
+import { api } from "~/trpc/react"
 
 export function UserNav({ user }: { user: User }) {
   const router = useRouter()
+  const { data: hasSub } = api.billing.userHasSubscription.useQuery()
+  const { refetch: fetchPortalLink } =
+    api.billing.generateCustomerPortalLink.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+      enabled: false,
+    })
+
+  const onBillingClick = async () => {
+    if (hasSub) {
+      const { data } = await fetchPortalLink()
+      if (data) window.location.href = data
+    } else {
+      router.push("/onboarding")
+    }
+  }
 
   return (
     <DropdownMenu>
@@ -56,7 +72,7 @@ export function UserNav({ user }: { user: User }) {
             Settings
             <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem className="text-gray-400 focus:text-gray-400">
+          <DropdownMenuItem className="cursor-pointer" onClick={onBillingClick}>
             Billing
             <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
           </DropdownMenuItem>

@@ -38,6 +38,8 @@ export const env = createEnv({
     RECAPTCHA_SECRET_KEY: z.string(),
     RECAPTCHA_THRESHOLD: z.number().default(0.7),
     ROBOTS_TXT: z.string().default("Disallow"),
+    STRIPE_SECRET_KEY: z.string(),
+    STRIPE_WEBHOOK_SECRET: z.string(),
   },
 
   /**
@@ -69,6 +71,8 @@ export const env = createEnv({
     RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
     RECAPTCHA_THRESHOLD: process.env.RECAPTCHA_THRESHOLD,
     ROBOTS_TXT: process.env.ROBOTS_TXT,
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

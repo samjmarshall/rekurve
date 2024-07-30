@@ -1,5 +1,6 @@
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc"
 
+import { billingRouter } from "./routers/billing"
 import { postRouter } from "~/server/api/routers/post"
 import { waitlistRouter } from "~/server/api/routers/waitlist"
 
@@ -9,6 +10,7 @@ import { waitlistRouter } from "~/server/api/routers/waitlist"
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
+  billing: billingRouter,
   post: postRouter,
   waitlist: waitlistRouter,
 })

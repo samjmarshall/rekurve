@@ -8,6 +8,7 @@ import { Label } from "~/components/ui/label"
 import { cn } from "~/lib/utils"
 import { signIn } from "next-auth/react"
 import { useState } from "react"
+import { useSearchParams } from "next/navigation"
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {
   email?: boolean
@@ -19,6 +20,7 @@ export function UserAuthForm({
   ...props
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const plan = useSearchParams().get("plan")
 
   async function emailSubmit(event: SyntheticEvent) {
     event.preventDefault()
@@ -27,7 +29,7 @@ export function UserAuthForm({
   async function googleSubmit() {
     setIsLoading(true)
     await signIn("google", {
-      callbackUrl: "/dashboard",
+      callbackUrl: plan ? `/onboarding/${plan.toLowerCase()}` : "/dashboard",
     })
   }
 
@@ -51,7 +53,8 @@ export function UserAuthForm({
               />
             </div>
             <Button
-              disabled={isLoading}
+              // disabled={isLoading}
+              disabled
               title="Continue with Email"
               rel="nofollow"
             >

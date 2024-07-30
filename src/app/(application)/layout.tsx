@@ -6,6 +6,7 @@ import { type Viewport, type Metadata } from "next"
 import { TRPCReactProvider } from "~/trpc/react"
 import { getServerAuthSession } from "~/server/auth"
 import { redirect } from "next/navigation"
+import { api } from "~/trpc/server"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -33,6 +34,12 @@ export default async function RootLayout({
 
   if (!session?.user) {
     redirect("/")
+  }
+
+  const hasSubscription = await api.billing.userHasSubscription()
+
+  if (!hasSubscription) {
+    redirect("/onboarding")
   }
 
   // FYI: In the event you need to add an inline or third-party script that requires. This is how to add the CSP nonce.

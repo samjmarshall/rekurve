@@ -19,13 +19,13 @@ export default function WebsiteHeader() {
         >
           Features
         </Link>
-        {/* <Link
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            href="/#pricing"
-            title="Pricing"
-          >
-            Pricing
-          </Link> */}
+        <Link
+          className="text-sm font-medium underline-offset-4 hover:underline"
+          href="/#pricing"
+          title="Pricing"
+        >
+          Pricing
+        </Link>
         {/* <Link
             className="text-sm font-medium underline-offset-4 hover:underline"
             href="/#about"

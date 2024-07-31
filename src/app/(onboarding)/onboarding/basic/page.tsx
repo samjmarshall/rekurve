@@ -1,6 +1,8 @@
 import { Button } from "~/components/ui/button"
+import Link from "next/link"
 import OnboardingProgress from "./onboarding-progress"
 import { PlanBasic } from "~/components/plans"
+import { Switch } from "~/components/ui/switch"
 import { api } from "~/trpc/server"
 
 export default async function PlanBasicCheckout() {
@@ -15,9 +17,17 @@ export default async function PlanBasicCheckout() {
       <h2 className="mb-6 text-4xl font-bold">Basic Plan Onboarding</h2>
 
       <OnboardingProgress />
-      <p className="mb-20 mt-1 text-sm text-gray-500">
+      <p className="mt-1 text-sm text-gray-500">
         You&apos;re almost done, click &quot;Checkout&quot; below.
       </p>
+      <div className="mx-auto mt-14 grid w-3/5 grid-cols-3">
+        <span className="ml-auto font-semibold text-slate-800">Monthly</span>
+        <Switch className="mx-auto" checked={false} disabled />
+        <span className="mr-auto text-slate-800">Yearly</span>
+      </div>
+      <div className="mb-14 mt-2 text-center text-sm text-gray-500">
+        Save 15% by switching to yearly billing.
+      </div>
       <div className="flex items-center justify-center">
         <PlanBasic>
           <Button
@@ -31,6 +41,11 @@ export default async function PlanBasicCheckout() {
             </a>
           </Button>
         </PlanBasic>
+      </div>
+      <div className="mt-8 text-center">
+        <Link className="text-gray-500 underline" href="/onboarding">
+          See other plans
+        </Link>
       </div>
     </div>
   )

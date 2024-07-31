@@ -1,11 +1,10 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc"
-import { stripe, stripePriceMap } from "~/server/stripe"
 
 import { TRPCError } from "@trpc/server"
 import { env } from "~/env"
 import { eq } from "drizzle-orm"
-import { interval } from "date-fns"
 import logger from "~/server/logger"
+import { stripe } from "~/server/stripe"
 import { users } from "~/server/db/schema"
 import { z } from "zod"
 

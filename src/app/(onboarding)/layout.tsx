@@ -2,17 +2,17 @@ import "~/styles/globals.css"
 
 import { type Metadata, type Viewport } from "next"
 
-import { Inter as FontSans } from "next/font/google"
+import { Inter } from "next/font/google"
 import openGraph from "~/lib/open-graph"
 import { getServerAuthSession } from "~/server/auth"
 import { redirect } from "next/navigation"
 import { api } from "~/trpc/server"
 
-const fontSans = FontSans({
+const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  fallback: ["system-ui", "sans-serif"],
 })
-
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,

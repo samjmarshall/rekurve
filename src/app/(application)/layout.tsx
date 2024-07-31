@@ -1,6 +1,6 @@
 import "~/styles/globals.css"
 
-import { Inter as FontSans } from "next/font/google"
+import { Inter } from "next/font/google"
 import { Header } from "~/components/header"
 import { type Viewport, type Metadata } from "next"
 import { TRPCReactProvider } from "~/trpc/react"
@@ -8,9 +8,10 @@ import { getServerAuthSession } from "~/server/auth"
 import { redirect } from "next/navigation"
 import { api } from "~/trpc/server"
 
-const fontSans = FontSans({
+const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  fallback: ["system-ui", "sans-serif"],
 })
 
 export const viewport: Viewport = {

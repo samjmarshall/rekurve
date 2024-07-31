@@ -6,6 +6,7 @@ import logger from "~/server/logger"
 import { stripe } from "~/server/stripe"
 import { env } from "~/env"
 import type Stripe from "stripe"
+import { api } from "~/trpc/server"
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const data = await request.text()
@@ -40,6 +41,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // See the 230+ Stripe event types: https://docs.stripe.com/api/events/types
   // Determine you use cases from the available events above and handle the events you need
   switch (event.type) {
+    case "customer.deleted":
+      await api.user.deleteStripeCustomerId({
+        stripeCustomerId: event.data.object.id,
+      })
+      break
     case "checkout.session.completed":
     case "customer.subscription.created":
       // Handle subscription creation

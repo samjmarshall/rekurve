@@ -9,6 +9,21 @@ import {
 
 import { Check } from "lucide-react"
 
+export function PlanPrice({
+  ammout,
+  interval,
+}: {
+  ammout: number
+  interval: string
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-2xl font-bold">${ammout}</span>
+      <span className="text-sm text-gray-500">/{interval}</span>
+    </div>
+  )
+}
+
 export function PlanBasic({ children }: { children?: React.ReactNode }) {
   return (
     <Card>
@@ -45,10 +60,7 @@ export function PlanBasic({ children }: { children?: React.ReactNode }) {
         </div>
       </CardContent>
       <CardFooter>
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold">$49</span>
-          <span className="text-sm text-gray-500">/month</span>
-        </div>
+        <PlanPrice ammout={49} interval="month" />
         {children}
       </CardFooter>
     </Card>
@@ -95,10 +107,7 @@ export function PlanPro({ children }: { children?: React.ReactNode }) {
         </div>
       </CardContent>
       <CardFooter>
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold">$99</span>
-          <span className="text-sm text-gray-500">/month</span>
-        </div>
+        <PlanPrice ammout={99} interval="month" />
         {children}
       </CardFooter>
     </Card>
@@ -149,10 +158,7 @@ export function PlanEnterprise({ children }: { children?: React.ReactNode }) {
         </div>
       </CardContent>
       <CardFooter>
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold">$199</span>
-          <span className="text-sm text-gray-500">/month</span>
-        </div>
+        <PlanPrice ammout={199} interval="month" />
         {children}
       </CardFooter>
     </Card>

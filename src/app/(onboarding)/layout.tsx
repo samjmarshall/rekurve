@@ -53,7 +53,9 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans antialiased ${fontSans.variable}`}>
-        <div className="flex min-h-[100dvh]">{children}</div>
+        <div className="flex h-full min-h-[100dvh] w-full items-center justify-center">
+          {children}
+        </div>
       </body>
     </html>
   )

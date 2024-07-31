@@ -1,6 +1,6 @@
 "use client"
 
-import { type HTMLAttributes, type SyntheticEvent } from "react"
+import { useEffect, type HTMLAttributes, type SyntheticEvent } from "react"
 import { Button } from "~/components/ui/button"
 import { Icons } from "~/components/icons"
 import { Input } from "~/components/ui/input"
@@ -49,7 +49,8 @@ export function UserAuthForm({
                 autoCapitalize="none"
                 autoComplete="email"
                 autoCorrect="off"
-                disabled={isLoading}
+                // disabled={isLoading}
+                disabled
               />
             </div>
             <Button

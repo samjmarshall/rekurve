@@ -2,6 +2,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc"
 
 import { billingRouter } from "./routers/billing"
 import { postRouter } from "~/server/api/routers/post"
+import { userRouter } from "./routers/user"
 import { waitlistRouter } from "~/server/api/routers/waitlist"
 
 /**
@@ -12,6 +13,7 @@ import { waitlistRouter } from "~/server/api/routers/waitlist"
 export const appRouter = createTRPCRouter({
   billing: billingRouter,
   post: postRouter,
+  user: userRouter,
   waitlist: waitlistRouter,
 })
 

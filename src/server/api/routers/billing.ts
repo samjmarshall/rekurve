@@ -4,6 +4,7 @@ import { stripe, stripePriceMap } from "~/server/stripe"
 import { TRPCError } from "@trpc/server"
 import { env } from "~/env"
 import { eq } from "drizzle-orm"
+import { interval } from "date-fns"
 import logger from "~/server/logger"
 import { users } from "~/server/db/schema"
 import { z } from "zod"
@@ -77,13 +78,26 @@ export const billingRouter = createTRPCRouter({
           })
 
           if (user?.stripe_customer_id) {
-            const price = stripePriceMap[input.plan]
+            type StripePriceMap = Record<string, string>
+
+            // If plans/prices will be created in Stripe regularly (e.g. promotions), building a dynamic solution for returning price ID would be better.
+            // This is a simple (but fragile) solution for a fixed set of plans.
+            // TODO - Support checkout for yearly plans
+            const stripePriceMap: StripePriceMap = {
+              BasicMonthly: "price_1PhkZiFqfoPDomWjxaWrgW8R",
+              BasicYearly: "price_1Pi8fPFqfoPDomWjN0bjaexu",
+              ProMonthly: "price_1Phkb4FqfoPDomWjwzIpaKFG",
+              ProYearly: "price_1Pi8j1FqfoPDomWjNxFMbRcb",
+              EnterpriseMonthly: "price_1Phkb4FqfoPDomWjLwNtA8hh",
+              EnterpriseYearly: "price_1Pi8oYFqfoPDomWjqhMWhIWI",
+            }
+
             const session = await stripe.checkout.sessions.create({
               mode: "subscription",
               payment_method_types: ["card"],
               line_items: [
                 {
-                  price,
+                  price: stripePriceMap[`${input.plan}Monthly`],
                   quantity: 1,
                 },
               ],
@@ -135,6 +149,15 @@ export const billingRouter = createTRPCRouter({
       }
     }
   }),
+  getProductById: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .query(async ({ input }) => {
+      return stripe.products.retrieve(input.id)
+    }),
   createCustomerIfNull: protectedProcedure.mutation(async ({ ctx }) => {
     if (ctx.session.user.email) {
       try {

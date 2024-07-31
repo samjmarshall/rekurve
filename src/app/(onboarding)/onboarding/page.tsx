@@ -1,12 +1,12 @@
+import { Button, buttonVariants } from "~/components/ui/button"
 import { PlanBasic, PlanEnterprise, PlanPro } from "~/components/plans"
 
 import Link from "next/link"
-import { buttonVariants } from "~/components/ui/button"
 import { cn } from "~/lib/utils"
 
 export default async function OnboardingPage() {
   return (
-    <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
+    <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-3 lg:gap-12">
       <PlanBasic>
         <Link
           className={cn(buttonVariants(), "ml-4 w-full")}
@@ -17,25 +17,20 @@ export default async function OnboardingPage() {
         </Link>
       </PlanBasic>
       <PlanPro>
-        <Link
-          className={cn(
-            buttonVariants(),
-            "ml-4 w-full bg-gray-50 text-gray-900 hover:bg-gray-50/90",
-          )}
-          title="Get Started"
-          href="/onboarding/pro"
+        <Button
+          className="ml-4 w-full bg-gray-50 font-bold text-red-600 line-through hover:bg-gray-50/90"
+          disabled
         >
-          Get Started
-        </Link>
+          Sold Out
+        </Button>
       </PlanPro>
       <PlanEnterprise>
-        <Link
-          className={cn(buttonVariants(), "ml-4 w-full")}
-          title="Get Started"
-          href="/onboarding/enterprise"
+        <Button
+          className="ml-4 w-full font-bold text-red-400 line-through"
+          disabled
         >
-          Get Started
-        </Link>
+          Sold Out
+        </Button>
       </PlanEnterprise>
     </div>
   )

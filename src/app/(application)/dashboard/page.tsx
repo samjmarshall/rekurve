@@ -9,15 +9,19 @@ import {
 import { CreatePost } from "~/components/create-post"
 import { api } from "~/trpc/server"
 import { getServerAuthSession } from "~/server/auth"
-import { stripePriceMap } from "~/server/stripe"
 
 export default async function Home() {
   const session = await getServerAuthSession()
   const subscriptions = await api.billing.userSubscriptions()
   const plan = subscriptions[0]?.items.data[0]?.plan
-  const planName = Object.keys(stripePriceMap).find(
-    (e) => stripePriceMap[e] == subscriptions[0]?.items.data[0]?.plan.id,
-  )
+
+  let product
+
+  if (typeof plan?.product === "string") {
+    product = await api.billing.getProductById({
+      id: plan.product,
+    })
+  }
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-12 px-4 py-16">
@@ -27,7 +31,7 @@ export default async function Home() {
       <div>
         <Card>
           <CardHeader>
-            <CardTitle className="text-slate-700">Rekurve {planName}</CardTitle>
+            <CardTitle className="text-slate-700">{product?.name}</CardTitle>
             <CardDescription>Your current plan.</CardDescription>
           </CardHeader>
           <CardContent className="text-2xl font-semibold">

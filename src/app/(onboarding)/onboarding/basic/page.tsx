@@ -13,8 +13,10 @@ export default async function PlanBasicCheckout() {
   })
 
   return (
-    <div>
-      <h2 className="mb-6 text-4xl font-bold">Basic Plan Onboarding</h2>
+    <div className="p-6">
+      <h2 className="mb-6 text-2xl font-bold sm:text-4xl">
+        Basic Plan Onboarding
+      </h2>
 
       <OnboardingProgress />
       <p className="mt-1 text-sm text-gray-500">

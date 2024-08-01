@@ -6,7 +6,7 @@ import { cn } from "~/lib/utils"
 
 export default async function OnboardingPage() {
   return (
-    <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-3 lg:gap-12">
+    <div className="mx-auto grid max-w-5xl items-center gap-6 py-6 lg:grid-cols-3 lg:gap-12">
       <PlanBasic>
         <Link
           className={cn(buttonVariants(), "ml-4 w-full")}

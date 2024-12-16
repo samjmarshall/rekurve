@@ -1927,10 +1927,10 @@ drizzle-kit@^0.21.2:
     json-diff "0.9.0"
     zod "^3.20.2"
 
-drizzle-orm@0.30.10:
-  version "0.30.10"
-  resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.30.10.tgz#1ae29d9d8e8fb5422e050e155c441854033ef13f"
-  integrity sha512-IRy/QmMWw9lAQHpwbUh1b8fcn27S/a9zMIzqea1WNOxK9/4EB8gIo+FZWLiPXzl2n9ixGSv8BhsLZiOppWEwBw==
+drizzle-orm@0.31.1:
+  version "0.31.1"
+  resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.31.1.tgz#1e86dcbf724b4694747f6e1c7eba9a94c89d33b9"
+  integrity sha512-hTbYne2XX3y6sV7WSxcPH6/vNSiQSUG9VZsFI27jBMCN0OT3Ok7ao3pIT5OMAqWkzJCRFgGjAaUeTAZWPgOKag==
 
 duplexer@^0.1.2:
   version "0.1.2"

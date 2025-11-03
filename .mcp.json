@@ -6,12 +6,6 @@
         "shadcn@latest",
         "mcp"
       ]
-    },
-    "aceternityui": {
-      "command": "npx",
-      "args": [
-        "aceternityui-mcp"
-      ]
     }
   }
 }

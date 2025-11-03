@@ -1,7 +1,5 @@
 # Rekurve AI Sales Automation Agency
 
-## Project Overview
-
 **Rekurve** is an AI automation agency building autonomous AI sales agents for professional services firms in Brisbane, Australia (expanding to Melbourne). This repository contains strategic documentation, business plans, and landing page specifications for the agency.
 
 **Target Market**: Professional services firms (consulting, accounting, marketing agencies) with 10-50 employees.
@@ -10,10 +8,45 @@
 
 ---
 
+## Quick Start: Current Project State
+
+**Active Project**: Next.js 15 landing page at `/rekurve-landing/`
+
+**Tech Stack**:
+- Next.js 15.2.3 (App Router) + React 19 + TypeScript
+- Tailwind CSS 4.0.15
+- Yarn 3.8.7 (PnP mode)
+- Environment validation: @t3-oss/env-nextjs
+
+**Key Commands**:
+```bash
+cd rekurve-landing
+yarn dev              # Development server (Turbo mode)
+yarn check            # Lint + TypeCheck
+yarn build            # Production build
+```
+
+**Status**: Initialized, staged in git, ready for landing page implementation
+
+---
+
 ## Repository Structure
 
 ```
-www/
+www/                                    # Project root
+├── rekurve-landing/                   # Next.js 15 landing page application
+│   ├── src/
+│   │   ├── app/                       # App Router (Next.js 15)
+│   │   │   ├── layout.tsx            # Root layout with fonts
+│   │   │   └── page.tsx              # Landing page (placeholder)
+│   │   ├── styles/
+│   │   │   └── globals.css           # Global styles
+│   │   └── env.js                    # Environment variable schema
+│   ├── public/                        # Static assets
+│   ├── package.json                   # Dependencies (Yarn 3.8.7)
+│   ├── tsconfig.json                  # TypeScript config
+│   ├── tailwind.config.js            # Tailwind 4 config
+│   └── [other config files]
 ├── docs/                               # Strategic documentation
 │   ├── ai-agency-roadmap.md           # 6-month implementation roadmap
 │   ├── ai_agent_positioning_guide.md  # Market positioning and messaging
@@ -27,110 +60,207 @@ www/
 │   └── ai-agency-launch-blueprint.md
 ├── .claude/                           # Claude Code configuration
 │   ├── agents/                        # Custom agent definitions
-│   ├── commands/                      # Slash commands
+│   ├── commands/                      # Slash commands (/create_plan, /implement_plan, etc.)
 │   └── skills/                        # Reusable skills
 │       └── ui-aesthetics/             # Distinctive UI design principles
-└── CLAUDE.md                          # This file
+├── thoughts/                          # Implementation plans and notes
+│   └── plans/                         # Detailed implementation plans
+├── CLAUDE.md                          # This file (project instructions)
+└── .mcp.json                          # MCP server configuration
 ```
 
 ---
 
-## Business Context
+## TIER 1: QUICK REFERENCE
 
-### Value Proposition
-"Autonomous AI Sales Agents That Work 24/7" - NOT just automation, but intelligent agents that:
-- Research prospects and enrich data
-- Qualify leads using custom criteria
-- Execute multi-channel campaigns (Email, LinkedIn, SMS)
-- Adapt messaging based on engagement patterns
-- Book qualified meetings automatically
+### Target Market & Core Offering
 
-### Positioning Strategy
-**Critical**: We position as **"AI Agents"** not "automation services" to justify premium pricing and differentiate from commodity Zapier/Make alternatives.
+**Who**: Professional services firms (consulting, accounting, marketing agencies) with 10-50 employees in Brisbane/Melbourne, Australia
 
-**Language Framework**:
+**What**: Autonomous AI sales agents (NOT automation tools) that handle:
+- Lead research & enrichment
+- Qualification using custom criteria
+- Multi-channel outreach (Email, LinkedIn, SMS)
+- Adaptive messaging based on engagement
+- Automated meeting booking
+
+**Results**: 20+ hours saved weekly, $100K+ pipeline growth, 8.6× average ROI
+
+### Critical Positioning Language
+
+**ALWAYS Use** (agent positioning):
 - ✅ "Deploy autonomous AI sales agents"
 - ✅ "Your 24/7 virtual SDR"
 - ✅ "Intelligent decision-making, not just workflows"
+
+**NEVER Use** (commodity automation):
 - ❌ "We'll automate your CRM"
 - ❌ "Simple workflow automation"
+- ❌ Generic "AI" without specifics
 
-See `/docs/ai_agent_positioning_guide.md` for complete messaging framework.
+**Why This Matters**: Agent positioning commands 30-50% premium vs automation services
 
-### Pricing Tiers
-1. **AI-Assisted Sales System** (Foundation): $9,500 setup + $2,500/mo
-2. **Intelligent Sales Agent** (Growth): $20,000 setup + $4,500/mo
-3. **Autonomous AI Sales Agent** (Enterprise): Custom pricing
+### Design System Quick Reference
 
-All packages include **5× ROI guarantee** in 120 days.
+**Typography**:
+- Headlines: IBM Plex Sans Bold (-0.02em tracking)
+- Body: IBM Plex Sans Regular/Medium
+- Technical: JetBrains Mono
+- Numbers: Tabular figures
+
+**Colors** (strategic deployment - ONE accent per context):
+- Primary: `#071D33` (Navy)
+- Accent Amber: `oklch(0.75 0.15 75)` - Urgent/highlight
+- Accent Cyan: `oklch(0.70 0.15 195)` - Active/in-progress
+- Accent Coral: `oklch(0.65 0.18 25)` - Attention states
+
+**Avoid Generic AI Aesthetics**:
+- ❌ Purple gradients on white
+- ❌ Inter/Roboto fonts
+- ❌ Uniform Tailwind defaults (blue-500/gray-100)
+- ❌ Rainbow color soup
+
+### Pricing Tiers (Quick Reference)
+
+1. **AI-Assisted Sales System**: $9,500 setup + $2,500/mo
+2. **Intelligent Sales Agent**: $20,000 setup + $4,500/mo
+3. **Autonomous AI Sales Agent**: Custom pricing
+
+All include **5× ROI guarantee** in 120 days.
+
+### Common Tasks Reference
+
+| Task | Reference Document |
+|------|-------------------|
+| Landing page copy | `docs/landing_page_prompt.md` + `docs/ai_agent_positioning_guide.md` |
+| UI component design | `docs/landing_page_prompt.md` + `.claude/skills/ui-aesthetics/SKILL.md` |
+| Pricing proposals | `docs/value_based_pricing_proposals.md` + `docs/pricing-ladder.md` |
+| Objection handling | `docs/ai_agent_positioning_guide.md` (Objection Handling section) |
+| Case studies | `docs/technical_case_study_complete.md` |
+| Roadmap/planning | `docs/ai-agency-roadmap.md` |
 
 ---
 
-## Technical Approach
+## TIER 2: IMPLEMENTATION GUIDELINES
 
-### Tech Stack (for implementation)
-- **Orchestration**: n8n (self-hosted on AWS) for workflow management
+### Tech Stack & Architecture
+
+**Landing Page Stack** (rekurve-landing/):
+- **Framework**: Next.js 15.2.3 (App Router, TypeScript, React 19)
+- **Styling**: Tailwind CSS 4.0.15 (custom theme required)
+- **UI Components**: shadcn/ui + Aceternity UI (customize to avoid generic look)
+- **Animation**: Framer Motion for orchestrated reveals
+- **Icons**: Lucide React (variable stroke-width: 1.5-2.5)
+- **Forms**: React Hook Form + Zod validation
+- **Analytics**: Google Analytics 4 + custom event tracking
+- **Package Manager**: Yarn 3.8.7 (PnP)
+
+**AI Agent Implementation Stack** (for future client projects):
+- **Orchestration**: n8n (self-hosted on AWS)
 - **Intelligence**: GPT-4 API for NLP, content generation, decision logic
 - **Data**: Clay, Clearbit, Apollo APIs for real-time enrichment
 - **CRM Integration**: HubSpot, Salesforce, Pipedrive APIs
-- **Infrastructure**: AWS (Lambda for serverless, EC2 for n8n, PostgreSQL)
+- **Infrastructure**: AWS (Lambda, EC2, PostgreSQL)
 
-### Architecture Philosophy
-**Enterprise-grade reliability with SRE principles**:
-- 99.9% uptime SLA
-- Production-grade monitoring and alerting
-- Idempotent operations (no duplicate sends)
-- Graceful error handling and retry logic
-- Comprehensive logging and observability
+### Recommended Code Structure
 
-**Why this matters**: Founder's background as AWS SRE is a key differentiator. Technical credibility justifies premium pricing.
-
----
-
-## Design Philosophy: Distinctive UI Aesthetics
-
-**Target Audience**: Pre-sales engineers, sales ops managers, sales leadership—technically sophisticated professionals.
-
-**Visual Identity**: Technical precision meets operational confidence. Think Linear's sophistication + Grafana's data viz aesthetic + Superhuman's speed signals.
-
-### Critical Design Rules
-
-**Avoid Generic "AI Slop"**:
-- ❌ No purple gradients on white backgrounds
-- ❌ No Inter/Roboto/default system fonts
-- ❌ No uniform blue-500/gray-100 Tailwind defaults
-- ❌ No generic chat bubble interfaces
-- ❌ No rainbow color soup
-
-**Instead, Use**:
-- ✅ IBM Plex Sans + JetBrains Mono (distinctive typography)
-- ✅ Data viz-inspired color palette (amber, cyan, coral accents)
-- ✅ Strategic color deployment (single accent per context)
-- ✅ Layered backgrounds with atmospheric depth
-- ✅ Terminal/technical aesthetics where appropriate
-
-### Typography System
 ```typescript
-// Fonts
---font-sans: IBM Plex Sans (400, 500, 600, 700)
---font-mono: JetBrains Mono (400, 500)
+rekurve-landing/src/
+├── app/
+│   ├── layout.tsx              # Root layout with fonts
+│   ├── page.tsx                # Landing page
+│   └── globals.css             # Custom theme (design system)
+├── components/
+│   ├── sections/               # Landing page sections
+│   │   ├── Hero.tsx
+│   │   ├── Problem.tsx
+│   │   ├── Solution.tsx
+│   │   ├── HowItWorks.tsx
+│   │   ├── Results.tsx
+│   │   ├── CaseStudies.tsx
+│   │   ├── Pricing.tsx
+│   │   ├── Guarantee.tsx
+│   │   ├── FAQ.tsx
+│   │   ├── AboutFounder.tsx
+│   │   └── FinalCTA.tsx
+│   ├── ui/                     # Reusable components
+│   │   ├── Button.tsx
+│   │   ├── Card.tsx
+│   │   ├── Badge.tsx
+│   │   └── [other primitives]
+│   └── motion/                 # Animation wrappers
+│       ├── FadeInUp.tsx
+│       └── ScrollReveal.tsx
+├── lib/
+│   ├── analytics.ts            # Event tracking
+│   └── utils.ts                # Helpers
+└── types/
+    └── index.ts                # TypeScript types
+```
+
+### Performance Requirements
+
+**Lighthouse Targets**:
+- Performance: 90+
+- Accessibility: 90+ (WCAG 2.1 AA)
+- Best Practices: 90+
+- SEO: 90+
+
+**Core Web Vitals**:
+- First Contentful Paint: < 1.5s
+- Largest Contentful Paint: < 2.5s
+- Cumulative Layout Shift: < 0.1
+- Total Page Weight: < 3MB
+
+### Content & Messaging Rules
+
+**Tone of Voice**:
+- Professional but approachable (not stiff, not casual)
+- Technical credibility without jargon
+- Results-focused (tie features to outcomes)
+- Confident (no hedge words: "try", "might", "could")
+- Specific (exact numbers, not ranges)
+
+**Writing Patterns**:
+✅ "Recover 20+ hours weekly"
+✅ "Add $100K to your pipeline in 90 days"
+✅ "8.6× average ROI in Year 1"
+
+❌ "Save time" (too vague)
+❌ "Increase revenue" (no specifics)
+❌ "Great ROI" (not quantified)
+
+**Social Proof Requirements**:
+- Specific numbers (hours saved, revenue added)
+- Company details (size, industry, location)
+- Before/after comparisons
+- Timeline (results visible by week X)
+- Attribution (name, title, photo)
+
+### Design Implementation Guidelines
+
+**Typography System**:
+```typescript
+// Font configuration
+--font-sans: IBM Plex Sans (weights: 400, 500, 600, 700)
+--font-mono: JetBrains Mono (weights: 400, 500)
 
 // Usage
 Headlines: IBM Plex Sans Bold, -0.02em letter-spacing
-Body: IBM Plex Sans Regular/Medium
-Technical elements: JetBrains Mono (IDs, timestamps, code)
-Numbers: Tabular figures (font-variant-numeric: tabular-nums)
+Body: IBM Plex Sans Regular (400) or Medium (500)
+Technical elements: JetBrains Mono (IDs, timestamps, code snippets)
+Numbers: font-variant-numeric: tabular-nums
 ```
 
-### Color System
+**Color System**:
 ```typescript
 // Primary
---primary: #071D33 (Navy)
+--primary: #071D33 (Navy - main brand color)
 
-// Accents (use strategically, NOT all at once)
---accent-amber: oklch(0.75 0.15 75)   // Urgent/highlight
---accent-cyan: oklch(0.70 0.15 195)    // Active/in-progress
---accent-coral: oklch(0.65 0.18 25)    // Attention states
+// Accents (use strategically - ONE per context, not all at once)
+--accent-amber: oklch(0.75 0.15 75)   // Urgent/highlight states
+--accent-cyan: oklch(0.70 0.15 195)    // Active/in-progress states
+--accent-coral: oklch(0.65 0.18 25)    // Attention/warning states
 
 // Semantic states
 --state-success: oklch(0.70 0.18 145)
@@ -138,229 +268,214 @@ Numbers: Tabular figures (font-variant-numeric: tabular-nums)
 --state-error: oklch(0.58 0.22 25)
 ```
 
-**See** `/docs/landing_page_prompt.md` for complete design system and implementation details.
+**Visual Identity**: Technical precision meets operational confidence
+- Target aesthetic: Linear's sophistication + Grafana's data viz + Superhuman's speed signals
+- Layered backgrounds with atmospheric depth
+- Terminal/technical aesthetics where appropriate
+- Data viz-inspired elements
 
----
-
-## Content & Messaging Guidelines
-
-### Tone of Voice
-- **Professional but approachable**: Not stiff, not overly casual
-- **Technical credibility**: Show expertise without jargon
-- **Results-focused**: Always tie features to outcomes
-- **Confident**: No hedge words ("try", "might", "could")
-- **Specific**: Use exact numbers, not ranges
-
-### Writing Patterns
-**Good**:
-- "Recover 20+ hours weekly"
-- "Add $100K to your pipeline in 90 days"
-- "8.6× average ROI in Year 1"
-
-**Avoid**:
-- "Save time" (too vague)
-- "Increase revenue" (no specifics)
-- "Great ROI" (not quantified)
-
-### Social Proof Requirements
-Always include:
-- Specific numbers (hours saved, revenue added)
-- Company details (size, industry, location)
-- Before/after comparisons
-- Timeline (results visible by week X)
-- Attribution (name, title, photo)
-
----
-
-## Key Strategic Documents
-
-When working on this project, reference these docs for context:
-
-### Business Strategy
-- **`ai-agency-roadmap.md`**: Complete 6-month launch plan (Pre-launch → $28K-38K monthly revenue)
-  - Phase 0: Pre-Launch Foundation (Weeks 1-4)
-  - Phase 1: Month 1 - Launch & Initial Outreach
-  - Phase 2-6: Scaling to 8-12 active clients + $12-18K MRR
-
-- **`ai-agency-launch-blueprint.md`**: Comprehensive strategy and tactical execution
-
-### Market Positioning
-- **`ai_agent_positioning_guide.md`**: Critical for messaging
-  - Why "AI Agent" positioning wins (30-50% higher perceived value)
-  - Three-tier agent framework (Foundation → Growth → Enterprise)
-  - Messaging by buyer type (CFO, CTO, VP Sales)
-  - Technical credibility demonstration
-  - Objection handling scripts
-
-### Product Design
-- **`landing_page_prompt.md`**: Complete landing page specification
-  - Next.js 15+ implementation guide
-  - Distinctive UI components (avoiding generic aesthetics)
-  - 12 optimized sections (Hero → Final CTA)
-  - Accessibility (WCAG 2.1 AA)
-  - Performance targets (Lighthouse 90+)
-
-### Pricing & Packaging
-- **`value_based_pricing_proposals.md`**: How to price based on value, not hours
-- **`pricing-ladder.md`**: Three-tier structure with clear differentiation
-- **`offer-analysis.md`**: Grand Slam Offer framework applied
-
-### Technical Validation
-- **`technical_case_study_complete.md`**: Real-world implementation examples
-
----
-
-## Development Guidelines
-
-### When Code is Added
-
-**Stack Recommendation**:
-- **Framework**: Next.js 15+ (App Router, TypeScript)
-- **Styling**: Tailwind CSS with custom theme (see color system above)
-- **UI Components**: shadcn/ui + Aceternity UI (customized to avoid generic look)
-- **Animation**: Framer Motion for orchestrated reveals
-- **Icons**: Lucide React (variable stroke-width: 1.5-2.5)
-- **Forms**: React Hook Form + Zod validation
-- **Analytics**: Google Analytics 4 + custom event tracking
-
-### Code Organization
-```typescript
-// Recommended structure when codebase is created
-app/
-  layout.tsx              // Root layout with fonts
-  page.tsx                // Landing page
-  globals.css             // Custom theme
-components/
-  sections/               // Page sections
-    Hero.tsx
-    Problem.tsx
-    Solution.tsx
-    ... (see landing_page_prompt.md)
-  ui/                     // Reusable components
-    Button.tsx
-    Card.tsx
-    Badge.tsx
-  motion/                 // Animation wrappers
-    FadeInUp.tsx
-    ScrollReveal.tsx
-lib/
-  analytics.ts            // Event tracking
-  utils.ts                // Helpers
-types/
-  index.ts                // TypeScript types
-```
-
-### Performance Standards
-- **Lighthouse Performance**: 90+
-- **First Contentful Paint**: < 1.5s
-- **Largest Contentful Paint**: < 2.5s
-- **Cumulative Layout Shift**: < 0.1
-- **Total Page Weight**: < 3MB
+**Complete design system**: See `docs/landing_page_prompt.md`
 
 ### Accessibility Requirements
-- **WCAG 2.1 Level AA** compliance
-- Color contrast: Minimum 4.5:1 for text
-- Keyboard navigation: All interactive elements accessible
-- Screen reader: Semantic HTML + ARIA labels
-- Motion preferences: Respect `prefers-reduced-motion`
+
+- **WCAG 2.1 Level AA** compliance mandatory
+- Color contrast: Minimum 4.5:1 for text, 3:1 for large text
+- Keyboard navigation: All interactive elements accessible via keyboard
+- Screen reader: Semantic HTML + appropriate ARIA labels
+- Motion preferences: Respect `prefers-reduced-motion` media query
+- Focus indicators: Visible focus states on all interactive elements
 
 ---
 
-## AI Agent Working Guidelines
+## TIER 3: STRATEGIC CONTEXT
 
-When working on this project:
+### Business Model
 
-### 1. Understand the Business Model First
-Before making any technical decisions, understand:
-- **Who is the customer?** Professional services firms (10-50 employees)
-- **What's the pain point?** 40% of time wasted on manual sales work
-- **What's the solution?** Autonomous AI agents (NOT simple automation)
-- **How do we position it?** As a virtual SDR, not a tool
+**Value Proposition**: "Autonomous AI Sales Agents That Work 24/7"
+- NOT just automation
+- NOT a tool or software
+- IS an intelligent agent that makes decisions
 
-### 2. Maintain Positioning Consistency
-Every word matters for positioning:
-- Use "agent" language, not "automation"
-- Emphasize autonomy and intelligence
-- Show technical credibility (SRE background)
-- Always include specific results (20+ hours, $100K, 8.6× ROI)
+**Target Customer Pain Point**: 40% of time wasted on manual sales work (research, qualification, follow-ups)
 
-### 3. Prioritize Distinctive Design
-Avoid generic SaaS aesthetics:
-- Reference `/docs/landing_page_prompt.md` for design system
-- Use custom color palette (not Tailwind defaults)
-- Strategic color deployment (one accent per context)
-- IBM Plex Sans + JetBrains Mono (not Inter)
+**Solution**: Virtual SDR that works 24/7, learns from engagement patterns, and adapts messaging
 
-### 4. Make Data-Driven Decisions
-When uncertain, reference:
-- **Roadmap** for timeline and priorities
-- **Positioning guide** for messaging
-- **Landing page spec** for design patterns
-- **Pricing docs** for package structure
+**Positioning Differentiation**: "AI Agents" vs "automation services" = 30-50% higher perceived value
 
-### 5. Ask Clarifying Questions
-If requirements conflict or are unclear:
-- **Market positioning** questions → See `ai_agent_positioning_guide.md`
-- **Design questions** → See `landing_page_prompt.md` + `.claude/skills/ui-aesthetics/`
-- **Business strategy** → See `ai-agency-roadmap.md`
-- **Technical implementation** → Refer to tech stack section
+### Pricing Strategy & Rationale
 
----
+**Three-Tier Structure**:
 
-## Common Tasks & Where to Find Answers
+1. **AI-Assisted Sales System** (Foundation)
+   - Setup: $9,500
+   - Monthly: $2,500
+   - Target: Small firms testing AI sales
+   - Deliverable: Semi-automated workflows + manual oversight
 
-| Task | Reference Document |
-|------|-------------------|
-| Writing landing page copy | `landing_page_prompt.md` + `ai_agent_positioning_guide.md` |
-| Designing UI components | `landing_page_prompt.md` + `.claude/skills/ui-aesthetics/SKILL.md` |
-| Pricing a proposal | `value_based_pricing_proposals.md` + `pricing-ladder.md` |
-| Handling objections | `ai_agent_positioning_guide.md` (Section: Objection Handling) |
-| Creating case studies | `technical_case_study_complete.md` |
-| Planning next quarter | `ai-agency-roadmap.md` |
-| Designing a feature | `landing_page_prompt.md` (Design Philosophy section) |
+2. **Intelligent Sales Agent** (Growth)
+   - Setup: $20,000
+   - Monthly: $4,500
+   - Target: Mid-size firms scaling outbound
+   - Deliverable: Autonomous agent with adaptive logic
 
----
+3. **Autonomous AI Sales Agent** (Enterprise)
+   - Setup: Custom (typically $40K-60K)
+   - Monthly: Custom (typically $8K-12K)
+   - Target: Established firms with complex sales processes
+   - Deliverable: Fully autonomous multi-channel agent
 
-## Success Metrics
+**All packages include**: 5× ROI guarantee in 120 days (risk reversal)
 
-### Business Goals (Year 1)
+**Pricing Philosophy**: Value-based, not hourly. Price anchored to:
+- Time saved (20+ hours weekly = $10K-15K/month in opportunity cost)
+- Pipeline value ($100K+ in new opportunities)
+- ROI multiple (8.6× average in Year 1)
+
+**See**: `docs/value_based_pricing_proposals.md` for full framework
+
+### Key Differentiators
+
+1. **Technical Credibility**: Former AWS SRE building enterprise-grade systems (99.9% uptime SLA, production monitoring, idempotent operations)
+2. **Agent Positioning**: Autonomous intelligence, not simple workflow automation
+3. **Specific Results**: 20+ hours saved, $100K pipeline, 8.6× ROI (always quantified)
+4. **5× ROI Guarantee**: Strong risk reversal, signals confidence
+5. **Industry Focus**: Professional services specialization (not generalist)
+6. **Local Expertise**: Brisbane/Melbourne market knowledge, in-person available
+
+### Architecture Philosophy (for Client Projects)
+
+**Enterprise-grade reliability with SRE principles**:
+- 99.9% uptime SLA
+- Production-grade monitoring and alerting (Grafana + CloudWatch)
+- Idempotent operations (no duplicate sends)
+- Graceful error handling and retry logic with exponential backoff
+- Comprehensive logging and observability
+- Infrastructure as Code (Terraform)
+
+**Why this matters**: Founder's AWS SRE background is a key differentiator. Technical credibility justifies premium pricing and builds trust with technically sophisticated buyers (pre-sales engineers, sales ops managers).
+
+### Target Buyer Personas
+
+**Primary Decision Makers**:
+1. **VP Sales / Sales Director**: Cares about pipeline, quota attainment, team efficiency
+2. **Sales Ops Manager**: Cares about process, data quality, tool integration
+3. **Pre-Sales Engineer**: Cares about technical feasibility, reliability, integration complexity
+
+**Secondary Influencers**:
+- CFO: ROI, cost vs benefit
+- CTO: Security, scalability, vendor risk
+
+**Messaging by Buyer**: See `docs/ai_agent_positioning_guide.md`
+
+### Success Metrics & Goals
+
+**Business Goals (Year 1)**:
 - **Month 1**: 2-3 pilot clients, $8K-15K revenue
 - **Month 3**: 4-6 clients, $15K-25K revenue, 2-3 case studies
 - **Month 6**: 8-12 clients, $28K-38K revenue, $12-18K MRR
 - **Year 1**: $200K-400K revenue (solo) OR $500K-1M (with team)
 
-### Website Metrics (Post-launch)
-- **Conversion rate**: 10-15% (visitors → form submissions)
-- **Booking rate**: 60-80% (form submissions → booked calls)
-- **Time on page**: 3+ minutes average
-- **Bounce rate**: < 40%
+**Website Metrics (Post-launch)**:
+- Conversion rate: 10-15% (visitors → form submissions)
+- Booking rate: 60-80% (form submissions → booked calls)
+- Time on page: 3+ minutes average
+- Bounce rate: < 40%
+
+### Strategic Document Reference
+
+**Business Strategy**:
+- `docs/ai-agency-roadmap.md` - Complete 6-month launch plan (Pre-launch → $28K-38K monthly revenue)
+- `docs/ai-agency-launch-blueprint.md` - Comprehensive strategy and tactical execution
+
+**Market Positioning**:
+- `docs/ai_agent_positioning_guide.md` - Critical for messaging (why "AI Agent" wins, messaging by buyer type, objection handling)
+
+**Product Design**:
+- `docs/landing_page_prompt.md` - Complete landing page specification (Next.js 15+ implementation, 12 optimized sections, accessibility, performance targets)
+
+**Pricing & Packaging**:
+- `docs/value_based_pricing_proposals.md` - How to price based on value, not hours
+- `docs/pricing-ladder.md` - Three-tier structure with clear differentiation
+- `docs/offer-analysis.md` - Grand Slam Offer framework applied
+
+**Technical Validation**:
+- `docs/technical_case_study_complete.md` - Real-world implementation examples
 
 ---
 
-## Key Differentiators to Emphasize
+## AI Agent Working Guidelines
 
-1. **Technical Credibility**: Former AWS SRE building enterprise-grade systems
-2. **Agent Positioning**: Autonomous intelligence, not simple automation
-3. **Specific Results**: 20+ hours saved, $100K pipeline, 8.6× ROI
-4. **5× ROI Guarantee**: Risk reversal, confidence signal
-5. **Industry Focus**: Professional services specialization (not generalist)
-6. **Brisbane/Melbourne**: Local market expertise, in-person available
+### When Working on This Project
 
----
+**1. Understand the Business Model First**
+Before making technical decisions:
+- **Customer**: Professional services firms (10-50 employees)
+- **Pain Point**: 40% of time wasted on manual sales work
+- **Solution**: Autonomous AI agents (NOT simple automation)
+- **Positioning**: Virtual SDR, not a tool
 
-## Questions? Start Here
+**2. Maintain Positioning Consistency**
+Every word matters:
+- Use "agent" language, not "automation"
+- Emphasize autonomy and intelligence
+- Show technical credibility (SRE background)
+- Always include specific results (20+ hours, $100K, 8.6× ROI)
 
-- **Business strategy**: Read `ai-agency-roadmap.md`
-- **Market positioning**: Read `ai_agent_positioning_guide.md`
-- **Landing page design**: Read `landing_page_prompt.md`
-- **Pricing strategy**: Read `value_based_pricing_proposals.md`
+**3. Prioritize Distinctive Design**
+Avoid generic SaaS aesthetics:
+- Reference `docs/landing_page_prompt.md` for design system
+- Use custom color palette (not Tailwind defaults)
+- Strategic color deployment (ONE accent per context)
+- IBM Plex Sans + JetBrains Mono (not Inter/Roboto)
+
+**4. Make Data-Driven Decisions**
+When uncertain, reference:
+- Roadmap for timeline and priorities
+- Positioning guide for messaging
+- Landing page spec for design patterns
+- Pricing docs for package structure
+
+**5. Ask Clarifying Questions**
+If requirements conflict or are unclear:
+- **Market positioning** → `docs/ai_agent_positioning_guide.md`
+- **Design questions** → `docs/landing_page_prompt.md` + `.claude/skills/ui-aesthetics/`
+- **Business strategy** → `docs/ai-agency-roadmap.md`
+- **Technical implementation** → Refer to tech stack section above
+
+### Development Workflow
+
+**Before Starting**:
+1. Read relevant strategic docs (see Common Tasks Reference table)
+2. Understand the "why" before implementing the "what"
+3. Check if similar patterns exist in the codebase
+
+**During Development**:
+1. Follow the design system exactly (no generic Tailwind defaults)
+2. Use agent positioning language consistently
+3. Include specific metrics and results
+4. Test accessibility (keyboard nav, screen readers, color contrast)
+5. Verify performance (Lighthouse 90+ targets)
+
+**After Completing**:
+1. Run `yarn check` (lint + typecheck)
+2. Test in browser (multiple screen sizes)
+3. Verify all links and references work
+4. Check motion respects `prefers-reduced-motion`
 
 ---
 
 ## Version History
 
+- **2025-01-03**: Updated repository structure, reorganized into three-tier format, added rekurve-landing/ project details
 - **2025-01-03**: Initial CLAUDE.md created based on existing strategic documentation
 
 ---
 
-**Next Steps**: When ready to build the landing page, reference `/docs/landing_page_prompt.md` for complete technical specifications and design system.
+## Questions? Start Here
+
+- **Business strategy**: `docs/ai-agency-roadmap.md`
+- **Market positioning**: `docs/ai_agent_positioning_guide.md`
+- **Landing page design**: `docs/landing_page_prompt.md`
+- **Pricing strategy**: `docs/value_based_pricing_proposals.md`
+
+**Next Steps**: Implement the landing page following `docs/landing_page_prompt.md` specifications in the `rekurve-landing/` directory.

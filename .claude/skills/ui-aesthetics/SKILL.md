@@ -3,6 +3,24 @@ name: ui-aesthetics
 description: Design beautiful, distinctive UX for AI Sales Agent UI that avoids generic AI aesthetics
 ---
 
+You tend to converge toward generic, "on distribution" outputs. In frontend design, this creates what users call the "AI slop" aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight. Focus on:
+
+Typography: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts like Arial and Inter; opt instead for distinctive choices that elevate the frontend's aesthetics.
+
+Color & Theme: Commit to a cohesive aesthetic. Use CSS variables for consistency. Dominant colors with sharp accents outperform timid, evenly-distributed palettes. Draw from IDE themes and cultural aesthetics for inspiration.
+
+Motion: Use animations for effects and micro-interactions. Prioritize CSS-only solutions for HTML. Use Motion library for React when available. Focus on high-impact moments: one well-orchestrated page load with staggered reveals (animation-delay) creates more delight than scattered micro-interactions. 
+
+Backgrounds: Create atmosphere and depth rather than defaulting to solid colors. Layer CSS gradients, use geometric patterns, or add contextual effects that match the overall aesthetic.
+
+Avoid generic AI-generated aesthetics:
+- Overused font families (Inter, Roboto, Arial, system fonts)
+- Clichéd color schemes (particularly purple gradients on white backgrounds)
+- Predictable layouts and component patterns
+- Cookie-cutter design that lacks context-specific character
+
+Interpret creatively and make unexpected choices that feel genuinely designed for the context. Vary between light and dark themes, different fonts, different aesthetics. You still tend to converge on common choices (Space Grotesk, for example) across generations. Avoid this: it is critical that you think outside the box!
+
 # AI Sales Agent UI Design Aesthetics
 
 When working on the AI Sales Agent UI, create a distinctive, professional interface that reflects the sophisticated nature of B2B enterprise software while avoiding generic "AI slop" aesthetics. This is a tool for sales teams and business owners managing service quotes - it should feel powerful, trustworthy, and efficient.
@@ -118,59 +136,6 @@ High-end B2B SaaS (Linear, Stripe Dashboard):
 - CSS animations
 - Consider adding framer-motion for complex orchestrations
 
-**Focus areas for this UI:**
-
-### 1. Dashboard Load Orchestration
-When the swimlane dashboard loads, create a moment:
-```tsx
-// Stagger reveal of swimlane columns
-{stages.map((stage, idx) => (
-  <div
-    key={stage.id}
-    className="animate-slide-in-up"
-    style={{ animationDelay: `${idx * 50}ms` }}
-  >
-    {/* Swimlane content */}
-  </div>
-))}
-```
-
-### 2. Opportunity Card Interactions
-Micro-interactions that feel responsive:
-- Subtle lift on hover (transform + shadow)
-- Quick scale on click (scale(0.98) for 100ms feedback)
-- Smooth state transitions when status updates
-
-### 3. Email Thread Scrolling
-Make conversation history feel fluid:
-- Smooth scroll to latest message
-- Fade-in for newly loaded messages
-- Highlight animation for referenced messages
-
-**CSS-first examples:**
-```css
-/* Sophisticated card hover */
-.opportunity-card {
-  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.opportunity-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.12);
-}
-
-/* Status badge pulse for urgent items */
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 var(--accent-attention); }
-  50% { box-shadow: 0 0 0 4px transparent; }
-}
-
-.badge-urgent {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-```
-
 **Performance:** Prefer transform and opacity. Avoid animating width, height, or color.
 
 ## Backgrounds: Depth & Atmosphere
@@ -195,7 +160,7 @@ Make conversation history feel fluid:
 
 ### 2. Layered Gradient Depth
 ```css
-.opportunity-detail-bg {
+.card-bg {
   background:
     radial-gradient(circle at 20% 10%, oklch(0.99 0.01 250) 0%, transparent 50%),
     radial-gradient(circle at 80% 90%, oklch(0.99 0.01 200) 0%, transparent 50%),
@@ -217,35 +182,6 @@ For dark mode, go beyond just inverting:
     url('data:image/svg+xml,...'); /* Subtle noise texture */
 }
 ```
-
-## Component-Specific Guidance
-
-### Swimlane Cards
-- **Not:** White cards with subtle shadow
-- **Instead:** Cards with tinted backgrounds per stage, stronger borders, internal shadows
-- Consider: Slight gradient from top to bottom on each card
-- Badge design: Filled backgrounds with high contrast, not outlined
-
-### Email Thread View
-- **Not:** Chat bubble interface
-- **Instead:** Email client aesthetic (Gmail/Superhuman inspired)
-- Collapsed/expanded headers with smooth transitions
-- Monospace for technical headers (Message-ID, timestamps)
-
-### Status Indicators
-- **Not:** Colored dots
-- **Instead:**
-  - Vertical colored bars (4px wide, full height of card)
-  - Animated progress indicators for "in progress" states
-  - Icon + color + text (never rely on color alone)
-
-### Data Tables (if needed)
-- **Not:** Stripe-on-white zebra tables
-- **Instead:**
-  - Subtle hover row highlight
-  - Fixed header with blur backdrop
-  - Tabular figures for number columns
-  - Monospace for IDs
 
 ## Technical Implementation Checklist
 

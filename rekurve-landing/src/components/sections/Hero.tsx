@@ -1,8 +1,9 @@
 'use client'
 
 import { ArrowRight, Play } from 'lucide-react'
-import { Button } from '~/components/ui/Button'
+
 import { Badge } from '~/components/ui/Badge'
+import { Button } from '~/components/ui/Button'
 import { FadeInUp } from '~/components/motion/FadeInUp'
 
 export default function Hero() {

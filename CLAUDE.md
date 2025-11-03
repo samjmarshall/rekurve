@@ -462,6 +462,94 @@ If requirements conflict or are unclear:
 3. Verify all links and references work
 4. Check motion respects `prefers-reduced-motion`
 
+### Design Review Workflow
+
+**When to use**: After implementing any UI/UX changes in `rekurve-landing/`
+
+When you've made visual changes (components, styles, layouts), follow this verification process:
+
+#### Automated Pre-Check (Before Design Review)
+
+Run these checks first:
+```bash
+cd rekurve-landing
+yarn check            # Lint + TypeCheck
+```
+
+Fix any errors before proceeding to design review.
+
+#### Manual Design Review Process
+
+1. **Start dev server**:
+   ```bash
+   cd rekurve-landing && yarn dev
+   ```
+
+2. **Navigate to your changes** in the browser (`http://localhost:3000`)
+
+3. **Self-review checklist** (quick sanity check):
+   - [ ] Functionality works as intended
+   - [ ] No console errors in browser
+   - [ ] Basic responsive behavior looks correct (resize browser)
+   - [ ] Colors match design system (not Tailwind defaults)
+   - [ ] Typography uses IBM Plex Sans (not Inter/Roboto)
+
+4. **Run design review**:
+   ```bash
+   /design-review
+   ```
+
+5. **Address feedback**:
+   - Fix any [Blocker] or [High-Priority] issues immediately
+   - Consider [Medium-Priority] improvements
+   - Decide on Nits based on time/impact
+
+6. **Iterate if needed**:
+   - Make adjustments based on feedback
+   - Run `/design-review` again for significant changes
+   - Repeat until approved or high-priority issues resolved
+
+7. **Document verification** in your commit or PR:
+   ```
+   Design review completed:
+   - ✓ Interaction testing passed
+   - ✓ Responsiveness verified (3 viewports)
+   - ✓ Accessibility WCAG 2.1 AA compliant
+   - ✓ Visual polish aligned with design system
+   - Issues addressed: [brief summary]
+   ```
+
+#### What the Design Review Checks
+
+The specialized agent evaluates **7 key areas**:
+
+1. **Interaction Testing**: Click, hover, keyboard navigation, form validation
+2. **Responsiveness**: Desktop (1440px), Tablet (768px), Mobile (375px)
+3. **Visual Polish**: Typography, colors, spacing, hierarchy vs design system
+4. **Accessibility**: WCAG 2.1 AA compliance (contrast, keyboard, screen readers)
+5. **Robustness**: Edge cases, error states, overflow, empty states
+6. **Code Health**: Component patterns, design tokens, semantic HTML
+7. **Performance**: Image optimization, code splitting, loading states
+
+**Issue Severity Levels**:
+- **[Blocker]**: Must fix - breaks functionality or accessibility
+- **[High-Priority]**: Should fix - significant design/UX violations
+- **[Medium-Priority]**: Nice to fix - minor inconsistencies
+- **Nit:** Optional - subjective improvements
+
+#### When to Skip Design Review
+
+Skip the automated review for:
+- Non-visual changes (backend logic, APIs, config)
+- Documentation-only changes
+- Trivial fixes (typos, whitespace)
+- Changes outside `rekurve-landing/`
+
+But still manually verify:
+- Changes work as expected
+- No regressions in related features
+- Code follows existing patterns
+
 ---
 
 ## Version History

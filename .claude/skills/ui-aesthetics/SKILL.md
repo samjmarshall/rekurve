@@ -198,6 +198,8 @@ When implementing UI components:
 - [ ] Ensure 4.5:1 contrast ratios minimum
 - [ ] Add loading states with skeleton screens or progressive reveal
 
+Comprehensive design checklist: [design-checklist](./design-checklist.md)
+
 ## Anti-Patterns to Avoid
 
 1. **Generic Tailwind Defaults:** Don't use blue-500, gray-100 directly without customization
@@ -233,3 +235,4 @@ You've achieved distinctive design when:
 ## Final Principle
 
 **Context-specific character over generic polish.** This is not a consumer app, not a marketing site, not a dashboard for everyone. It's a specialized tool for professionals managing service quotes. Every design decision should serve that purpose with distinction and personality.
+

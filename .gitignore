@@ -10,6 +10,7 @@ yarn.lock
 
 # testing
 /coverage
+/.playwright-mcp
 
 # database
 /prisma/db.sqlite

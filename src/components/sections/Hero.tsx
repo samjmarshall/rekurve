@@ -20,27 +20,27 @@ export default function Hero() {
   return (
     <section className="relative min-h-[80vh] md:min-h-screen flex items-start md:items-center justify-center overflow-hidden pt-24 md:pt-0">
       {/* Background with atmospheric depth */}
-      <div className="absolute inset-0 bg-[oklch(0.12_0_0)]">
+      <div className="absolute inset-0 bg-[oklch(0.15_0_0)]">
         {/* Radial gradients for depth */}
         <div
           className="absolute inset-0"
           style={{
             background: `
-              radial-gradient(circle at 20% 10%, oklch(0.15 0.02 250) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, oklch(0.13 0.02 230) 0%, transparent 50%)
+              radial-gradient(circle at 20% 10%, oklch(0.18 0.02 250) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, oklch(0.16 0.02 230) 0%, transparent 50%)
             `
           }}
         />
         {/* Subtle geometric pattern overlay */}
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-30"
           style={{
             backgroundImage: `repeating-linear-gradient(
               45deg,
               transparent,
               transparent 40px,
-              oklch(0.13 0 0) 40px,
-              oklch(0.13 0 0) 41px
+              oklch(0.25 0.08 195) 40px,
+              oklch(0.25 0.08 195) 41px
             )`
           }}
         />
@@ -49,15 +49,6 @@ export default function Hero() {
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <FadeInUp delay={0}>
-            <div className="flex justify-center mb-8">
-              <Badge variant="outline" className="text-sm">
-                Built by a Former AWS SRE
-              </Badge>
-            </div>
-          </FadeInUp>
-
           {/* Headline */}
           <FadeInUp delay={0.2}>
             <h1

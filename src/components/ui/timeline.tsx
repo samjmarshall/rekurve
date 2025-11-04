@@ -65,11 +65,12 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
         </motion.div>
 
         {/* Timeline */}
-        <div ref={ref} className="relative mx-auto max-w-5xl pb-20">
+        <div ref={ref} className="relative mx-auto max-w-5xl pb-20" role="list" aria-label="Implementation timeline with 4 phases">
           {data.map((item, index) => (
             <div
               key={index}
               className="flex justify-start gap-10 pt-10 md:pt-40"
+              role="listitem"
             >
               <div className="sticky top-40 z-40 flex max-w-xs flex-col items-center self-start md:w-full md:flex-row lg:max-w-sm">
                 <div className="absolute left-3 flex h-10 w-10 items-center justify-center rounded-full bg-white md:left-3">

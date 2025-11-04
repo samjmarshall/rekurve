@@ -660,7 +660,7 @@ Ensure all new components respect accessibility standards (WCAG 2.1 AA) and hono
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] No accessibility linting errors: `yarn check`
+- [x] No accessibility linting errors: `yarn check`
 - [ ] Lighthouse Accessibility score: 90+ (run via Chrome DevTools)
 
 #### Manual Verification:

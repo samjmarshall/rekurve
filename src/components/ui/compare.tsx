@@ -151,6 +151,12 @@ export const Compare = ({
         position: "relative",
         cursor: slideMode === "drag" ? "grab" : "col-resize",
       }}
+      role="slider"
+      aria-label="Drag to compare before and after images"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(sliderXPercent)}
+      tabIndex={0}
       onMouseMove={handleMouseMove}
       onMouseLeave={mouseLeaveHandler}
       onMouseEnter={mouseEnterHandler}

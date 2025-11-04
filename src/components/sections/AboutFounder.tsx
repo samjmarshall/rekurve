@@ -8,7 +8,7 @@ import { motion } from "framer-motion"
 
 const credentials = [
   "Member of the founding team at V2 AI",
-  "Leading Gen AI Prototyping Partner for Amazon Web Service APAC",
+  "Leading Gen AI Prototyping Partner for Amazon Web Service - APAC",
   "10+ years scaling production systems"
 ]
 

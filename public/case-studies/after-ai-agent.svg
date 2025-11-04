@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none">
+  <rect width="800" height="500" fill="#f8fafc"/>
+  <text x="400" y="40" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="24" font-weight="700" fill="#071D33">AI Agent Process (20+ Hours Saved)</text>
+  <rect x="50" y="80" width="140" height="60" rx="8" fill="#071D33" stroke="#64748b" stroke-width="2"/>
+  <text x="120" y="115" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="16" font-weight="600" fill="white">New Lead</text>
+  <path d="M 190 110 L 230 110" stroke="oklch(0.80 0.15 195)" stroke-width="3" marker-end="url(#arrowhead-cyan)"/>
+  <rect x="230" y="80" width="140" height="60" rx="8" fill="oklch(0.80 0.15 195)" stroke="oklch(0.80 0.15 195)" stroke-width="2"/>
+  <text x="300" y="105" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">AI Research</text>
+  <text x="300" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="white">4 minutes</text>
+  <path d="M 370 110 L 410 110" stroke="oklch(0.80 0.15 195)" stroke-width="3" marker-end="url(#arrowhead-cyan)"/>
+  <rect x="410" y="80" width="140" height="60" rx="8" fill="oklch(0.80 0.15 195)" stroke="oklch(0.80 0.15 195)" stroke-width="2"/>
+  <text x="480" y="105" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">AI Qualification</text>
+  <text x="480" y="125" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">(12 criteria)</text>
+  <path d="M 550 110 L 590 110" stroke="oklch(0.80 0.15 195)" stroke-width="3" marker-end="url(#arrowhead-cyan)"/>
+  <rect x="590" y="80" width="140" height="60" rx="8" fill="oklch(0.80 0.15 195)" stroke="oklch(0.80 0.15 195)" stroke-width="2"/>
+  <text x="660" y="105" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Auto CRM</text>
+  <text x="660" y="125" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Sync</text>
+  <path d="M 660 140 L 660 180" stroke="oklch(0.7 0.18 145)" stroke-width="3" marker-end="url(#arrowhead-success)"/>
+  <rect x="590" y="180" width="140" height="60" rx="8" fill="oklch(0.7 0.18 145)" stroke="oklch(0.7 0.18 145)" stroke-width="2"/>
+  <text x="660" y="205" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Adaptive</text>
+  <text x="660" y="225" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Follow-up</text>
+  <path d="M 660 240 L 660 280" stroke="oklch(0.7 0.18 145)" stroke-width="3" marker-end="url(#arrowhead-success)"/>
+  <rect x="590" y="280" width="140" height="60" rx="8" fill="oklch(0.7 0.18 145)" stroke="oklch(0.7 0.18 145)" stroke-width="2"/>
+  <text x="660" y="305" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Booked Meetings</text>
+  <text x="660" y="325" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="white">43% increase</text>
+  <g transform="translate(50, 200)">
+    <text x="0" y="0" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="oklch(0.7 0.18 145)">Results:</text>
+    <text x="0" y="25" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#64748b">• 25 hours saved weekly</text>
+    <text x="0" y="45" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#64748b">• $380K pipeline added</text>
+    <text x="0" y="65" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#64748b">• 43% MQL-to-SQL increase</text>
+    <text x="0" y="85" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#64748b">• 8.6× ROI in Year 1</text>
+  </g>
+  <defs>
+    <marker id="arrowhead-cyan" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="oklch(0.80 0.15 195)" />
+    </marker>
+    <marker id="arrowhead-success" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="oklch(0.7 0.18 145)" />
+    </marker>
+  </defs>
+</svg>

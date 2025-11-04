@@ -10,6 +10,7 @@ import {
 } from "~/components/ui/Accordion"
 import { Badge } from "~/components/ui/Badge"
 import { Card, CardContent } from "~/components/ui/Card"
+import { Compare } from "~/components/ui/compare"
 
 const caseStudy = {
   title: "How ABC Accounting Saved 25 Hours Weekly and Added $380K to Pipeline",
@@ -108,6 +109,24 @@ export function CaseStudies() {
                   <Badge variant="default">{caseStudy.company.industry}</Badge>
                   <Badge variant="default">{caseStudy.company.size}</Badge>
                   <Badge variant="default">{caseStudy.company.location}</Badge>
+                </div>
+              </div>
+
+              {/* Before/After Comparison Slider */}
+              <div className="mb-8">
+                <Compare
+                  firstImage="/case-studies/before-manual-process.svg"
+                  secondImage="/case-studies/after-ai-agent.svg"
+                  firstImageClassName="object-contain"
+                  secondImageClassname="object-contain"
+                  className="h-[500px] w-full rounded-lg border-2 border-state-success/20 bg-slate-50"
+                  slideMode="hover"
+                  autoplay={true}
+                  autoplayDuration={5000}
+                />
+                <div className="mt-4 flex justify-between px-4 text-sm text-slate-600">
+                  <span className="font-mono">← Manual Process (40% time wasted)</span>
+                  <span className="font-mono">AI Agent (20+ hrs saved) →</span>
                 </div>
               </div>
 
@@ -221,6 +240,23 @@ export function CaseStudies() {
               </Accordion>
             </CardContent>
           </Card>
+        </motion.div>
+
+        {/* Placeholder for future case studies carousel */}
+        <motion.div
+          className="mx-auto mt-16 max-w-4xl text-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <h3 className="mb-4 text-2xl font-bold text-primary">
+            More Success Stories Coming Soon
+          </h3>
+          <p className="text-slate-600">
+            We&apos;re collecting additional case studies from our clients. Check back soon for more transformative results.
+          </p>
+          {/* Future: AnimatedTestimonials carousel will be implemented here with multiple case studies */}
         </motion.div>
       </div>
     </section>

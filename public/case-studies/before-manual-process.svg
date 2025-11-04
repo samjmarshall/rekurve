@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none">
+  <rect width="800" height="500" fill="#f8fafc"/>
+  <text x="400" y="40" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="24" font-weight="700" fill="#071D33">Manual Process (40% Time Wasted)</text>
+  <rect x="50" y="80" width="140" height="60" rx="8" fill="#071D33" stroke="#64748b" stroke-width="2"/>
+  <text x="120" y="115" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="16" font-weight="600" fill="white">New Lead</text>
+  <path d="M 190 110 L 230 110" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <rect x="230" y="80" width="140" height="60" rx="8" fill="oklch(0.65 0.18 25)" stroke="#64748b" stroke-width="2"/>
+  <text x="300" y="105" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Manual Research</text>
+  <text x="300" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="white">4 hours</text>
+  <path d="M 370 110 L 410 110" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <rect x="410" y="80" width="140" height="60" rx="8" fill="oklch(0.65 0.18 25)" stroke="#64748b" stroke-width="2"/>
+  <text x="480" y="105" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Manual</text>
+  <text x="480" y="125" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Qualification</text>
+  <path d="M 550 110 L 590 110" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <rect x="590" y="80" width="140" height="60" rx="8" fill="oklch(0.65 0.18 25)" stroke="#64748b" stroke-width="2"/>
+  <text x="660" y="105" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Manual CRM</text>
+  <text x="660" y="125" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Update</text>
+  <path d="M 660 140 L 660 180" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <rect x="590" y="180" width="140" height="60" rx="8" fill="oklch(0.65 0.18 25)" stroke="#64748b" stroke-width="2"/>
+  <text x="660" y="205" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Manual</text>
+  <text x="660" y="225" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Follow-up</text>
+  <path d="M 660 240 L 660 280" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <rect x="590" y="280" width="140" height="60" rx="8" fill="oklch(0.65 0.18 25)" stroke="#64748b" stroke-width="2"/>
+  <text x="660" y="305" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="white">Lost Leads</text>
+  <text x="660" y="325" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="white">60% drop-off</text>
+  <g transform="translate(50, 200)">
+    <text x="0" y="0" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="#dc2626">Pain Points:</text>
+    <text x="0" y="25" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#64748b">• 40% time wasted on manual tasks</text>
+    <text x="0" y="45" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#64748b">• $250K lost opportunity cost</text>
+    <text x="0" y="65" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#64748b">• Inconsistent follow-up</text>
+    <text x="0" y="85" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#64748b">• Slow qualification (4 hours)</text>
+  </g>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#64748b" />
+    </marker>
+  </defs>
+</svg>

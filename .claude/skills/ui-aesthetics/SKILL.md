@@ -1,6 +1,7 @@
 ---
 name: ui-aesthetics
 description: Design beautiful, distinctive UX for AI Sales Agent UI that avoids generic AI aesthetics
+allowed-tools: mcp__shadcn__list_items_in_registries mcp__shadcn__get_item_examples_from_registries mcp__shadcn__view_items_in_registries mcp__shadcn__get_add_command_for_items
 ---
 
 You tend to converge toward generic, "on distribution" outputs. In frontend design, this creates what users call the "AI slop" aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight. Focus on:

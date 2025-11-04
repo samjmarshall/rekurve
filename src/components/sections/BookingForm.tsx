@@ -219,10 +219,12 @@ export function BookingForm() {
                             isCompleted
                               ? 'border-state-success bg-state-success text-white'
                               : isActive
-                                ? 'border-accent-cyan bg-accent-cyan text-white'
+                                ? 'border-accent-cyan bg-accent-cyan text-white ring-2 ring-accent-cyan/30 ring-offset-2 ring-offset-slate-950'
                                 : 'border-slate-700 bg-slate-900 text-slate-500'
                           }
                         `}
+                        aria-current={isActive ? 'step' : undefined}
+                        aria-label={`Step ${step.id}: ${step.title}${isCompleted ? ' (completed)' : isActive ? ' (current)' : ''}`}
                       >
                         {isCompleted ? (
                           <CheckCircle className="h-5 w-5" strokeWidth={2.5} />

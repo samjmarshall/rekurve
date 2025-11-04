@@ -18,7 +18,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[80vh] md:min-h-screen flex items-start md:items-center justify-center overflow-hidden pt-24 md:pt-0">
       {/* Background with atmospheric depth */}
       <div className="absolute inset-0 bg-[oklch(0.12_0_0)]">
         {/* Radial gradients for depth */}
@@ -108,30 +108,12 @@ export default function Hero() {
             </p>
           </FadeInUp>
 
-          {/* Trust Elements */}
+          {/* Social Proof */}
           <FadeInUp delay={1.0}>
             <div className="border-t border-slate-700 pt-8">
-              <p className="text-sm text-slate-400 mb-6">
-                Trusted by 50+ consulting, accounting, and marketing firms
+              <p className="text-sm text-slate-400">
+                Trusted by professional services firms across Brisbane and Melbourne
               </p>
-              <div className="flex flex-wrap justify-center gap-8 items-center opacity-70 grayscale">
-                {/* Placeholder for client logos */}
-                <div className="h-12 w-32 bg-slate-700/30 rounded flex items-center justify-center text-xs text-slate-500 font-mono">
-                  Client Logo
-                </div>
-                <div className="h-12 w-32 bg-slate-700/30 rounded flex items-center justify-center text-xs text-slate-500 font-mono">
-                  Client Logo
-                </div>
-                <div className="h-12 w-32 bg-slate-700/30 rounded flex items-center justify-center text-xs text-slate-500 font-mono">
-                  Client Logo
-                </div>
-                <div className="h-12 w-32 bg-slate-700/30 rounded flex items-center justify-center text-xs text-slate-500 font-mono">
-                  Client Logo
-                </div>
-                <div className="h-12 w-32 bg-slate-700/30 rounded flex items-center justify-center text-xs text-slate-500 font-mono">
-                  Client Logo
-                </div>
-              </div>
             </div>
           </FadeInUp>
         </div>

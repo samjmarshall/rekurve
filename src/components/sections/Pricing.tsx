@@ -161,7 +161,7 @@ export function Pricing() {
                 {/* Badge (Most Popular) */}
                 {tier.badge && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge variant="amber" className="shadow-lg">
+                    <Badge variant="amber" className="shadow-xl scale-110 px-4 py-2">
                       <motion.span
                         animate={{
                           scale: [1, 1.05, 1],
@@ -171,6 +171,7 @@ export function Pricing() {
                           repeat: Infinity,
                           ease: 'easeInOut',
                         }}
+                        className="font-semibold"
                       >
                         {tier.badge}
                       </motion.span>

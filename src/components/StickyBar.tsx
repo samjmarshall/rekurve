@@ -79,7 +79,7 @@ export function StickyBar() {
 
             <button
               onClick={handleDismiss}
-              className="text-white/60 transition-colors hover:text-white"
+              className="text-white/60 transition-all hover:text-white hover:opacity-70"
               aria-label="Dismiss sticky bar"
             >
               <X className="h-5 w-5" />
@@ -96,9 +96,9 @@ export function StickyBar() {
         )}
       >
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex-1 truncate pr-2">
-            <p className="text-sm font-semibold text-white">
-              Get 20+ Hours Back
+          <div className="flex-1 pr-2">
+            <p className="text-sm font-semibold text-white leading-tight">
+              Save 20+ hrs/week
             </p>
           </div>
 
@@ -114,7 +114,7 @@ export function StickyBar() {
 
             <button
               onClick={handleDismiss}
-              className="text-white/60 transition-colors hover:text-white"
+              className="text-white/60 transition-all hover:text-white hover:opacity-70"
               aria-label="Dismiss sticky bar"
             >
               <X className="h-5 w-5" />

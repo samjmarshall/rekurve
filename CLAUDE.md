@@ -10,7 +10,7 @@
 
 ## Quick Start: Current Project State
 
-**Active Project**: Next.js 15 landing page at `/rekurve-landing/`
+**Active Project**: Next.js 15 landing page
 
 **Tech Stack**:
 - Next.js 15.2.3 (App Router) + React 19 + TypeScript
@@ -20,7 +20,6 @@
 
 **Key Commands**:
 ```bash
-cd rekurve-landing
 yarn dev              # Development server (Turbo mode)
 yarn check            # Lint + TypeCheck
 yarn build            # Production build
@@ -33,20 +32,18 @@ yarn build            # Production build
 ## Repository Structure
 
 ```
-www/                                    # Project root
-├── rekurve-landing/                   # Next.js 15 landing page application
-│   ├── src/
-│   │   ├── app/                       # App Router (Next.js 15)
-│   │   │   ├── layout.tsx            # Root layout with fonts
-│   │   │   └── page.tsx              # Landing page (placeholder)
-│   │   ├── styles/
-│   │   │   └── globals.css           # Global styles
-│   │   └── env.js                    # Environment variable schema
-│   ├── public/                        # Static assets
-│   ├── package.json                   # Dependencies (Yarn 3.8.7)
-│   ├── tsconfig.json                  # TypeScript config
-│   ├── tailwind.config.js            # Tailwind 4 config
-│   └── [other config files]
+www/                                    # Next.js 15 landing page application
+├── src/
+│   ├── app/                       # App Router (Next.js 15)
+│   │   ├── layout.tsx            # Root layout with fonts
+│   │   └── page.tsx              # Landing page (placeholder)
+│   ├── styles/
+│   │   └── globals.css           # Global styles
+│   └── env.js                    # Environment variable schema
+├── public/                        # Static assets
+├── package.json                   # Dependencies (Yarn 3.8.7)
+├── tsconfig.json                  # TypeScript config
+├── tailwind.config.js            # Tailwind 4 config
 ├── docs/                               # Strategic documentation
 │   ├── ai-agency-roadmap.md           # 6-month implementation roadmap
 │   ├── ai_agent_positioning_guide.md  # Market positioning and messaging
@@ -145,7 +142,7 @@ All include **5× ROI guarantee** in 120 days.
 
 ### Tech Stack & Architecture
 
-**Landing Page Stack** (rekurve-landing/):
+**Landing Page Stack**:
 - **Framework**: Next.js 15.2.3 (App Router, TypeScript, React 19)
 - **Styling**: Tailwind CSS 4.0.15 (custom theme required)
 - **UI Components**: shadcn/ui + Aceternity UI (customize to avoid generic look)
@@ -165,7 +162,7 @@ All include **5× ROI guarantee** in 120 days.
 ### Recommended Code Structure
 
 ```typescript
-rekurve-landing/src/
+src/
 ├── app/
 │   ├── layout.tsx              # Root layout with fonts
 │   ├── page.tsx                # Landing page
@@ -464,7 +461,7 @@ If requirements conflict or are unclear:
 
 ### Design Review Workflow
 
-**When to use**: After implementing any UI/UX changes in `rekurve-landing/`
+**When to use**: After implementing any UI/UX changes in `src/`.
 
 When you've made visual changes (components, styles, layouts), follow this verification process:
 
@@ -472,7 +469,6 @@ When you've made visual changes (components, styles, layouts), follow this verif
 
 Run these checks first:
 ```bash
-cd rekurve-landing
 yarn check            # Lint + TypeCheck
 ```
 
@@ -482,7 +478,7 @@ Fix any errors before proceeding to design review.
 
 1. **Start dev server**:
    ```bash
-   cd rekurve-landing && yarn dev
+   yarn dev
    ```
 
 2. **Navigate to your changes** in the browser (`http://localhost:3000`)
@@ -543,7 +539,7 @@ Skip the automated review for:
 - Non-visual changes (backend logic, APIs, config)
 - Documentation-only changes
 - Trivial fixes (typos, whitespace)
-- Changes outside `rekurve-landing/`
+- Changes outside `src/`
 
 But still manually verify:
 - Changes work as expected
@@ -554,7 +550,6 @@ But still manually verify:
 
 ## Version History
 
-- **2025-01-03**: Updated repository structure, reorganized into three-tier format, added rekurve-landing/ project details
 - **2025-01-03**: Initial CLAUDE.md created based on existing strategic documentation
 
 ---
@@ -565,5 +560,3 @@ But still manually verify:
 - **Market positioning**: `docs/ai_agent_positioning_guide.md`
 - **Landing page design**: `docs/landing_page_prompt.md`
 - **Pricing strategy**: `docs/value_based_pricing_proposals.md`
-
-**Next Steps**: Implement the landing page following `docs/landing_page_prompt.md` specifications in the `rekurve-landing/` directory.

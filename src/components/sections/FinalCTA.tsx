@@ -84,16 +84,8 @@ export function FinalCTA() {
 
         {/* Trust elements */}
         <ScrollReveal delay={0.4}>
-          <div className="space-y-4">
-            <div className="font-mono text-sm text-white/60">
-              30-minute call • No obligation • 5× ROI guarantee
-            </div>
-            <div className="flex items-center justify-center gap-8 opacity-60 grayscale">
-              {/* Placeholder for client logos */}
-              <div className="h-8 w-24 rounded bg-white/10" />
-              <div className="h-8 w-24 rounded bg-white/10" />
-              <div className="h-8 w-24 rounded bg-white/10" />
-            </div>
+          <div className="font-mono text-sm text-white/60">
+            30-minute call • No obligation • 5× ROI guarantee
           </div>
         </ScrollReveal>
       </div>

@@ -104,7 +104,7 @@ export function FAQ() {
   return (
     <section className="relative bg-slate-50 py-24">
       {/* Subtle paper texture */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03]" />
+      <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-[0.03]" />
 
       <div className="container relative mx-auto max-w-4xl px-6">
         <ScrollReveal>
@@ -120,7 +120,7 @@ export function FAQ() {
 
         {/* Search Input */}
         <ScrollReveal delay={0.1}>
-          <div className="mb-8">
+          <div className="mb-6">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-primary/40" />
               <input
@@ -135,7 +135,7 @@ export function FAQ() {
         </ScrollReveal>
 
         {/* FAQ Accordion */}
-        <ScrollReveal delay={0.2}>
+        <ScrollReveal delay={0.2} amount={0.1}>
           {filteredFAQs.length > 0 ? (
             <Accordion
               type="multiple"

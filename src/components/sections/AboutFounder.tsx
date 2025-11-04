@@ -116,7 +116,7 @@ export function AboutFounder() {
                   <div className="mb-3 text-5xl leading-none text-accent-amber">
                     &ldquo;
                   </div>
-                  <p className="italic leading-relaxed text-slate-200">
+                  <p className="italic leading-relaxed text-slate-200 max-w-prose">
                     I saw professional services firms struggling with problems I
                     solved in engineering—manual, repetitive work that should be
                     automated. Now I build AI agents with production-grade
@@ -139,7 +139,7 @@ export function AboutFounder() {
               <h3 className="text-2xl font-bold text-white">
                 Enterprise-Grade Architecture
               </h3>
-              <p className="text-slate-300">
+              <p className="text-slate-300 max-w-prose">
                 Built with the same reliability principles used at scale by
                 leading tech companies. Production-grade monitoring,
                 idempotent operations, and 99.9% uptime SLA.

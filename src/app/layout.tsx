@@ -3,6 +3,10 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "~/components/Analytics";
+import { cn } from "~/lib/utils";
+import { ThemeProvider } from "~/context/providers";
+import { Navbar } from "~/components/navbar";
+import { Footer } from "~/components/sections/footer";
 
 export const metadata: Metadata = {
   title: "AI Sales Agents for Brisbane Professional Services | Rekurve",
@@ -118,9 +122,18 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body className="font-sans antialiased">
-        <Analytics />
-        {children}
+      <body className="font-sans antialiased dark:bg-black bg-white">
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+          <Navbar />
+          <Analytics />
+          {children}
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

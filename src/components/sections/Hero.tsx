@@ -1,113 +1,393 @@
-'use client'
+"use client";
 
-import { ArrowRight, Play } from 'lucide-react'
+import { AnimatePresence, motion } from "framer-motion";
+import { Card, CardDescription, CardTitle } from "../agentic-intelligence/card";
+import React, { useEffect, useRef, useState } from "react";
 
-import { Button } from '~/components/ui/Button'
-import { FadeInUp } from '~/components/motion/FadeInUp'
+import Balancer from "react-wrap-balancer";
+import { Button } from "~/components/button";
+import { CONSTANTS } from "~/constants/links";
+import Link from "next/link";
+import { NativeIcon } from "~/icons/bento-icons";
+import { NativeIntegrationSkeleton } from "../agentic-intelligence/skeletons";
+import { cn } from "~/lib/utils";
+import { useCalEmbed } from "~/hooks/useCalEmbed";
 
-export default function Hero() {
-  const handlePrimaryCTA = () => {
-    const bookingSection = document.getElementById('booking')
-    bookingSection?.scrollIntoView({ behavior: 'smooth' })
+export function Hero() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
+  const calOptions = useCalEmbed({
+    namespace: CONSTANTS.CALCOM_NAMESPACE,
+    styles: {
+      branding: {
+        brandColor: CONSTANTS.CALCOM_BRAND_COLOR,
+      },
+    },
+    hideEventTypeDetails: CONSTANTS.CALCOM_HIDE_EVENT_TYPE_DETAILS,
+    layout: CONSTANTS.CALCOM_LAYOUT,
+  });
+  return (
+    <div
+      ref={parentRef}
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 md:px-8 md:py-40 bg-neutral-50 dark:bg-neutral-900"
+    >
+      <BackgroundGrids />
+      <CollisionMechanism
+        beamOptions={{
+          initialX: -400,
+          translateX: 600,
+          duration: 7,
+          repeatDelay: 3,
+        }}
+        containerRef={containerRef}
+        parentRef={parentRef}
+      />
+      <CollisionMechanism
+        beamOptions={{
+          initialX: -200,
+          translateX: 800,
+          duration: 4,
+          repeatDelay: 3,
+        }}
+        containerRef={containerRef}
+        parentRef={parentRef}
+      />
+      <CollisionMechanism
+        beamOptions={{
+          initialX: 200,
+          translateX: 1200,
+          duration: 5,
+          repeatDelay: 3,
+        }}
+        containerRef={containerRef}
+        parentRef={parentRef}
+      />
+      <CollisionMechanism
+        containerRef={containerRef}
+        parentRef={parentRef}
+        beamOptions={{
+          initialX: 400,
+          translateX: 1400,
+          duration: 6,
+          repeatDelay: 3,
+        }}
+      />
+
+      <div className="text-balance relative z-20 mx-auto mb-4 mt-4 max-w-4xl text-center text-3xl font-semibold tracking-tight text-gray-700 dark:text-neutral-300 md:text-7xl">
+        <Balancer>
+          <motion.h2>
+            {"Recover 20+ Hours Weekly and Add $100K to Your Pipeline in 90 Days"
+              .split(" ")
+              .map((word, index) => (
+                <motion.span
+                  initial={{
+                    filter: "blur(10px)",
+                    opacity: 0,
+                    y: 10,
+                  }}
+                  animate={{
+                    filter: "blur(0px)",
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  transition={{
+                    duration: 0.4,
+                    delay: index * 0.05,
+                  }}
+                  className="inline-block"
+                  key={index}
+                >
+                  {word}&nbsp;
+                </motion.span>
+              ))}
+          </motion.h2>
+        </Balancer>
+      </div>
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, delay: 0.5 }}
+        className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center text-base/6 text-gray-600 dark:text-gray-200"
+      >
+        Autonomous AI sales agents for professional services firms - built by a seasoned Engineer & Entrepreneur who understand both the code and the business outcomes.
+      </motion.p>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, delay: 0.7 }}
+        className="mb-10 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-20"
+      >
+        <Button
+          variant="dark"
+          as={Link}
+          href="/"
+          className="hidden md:block w-40 text-center"
+        >
+          Watch demo
+        </Button>
+
+        <Button
+          data-cal-namespace={calOptions.namespace}
+          data-cal-link={CONSTANTS.CALCOM_LINK}
+          data-cal-config={`{"layout":"${calOptions.layout}"}`}
+          as="button"
+          variant="primary"
+          className="hidden md:block w-40"
+        >
+          Book a call
+        </Button>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.9, ease: "easeOut" }}
+        ref={containerRef}
+        className="relative mx-auto max-w-7xl rounded-4xl border border-neutral-200/50 bg-neutral-100 p-2 backdrop-blur-lg dark:border-neutral-700 dark:bg-neutral-800/50 md:p-4"
+      >
+        <div className="rounded-3xl border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-black">
+          <div className="w-full">
+            <Card className="relative w-full max-w-none overflow-hidden">
+              {/* <div className="pointer-events-none absolute inset-0 h-full w-full bg-[radial-gradient(var(--color-dots)_1px,transparent_1px)] mask-radial-from-10% [background-size:10px_10px]"></div> */}
+              <div className="flex items-center gap-2">
+                <NativeIcon />
+                <CardTitle>Native Integration</CardTitle>
+              </div>
+              <CardDescription>
+                24/7 real-time sales activity with detailed records of
+                actions, integrations used and outcomes.
+              </CardDescription>
+              <NativeIntegrationSkeleton />
+            </Card>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+const BackgroundGrids = () => {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-0 grid h-full w-full -rotate-45 transform select-none grid-cols-2 gap-10 md:grid-cols-4">
+      <div className="relative h-full w-full">
+        <GridLineVertical className="left-0" />
+        <GridLineVertical className="left-auto right-0" />
+      </div>
+      <div className="relative h-full w-full">
+        <GridLineVertical className="left-0" />
+        <GridLineVertical className="left-auto right-0" />
+      </div>
+      <div className="relative h-full w-full bg-linear-to-b from-transparent via-neutral-100 to-transparent dark:via-neutral-800">
+        <GridLineVertical className="left-0" />
+        <GridLineVertical className="left-auto right-0" />
+      </div>
+      <div className="relative h-full w-full">
+        <GridLineVertical className="left-0" />
+        <GridLineVertical className="left-auto right-0" />
+      </div>
+    </div>
+  );
+};
+
+const CollisionMechanism = React.forwardRef<
+  HTMLDivElement,
+  {
+    containerRef: React.RefObject<HTMLDivElement>;
+    parentRef: React.RefObject<HTMLDivElement>;
+    beamOptions?: {
+      initialX?: number;
+      translateX?: number;
+      initialY?: number;
+      translateY?: number;
+      rotate?: number;
+      className?: string;
+      duration?: number;
+      delay?: number;
+      repeatDelay?: number;
+    };
   }
+>(({ parentRef, containerRef, beamOptions = {} }, ref) => {
+  const beamRef = useRef<HTMLDivElement>(null);
+  const [collision, setCollision] = useState<{
+    detected: boolean;
+    coordinates: { x: number; y: number } | null;
+  }>({
+    detected: false,
+    coordinates: null,
+  });
+  const [beamKey, setBeamKey] = useState(0);
+  const [cycleCollisionDetected, setCycleCollisionDetected] = useState(false);
 
-  const handleSecondaryCTA = () => {
-    // In a real implementation, this would open a video modal
-    console.log('Open demo video')
-  }
+  useEffect(() => {
+    const checkCollision = () => {
+      if (
+        beamRef.current &&
+        containerRef.current &&
+        parentRef.current &&
+        !cycleCollisionDetected
+      ) {
+        const beamRect = beamRef.current.getBoundingClientRect();
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const parentRect = parentRef.current.getBoundingClientRect();
+
+        if (beamRect.bottom >= containerRect.top) {
+          const relativeX =
+            beamRect.left - parentRect.left + beamRect.width / 2;
+          const relativeY = beamRect.bottom - parentRect.top;
+
+          setCollision({
+            detected: true,
+            coordinates: {
+              x: relativeX,
+              y: relativeY,
+            },
+          });
+          setCycleCollisionDetected(true);
+          if (beamRef.current) {
+            beamRef.current.style.opacity = "0";
+          }
+        }
+      }
+    };
+
+    const animationInterval = setInterval(checkCollision, 50);
+
+    return () => clearInterval(animationInterval);
+  }, [cycleCollisionDetected, containerRef]);
+
+  useEffect(() => {
+    if (collision.detected && collision.coordinates) {
+      setTimeout(() => {
+        setCollision({ detected: false, coordinates: null });
+        setCycleCollisionDetected(false);
+        // Set beam opacity to 0
+        if (beamRef.current) {
+          beamRef.current.style.opacity = "1";
+        }
+      }, 2000);
+
+      // Reset the beam animation after a delay
+      setTimeout(() => {
+        setBeamKey((prevKey) => prevKey + 1);
+      }, 2000);
+    }
+  }, [collision]);
 
   return (
-    <section className="relative min-h-[80vh] md:min-h-screen flex items-start md:items-center justify-center overflow-hidden pt-24 md:pt-0">
-      {/* Background with atmospheric depth */}
-      <div className="absolute inset-0 bg-[oklch(0.15_0_0)]">
-        {/* Radial gradients for depth */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(circle at 20% 10%, oklch(0.18 0.02 250) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, oklch(0.16 0.02 230) 0%, transparent 50%)
-            `
+    <>
+      <motion.div
+        key={beamKey}
+        ref={beamRef}
+        animate="animate"
+        initial={{
+          translateY: beamOptions.initialY || "-200px",
+          translateX: beamOptions.initialX || "0px",
+          rotate: beamOptions.rotate || -45,
+        }}
+        variants={{
+          animate: {
+            translateY: beamOptions.translateY || "800px",
+            translateX: beamOptions.translateX || "700px",
+            rotate: beamOptions.rotate || -45,
+          },
+        }}
+        transition={{
+          duration: beamOptions.duration || 8,
+          repeat: Infinity,
+          repeatType: "loop",
+          ease: "linear",
+          delay: beamOptions.delay || 0,
+          repeatDelay: beamOptions.repeatDelay || 0,
+        }}
+        className={cn(
+          "absolute left-96 top-20 m-auto h-14 w-px rounded-full bg-linear-to-t from-orange-500 via-yellow-500 to-transparent",
+          beamOptions.className
+        )}
+      />
+      <AnimatePresence>
+        {collision.detected && collision.coordinates && (
+          <Explosion
+            key={`${collision.coordinates.x}-${collision.coordinates.y}`}
+            className=""
+            style={{
+              left: `${collision.coordinates.x + 20}px`,
+              top: `${collision.coordinates.y}px`,
+              transform: "translate(-50%, -50%)",
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </>
+  );
+});
+
+CollisionMechanism.displayName = "CollisionMechanism";
+
+const Explosion = ({ ...props }: React.HTMLProps<HTMLDivElement>) => {
+  const spans = Array.from({ length: 20 }, (_, index) => ({
+    id: index,
+    initialX: 0,
+    initialY: 0,
+    directionX: Math.floor(Math.random() * 80 - 40),
+    directionY: Math.floor(Math.random() * -50 - 10),
+  }));
+
+  return (
+    <div {...props} className={cn("absolute z-50 h-2 w-2", props.className)}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 1, 0] }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        className="absolute -inset-x-10 top-0 m-auto h-1 w-10 rounded-full bg-linear-to-r from-transparent via-orange-500 to-transparent blur-sm"
+      ></motion.div>
+      {spans.map((span) => (
+        <motion.span
+          key={span.id}
+          initial={{ x: span.initialX, y: span.initialY, opacity: 1 }}
+          animate={{
+            x: span.directionX,
+            y: span.directionY,
+            opacity: 0,
           }}
+          transition={{ duration: Math.random() * 1.5 + 0.5, ease: "easeOut" }}
+          className="absolute h-1 w-1 rounded-full bg-linear-to-b from-orange-500 to-yellow-500"
         />
-        {/* Subtle geometric pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `repeating-linear-gradient(
-              45deg,
-              transparent,
-              transparent 40px,
-              oklch(0.25 0.08 195) 40px,
-              oklch(0.25 0.08 195) 41px
-            )`
-          }}
-        />
-      </div>
+      ))}
+    </div>
+  );
+};
 
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Headline */}
-          <FadeInUp delay={0.2}>
-            <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight text-white mb-6"
-              style={{ letterSpacing: '-0.02em' }}
-            >
-              Recover 20+ Hours Weekly and Add{' '}
-              <span className="text-accent-cyan">$100K</span> to Your Pipeline in{' '}
-              <span className="text-accent-amber">90 Days</span>
-            </h1>
-          </FadeInUp>
-
-          {/* Subheadline */}
-          <FadeInUp delay={0.4}>
-            <p className="text-xl md:text-2xl text-slate-300 leading-relaxed mb-12 max-w-3xl mx-auto">
-              Autonomous AI sales agents for Brisbane professional services firms—built by a former AWS SRE who understands both the code and the business outcomes.
-            </p>
-          </FadeInUp>
-
-          {/* CTA Buttons */}
-          <FadeInUp delay={0.6}>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Button
-                size="lg"
-                variant="primary"
-                onClick={handlePrimaryCTA}
-                className="group"
-              >
-                Book Your Free Strategy Session
-                <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={handleSecondaryCTA}
-                className="group"
-              >
-                <Play className="mr-2 w-5 h-5 transition-transform group-hover:scale-110" />
-                Watch 3-Minute Demo
-              </Button>
-            </div>
-          </FadeInUp>
-
-          {/* Micro-copy */}
-          <FadeInUp delay={0.8}>
-            <p className="text-sm text-slate-500 font-mono mb-12">
-              30-minute call, no obligation • See if we&apos;re a fit
-            </p>
-          </FadeInUp>
-
-          {/* Social Proof */}
-          <FadeInUp delay={1.0}>
-            <div className="border-t border-slate-700 pt-8">
-              <p className="text-sm text-slate-400">
-                Trusted by professional services firms across Brisbane and Melbourne
-              </p>
-            </div>
-          </FadeInUp>
-        </div>
-      </div>
-    </section>
-  )
-}
+const GridLineVertical = ({
+  className,
+  offset,
+}: {
+  className?: string;
+  offset?: string;
+}) => {
+  return (
+    <div
+      style={
+        {
+          "--background": "#ffffff",
+          "--color": "rgba(0, 0, 0, 0.2)",
+          "--height": "5px",
+          "--width": "1px",
+          "--fade-stop": "90%",
+          "--offset": offset || "150px", //-100px if you want to keep the line inside
+          "--color-dark": "rgba(255, 255, 255, 0.3)",
+          maskComposite: "exclude",
+        } as React.CSSProperties
+      }
+      className={cn(
+        "absolute top-[calc(var(--offset)/2*-1)] h-[calc(100%+var(--offset))] w-(--width)",
+        "bg-[linear-gradient(to_bottom,var(--color),var(--color)_50%,transparent_0,transparent)]",
+        "[background-size:var(--width)_var(--height)]",
+        "[mask:linear-gradient(to_top,var(--background)_var(--fade-stop),transparent),_linear-gradient(to_bottom,var(--background)_var(--fade-stop),transparent),_linear-gradient(black,black)]",
+        "[mask-composite:exclude]",
+        "z-30",
+        "dark:bg-[linear-gradient(to_bottom,var(--color-dark),var(--color-dark)_50%,transparent_0,transparent)]",
+        className
+      )}
+    ></div>
+  );
+};

@@ -1,21 +1,22 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowLeft,
   ArrowRight,
-  CheckCircle,
-  Calendar,
-  User,
   Building,
+  Calendar,
+  CheckCircle,
   Target,
+  User,
 } from 'lucide-react'
+
 import { Button } from '~/components/ui/Button'
 import { Card } from '~/components/ui/Card'
+import { useForm } from 'react-hook-form'
+import { useState } from 'react'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 // Form validation schema
 const formSchema = z.object({

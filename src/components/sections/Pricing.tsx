@@ -1,21 +1,24 @@
 'use client'
 
+import { cn, formatCurrency } from '~/lib/utils'
+
 import { Badge } from '~/components/ui/Badge'
+import { BrandShimmer } from '../brand-shimmer'
 import { Button } from '~/components/ui/Button'
 import { Check } from 'lucide-react'
 import type { PricingTier } from '~/types'
-import { formatCurrency } from '~/lib/utils'
 import { motion } from 'framer-motion'
 
 const pricingTiers: PricingTier[] = [
   {
     id: 'foundation',
     name: 'AI-Assisted Sales System',
-    tagline: 'Foundation for small teams testing AI sales',
+    tagline: 'For small teams testing AI sales',
     setupFee: 9500,
     monthlyFee: 2500,
     features: [
       'CRM setup & integration',
+      'Simple Quote Generation',
       'Basic lead research automation',
       'Email sequence automation (3-5 sequences)',
       'Basic lead scoring',
@@ -110,8 +113,8 @@ export function Pricing() {
           <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
             Simple, Transparent Pricing
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-slate-400">
-            All plans include our 5× ROI guarantee. If you don&apos;t see
+          <p className="mx-auto max-w-2xl text-lg text-gray-600">
+            All plans include our 5x ROI guarantee. If you don&apos;t see
             results, you don&apos;t pay.
           </p>
         </motion.div>
@@ -127,17 +130,17 @@ export function Pricing() {
           {pricingTiers.map((tier) => {
             const isCustomPricing = tier.setupFee === 0 && tier.monthlyFee === 0
             const borderColor = tier.highlighted
-              ? 'border-accent-cyan'
+              ? 'border-brand'
               : tier.id === 'enterprise'
-                ? 'border-state-success'
-                : 'border-accent-coral'
+                ? 'border-brand/80'
+                : 'border-brand/60'
 
             return (
               <motion.div
                 key={tier.id}
                 variants={cardVariants}
                 className={`
-                  group relative flex flex-col rounded-xl border-2 bg-slate-900/50 p-8 backdrop-blur-sm
+                  group relative flex flex-col rounded-xl border-2 p-8 backdrop-blur-sm
                   transition-all duration-300
                   hover:-translate-y-2 hover:shadow-2xl
                   ${borderColor}
@@ -146,8 +149,8 @@ export function Pricing() {
               >
                 {/* Badge (Most Popular) */}
                 {tier.badge && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge variant="amber" className="shadow-xl scale-110 px-4 py-2">
+                  <div className="absolute -top-9 left-1/2 -translate-x-1/2">
+                    <Badge variant="brand" className="scale-110 px-2 py-1">
                       <motion.span
                         animate={{
                           scale: [1, 1.05, 1],
@@ -159,7 +162,7 @@ export function Pricing() {
                         }}
                         className="font-semibold"
                       >
-                        {tier.badge}
+                        <BrandShimmer text={tier.badge} />
                       </motion.span>
                     </Badge>
                   </div>
@@ -167,43 +170,43 @@ export function Pricing() {
 
                 {/* Header */}
                 <div className="mb-6">
-                  <h3 className="mb-2 text-2xl font-bold text-white">
+                  <h3 className="mb-2 text-2xl font-bold">
                     {tier.name}
                   </h3>
-                  <p className="text-sm text-slate-400">{tier.tagline}</p>
+                  <p className="text-sm text-gray-600"><span className="text-brand front-bold">{tier.id.charAt(0).toUpperCase() + tier.id.slice(1)}</span> - {tier.tagline}</p>
                 </div>
 
                 {/* Pricing */}
                 <div className="mb-8">
                   {isCustomPricing ? (
                     <div>
-                      <div className="mb-1 text-4xl font-bold text-white">
+                      <div className="mb-1 text-4xl font-bold">
                         Custom
                       </div>
-                      <p className="text-sm text-slate-400">
+                      <p className="text-sm text-gray-600">
                         Tailored to your needs
                       </p>
                     </div>
                   ) : (
                     <div>
                       <div className="mb-1 flex items-baseline gap-2">
-                        <span className="text-4xl font-bold text-white">
+                        <span className="text-4xl font-bold">
                           {formatCurrency(tier.setupFee)}
                         </span>
-                        <span className="text-slate-400">setup</span>
+                        <span className="text-gray-600">setup</span>
                       </div>
                       <div className="flex items-baseline gap-2 text-lg">
-                        <span className="font-semibold text-accent-cyan">
+                        <span className="font-semibold text-brand">
                           {formatCurrency(tier.monthlyFee)}
                         </span>
-                        <span className="text-slate-400">per month</span>
+                        <span className="text-gray-600">per month</span>
                       </div>
                     </div>
                   )}
                 </div>
 
                 {/* Features */}
-                <ul className="mb-8 flex-grow space-y-3">
+                <ul className="mb-8 grow space-y-3">
                   {tier.features.map((feature, index) => (
                     <motion.li
                       key={index}
@@ -218,13 +221,11 @@ export function Pricing() {
                     >
                       <Check
                         className={`mt-0.5 h-5 w-5 shrink-0 ${
-                          tier.highlighted
-                            ? 'text-accent-cyan'
-                            : 'text-slate-400'
+                          !tier.highlighted && 'text-gray-600'
                         }`}
                         strokeWidth={2.5}
                       />
-                      <span className="text-sm text-slate-300">{feature}</span>
+                      <span className="text-sm text-gray-600">{feature}</span>
                     </motion.li>
                   ))}
                 </ul>
@@ -251,13 +252,13 @@ export function Pricing() {
           transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="mt-16 text-center"
         >
-          <p className="text-slate-400">
+          <p className="text-gray-600">
             All plans backed by our{' '}
             <a
               href="#guarantee"
-              className="font-semibold text-accent-amber underline decoration-accent-amber/30 transition-colors hover:text-accent-amber/90 hover:decoration-accent-amber"
+              className="font-semibold text-accent-coral underline decoration-accent-coral/30 transition-colors hover:text-accent-coral/90 hover:decoration-accent-coral"
             >
-              5× ROI Guarantee
+              5x ROI Guarantee
             </a>
             . Questions?{' '}
             <a

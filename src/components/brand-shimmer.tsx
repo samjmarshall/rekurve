@@ -2,7 +2,7 @@ import React from "react";
 import { ShimmerText } from "./shimmer-text";
 import { cn } from "~/lib/utils";
 
-export const BrandShimmer = ({ text, className }: { text: string, className: string }) => {
+export const BrandShimmer = ({ text, className }: { text: string, className?: string }) => {
   return (
     <ShimmerText
       duration={1.2}

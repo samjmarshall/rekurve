@@ -52,12 +52,12 @@ export const NativeIntegrationSkeleton = () => {
             </div>
           </div>
           <div className="2 absolute -top-4 right-30 flex h-full flex-col items-center">
-            <IconBlock icon={<SalesOps className="size-4" />} />
+            <IconBlock icon={<SalesOps className="size-6 fill-black dark:fill-white" />} />
             <VerticalLine />
-            <IconBlock icon={<Hubspot className="size-4" />} />
+            <IconBlock icon={<Hubspot className="size-6" />} />
           </div>
           <RightSideSVG />
-          <IconBlock icon={<Xero className="size-4" />} />
+          <IconBlock icon={<Xero className="size-8" />} />
         </div>
       </motion.div>
     </>

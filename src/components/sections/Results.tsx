@@ -75,11 +75,11 @@ export function Results() {
 
                     {/* Metric value */}
                     <div className="mb-2 font-mono">
-                      <span className="text-2xl font-bold tabular-nums text-white sm:text-3xl">
+                      <span className="text-2xl font-bold tabular-nums sm:text-3xl">
                         {metric.value}
                       </span>
                       {metric.suffix && (
-                        <span className="text-xl font-semibold text-white">
+                        <span className="text-xl font-semibold">
                           {metric.suffix}
                         </span>
                       )}
@@ -90,7 +90,7 @@ export function Results() {
 
                     {/* Accent line at bottom */}
                     <div
-                      className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-transparent via-brand to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      className="absolute bottom-0 left-0 h-1 w-full bg-linear-to-r from-transparent via-brand to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                     />
                   </CardContent>
                 </Card>

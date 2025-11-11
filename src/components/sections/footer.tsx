@@ -75,7 +75,7 @@ export function Footer() {
     },
   ];
   return (
-    <div className="border-t border-neutral-100 dark:border-white/[0.1] px-8 py-20 bg-white dark:bg-neutral-950 w-full relative overflow-hidden">
+    <div className="border-t border-neutral-100 dark:border-white/10 px-8 py-20 bg-white dark:bg-neutral-950 w-full relative overflow-hidden">
       <div className="max-w-7xl mx-auto text-sm text-neutral-500 flex sm:flex-row flex-col justify-between items-start  md:px-8">
         <div>
           <div className="mr-0 md:mr-4  md:flex mb-4">
@@ -83,7 +83,7 @@ export function Footer() {
           </div>
 
           <div className="mt-2 ml-2">
-            &copy; copyright Startup 2024. All rights reserved.
+            &copy; copyright Rekurve.ai 2025. All rights reserved.
           </div>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 items-start mt-10 sm:mt-0 md:mt-0">
@@ -159,8 +159,8 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <p className="text-center uppercase mt-20 text-5xl md:text-9xl lg:text-[12rem] xl:text-[13rem] font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 dark:from-neutral-950 to-neutral-200 dark:to-neutral-800 inset-x-0">
-        Startup
+      <p className="text-center uppercase mt-20 text-5xl md:text-9xl lg:text-[12rem] xl:text-[13rem] font-bold bg-clip-text text-transparent bg-linear-to-b from-neutral-50 dark:from-neutral-950 to-neutral-200 dark:to-neutral-800 inset-x-0">
+        Make it rain
       </p>
     </div>
   );

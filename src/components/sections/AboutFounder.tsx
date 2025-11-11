@@ -72,7 +72,7 @@ export function AboutFounder() {
                   <div className="text-center text-white">
                     <div className="text-5xl font-bold">SM</div>
                     <div className="mt-2 text-xs">
-                      Founder Photo
+                      Photo here
                     </div>
                   </div>
                 </div>

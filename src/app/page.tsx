@@ -10,12 +10,10 @@ import { Pricing } from '~/components/sections/Pricing'
 import Problem from '~/components/sections/Problem'
 import { Results } from '~/components/sections/Results'
 import Solution from '~/components/sections/Solution'
-import { StickyBar } from '~/components/StickyBar'
 
 export default function HomePage() {
   return (
     <>
-      <StickyBar />
       <main className="min-h-screen">
         <Hero />
         <Problem />

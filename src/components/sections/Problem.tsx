@@ -40,7 +40,7 @@ export default function Problem() {
               style={{ letterSpacing: '-0.02em' }}
             >
               Your Sales Team Is Losing{' '}
-              <span className="text-accent-coral">$250K+</span> Annually to Manual Work
+              <span className="text-brand">$250K+</span> Annually to Manual Work
             </h2>
             {/* <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Here&apos;s exactly what it&apos;s costing you:

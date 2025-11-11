@@ -8,9 +8,9 @@ import { motion } from 'framer-motion'
 const guaranteeFeatures = [
   {
     icon: TrendingUp,
-    title: '5× ROI Minimum',
+    title: '5x ROI Minimum',
     description:
-      'We guarantee you\'ll see at least 5× return on your investment within 120 days, or we\'ll work for free until you do.',
+      'We guarantee you\'ll see at least 5x return on your investment within 120 days, or we\'ll work for free until you do.',
   },
   {
     icon: Clock,

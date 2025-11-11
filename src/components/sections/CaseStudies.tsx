@@ -1,16 +1,17 @@
 "use client"
 
-import { AlertTriangle, Lightbulb, TrendingUp } from "lucide-react"
-import { motion } from "framer-motion"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/Accordion"
-import { Badge } from "~/components/ui/Badge"
+import { AlertTriangle, Lightbulb, TrendingUp } from "lucide-react"
 import { Card, CardContent } from "~/components/ui/Card"
+
+import { Badge } from "~/components/ui/Badge"
 import { Compare } from "~/components/ui/compare"
+import { motion } from "framer-motion"
 
 const caseStudy = {
   title: "How ABC Accounting Saved 25 Hours Weekly and Added $380K to Pipeline",
@@ -53,7 +54,7 @@ const caseStudy = {
       "Lead qualification time reduced from 4 hours to 4 minutes",
       "MQL-to-SQL conversion rate increased by 43%",
       "Sales team now focuses entirely on high-value conversations",
-      "ROI of 8.6× in the first year",
+      "ROI of 8.6x in the first year",
     ],
   },
 }
@@ -67,7 +68,7 @@ export function CaseStudies() {
     <section className="relative overflow-hidden bg-slate-50 py-20">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#071D33_1px,transparent_1px)] bg-[size:2rem_2rem]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#071D33_1px,transparent_1px)] bg-size-[2rem_2rem]" />
       </div>
 
       <div className="container relative z-10 mx-auto px-4">

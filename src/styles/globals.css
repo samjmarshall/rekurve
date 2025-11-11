@@ -25,9 +25,8 @@
     0px 2px 3px -1px rgba(0, 0, 0, 0.1), 0px 1px 0px 0px rgba(25, 28, 33, 0.02),
     0px 0px 0px 1px rgba(25, 28, 33, 0.08);
 
-  /* Primary brand color - Navy */
-  --color-primary: #071d33;
-  --color-primary-dark: oklch(0.12 0.02 250);
+  /* Primary brand color */
+  --color-primary: #f17463;
 
   /* Distinctive accents (NOT generic purple) - use strategically, ONE per context */
   --color-accent-amber: oklch(0.75 0.15 75);

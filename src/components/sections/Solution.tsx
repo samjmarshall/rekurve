@@ -145,7 +145,7 @@ export default function Solution() {
                 </p>
 
                 <Badge variant="cyan" className="text-sm font-mono">
-                  {formatNumber(3)}-{formatNumber(5)}× more qualified meetings
+                  {formatNumber(3)}-{formatNumber(5)}x more qualified meetings
                 </Badge>
               </CardContent>
             </Card>
@@ -165,14 +165,14 @@ export default function Solution() {
                 </div>
 
                 <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                  <span className="text-state-success">{formatNumber(5)}-{formatNumber(10)}× ROI</span> in 120 Days
+                  <span className="text-state-success">{formatNumber(5)}-{formatNumber(10)}x ROI</span> in 120 Days
                 </h3>
                 <p className="text-slate-600 leading-relaxed mb-4">
                   Typical clients see full payback in 2 months, then continuous compounding value.
                 </p>
 
                 <Badge variant="success" className="text-sm font-mono">
-                  Average ROI: {formatNumber(8.6)}× in Year 1
+                  Average ROI: {formatNumber(8.6)}x in Year 1
                 </Badge>
               </CardContent>
             </Card>

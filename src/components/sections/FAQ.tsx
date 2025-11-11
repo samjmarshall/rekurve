@@ -17,7 +17,7 @@ const faqData: FAQItem[] = [
   {
     id: "1",
     question: "How quickly will I see ROI from the AI sales agent?",
-    answer: "Most clients see measurable results within the first 30 days—qualified leads in your pipeline, meetings booked, and time recovered. Our 5× ROI guarantee ensures you'll see $5 in value for every $1 invested within 120 days, or we'll work for free until you do.",
+    answer: "Most clients see measurable results within the first 30 days—qualified leads in your pipeline, meetings booked, and time recovered. Our 5x ROI guarantee ensures you'll see $5 in value for every $1 invested within 120 days, or we'll work for free until you do.",
     category: "ROI & Results"
   },
   {
@@ -47,12 +47,12 @@ const faqData: FAQItem[] = [
   {
     id: "6",
     question: "Can we cancel or pause the service anytime?",
-    answer: "Yes. All packages are month-to-month after the initial 120-day guarantee period. You can pause or cancel with 30 days' notice. If you're not seeing 5× ROI within 120 days, we'll continue working at no additional cost until you do.",
+    answer: "Yes. All packages are month-to-month after the initial 120-day guarantee period. You can pause or cancel with 30 days' notice. If you're not seeing 5x ROI within 120 days, we'll continue working at no additional cost until you do.",
     category: "Pricing"
   },
   {
     id: "7",
-    question: "How do you measure the 5× ROI guarantee?",
+    question: "How do you measure the 5x ROI guarantee?",
     answer: "ROI is calculated as: (Time Saved Value + Pipeline Value) ÷ Total Investment. Time saved is measured in hours (tracked via your CRM activity logs). Pipeline value is measured by opportunities created and their expected close value. We provide monthly ROI reports with full transparency.",
     category: "ROI & Results"
   },

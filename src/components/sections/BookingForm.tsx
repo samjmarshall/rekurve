@@ -7,12 +7,14 @@ import {
   Building,
   Calendar,
   CheckCircle,
+  ShieldCheck,
   Target,
   User,
 } from 'lucide-react'
 
 import { Button } from '~/components/ui/Button'
 import { Card } from '~/components/ui/Card'
+import { Checkbox } from '../ui/checkbox'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { z } from 'zod'
@@ -50,7 +52,7 @@ type FormData = z.infer<typeof formSchema>
 
 const steps = [
   { id: 1, title: 'Basic Info', icon: User },
-  { id: 2, title: 'Company Details', icon: Building },
+  { id: 2, title: 'Company', icon: Building },
   { id: 3, title: 'Challenges', icon: Target },
   { id: 4, title: 'Goals', icon: Target },
   { id: 5, title: 'Book a Call', icon: Calendar },
@@ -140,7 +142,7 @@ export function BookingForm() {
     return (
       <section
         id="booking-form"
-        className="relative overflow-hidden bg-slate-950 py-24"
+        className="relative overflow-hidden bg-white dark:bg-black py-24"
       >
         <div className="container relative mx-auto px-4">
           <motion.div
@@ -160,14 +162,14 @@ export function BookingForm() {
             <h2 className="mb-4 text-3xl font-bold text-white">
               Thank You! We&apos;ll Be In Touch Soon
             </h2>
-            <p className="mb-8 text-lg text-slate-400">
+            <p className="mb-8 text-lg text-gray-600">
               Your information has been received. You&apos;ll be redirected to book a
               time that works for you...
             </p>
             <div className="flex items-center justify-center gap-2">
-              <div className="h-2 w-2 animate-bounce rounded-full bg-accent-cyan [animation-delay:-0.3s]" />
-              <div className="h-2 w-2 animate-bounce rounded-full bg-accent-cyan [animation-delay:-0.15s]" />
-              <div className="h-2 w-2 animate-bounce rounded-full bg-accent-cyan" />
+              <div className="h-2 w-2 animate-bounce rounded-full bg-brand [animation-delay:-0.3s]" />
+              <div className="h-2 w-2 animate-bounce rounded-full bg-brand [animation-delay:-0.15s]" />
+              <div className="h-2 w-2 animate-bounce rounded-full bg-brand" />
             </div>
           </motion.div>
         </div>
@@ -178,11 +180,8 @@ export function BookingForm() {
   return (
     <section
       id="booking-form"
-      className="relative overflow-hidden bg-slate-950 py-24"
+      className="relative overflow-hidden bg-white dark:bg-black py-24"
     >
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900" />
-
       <div className="container relative mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -193,10 +192,10 @@ export function BookingForm() {
         >
           {/* Heading */}
           <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
-              Book Your Strategy Call
+            <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+              Book Your Call
             </h2>
-            <p className="mx-auto max-w-2xl text-lg text-slate-400">
+            <p className="mx-auto max-w-2xl text-lg text-gray-600">
               Let&apos;s discuss how an AI sales agent can transform your sales
               process. Takes less than 2 minutes to complete.
             </p>
@@ -218,10 +217,10 @@ export function BookingForm() {
                           flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300
                           ${
                             isCompleted
-                              ? 'border-state-success bg-state-success text-white'
+                              ? 'border-accent-amber bg-accent-amber'
                               : isActive
-                                ? 'border-accent-cyan bg-accent-cyan text-white ring-2 ring-accent-cyan/30 ring-offset-2 ring-offset-slate-950'
-                                : 'border-slate-700 bg-slate-900 text-slate-500'
+                                ? 'border-brand bg-brand text-white ring-2 ring-brand/30 ring-offset-2 ring-offset-neutral-900'
+                                : 'border-neutral-700 bg-neutral-800 text-gray-600'
                           }
                         `}
                         aria-current={isActive ? 'step' : undefined}
@@ -236,7 +235,7 @@ export function BookingForm() {
                       <span
                         className={`
                           mt-2 hidden text-xs font-medium md:block
-                          ${isActive || isCompleted ? 'text-white' : 'text-slate-500'}
+                          ${isActive || isCompleted ? 'text-white' : 'text-gray-600'}
                         `}
                       >
                         {step.title}
@@ -245,8 +244,8 @@ export function BookingForm() {
                     {index < steps.length - 1 && (
                       <div
                         className={`
-                          mx-2 h-0.5 flex-1 transition-colors duration-300
-                          ${isCompleted ? 'bg-state-success' : 'bg-slate-800'}
+                          mx-2 mb-6 h-0.5 flex-1 transition-colors duration-300
+                          ${isCompleted ? 'bg-accent-amber' : 'bg-neutral-800'}
                         `}
                       />
                     )}
@@ -254,13 +253,13 @@ export function BookingForm() {
                 )
               })}
             </div>
-            <div className="text-center text-sm text-slate-400">
+            <div className="text-center text-sm text-gray-600">
               Step {currentStep} of {steps.length}
             </div>
           </div>
 
           {/* Form */}
-          <Card className="border-slate-800 bg-slate-900/50 p-8 backdrop-blur-sm">
+          <Card className="border-neutral-800 bg-neutral-900/50 p-8 backdrop-blur-sm">
             <form onSubmit={handleSubmit(onSubmit)}>
               <AnimatePresence mode="wait">
                 {/* Step 1: Basic Info */}
@@ -281,7 +280,7 @@ export function BookingForm() {
                       <div>
                         <label
                           htmlFor="firstName"
-                          className="mb-2 block text-sm font-medium text-slate-300"
+                          className="mb-2 block text-sm font-medium"
                         >
                           First Name <span className="text-accent-coral">*</span>
                         </label>
@@ -289,20 +288,18 @@ export function BookingForm() {
                           {...register('firstName')}
                           type="text"
                           id="firstName"
-                          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                          className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                           placeholder="John"
                         />
-                        {errors.firstName && (
-                          <p className="mt-1 text-sm text-accent-coral">
-                            {errors.firstName.message}
-                          </p>
-                        )}
+                        <p className="mt-1 text-sm text-accent-coral">
+                          {errors.firstName?.message}
+                        </p>
                       </div>
 
                       <div>
                         <label
                           htmlFor="lastName"
-                          className="mb-2 block text-sm font-medium text-slate-300"
+                          className="mb-2 block text-sm font-medium"
                         >
                           Last Name <span className="text-accent-coral">*</span>
                         </label>
@@ -310,21 +307,19 @@ export function BookingForm() {
                           {...register('lastName')}
                           type="text"
                           id="lastName"
-                          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                          className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                           placeholder="Smith"
                         />
-                        {errors.lastName && (
-                          <p className="mt-1 text-sm text-accent-coral">
-                            {errors.lastName.message}
-                          </p>
-                        )}
+                        <p className="mt-1 text-sm text-accent-coral">
+                          {errors.lastName?.message}
+                        </p>
                       </div>
                     </div>
 
                     <div>
                       <label
                         htmlFor="email"
-                        className="mb-2 block text-sm font-medium text-slate-300"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Email <span className="text-accent-coral">*</span>
                       </label>
@@ -332,20 +327,18 @@ export function BookingForm() {
                         {...register('email')}
                         type="email"
                         id="email"
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                         placeholder="john.smith@company.com"
                       />
-                      {errors.email && (
-                        <p className="mt-1 text-sm text-accent-coral">
-                          {errors.email.message}
-                        </p>
-                      )}
+                      <p className="mt-1 text-sm text-accent-coral">
+                        {errors.email?.message}
+                      </p>
                     </div>
 
                     <div>
                       <label
                         htmlFor="phone"
-                        className="mb-2 block text-sm font-medium text-slate-300"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Phone (Optional)
                       </label>
@@ -353,7 +346,7 @@ export function BookingForm() {
                         {...register('phone')}
                         type="tel"
                         id="phone"
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                         placeholder="+61 4XX XXX XXX"
                       />
                     </div>
@@ -377,7 +370,7 @@ export function BookingForm() {
                     <div>
                       <label
                         htmlFor="company"
-                        className="mb-2 block text-sm font-medium text-slate-300"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Company Name <span className="text-accent-coral">*</span>
                       </label>
@@ -385,27 +378,25 @@ export function BookingForm() {
                         {...register('company')}
                         type="text"
                         id="company"
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                         placeholder="Acme Professional Services"
                       />
-                      {errors.company && (
-                        <p className="mt-1 text-sm text-accent-coral">
-                          {errors.company.message}
-                        </p>
-                      )}
+                      <p className="mt-1 text-sm text-accent-coral">
+                        {errors.company?.message}
+                      </p>
                     </div>
 
                     <div>
                       <label
                         htmlFor="companySize"
-                        className="mb-2 block text-sm font-medium text-slate-300"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Company Size <span className="text-accent-coral">*</span>
                       </label>
                       <select
                         {...register('companySize')}
                         id="companySize"
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                       >
                         <option value="">Select company size</option>
                         <option value="1-10">1-10 employees</option>
@@ -414,17 +405,15 @@ export function BookingForm() {
                         <option value="51-100">51-100 employees</option>
                         <option value="100+">100+ employees</option>
                       </select>
-                      {errors.companySize && (
-                        <p className="mt-1 text-sm text-accent-coral">
-                          {errors.companySize.message}
-                        </p>
-                      )}
+                      <p className="mt-1 text-sm text-accent-coral">
+                        {errors.companySize?.message}
+                      </p>
                     </div>
 
                     <div>
                       <label
                         htmlFor="industry"
-                        className="mb-2 block text-sm font-medium text-slate-300"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Industry <span className="text-accent-coral">*</span>
                       </label>
@@ -432,20 +421,18 @@ export function BookingForm() {
                         {...register('industry')}
                         type="text"
                         id="industry"
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                         placeholder="e.g., Consulting, Accounting, Marketing"
                       />
-                      {errors.industry && (
-                        <p className="mt-1 text-sm text-accent-coral">
-                          {errors.industry.message}
-                        </p>
-                      )}
+                      <p className="mt-1 text-sm text-accent-coral">
+                        {errors.industry?.message}
+                      </p>
                     </div>
 
                     <div>
                       <label
                         htmlFor="location"
-                        className="mb-2 block text-sm font-medium text-slate-300"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Location <span className="text-accent-coral">*</span>
                       </label>
@@ -453,14 +440,12 @@ export function BookingForm() {
                         {...register('location')}
                         type="text"
                         id="location"
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                         placeholder="Brisbane, Australia"
                       />
-                      {errors.location && (
-                        <p className="mt-1 text-sm text-accent-coral">
-                          {errors.location.message}
-                        </p>
-                      )}
+                      <p className="mt-1 text-sm text-accent-coral">
+                        {errors.location?.message}
+                      </p>
                     </div>
                   </motion.div>
                 )}
@@ -478,7 +463,7 @@ export function BookingForm() {
                     <h3 className="text-xl font-semibold text-white">
                       What are your biggest challenges?
                     </h3>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-gray-600">
                       Select all that apply
                     </p>
 
@@ -492,8 +477,8 @@ export function BookingForm() {
                               flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-all duration-200
                               ${
                                 isSelected
-                                  ? 'border-accent-cyan bg-accent-cyan/10'
-                                  : 'border-slate-700 bg-slate-950 hover:border-slate-600'
+                                  ? 'border-accent-amber bg-accent-amber/10'
+                                  : 'border-neutral-700 bg-neutral-900 hover:border-neutral-700'
                               }
                             `}
                           >
@@ -501,20 +486,18 @@ export function BookingForm() {
                               {...register('challenges')}
                               type="checkbox"
                               value={challenge}
-                              className="mt-0.5 h-5 w-5 rounded border-slate-600 bg-slate-900 text-accent-cyan focus:ring-2 focus:ring-accent-cyan/20 focus:ring-offset-0"
+                              className="mt-0.5 h-5 w-5 rounded border-neutral-700 bg-neutral-900 focus:ring-2 focus:ring-brand/20 focus:ring-offset-0"
                             />
-                            <span className="text-sm text-slate-300">
+                            <span className="text-sm">
                               {challenge}
                             </span>
                           </label>
                         )
                       })}
                     </div>
-                    {errors.challenges && (
-                      <p className="text-sm text-accent-coral">
-                        {errors.challenges.message}
-                      </p>
-                    )}
+                    <p className="text-sm text-accent-coral">
+                      {errors.challenges?.message}
+                    </p>
                   </motion.div>
                 )}
 
@@ -528,14 +511,14 @@ export function BookingForm() {
                     transition={{ duration: 0.3 }}
                     className="space-y-6"
                   >
-                    <h3 className="text-xl font-semibold text-white">
+                    <h3 className="text-xl font-semibold">
                       What are your goals?
                     </h3>
 
                     <div>
                       <label
                         htmlFor="goals"
-                        className="mb-2 block text-sm font-medium text-slate-300"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Describe your sales goals{' '}
                         <span className="text-accent-coral">*</span>
@@ -544,20 +527,18 @@ export function BookingForm() {
                         {...register('goals')}
                         id="goals"
                         rows={4}
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                         placeholder="e.g., Generate 50+ qualified leads per month, reduce manual prospecting time, improve conversion rates..."
                       />
-                      {errors.goals && (
-                        <p className="mt-1 text-sm text-accent-coral">
-                          {errors.goals.message}
-                        </p>
-                      )}
+                      <p className="mt-1 text-sm text-accent-coral">
+                        {errors.goals?.message}
+                      </p>
                     </div>
 
                     <div>
                       <label
                         htmlFor="timeline"
-                        className="mb-2 block text-sm font-medium text-slate-300"
+                        className="mb-2 block text-sm font-medium"
                       >
                         When do you want to start?{' '}
                         <span className="text-accent-coral">*</span>
@@ -565,7 +546,7 @@ export function BookingForm() {
                       <select
                         {...register('timeline')}
                         id="timeline"
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                       >
                         <option value="">Select timeline</option>
                         <option value="immediate">Immediately</option>
@@ -573,24 +554,22 @@ export function BookingForm() {
                         <option value="3-6-months">In 3-6 months</option>
                         <option value="6-12-months">In 6-12 months</option>
                       </select>
-                      {errors.timeline && (
-                        <p className="mt-1 text-sm text-accent-coral">
-                          {errors.timeline.message}
-                        </p>
-                      )}
+                      <p className="mt-1 text-sm text-accent-coral">
+                        {errors.timeline?.message}
+                      </p>
                     </div>
 
                     <div>
                       <label
                         htmlFor="currentMRR"
-                        className="mb-2 block text-sm font-medium text-slate-300"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Current Monthly Revenue (Optional)
                       </label>
                       <select
                         {...register('currentMRR')}
                         id="currentMRR"
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white transition-colors focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                       >
                         <option value="">Prefer not to say</option>
                         <option value="0-50k">$0 - $50K</option>
@@ -615,7 +594,7 @@ export function BookingForm() {
                     <h3 className="text-xl font-semibold text-white">
                       Choose your booking method
                     </h3>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-gray-600">
                       Select how you&apos;d like to schedule your strategy call
                     </p>
 
@@ -625,8 +604,8 @@ export function BookingForm() {
                           flex cursor-pointer items-start gap-4 rounded-lg border p-6 transition-all duration-200
                           ${
                             watch('bookingMethod') === 'calendly'
-                              ? 'border-accent-cyan bg-accent-cyan/10'
-                              : 'border-slate-700 bg-slate-950 hover:border-slate-600'
+                              ? 'border-brand bg-brand/10'
+                              : 'border-neutral-700 bg-neutral-900 hover:border-neutral-700'
                           }
                         `}
                       >
@@ -634,13 +613,13 @@ export function BookingForm() {
                           {...register('bookingMethod')}
                           type="radio"
                           value="calendly"
-                          className="mt-1 h-5 w-5 border-slate-600 bg-slate-900 text-accent-cyan focus:ring-2 focus:ring-accent-cyan/20 focus:ring-offset-0"
+                          className="mt-1 h-5 w-5 border-neutral-700 bg-neutral-900 text-brand focus:ring-2 focus:ring-brand/20 focus:ring-offset-0"
                         />
                         <div>
                           <div className="mb-1 font-semibold text-white">
                             Calendly
                           </div>
-                          <p className="text-sm text-slate-400">
+                          <p className="text-sm text-gray-600">
                             Quick and easy self-scheduling. Pick a time that
                             works for you from available slots.
                           </p>
@@ -652,8 +631,8 @@ export function BookingForm() {
                           flex cursor-pointer items-start gap-4 rounded-lg border p-6 transition-all duration-200
                           ${
                             watch('bookingMethod') === 'hubspot'
-                              ? 'border-accent-cyan bg-accent-cyan/10'
-                              : 'border-slate-700 bg-slate-950 hover:border-slate-600'
+                              ? 'border-brand bg-brand/10'
+                              : 'border-neutral-700 bg-neutral-900 hover:border-neutral-700'
                           }
                         `}
                       >
@@ -661,24 +640,22 @@ export function BookingForm() {
                           {...register('bookingMethod')}
                           type="radio"
                           value="hubspot"
-                          className="mt-1 h-5 w-5 border-slate-600 bg-slate-900 text-accent-cyan focus:ring-2 focus:ring-accent-cyan/20 focus:ring-offset-0"
+                          className="mt-1 h-5 w-5 border-neutral-700 bg-neutral-900 text-brand focus:ring-2 focus:ring-brand/20 focus:ring-offset-0"
                         />
                         <div>
                           <div className="mb-1 font-semibold text-white">
                             HubSpot Meetings
                           </div>
-                          <p className="text-sm text-slate-400">
+                          <p className="text-sm text-gray-600">
                             Integrated scheduling with automatic CRM sync. Best
                             for enterprise clients.
                           </p>
                         </div>
                       </label>
                     </div>
-                    {errors.bookingMethod && (
-                      <p className="text-sm text-accent-coral">
-                        {errors.bookingMethod.message}
-                      </p>
-                    )}
+                    <p className="text-sm text-accent-coral">
+                      {errors.bookingMethod?.message}
+                    </p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -723,10 +700,9 @@ export function BookingForm() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="mt-8 text-center text-sm text-slate-500"
+            className="mt-8 flex items-center justify-center gap-1 text-center text-sm text-gray-600"
           >
-            🔒 Your information is secure and will never be shared. Average
-            response time: 2 hours
+            <ShieldCheck className="w-4 h-4 text-accent-coral" /> Your information is secure and will never be shared. Average response time: 2 hours
           </motion.div>
         </motion.div>
       </div>

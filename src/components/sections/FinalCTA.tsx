@@ -85,7 +85,7 @@ export function FinalCTA() {
         {/* Trust elements */}
         <ScrollReveal delay={0.4}>
           <div className="font-mono text-sm text-white/60">
-            30-minute call • No obligation • 5× ROI guarantee
+            30-minute call • No obligation • 5x ROI guarantee
           </div>
         </ScrollReveal>
       </div>

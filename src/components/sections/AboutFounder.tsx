@@ -1,9 +1,10 @@
 "use client"
 
-import { Brain, Database, Plug, Server, Workflow } from "lucide-react"
+import { Brain, CircleCheckBig, Database, Plug, Server, Workflow } from "lucide-react"
 import { Card, CardContent } from "~/components/ui/Card"
 
 import { Badge } from "~/components/ui/Badge"
+import { BrandShimmer } from "../brand-shimmer"
 import { motion } from "framer-motion"
 
 const credentials = [
@@ -16,38 +17,34 @@ const techStack = [
   {
     layer: "Intelligence Layer",
     icon: Brain,
-    color: "accent-amber",
-    content: "GPT-4 + Proprietary Models",
+    content: "OpenAI, Anthropic + Proprietary Models",
   },
   {
     layer: "Orchestration Layer",
     icon: Workflow,
-    color: "accent-cyan",
-    content: "n8n + TypeScript + AWS Lambda",
+    content: "Proprietary AI Agent Orchestration Engine",
   },
   {
     layer: "Data Layer",
     icon: Database,
-    color: "accent-cyan",
     content: "Real-time enrichment (Clay, Clearbit, Apollo)",
   },
   {
     layer: "Integration Layer",
     icon: Plug,
-    color: "state-success",
     content: "HubSpot, Salesforce, Pipedrive APIs",
   },
   {
     layer: "Infrastructure",
     icon: Server,
     color: "primary",
-    content: "AWS with 99.9% uptime SLA",
+    content: "Amazon Web Services with 99.9% uptime SLA",
   },
 ]
 
 export function AboutFounder() {
   return (
-    <section className="relative overflow-hidden bg-slate-900 py-20">
+    <section className="relative overflow-hidden bg-white dark:bg-black py-20">
       {/* Background pattern - subtle code/terminal aesthetic */}
       <div className="absolute inset-0 opacity-[0.03]">
         <div
@@ -70,11 +67,11 @@ export function AboutFounder() {
           >
             {/* Founder photo placeholder */}
             <div className="relative mx-auto w-fit lg:mx-0">
-              <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-transparent bg-gradient-to-br from-accent-cyan via-accent-amber to-state-success p-1 shadow-2xl">
-                <div className="flex h-full w-full items-center justify-center rounded-full bg-slate-800">
-                  <div className="text-center">
-                    <div className="text-5xl font-bold text-white">SK</div>
-                    <div className="mt-2 text-xs text-slate-400">
+              <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-transparent bg-linear-to-br from-accent-amber via-brand to-accent-coral p-1 shadow-2xl">
+                <div className="flex h-full w-full items-center justify-center rounded-full bg-black">
+                  <div className="text-center text-white">
+                    <div className="text-5xl font-bold">SM</div>
+                    <div className="mt-2 text-xs">
                       Founder Photo
                     </div>
                   </div>
@@ -84,44 +81,40 @@ export function AboutFounder() {
 
             {/* Bio section */}
             <div className="space-y-4">
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="text-2xl font-semibold">
                 Built by Sam Marshall
                 <br />
-                <span className="text-accent-cyan">Principal AI Engineer</span>
+                <BrandShimmer text="Principal AI Engineer" className="text-lg" />
               </h3>
 
               {/* Credentials */}
               <div className="space-y-3">
                 {credentials.map((credential, index) => (
                   <div key={index} className="flex items-start gap-3">
-                    <div className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-cyan" />
-                    <p className="text-sm leading-relaxed text-slate-300">
-                      <span
-                        className="font-mono text-accent-cyan"
-                        dangerouslySetInnerHTML={{
-                          __html: credential.replace(
-                            /(TypeScript|AWS|SRE)/g,
-                            '<span class="font-semibold">$1</span>'
-                          ),
-                        }}
-                      />
+                    <div className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-600" />
+                    <p className="text-sm font-mono leading-relaxed text-gray-600">
+                      {credential}
                     </p>
                   </div>
                 ))}
               </div>
 
               {/* Quote block */}
-              <Card className="border-l-4 border-accent-cyan bg-slate-800/50 backdrop-blur-sm">
+              <Card className="bg-gray-50 dark:bg-neutral-800 backdrop-blur-sm">
                 <CardContent className="p-6">
-                  <div className="mb-3 text-5xl leading-none text-accent-amber">
-                    &ldquo;
-                  </div>
-                  <p className="italic leading-relaxed text-slate-200 max-w-prose">
-                    I saw professional services firms struggling with problems I
-                    solved in engineering—manual, repetitive work that should be
-                    automated. Now I build AI agents with production-grade
+                  
+                  <p className="italic flex leading-relaxed text-gray-600 max-w-prose">
+                    <span className="mb-3 pr-2 text-5xl leading-none text-brand">
+                      &ldquo;
+                    </span>
+                    I saw small to medium business struggling with problems I&apos;d
+                    solved in Enterprise. Manual, repetitive work that took sales reps and business owners away from growing their businesses. Now I build AI agents with production-grade
                     reliability, not marketing hype.
+                    <span className="mt-auto rotate-180 text-5xl leading-none text-brand">
+                      &ldquo;
+                    </span>
                   </p>
+                  
                 </CardContent>
               </Card>
             </div>
@@ -136,13 +129,13 @@ export function AboutFounder() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="space-y-4">
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="text-2xl font-bold">
                 Enterprise-Grade Architecture
               </h3>
-              <p className="text-slate-300 max-w-prose">
+              <p className="max-w-prose">
                 Built with the same reliability principles used at scale by
-                leading tech companies. Production-grade monitoring,
-                idempotent operations, and 99.9% uptime SLA.
+                leading tech companies like <span className="font-semibold">Google</span>, <span className="font-semibold">Amazon</span> and <span className="font-semibold">Netflix</span>. Production-grade monitoring,
+                operations, and 99.9% uptime SLA.
               </p>
             </div>
 
@@ -159,19 +152,19 @@ export function AboutFounder() {
                     transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                   >
                     <Card
-                      className={`border-l-4 border-${layer.color} bg-slate-800/50 backdrop-blur-sm transition-all duration-300 hover:bg-slate-800/70`}
+                      className="border-l-4 backdrop-blur-sm transition-all duration-300 bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 border-gray-300 dark:hover:border-brand hover:border-brand"
                     >
                       <CardContent className="flex items-center gap-4 p-4">
                         <div
-                          className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-${layer.color}/10`}
+                          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg"
                         >
-                          <Icon className={`h-6 w-6 text-${layer.color}`} />
+                          <Icon className="h-6 w-6 text-brand" />
                         </div>
                         <div className="flex-1">
-                          <div className="mb-1 text-sm font-semibold text-white">
+                          <div className="mb-1 text-sm font-semibold">
                             {layer.layer}
                           </div>
-                          <div className="font-mono text-xs text-slate-400">
+                          <div className="font-mono text-xs text-gray-600">
                             {layer.content}
                           </div>
                         </div>
@@ -184,13 +177,16 @@ export function AboutFounder() {
 
             {/* Trust badges */}
             <div className="flex flex-wrap items-center justify-center gap-6 pt-6 lg:justify-start">
-              <Badge variant="default" className="bg-slate-800 text-slate-300">
+              <Badge variant="default" className="text-gray-600 border-gray-300 bg-white dark:bg-black dark:border-neutral-800">
+                <CircleCheckBig className="h-3 w-3 mr-1.5 text-state-success" />
                 SOC 2 Compliant
               </Badge>
-              <Badge variant="default" className="bg-slate-800 text-slate-300">
+              <Badge variant="default" className="text-gray-600 border-gray-300 bg-white dark:bg-black dark:border-neutral-800">
+                <CircleCheckBig className="h-3 w-3 mr-1.5 text-state-success" />
                 AWS Partner
               </Badge>
-              <Badge variant="default" className="bg-slate-800 text-slate-300">
+              <Badge variant="default" className="text-gray-600 border-gray-300 bg-white dark:bg-black dark:border-neutral-800">
+                <CircleCheckBig className="h-3 w-3 mr-1.5 text-state-success" />
                 GDPR Compliant
               </Badge>
             </div>

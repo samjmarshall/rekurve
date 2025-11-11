@@ -1,11 +1,11 @@
 'use client'
 
-import { Check } from 'lucide-react'
-import { motion } from 'framer-motion'
-import type { PricingTier } from '~/types'
 import { Badge } from '~/components/ui/Badge'
 import { Button } from '~/components/ui/Button'
+import { Check } from 'lucide-react'
+import type { PricingTier } from '~/types'
 import { formatCurrency } from '~/lib/utils'
+import { motion } from 'framer-motion'
 
 const pricingTiers: PricingTier[] = [
   {
@@ -96,22 +96,8 @@ export function Pricing() {
   return (
     <section
       id="pricing"
-      className="relative overflow-hidden bg-slate-950 py-24"
+      className="relative overflow-hidden bg-white dark:bg-black py-24"
     >
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 opacity-[0.03]">
-        <div
-          className="h-full w-full"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, #94a3b8 1px, transparent 1px),
-              linear-gradient(to bottom, #94a3b8 1px, transparent 1px)
-            `,
-            backgroundSize: '64px 64px',
-          }}
-        />
-      </div>
-
       <div className="container relative mx-auto px-4">
         {/* Heading */}
         <motion.div
@@ -121,7 +107,7 @@ export function Pricing() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="mb-16 text-center"
         >
-          <h2 className="mb-4 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
+          <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
             Simple, Transparent Pricing
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-slate-400">

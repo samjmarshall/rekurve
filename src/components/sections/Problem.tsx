@@ -3,7 +3,7 @@
 import { Card, CardContent } from '~/components/ui/Card'
 import { Clock, DollarSign, TrendingDown } from 'lucide-react'
 
-import { Badge } from '../badge'
+import { BrandShimmer } from '../brand-shimmer'
 import { ScrollReveal } from '~/components/motion/ScrollReveal'
 import { formatCurrency } from '~/lib/utils'
 
@@ -45,7 +45,7 @@ export default function Problem() {
             {/* <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Here&apos;s exactly what it&apos;s costing you:
             </p> */}
-            <Badge text="Here&apos;s exactly what it&apos;s costing you:" />
+            <BrandShimmer text="Here&apos;s exactly what it&apos;s costing you:" />
           </div>
         </ScrollReveal>
 

@@ -1,7 +1,8 @@
 'use client'
 
-import { Zap, TrendingUp, Target, Mail, Search, MessageSquare } from 'lucide-react'
 import { Card, CardContent } from '~/components/ui/Card'
+import { Mail, MessageSquare, Search, Target, TrendingUp, Zap } from 'lucide-react'
+
 import { Badge } from '~/components/ui/Badge'
 import { ScrollReveal } from '~/components/motion/ScrollReveal'
 import { formatNumber } from '~/lib/utils'
@@ -26,28 +27,19 @@ const keyCapabilities = [
 
 export default function Solution() {
   return (
-    <section className="relative py-24 bg-slate-50">
-      {/* Subtle grid pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.015]"
-        style={{
-          backgroundImage: `linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)`,
-          backgroundSize: '64px 64px'
-        }}
-      />
-
+    <section className="relative py-24 bg-white dark:bg-black">
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Heading */}
         <ScrollReveal>
           <div className="text-center mb-16">
             <h2
-              className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4"
+              className="text-4xl md:text-5xl font-bold tracking-tight mb-4"
               style={{ letterSpacing: '-0.02em' }}
             >
-              Meet Your <span className="text-accent-cyan">24/7 Virtual SDR</span>
+              Meet Your <span className="text-brand">24/7 Sales Rep</span>
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Not automation. Not chatbots. Intelligent agents that research, qualify, and engage autonomously.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Not n8n automation. Not chatbots. Intelligent agents that research, qualify, and engage autonomously.
             </p>
           </div>
         </ScrollReveal>

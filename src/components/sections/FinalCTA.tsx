@@ -45,7 +45,7 @@ export function FinalCTA() {
             {/* Secondary link */}
             <a
               href="mailto:contact@rekurve.ai"
-              className="font-mono text-white underline underline-offset-4 transition-colors hover:text-brand"
+              className="font-mono underline underline-offset-4 transition-colors hover:text-brand"
             >
               Or email us: contact@rekurve.ai
             </a>

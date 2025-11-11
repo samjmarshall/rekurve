@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from 'react'
-import { Search } from 'lucide-react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/Accordion'
+
 import { ScrollReveal } from '~/components/motion/ScrollReveal'
+import { Search } from 'lucide-react'
+import { useState } from 'react'
 
 interface FAQItem {
   id: string
@@ -102,18 +103,15 @@ export function FAQ() {
   })
 
   return (
-    <section className="relative bg-slate-50 py-24">
-      {/* Subtle paper texture */}
-      <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-[0.03]" />
-
+    <section className="relative bg-white dark:bg-black py-24">
       <div className="container relative mx-auto max-w-4xl px-6">
         <ScrollReveal>
           <div className="mb-12 text-center">
-            <h2 className="mb-4 font-sans text-4xl font-bold tracking-tight text-primary">
+            <h2 className="mb-4 font-sans text-4xl font-bold tracking-tight">
               Frequently Asked Questions
             </h2>
-            <p className="text-lg text-primary/70">
-              Everything you need to know about deploying your AI sales agent
+            <p className="text-lg">
+              Everything you need to know about your AI sales agent
             </p>
           </div>
         </ScrollReveal>
@@ -122,13 +120,13 @@ export function FAQ() {
         <ScrollReveal delay={0.1}>
           <div className="mb-6">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-primary/40" />
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search questions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-primary/20 bg-white py-4 pl-12 pr-4 font-mono text-sm text-primary transition-all focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                className="w-full rounded-lg border border-gray-300 dark:border-neutral-800 py-4 pl-12 pr-4 font-mono text-sm  transition-all focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/80"
               />
             </div>
           </div>
@@ -147,24 +145,24 @@ export function FAQ() {
                 <AccordionItem
                   key={item.id}
                   value={item.id}
-                  className={`rounded-lg border-l-4 bg-white p-6 shadow-sm transition-all hover:bg-slate-50 ${
+                  className={`rounded-lg border-l-4 bg-gray-50 dark:bg-neutral-800 p-6 shadow-sm transition-all hover:bg-gray-200 dark:hover:bg-neutral-900 ${
                     openItems.includes(item.id)
-                      ? 'border-l-accent-amber'
-                      : 'border-l-accent-cyan'
+                      ? 'border-l-brand'
+                      : 'border-l-gray-300 dark:border-l-neutral-700'
                   }`}
                 >
                   <AccordionTrigger className="text-left hover:no-underline">
                     <div>
-                      <div className="mb-1 text-xs font-mono text-accent-cyan uppercase tracking-wide">
+                      <div className="mb-1 text-xs font-mono text-brand uppercase tracking-wide">
                         {item.category}
                       </div>
-                      <div className="text-lg font-semibold text-primary">
+                      <div className="text-lg font-semibold text-black dark:text-white">
                         {item.question}
                       </div>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className="pt-4 text-base leading-relaxed text-primary/80">
+                    <div className="pt-4 text-base leading-relaxed text-gray-700 dark:text-gray-300">
                       {item.answer}
                     </div>
                   </AccordionContent>
@@ -172,13 +170,13 @@ export function FAQ() {
               ))}
             </Accordion>
           ) : (
-            <div className="rounded-lg bg-white p-12 text-center shadow-sm">
-              <p className="text-lg text-primary/60">
+            <div className="rounded-lg bg-gray-50 dark:bg-neutral-900 p-12 text-center shadow-sm">
+              <p className="text-lg">
                 No questions found matching &ldquo;{searchQuery}&rdquo;
               </p>
               <button
                 onClick={() => setSearchQuery('')}
-                className="mt-4 font-mono text-sm text-accent-cyan hover:text-accent-amber transition-colors"
+                className="mt-4 font-mono text-sm text-brand hover:text-brand/70 transition-colors"
               >
                 Clear search
               </button>
@@ -194,7 +192,7 @@ export function FAQ() {
             </p>
             <a
               href="#booking-form"
-              className="inline-flex items-center font-mono text-accent-cyan hover:text-accent-amber transition-colors underline underline-offset-4"
+              className="inline-flex items-center font-mono text-accent-amber hover:text-accent-amber/70 transition-colors underline underline-offset-4"
             >
               Book a free 30-minute call
             </a>

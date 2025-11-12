@@ -15,6 +15,7 @@ import {
 import { Button } from '~/components/ui/Button'
 import { Card } from '~/components/ui/Card'
 import { Checkbox } from '../ui/checkbox'
+import { cn } from '~/lib/utils'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { z } from 'zod'
@@ -580,84 +581,6 @@ export function BookingForm() {
                     </div>
                   </motion.div>
                 )}
-
-                {/* Step 5: Booking Method */}
-                {currentStep === 5 && (
-                  <motion.div
-                    key="step5"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-6"
-                  >
-                    <h3 className="text-xl font-semibold text-white">
-                      Choose your booking method
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      Select how you&apos;d like to schedule your strategy call
-                    </p>
-
-                    <div className="space-y-4">
-                      <label
-                        className={`
-                          flex cursor-pointer items-start gap-4 rounded-lg border p-6 transition-all duration-200
-                          ${
-                            watch('bookingMethod') === 'calendly'
-                              ? 'border-brand bg-brand/10'
-                              : 'border-neutral-700 bg-neutral-900 hover:border-neutral-700'
-                          }
-                        `}
-                      >
-                        <input
-                          {...register('bookingMethod')}
-                          type="radio"
-                          value="calendly"
-                          className="mt-1 h-5 w-5 border-neutral-700 bg-neutral-900 text-brand focus:ring-2 focus:ring-brand/20 focus:ring-offset-0"
-                        />
-                        <div>
-                          <div className="mb-1 font-semibold text-white">
-                            Calendly
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            Quick and easy self-scheduling. Pick a time that
-                            works for you from available slots.
-                          </p>
-                        </div>
-                      </label>
-
-                      <label
-                        className={`
-                          flex cursor-pointer items-start gap-4 rounded-lg border p-6 transition-all duration-200
-                          ${
-                            watch('bookingMethod') === 'hubspot'
-                              ? 'border-brand bg-brand/10'
-                              : 'border-neutral-700 bg-neutral-900 hover:border-neutral-700'
-                          }
-                        `}
-                      >
-                        <input
-                          {...register('bookingMethod')}
-                          type="radio"
-                          value="hubspot"
-                          className="mt-1 h-5 w-5 border-neutral-700 bg-neutral-900 text-brand focus:ring-2 focus:ring-brand/20 focus:ring-offset-0"
-                        />
-                        <div>
-                          <div className="mb-1 font-semibold text-white">
-                            HubSpot Meetings
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            Integrated scheduling with automatic CRM sync. Best
-                            for enterprise clients.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                    <p className="text-sm text-accent-coral">
-                      {errors.bookingMethod?.message}
-                    </p>
-                  </motion.div>
-                )}
               </AnimatePresence>
 
               {/* Navigation Buttons */}
@@ -674,7 +597,11 @@ export function BookingForm() {
                   Back
                 </Button>
 
-                {currentStep < 5 ? (
+                {currentStep === 4 ? (
+                  <Button type="submit" variant="primary" size="lg">
+                    Book Your Call
+                  </Button>
+                ) : (
                   <Button
                     type="button"
                     variant="primary"
@@ -684,10 +611,6 @@ export function BookingForm() {
                   >
                     Next
                     <ArrowRight className="h-4 w-4" />
-                  </Button>
-                ) : (
-                  <Button type="submit" variant="primary" size="lg">
-                    Book Your Call
                   </Button>
                 )}
               </div>

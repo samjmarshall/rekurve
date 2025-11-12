@@ -187,7 +187,7 @@ export function FAQ() {
         {/* Still have questions CTA */}
         <ScrollReveal delay={0.3}>
           <div className="mt-12 text-center">
-            <p className="mb-4 text-lg text-primary/70">
+            <p className="mb-4 text-lg text-gray-600">
               Still have questions?
             </p>
             <a

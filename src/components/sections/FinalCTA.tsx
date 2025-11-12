@@ -1,94 +1,133 @@
 "use client"
 
-import { ArrowRight } from 'lucide-react'
-import { Button } from '~/components/ui/Button'
+import { ArrowRight, Mail } from 'lucide-react'
+
+import { BrandShimmer } from '../brand-shimmer';
+import { Button } from '../ui/Button';
+import React from "react";
 import { ScrollReveal } from '~/components/motion/ScrollReveal'
+import { cn } from "~/lib/utils";
 
 export function FinalCTA() {
   return (
-    <section className="relative overflow-hidden bg-linear-to-br dar:from-black dark:via-neutral-900 dark:to-black py-24">
-      {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(112,179,219,0.1),transparent_50%),radial-gradient(circle_at_70%_80%,rgba(251,191,36,0.08),transparent_50%)] animate-pulse-slow" />
-
-      {/* Grid overlay */}
-      <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
-
-      <div className="container relative mx-auto max-w-4xl px-6 text-center">
-        <ScrollReveal>
-          <div className="mb-8">
-            <h2 className="mb-4 font-sans text-5xl font-bold tracking-tight">
-              Ready to Recover 20+ Hours Weekly?
+    <section className="w-full grid grid-cols-1 md:grid-cols-3 my-20 md:my-40 justify-start relative z-20 max-w-7xl mx-auto bg-linear-to-br from-gray-100 to-white dark:from-neutral-900 dark:to-neutral-950">
+        <GridLineHorizontal className="top-0" offset="200px" />
+        <GridLineHorizontal className="bottom-0 top-auto" offset="200px" />
+        <GridLineVertical className="left-0" offset="80px" />
+        <GridLineVertical className="left-auto right-0" offset="80px" />
+        <div className="md:col-span-2 p-8 md:p-14">
+          <ScrollReveal>
+            <h2 className="text-left text-neutral-500 dark:text-neutral-200 text-xl md:text-3xl tracking-tight font-medium">
+              Sell your services with the{" "}
+              <BrandShimmer className="font-bold" text="speed of light" />
             </h2>
-            <p className="mx-auto max-w-2xl text-xl leading-relaxed text-gray-500">
-              Join professional services firms across Brisbane and Melbourne deploying autonomous AI sales agents.
-              Your 24/7 virtual Sales Rep is one call away.
+
+            <p className="text-left text-neutral-500 mt-4 max-w-lg dark:text-neutral-200 text-base tracking-tight font-medium">
+              Get the best in class support for the most advanced sales software.
             </p>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal delay={0.2}>
-          <div className="mb-8 flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
-            {/* Primary CTA */}
-            <Button
-              size="xl"
-              variant="primary"
-              className="group relative bg-accent-amber shadow-2xl shadow-accent-amber/30 hover:scale-110 hover:shadow-accent-amber/50 transition-all duration-300"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                Book Your Free Strategy Session
-                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </span>
-              {/* Pulsing glow effect */}
-              <span className="absolute inset-0 rounded-lg bg-accent-amber opacity-30 blur-xl animate-pulse" />
-            </Button>
-
-            {/* Secondary link */}
-            <a
-              href="mailto:contact@rekurve.ai"
-              className="font-mono underline underline-offset-4 transition-colors hover:text-brand"
-            >
-              Or email us: contact@rekurve.ai
-            </a>
-          </div>
-        </ScrollReveal>
-
-        {/* Value props recap */}
-        <ScrollReveal delay={0.3}>
-          <div className="mb-8 grid gap-6 sm:grid-cols-3">
-            <div className="rounded-lg border border-brand bg-gray-50 dark:bg-neutral-800 p-6 backdrop-blur-sm">
-              <div className="mb-2 font-mono text-3xl font-bold">
-                20+ hrs
-              </div>
-              <div className="text-sm text-gray-600">
-                Saved every week
-              </div>
+          </ScrollReveal>
+  
+          <ScrollReveal delay={0.2}>
+            <div className="flex items-start sm:items-center flex-col sm:flex-row sm:gap-4">
+              <Button variant="primary" className="mt-8 flex items-center space-x-2">
+                Book Your Call
+                <ArrowRight className="group-hover:translate-x-1 h-5 w-5 stroke-1 transition-transform duration-200" />
+              </Button>
+              <Button variant="ghost" className="mt-8 flex items-center">
+                Or email us: contact@rekurve.ai
+                <Mail className="group-hover:translate-x-1 stroke-1 transition-transform duration-200" />
+              </Button>
             </div>
-            <div className="rounded-lg border border-brand bg-gray-50 dark:bg-neutral-800 p-6 backdrop-blur-sm">
-              <div className="mb-2 font-mono text-3xl font-bold">
-                $100K+
-              </div>
-              <div className="text-sm text-gray-600">
-                Pipeline growth in 90 days
-              </div>
-            </div>
-            <div className="rounded-lg border border-brand bg-gray-50 dark:bg-neutral-800 p-6 backdrop-blur-sm">
-              <div className="mb-2 font-mono text-3xl font-bold">
-                8.6x ROI
-              </div>
-              <div className="text-sm text-gray-600">
-                Average in Year 1
-              </div>
-            </div>
-          </div>
-        </ScrollReveal>
+          </ScrollReveal>
+        </div>
 
-        {/* Trust elements */}
         <ScrollReveal delay={0.4}>
-          <div className="font-mono text-sm text-white/60">
-            30-minute call • No obligation • 5x ROI guarantee
+          <div className="border-t h-full md:border-t-0 md:border-l border-dashed p-8 md:p-14">
+            <p className="text-base text-neutral-700 dark:text-neutral-200">
+              &quot;This is the best product & service ever when it comes to sales automation. 10/10 recommended.
+              I can&apos;t wait to see what happens with this
+              product.&quot;
+            </p>
+            <div className="flex flex-col text-sm items-start mt-4 gap-1">
+              <p className="font-bold text-neutral-800 dark:text-neutral-200">
+                Michael Scarn
+              </p>
+              <p className="text-gray-600 dark:text-neutral-400">
+                Side projects builder
+              </p>
+            </div>
           </div>
         </ScrollReveal>
-      </div>
     </section>
   )
 }
+
+const GridLineHorizontal = ({
+  className,
+  offset,
+}: {
+  className?: string;
+  offset?: string;
+}) => {
+  return (
+    <div
+      style={
+        {
+          "--background": "#ffffff",
+          "--color": "rgba(0, 0, 0, 0.2)",
+          "--height": "1px",
+          "--width": "5px",
+          "--fade-stop": "90%",
+          "--offset": offset || "200px", //-100px if you want to keep the line inside
+          "--color-dark": "rgba(255, 255, 255, 0.2)",
+          maskComposite: "exclude",
+        } as React.CSSProperties
+      }
+      className={cn(
+        "absolute w-[calc(100%+var(--offset))] h-[var(--height)] left-[calc(var(--offset)/2*-1)]",
+        "bg-[linear-gradient(to_right,var(--color),var(--color)_50%,transparent_0,transparent)]",
+        "[background-size:var(--width)_var(--height)]",
+        "[mask:linear-gradient(to_left,var(--background)_var(--fade-stop),transparent),_linear-gradient(to_right,var(--background)_var(--fade-stop),transparent),_linear-gradient(black,black)]",
+        "[mask-composite:exclude]",
+        "z-30",
+        "dark:bg-[linear-gradient(to_right,var(--color-dark),var(--color-dark)_50%,transparent_0,transparent)]",
+        className
+      )}
+    ></div>
+  );
+};
+
+const GridLineVertical = ({
+  className,
+  offset,
+}: {
+  className?: string;
+  offset?: string;
+}) => {
+  return (
+    <div
+      style={
+        {
+          "--background": "#ffffff",
+          "--color": "rgba(0, 0, 0, 0.2)",
+          "--height": "5px",
+          "--width": "1px",
+          "--fade-stop": "90%",
+          "--offset": offset || "150px", //-100px if you want to keep the line inside
+          "--color-dark": "rgba(255, 255, 255, 0.2)",
+          maskComposite: "exclude",
+        } as React.CSSProperties
+      }
+      className={cn(
+        "absolute h-[calc(100%+var(--offset))] w-[var(--width)] top-[calc(var(--offset)/2*-1)]",
+        "bg-[linear-gradient(to_bottom,var(--color),var(--color)_50%,transparent_0,transparent)]",
+        "[background-size:var(--width)_var(--height)]",
+        "[mask:linear-gradient(to_top,var(--background)_var(--fade-stop),transparent),_linear-gradient(to_bottom,var(--background)_var(--fade-stop),transparent),_linear-gradient(black,black)]",
+        "[mask-composite:exclude]",
+        "z-30",
+        "dark:bg-[linear-gradient(to_bottom,var(--color-dark),var(--color-dark)_50%,transparent_0,transparent)]",
+        className
+      )}
+    ></div>
+  );
+};

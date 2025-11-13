@@ -76,7 +76,7 @@ export function Hero() {
       <div className="text-balance relative z-20 mx-auto mb-4 mt-4 max-w-4xl text-center text-3xl font-semibold tracking-tight text-gray-700 dark:text-neutral-300 md:text-7xl">
         <Balancer>
           <motion.h2>
-            {"Recover 20+ Hours Weekly and Add $100K to Your Pipeline in 90 Days"
+            {"Recover 20+ Hours Weekly or Add $100K to Your Pipeline in 90 Days"
               .split(" ")
               .map((word, index) => (
                 <motion.span
@@ -109,7 +109,9 @@ export function Hero() {
         transition={{ duration: 0.2, delay: 0.5 }}
         className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center text-base/6 text-gray-600 dark:text-gray-200"
       >
-        Autonomous AI sales agents for professional services firms - built by a seasoned Engineer & Entrepreneur who understand both the code and the business outcomes.
+        End-to-End AI sales agents, from Customer enquiry &rarr; Quote.
+        <br />
+        For service businesses spending 20+ hours a week quoting.
       </motion.p>
       <motion.div
         initial={{ opacity: 0, y: 10 }}

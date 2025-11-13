@@ -110,9 +110,16 @@ export function FAQ() {
             <h2 className="mb-4 font-sans text-4xl font-bold tracking-tight">
               Frequently Asked Questions
             </h2>
-            <p className="text-lg">
-              Everything you need to know about your AI sales agent
-            </p>
+            <p className="mx-auto max-w-lg text-center text-base text-neutral-600 dark:text-neutral-50">
+              We are here to help you with any questions you may have. If you
+              don&apos;t find what you need, please contact us at{" "}
+              <a
+                href="mailto:support@rekurve.ai"
+                className="text-brand underline"
+              >
+                support@rekurve.ai
+              </a>
+      </p>
           </div>
         </ScrollReveal>
 

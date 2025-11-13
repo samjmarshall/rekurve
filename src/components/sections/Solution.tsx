@@ -1,29 +1,11 @@
 'use client'
 
-import { Card, CardContent } from '~/components/ui/Card'
-import { Mail, MessageSquare, Search, Target, TrendingUp, Zap } from 'lucide-react'
+import { Clock, Mail, MessageSquare, Search, Target, TrendingUp } from 'lucide-react'
 
-import { Badge } from '~/components/ui/Badge'
+import { GlowingEffect } from "~/components/ui/glowing-effect";
+import { NativeIcon } from '~/icons/bento-icons';
+import type React from 'react';
 import { ScrollReveal } from '~/components/motion/ScrollReveal'
-import { formatNumber } from '~/lib/utils'
-
-const keyCapabilities = [
-  {
-    icon: Search,
-    title: 'Intelligent Lead Research',
-    description: 'AI agents analyze prospects across multiple data sources, enriching profiles with buying signals and firmographic data in real-time.'
-  },
-  {
-    icon: Mail,
-    title: 'Multi-Channel Outreach',
-    description: 'Coordinated engagement across Email, LinkedIn, and SMS with adaptive messaging that responds to prospect behavior.'
-  },
-  {
-    icon: MessageSquare,
-    title: 'Adaptive Messaging',
-    description: 'Dynamic content generation that personalizes based on industry, role, company size, and engagement patterns.'
-  }
-]
 
 export default function Solution() {
   return (
@@ -45,168 +27,171 @@ export default function Solution() {
         </ScrollReveal>
 
         {/* Bento Grid Layout */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-12">
-          {/* Large Card - Main Value Prop */}
-          <ScrollReveal delay={0.1}>
-            <Card className="lg:col-span-2 bg-gradient-to-br from-slate-900 to-slate-800 border-accent-cyan/20 hover:border-accent-cyan/40 transition-all duration-300">
-              <CardContent className="p-10">
-                <div className="flex flex-col md:flex-row items-start gap-8">
-                  {/* Icon */}
-                  <div className="flex-shrink-0">
-                    <div
-                      className="w-16 h-16 rounded-xl flex items-center justify-center"
-                      style={{
-                        background: 'linear-gradient(135deg, oklch(0.70 0.15 195), oklch(0.75 0.15 75))'
-                      }}
-                    >
-                      <Zap className="w-8 h-8 text-white" strokeWidth={2} />
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1">
-                    <h3 className="text-3xl font-bold text-white mb-4">
-                      Recover <span className="text-accent-amber">20+ Hours Weekly</span>
-                    </h3>
-                    <p className="text-lg text-slate-300 leading-relaxed mb-6">
-                      AI agents handle lead research, CRM updates, follow-up sequencing, and meeting scheduling automatically—freeing your team to focus on high-value conversations.
-                    </p>
-
-                    {/* Enhanced workflow visualization */}
-                    <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
-                      <div className="flex items-center gap-3 text-sm font-mono">
-                        {/* Step 1: Lead Research */}
-                        <div className="flex items-center gap-2 opacity-100">
-                          <div className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse" />
-                          <span className="text-slate-300">Lead Research</span>
-                        </div>
-
-                        {/* Connector 1 */}
-                        <div className="flex-1 h-[1px] bg-gradient-to-r from-accent-cyan/60 to-accent-cyan/30 min-w-[20px]" />
-
-                        {/* Step 2: Qualification */}
-                        <div className="flex items-center gap-2 opacity-70">
-                          <div
-                            className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse"
-                            style={{ animationDelay: '0.3s' }}
-                          />
-                          <span className="text-slate-400">Qualification</span>
-                        </div>
-
-                        {/* Connector 2 */}
-                        <div className="flex-1 h-[1px] bg-gradient-to-r from-accent-cyan/30 to-accent-cyan/20 min-w-[20px]" />
-
-                        {/* Step 3: Outreach */}
-                        <div className="flex items-center gap-2 opacity-50">
-                          <div
-                            className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse"
-                            style={{ animationDelay: '0.6s' }}
-                          />
-                          <span className="text-slate-500">Outreach</span>
-                        </div>
-
-                        {/* Connector 3 */}
-                        <div className="flex-1 h-[1px] bg-gradient-to-r from-accent-cyan/20 to-state-success/60 min-w-[20px]" />
-
-                        {/* Step 4: Meeting Booked (Success) */}
-                        <div className="flex items-center gap-2 opacity-100">
-                          <div
-                            className="w-3 h-3 rounded-full bg-state-success animate-pulse shadow-lg shadow-state-success/50"
-                            style={{ animationDelay: '0.9s' }}
-                          />
-                          <span className="text-state-success font-semibold">Meeting Booked</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </ScrollReveal>
-
-          {/* Medium Card 1 - Pipeline Growth */}
-          <ScrollReveal delay={0.2}>
-            <Card className="bg-white hover:-translate-y-1 transition-all duration-300">
-              <CardContent className="p-8">
-                <div
-                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-6"
-                  style={{
-                    background: 'linear-gradient(135deg, oklch(0.70 0.15 195), oklch(0.70 0.18 145))'
-                  }}
-                >
-                  <TrendingUp className="w-6 h-6 text-white" strokeWidth={2} />
-                </div>
-
-                <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                  Add <span className="text-accent-cyan">$100K+</span> to Pipeline
-                </h3>
-                <p className="text-slate-600 leading-relaxed mb-4">
-                  Never miss a lead. Instant 24/7 response. Personalized multi-channel outreach.
-                </p>
-
-                <Badge variant="cyan" className="text-sm font-mono">
-                  {formatNumber(3)}-{formatNumber(5)}x more qualified meetings
-                </Badge>
-              </CardContent>
-            </Card>
-          </ScrollReveal>
-
-          {/* Medium Card 2 - ROI */}
-          <ScrollReveal delay={0.3}>
-            <Card className="bg-white hover:-translate-y-1 transition-all duration-300">
-              <CardContent className="p-8">
-                <div
-                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-6"
-                  style={{
-                    background: 'linear-gradient(135deg, oklch(0.70 0.18 145), oklch(0.75 0.15 75))'
-                  }}
-                >
-                  <Target className="w-6 h-6 text-white" strokeWidth={2} />
-                </div>
-
-                <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                  <span className="text-state-success">{formatNumber(5)}-{formatNumber(10)}x ROI</span> in 120 Days
-                </h3>
-                <p className="text-slate-600 leading-relaxed mb-4">
-                  Typical clients see full payback in 2 months, then continuous compounding value.
-                </p>
-
-                <Badge variant="success" className="text-sm font-mono">
-                  Average ROI: {formatNumber(8.6)}x in Year 1
-                </Badge>
-              </CardContent>
-            </Card>
-          </ScrollReveal>
-        </div>
-
-        {/* Key Capabilities Grid */}
-        <ScrollReveal delay={0.4}>
-          <div className="bg-white rounded-2xl border border-slate-200 p-8">
-            <h3 className="text-2xl font-bold text-slate-900 mb-8 text-center">
-              How Your AI Sales Agent Works
-            </h3>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {keyCapabilities.map((capability, index) => {
-                const Icon = capability.icon
-                return (
-                  <div key={index} className="text-center">
-                    <div className="inline-flex p-3 rounded-lg bg-accent-cyan/10 mb-4">
-                      <Icon className="w-6 h-6 text-accent-cyan" strokeWidth={2} />
-                    </div>
-                    <h4 className="text-lg font-semibold text-slate-900 mb-2">
-                      {capability.title}
-                    </h4>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      {capability.description}
-                    </p>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+        <ScrollReveal delay={0.1}>
+          <GlowingBento />
         </ScrollReveal>
       </div>
     </section>
   )
 }
+
+export function GlowingBento() {
+  return (
+    <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-5 lg:gap-4 xl:grid-rows-3">
+      {/* Benefits */}
+      <GridItem
+        area="md:[grid-area:1/1/2/7] xl:[grid-area:1/1/1/5]"
+        icon={<Clock className="h-4 w-4 text-primary" />}
+        title="Recover 20+ Hours Weekly"
+        description="AI agents handle lead research, qualification, CRM updates, follow-up sequencing, meeting scheduling and quote generation. Freeing your team to focus on high-value conversations."
+      />
+
+      <GridItem
+        area="md:[grid-area:1/1/3/7] xl:[grid-area:1/5/1/9]"
+        icon={<Target className="h-4 w-4 text-primary" />}
+        title="5-10x ROI in 120 Days"
+        description="Typical clients see full payback in 2 months, then continuous compounding value. Average ROI: 8.6x in Year 1"
+      />
+
+      <GridItem
+        area="md:[grid-area:1/7/3/13] xl:[grid-area:1/9/1/13]"
+        icon={<TrendingUp className="h-4 w-4 text-primary" />}
+        title="Add $100K+ to Pipeline"
+        description="Never miss a lead. Instant 24/7 response. Personalized multi-channel integration."
+      />
+
+      {/* Workflow */}
+      <GridItem area="md:[grid-area:1/7/2/13] xl:[grid-area:2/1/2/13]">
+        {/* Enhanced workflow visualization */}
+        <ScrollReveal delay={0.2} className="flex h-full w-full px-10 items-center justify-center">
+          <div className="flex w-full items-center gap-3 text-sm font-mono">
+            {/* Step 1: Lead Research */}
+            <div className="flex items-center gap-2 opacity-100">
+              <div className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse" />
+              <span className="text-slate-300">Lead Research</span>
+            </div>
+
+            {/* Connector 1 */}
+            <div className="flex-1 h-[1px] bg-gradient-to-r from-accent-cyan/60 to-accent-cyan/30 min-w-[20px]" />
+
+            {/* Step 2: Qualification */}
+            <div className="flex items-center gap-2 opacity-70">
+              <div
+                className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse"
+                style={{ animationDelay: '0.3s' }}
+              />
+              <span className="text-slate-400">Qualification</span>
+            </div>
+
+            {/* Connector 2 */}
+            <div className="flex-1 h-px bg-linear-to-r from-accent-cyan/30 to-accent-cyan/20 min-w-[20px]" />
+
+            {/* Step 3: Follow-up */}
+            <div className="flex items-center gap-2 opacity-50">
+              <div
+                className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse"
+                style={{ animationDelay: '0.6s' }}
+              />
+              <span className="text-slate-500">Follow-up</span>
+            </div>
+
+            {/* Connector 3 */}
+            <div className="flex-1">
+              <div className="relative left-24 w-20 h-px bg-linear-to-r from-accent-cyan/20 to-state-success/60 min-w-5" />
+              <div className="relative left-24 h-5 w-px bg-state-success/30" />
+              <div className="h-px w-24.25 bg-linear-to-r from-accent-cyan/20 to-state-success/30 min-w-5" />
+              <div className="relative left-24 h-5 w-px bg-state-success/30" />
+              <div className="relative left-24 w-20 h-px bg-linear-to-r bg-state-success/30 to-state-success/60 min-w-5" />
+            </div>
+            
+
+            {/* Step 4: (Success) */}
+            <div className="flex flex-col gap-5.5">
+              <div className="flex items-center space-x-2 opacity-100">
+                <div
+                  className="w-3 h-3 rounded-full bg-state-success animate-pulse shadow-lg shadow-state-success/50"
+                  style={{ animationDelay: '0.9s' }}
+                />
+                <span className="text-state-success font-semibold">Meeting Booked</span>
+              </div>
+              <div className="flex items-center space-x-2 opacity-100">
+                <div
+                  className="w-3 h-3 rounded-full bg-state-success animate-pulse shadow-lg shadow-state-success/50"
+                  style={{ animationDelay: '0.9s' }}
+                />
+                <span className="text-state-success font-semibold">Quote Sent</span>
+              </div>
+            </div>
+          </div>
+        </ScrollReveal>
+      </GridItem>
+
+      {/* How it works */}
+      <GridItem
+        area="md:[grid-area:1/1/2/7] xl:[grid-area:3/1/3/5]"
+        icon={<Search className="h-4 w-4 text-primary" />}
+        title="Research"
+        description="AI agents handle lead research. Analyzing prospects across multiple data sources. Enriching profiles with buying signals and data in real-time"
+      />
+
+      <GridItem
+        area="md:[grid-area:2/1/3/7] xl:[grid-area:3/5/3/9]"
+        icon={<Mail className="h-4 w-4 text-primary" />}
+        title="Qualification"
+        description="Coordinated engagement across Email, Social Media, and SMS with adaptive messaging that responds to prospect behavior with proven follow-up sequencing based on your unique sales process."
+      />
+
+      <GridItem
+        area="md:[grid-area:2/7/3/13] xl:[grid-area:3/9/3/13]"
+        icon={<MessageSquare className="h-4 w-4 text-primary" />}
+        title="Booking"
+        description="Dynamic lead progression with meeting scheduling and quote generation based on your product and service offerings."
+      />
+    </ul>
+  );
+}
+
+interface GridItemProps {
+  area: string;
+  icon?: React.ReactNode;
+  title?: string;
+  description?: React.ReactNode;
+}
+
+const GridItem = ({ area, icon, title, description, children }: React.PropsWithChildren<GridItemProps>) => {
+  return (
+    <li className={`min-h-[14rem] list-none ${area}`}>
+      <div className="relative h-full rounded-2xl border p-2 md:rounded-3xl md:p-3">
+        <GlowingEffect
+          spread={40}
+          glow={true}
+          disabled={false}
+          proximity={64}
+          inactiveZone={0.01}
+        />
+        <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl p-6 md:p-6 dark:shadow-[0px_0px_27px_0px_#2D2D2D]">
+          <div className="relative flex flex-1 flex-col justify-between gap-3">
+            {icon && (
+              <div className="w-fit rounded-lg border border-neutral-800 p-2">
+                {icon}
+              </div>
+            )}
+            <div className="space-y-3 mb-auto h-full">
+              {title && (
+                <h3 className="-tracking-4 pt-0.5 font-sans text-xl/[1.375rem] font-semibold text-balance md:text-2xl/[1.875rem]">
+                  {title}
+                </h3>
+              )}
+              {description && (
+                <p className="font-sans text-sm/[1.125rem] md:text-base/[1.375rem] text-neutral-400 [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+                  {description}
+                </p>
+              )}
+              {children}
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+  );
+};

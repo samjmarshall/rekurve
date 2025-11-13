@@ -37,10 +37,16 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
       className="relative w-full overflow-hidden bg-white dark:bg-black py-20"
       ref={containerRef}
     >
+      {/* Background pattern */}
+      <div className="absolute inset-0">
+        <div className="absolute z-10 inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.98),rgba(0,0,0,0.95),rgba(0,0,0,0.95),rgba(0,0,0,0.98))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-size-[4rem_4rem]" />
+      </div>
+
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-20 md:px-8 lg:px-10">
         {/* Section header */}
         <motion.div
-          className="mb-16 text-center"
+          className="text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

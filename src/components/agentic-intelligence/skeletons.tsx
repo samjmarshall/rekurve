@@ -1,6 +1,6 @@
 "use client";
 
-import { AppWindowMac, CalendarDays, Mail, MessageSquare } from "lucide-react";
+import { AppWindowMac, Book, BookOpen, CalendarDays, DollarSign, LayoutList, Mail, MessageSquare, Package, Search } from "lucide-react";
 import {
   Hubspot,
   SalesOps,
@@ -45,14 +45,14 @@ export const NativeIntegrationSkeleton = () => {
               Connected
             </span>
             <div className="absolute inset-x-0 -top-30 flex h-full flex-col items-center">
-              <IconBlock icon={<CalendarDays className="size-6" />} />
+              <IconBlock icon={<Catalogue />} className="h-14 w-14" />
               <VerticalLine />
               <VerticalLine />
               <IconBlock icon={<SlackLogo className="size-6" />} />
             </div>
           </div>
           <div className="2 absolute -top-4 right-30 flex h-full flex-col items-center">
-            <IconBlock icon={<SalesOps className="size-6 fill-black dark:fill-white" />} />
+            <IconBlock icon={<Calendar className="size-7" />} />
             <VerticalLine />
             <IconBlock icon={<Hubspot className="size-6" />} />
           </div>
@@ -63,6 +63,27 @@ export const NativeIntegrationSkeleton = () => {
     </>
   );
 };
+
+export const Calendar = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 36 36" {...props}>
+    <path fill="#E0E7EC" d="M36 32a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4h28a4 4 0 0 1 4 4v23z"></path>
+    <path fill="#66757F" d="M23.657 19.12H17.87c-1.22 0-1.673-.791-1.673-1.56c0-.791.429-1.56 1.673-1.56h8.184c1.154 0 1.628 1.04 1.628 1.628c0 .452-.249.927-.52 1.492l-5.607 11.395c-.633 1.266-.882 1.717-1.899 1.717c-1.244 0-1.877-.949-1.877-1.605c0-.271.068-.474.226-.791l5.652-10.716zM10.889 19h-.5c-1.085 0-1.538-.731-1.538-1.5c0-.792.565-1.5 1.538-1.5h2.015c.972 0 1.515.701 1.515 1.605V30.47c0 1.13-.558 1.763-1.53 1.763s-1.5-.633-1.5-1.763V19z"></path>
+    <path fill="#DD2F45" d="M34 0h-3.277c.172.295.277.634.277 1a2 2 0 0 1-4 0c0-.366.105-.705.277-1H8.723C8.895.295 9 .634 9 1a2 2 0 0 1-4 0c0-.366.105-.705.277-1H2a2 2 0 0 0-2 2v11h36V2a2 2 0 0 0-2-2z"></path>
+    <path fill="#F5F8FA" d="M13.182 4.604c0-.5.32-.78.75-.78c.429 0 .749.28.749.78v5.017h1.779c.51 0 .73.38.72.72a.7.7 0 0 1-.72.659h-2.498c-.49 0-.78-.319-.78-.819V4.604zm-6.91 0c0-.5.32-.78.75-.78s.75.28.75.78v3.488c0 .92.589 1.649 1.539 1.649c.909 0 1.529-.769 1.529-1.649V4.604c0-.5.319-.78.749-.78s.75.28.75.78v3.568c0 1.679-1.38 2.949-3.028 2.949c-1.669 0-3.039-1.25-3.039-2.949V4.604zM5.49 9.001c0 1.679-1.069 2.119-1.979 2.119c-.689 0-1.839-.27-1.839-1.14c0-.269.23-.609.56-.609c.4 0 .75.37 1.199.37c.56 0 .56-.52.56-.84V4.604c0-.5.32-.78.749-.78c.431 0 .75.28.75.78v4.397z"></path>
+    <path fill="#F4ABBA" d="M32 10a1 1 0 1 0 2 0a1 1 0 0 0-2 0m0-3a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3 3a1 1 0 1 0 2 0a1 1 0 0 0-2 0m0-3a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3 3a1 1 0 1 0 2 0a1 1 0 0 0-2 0m0-3a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3 0a1 1 0 1 0 2 0a1 1 0 0 0-2 0m0 3a1 1 0 1 0 2 0a1 1 0 0 0-2 0"></path>
+  </svg>
+)
+
+const Catalogue = () => {
+  return (
+    <div className="flex my-auto items-center">
+      <BookOpen className="my-auto text-neutral-600 stroke-[0.75px] size-12" />
+      <Package className="absolute text-stone-400 top-4.25 left-2.5 size-4" />
+      <LayoutList className="absolute top-4.25 right-2.5 size-4" />
+      <Search className="absolute text-gray-600 top-8 right-1.5 size-4" />
+    </div>
+  );
+}
 
 const VerticalLine = (
   props: React.SVGProps<SVGSVGElement> & { stopColor?: string },

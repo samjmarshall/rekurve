@@ -6,7 +6,7 @@ import { Analytics } from "~/components/Analytics";
 import { cn } from "~/lib/utils";
 import { ThemeProvider } from "~/context/providers";
 import { Navbar } from "~/components/navbar";
-import { Footer } from "~/components/sections/footer";
+import { Footer } from "~/components/sections/Footer";
 
 export const metadata: Metadata = {
   title: "AI Sales Agents for Brisbane Professional Services | Rekurve",

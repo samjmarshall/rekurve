@@ -144,7 +144,7 @@ export function Pricing() {
                   transition-all duration-300
                   hover:-translate-y-2 hover:shadow-2xl
                   ${borderColor}
-                  ${tier.highlighted ? 'lg:scale-105 lg:shadow-xl' : ''}
+                  ${tier.highlighted ? 'lg:scale-105 lg:shadow-xl shadow-primary/15 relative bg-[radial-gradient(164.75%_100%_at_50%_0%,var(--color-neutral-900)_0%,var(--color-neutral-950)_48.73%)] shadow-2xl' : ''}
                 `}
               >
                 {/* Badge (Most Popular) */}

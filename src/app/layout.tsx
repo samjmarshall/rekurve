@@ -114,6 +114,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${ibmPlexSans.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
     >
       <head>
         <script

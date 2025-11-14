@@ -3,7 +3,6 @@
 import { Clock, Mail, MessageSquare, Search, Target, TrendingUp } from 'lucide-react'
 
 import { GlowingEffect } from "~/components/ui/glowing-effect";
-import { NativeIcon } from '~/icons/bento-icons';
 import type React from 'react';
 import { ScrollReveal } from '~/components/motion/ScrollReveal'
 

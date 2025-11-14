@@ -25,7 +25,7 @@
     0px 0px 0px 1px rgba(25, 28, 33, 0.08);
 
   /* Primary brand color */
-  --color-primary: #f17463;
+  --color-primary: #d97857;
 
   /* Distinctive accents (NOT generic purple) - use strategically, ONE per context */
   --color-accent-amber: oklch(0.75 0.15 75);

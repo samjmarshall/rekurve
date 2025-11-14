@@ -24,7 +24,7 @@ To access Rekurve's official brand identity and style resources, use this skill.
 
 **Accent Colors:**
 
-- Orange: `#f17463` - Primary accent
+- Orange: `#d97857` - Primary accent
 - Blue: `#6a9bcc` - Secondary accent
 - Green: `#788c5d` - Tertiary accent
 

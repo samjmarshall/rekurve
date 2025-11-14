@@ -18,7 +18,7 @@ export default function Solution() {
               className="text-4xl md:text-5xl font-bold tracking-tight mb-4"
               style={{ letterSpacing: '-0.02em' }}
             >
-              Meet Your <span className="text-brand">24/7 Sales Rep</span>
+              Meet Your <span className="text-primary">24/7 Sales Rep</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Not n8n automation. Not chatbots. Intelligent agents that research, qualify, and engage autonomously.
@@ -144,7 +144,7 @@ export function GlowingBento() {
       <GridItem
         area="md:[grid-area:2/7/3/13] xl:[grid-area:3/9/3/13]"
         icon={<MessageSquare className="h-4 w-4 text-primary" />}
-        title="Booking"
+        title="Book & Quote"
         description="Dynamic lead progression with meeting scheduling and quote generation based on your product and service offerings."
       />
     </ul>
@@ -160,8 +160,8 @@ interface GridItemProps {
 
 const GridItem = ({ area, icon, title, description, children }: React.PropsWithChildren<GridItemProps>) => {
   return (
-    <li className={`min-h-[14rem] list-none ${area}`}>
-      <div className="relative h-full rounded-2xl border p-2 md:rounded-3xl md:p-3">
+    <li className={`min-h-56 list-none ${area}`}>
+      <div className="relative h-full rounded-2xl shadow-md border border-gray-300 dark:border-neutral-800 p-2 md:rounded-3xl md:p-3">
         <GlowingEffect
           spread={40}
           glow={true}
@@ -172,7 +172,7 @@ const GridItem = ({ area, icon, title, description, children }: React.PropsWithC
         <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl p-6 md:p-6 dark:shadow-[0px_0px_27px_0px_#2D2D2D]">
           <div className="relative flex flex-1 flex-col justify-between gap-3">
             {icon && (
-              <div className="w-fit rounded-lg border border-neutral-800 p-2">
+              <div className="w-fit rounded-lg border border-gray-300 dark:border-neutral-800 p-2">
                 {icon}
               </div>
             )}
@@ -183,7 +183,7 @@ const GridItem = ({ area, icon, title, description, children }: React.PropsWithC
                 </h3>
               )}
               {description && (
-                <p className="font-sans text-sm/[1.125rem] md:text-base/[1.375rem] text-neutral-400 [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+                <p className="font-sans text-sm/[1.125rem] md:text-base/[1.375rem] text-gray-600 dark:text-neutral-400 [&_b]:md:font-semibold [&_strong]:md:font-semibold">
                   {description}
                 </p>
               )}

@@ -43,7 +43,7 @@ export default function Problem() {
               style={{ letterSpacing: '-0.02em' }}
             >
               Your Sales Team Is Losing{' '}
-              <span className="text-brand">$250K+</span> Annually to Manual Work
+              <span className="text-primary">$250K+</span> Annually to Manual Work
             </h2>
             {/* <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Here&apos;s exactly what it&apos;s costing you:
@@ -59,7 +59,7 @@ export default function Problem() {
               <ScrollReveal key={index} delay={index * 0.1}>
                 <div
                   key={"card" + index}
-                  className="group/card relative overflow-hidden p-10 border rounded-md border-neutral-200 dark:border-neutral-800"
+                  className="group/card relative overflow-hidden p-10 shadow-md rounded-md dark:border dark:border-neutral-900"
                 >
                   <Grid size={20} />
                   <EdgeElement />
@@ -73,7 +73,7 @@ export default function Problem() {
                       <span className='text-lg'>{item.label}</span>
                     </div>
                   </div>
-                  <p className="text-balance text-balance mt-4 text-base text-neutral-600 dark:text-neutral-300">
+                  <p className="text-balance mt-4 text-base text-neutral-600 dark:text-neutral-300">
                     {item.description}
                   </p>
                 </div>
@@ -131,7 +131,7 @@ export function StatsWithGridBackground() {
                   {item.value}
                 </p>
               </div>
-              <p className="text-balance text-balance mt-4 text-base text-neutral-600 dark:text-neutral-300">
+              <p className="text-balance mt-4 text-base text-neutral-600 dark:text-neutral-300">
                 {item.description}
               </p>
             </div>
@@ -151,8 +151,8 @@ const EdgeElement = () => {
 };
 const IconContainer = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-linear-to-b from-neutral-200 to-white to-50% p-1 dark:from-neutral-800 dark:to-neutral-950 shadow-md shadow-neutral-900">
-      <div className="flex h-full w-full items-center justify-center rounded-lg bg-black ">
+    <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-linear-to-b from-neutral-200 to-gray-50 to-50% p-1 dark:from-neutral-800 dark:to-neutral-950 shadow-md dark:shadow-neutral-900">
+      <div className="flex h-full w-full items-center justify-center rounded-lg bg-white dark:bg-black ">
         {children}
       </div>
     </div>
@@ -227,10 +227,10 @@ export function GridPattern({
       />
       {squares && (
         <svg x={x} y={y} className="overflow-visible">
-          {squares.map(([x, y]) => (
+          {squares.map(([x, y], index) => (
             <rect
               strokeWidth="0"
-              key={`${x}-${y}`}
+              key={index}
               width={width + 1}
               height={height + 1}
               x={x * width}

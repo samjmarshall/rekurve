@@ -130,10 +130,10 @@ export function Pricing() {
           {pricingTiers.map((tier) => {
             const isCustomPricing = tier.setupFee === 0 && tier.monthlyFee === 0
             const borderColor = tier.highlighted
-              ? 'border-brand'
+              ? 'border-primary'
               : tier.id === 'enterprise'
-                ? 'border-brand/80'
-                : 'border-brand/60'
+                ? 'border-primary/80'
+                : 'border-primary/60'
 
             return (
               <motion.div
@@ -144,7 +144,7 @@ export function Pricing() {
                   transition-all duration-300
                   hover:-translate-y-2 hover:shadow-2xl
                   ${borderColor}
-                  ${tier.highlighted ? 'lg:scale-105 lg:shadow-xl shadow-primary/15 relative bg-[radial-gradient(164.75%_100%_at_50%_0%,var(--color-neutral-900)_0%,var(--color-neutral-950)_48.73%)] shadow-2xl' : ''}
+                  ${tier.highlighted ? 'lg:scale-105 lg:shadow-xl shadow-primary/15 relative bg-[radial-gradient(164.75%_100%_at_50%_0%,var(--color-gray-50)_0%,var(--color-white)_48.73%)] dark:bg-[radial-gradient(164.75%_100%_at_50%_0%,var(--color-neutral-900)_0%,var(--color-neutral-950)_48.73%)] shadow-2xl' : ''}
                 `}
               >
                 {/* Badge (Most Popular) */}
@@ -173,7 +173,7 @@ export function Pricing() {
                   <h3 className="mb-2 text-2xl font-bold">
                     {tier.name}
                   </h3>
-                  <p className="text-sm text-gray-600"><span className="text-brand front-bold">{tier.id.charAt(0).toUpperCase() + tier.id.slice(1)}</span> - {tier.tagline}</p>
+                  <p className="text-sm text-gray-600"><span className="text-primary front-bold">{tier.id.charAt(0).toUpperCase() + tier.id.slice(1)}</span> - {tier.tagline}</p>
                 </div>
 
                 {/* Pricing */}
@@ -196,7 +196,7 @@ export function Pricing() {
                         <span className="text-gray-600">setup</span>
                       </div>
                       <div className="flex items-baseline gap-2 text-lg">
-                        <span className="font-semibold text-brand">
+                        <span className="font-semibold text-primary">
                           {formatCurrency(tier.monthlyFee)}
                         </span>
                         <span className="text-gray-600">per month</span>

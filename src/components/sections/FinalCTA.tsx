@@ -17,12 +17,12 @@ export function FinalCTA() {
         <GridLineVertical className="left-auto right-0" offset="80px" />
         <div className="md:col-span-2 p-8 md:p-14">
           <ScrollReveal>
-            <h2 className="text-left text-neutral-500 dark:text-neutral-200 text-xl md:text-3xl tracking-tight font-medium">
+            <h2 className="text-left text-xl md:text-3xl tracking-tight font-medium">
               Sell your services with the{" "}
               <BrandShimmer className="font-bold" text="speed of light" />
             </h2>
 
-            <p className="text-left text-neutral-500 mt-4 max-w-lg dark:text-neutral-200 text-base tracking-tight font-medium">
+            <p className="text-left text-neutral-600 mt-4 max-w-lg dark:text-neutral-200 text-base tracking-tight font-medium">
               Get the best in class support for the most advanced sales software.
             </p>
           </ScrollReveal>

@@ -32,9 +32,9 @@ export const NativeIntegrationSkeleton = () => {
           </div>
           <div className="relative h-16 w-16 overflow-hidden rounded-md bg-gray-200 p-px shadow-xl dark:bg-neutral-700">
             <div className="absolute inset-0 scale-[1.4] animate-spin rounded-full bg-conic bg-[conic-gradient(at_center,transparent,var(--color-blue-500)_20%,transparent_30%)] animation-duration-[2s]"></div>
-            <div className="absolute inset-0 scale-[1.4] animate-spin rounded-full bg-[conic-gradient(at_center,transparent,var(--color-brand)_20%,transparent_30%)] [animation-delay:1s] animation-duration-[2s]"></div>
+            <div className="absolute inset-0 scale-[1.4] animate-spin rounded-full bg-[conic-gradient(at_center,transparent,var(--color-primary)_20%,transparent_30%)] [animation-delay:1s] animation-duration-[2s]"></div>
             <div className="relative z-20 flex h-full w-full items-center justify-center rounded-[5px] bg-white dark:bg-neutral-900">
-              <NativeIcon className="size-6 text-brand" />
+              <NativeIcon className="size-6 text-primary" />
             </div>
           </div>
         </div>
@@ -52,7 +52,7 @@ export const NativeIntegrationSkeleton = () => {
             </div>
           </div>
           <div className="2 absolute -top-4 right-30 flex h-full flex-col items-center">
-            <IconBlock icon={<Calendar className="size-7" />} />
+            <IconBlock icon={<Calendar className="size-7 shadow" />} />
             <VerticalLine />
             <IconBlock icon={<Hubspot className="size-6" />} />
           </div>
@@ -77,8 +77,8 @@ export const Calendar = (props: React.SVGProps<SVGSVGElement>) => (
 const Catalogue = () => {
   return (
     <div className="flex my-auto items-center">
-      <BookOpen className="my-auto text-neutral-600 stroke-[0.75px] size-12" />
-      <Package className="absolute text-stone-400 top-4.25 left-2.5 size-4" />
+      <BookOpen className="my-auto text-neutral-500 dark:text-neutral-600 stroke-[0.75px] size-12" />
+      <Package className="absolute text-stone-600 dark:text-stone-400 top-4.25 left-2.5 size-4" />
       <LayoutList className="absolute top-4.25 right-2.5 size-4" />
       <Search className="absolute text-gray-600 top-8 right-1.5 size-4" />
     </div>

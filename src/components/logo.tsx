@@ -11,7 +11,7 @@ export const Logo = ({ className }: { className?: string }) => {
       href="/"
       className={cn("font-normal flex space-x-2 items-center text-sm mr-4  text-black px-2 py-1  relative z-20", )}
     >
-      <NativeIcon className="size-6 text-brand" />
+      <NativeIcon className="size-6 text-primary" />
       <span className="font-medium text-black dark:text-white">Rekurve.ai</span>
     </Link>
   );

@@ -1,6 +1,6 @@
 import { AboutFounder } from '~/components/sections/AboutFounder'
 import { BookingForm } from '~/components/sections/BookingForm'
-import { CaseStudies } from '~/components/sections/CaseStudies'
+// import { CaseStudies } from '~/components/sections/CaseStudies'
 import { FAQ } from '~/components/sections/FAQ'
 import { FinalCTA } from '~/components/sections/FinalCTA'
 import { Guarantee } from '~/components/sections/Guarantee'

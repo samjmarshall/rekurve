@@ -12,7 +12,7 @@ const badgeVariants = cva(
         amber:
           "border-transparent bg-accent-amber/10 text-accent-amber hover:bg-accent-amber/20",
         brand:
-          "border-transparent bg-none dark:bg-brand/10 text-brand dark:hover:bg-brand/20",
+          "border-transparent bg-none dark:bg-primary/10 text-primary dark:hover:bg-primary/20",
         coral:
           "border-transparent bg-accent-coral/10 text-accent-coral hover:bg-accent-coral/20",
         success:

@@ -1,12 +1,11 @@
 'use client'
 
-import { cn, formatCurrency } from '~/lib/utils'
-
 import { Badge } from '~/components/ui/Badge'
 import { BrandShimmer } from '../brand-shimmer'
 import { Button } from '~/components/ui/Button'
 import { Check } from 'lucide-react'
 import type { PricingTier } from '~/types'
+import { formatCurrency } from '~/lib/utils'
 import { motion } from 'framer-motion'
 
 const pricingTiers: PricingTier[] = [

@@ -1,10 +1,9 @@
 'use client'
 
-import { Card, CardContent } from '~/components/ui/Card'
 import { Clock, DollarSign, TrendingDown } from 'lucide-react'
+import React, { useEffect, useState } from "react";
 
 import { BrandShimmer } from '../brand-shimmer'
-import React from "react";
 import { ScrollReveal } from '~/components/motion/ScrollReveal'
 import { cn } from "~/lib/utils";
 import { formatCurrency } from '~/lib/utils'
@@ -166,13 +165,31 @@ export const Grid = ({
   pattern?: [number, number][];
   size: number;
 }) => {
-  const p: [number, number][] = pattern ?? [
-    [Math.floor(Math.random() * 4) + 7, Math.floor(Math.random() * 6) + 1],
-    [Math.floor(Math.random() * 4) + 7, Math.floor(Math.random() * 6) + 1],
-    [Math.floor(Math.random() * 4) + 7, Math.floor(Math.random() * 6) + 1],
-    [Math.floor(Math.random() * 4) + 7, Math.floor(Math.random() * 6) + 1],
-    [Math.floor(Math.random() * 4) + 7, Math.floor(Math.random() * 6) + 1],
+  // Static fallback pattern for SSR and initial client render (prevents hydration mismatch)
+  const fallbackPattern: [number, number][] = [
+    [9, 4],
+    [10, 2],
+    [8, 5],
+    [11, 3],
+    [9, 1],
   ];
+
+  // Use static pattern initially, then switch to random on client after mount
+  const [clientPattern, setClientPattern] = useState<[number, number][]>(fallbackPattern);
+
+  useEffect(() => {
+    // Only generate random pattern on client-side after hydration
+    if (!pattern) {
+      const randomPattern: [number, number][] = Array.from({ length: 5 }, () => [
+        Math.floor(Math.random() * 4) + 7,
+        Math.floor(Math.random() * 6) + 1,
+      ]);
+      setClientPattern(randomPattern);
+    }
+  }, [pattern]);
+
+  const p = pattern ?? clientPattern;
+
   return (
     <div className="pointer-events-none absolute left-1/2 top-0 -ml-20 -mt-2 h-full w-full [mask-image:linear-gradient(white,transparent)]">
       <div className="absolute inset-0 bg-gradient-to-r from-zinc-100/30 to-zinc-300/30 opacity-100 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)] dark:from-zinc-900/30 dark:to-zinc-900/30">

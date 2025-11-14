@@ -32,9 +32,6 @@ export function Guarantee() {
       id="guarantee"
       className="relative overflow-hidden bg-white dark:bg-black py-24"
     >
-      {/* Ambient glow */}
-      <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-brand/10 blur-3xl" />
-
       <div className="container relative mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -104,9 +101,9 @@ export function Guarantee() {
                     },
                   }}
                 >
-                  <Card className="group h-full p-6 backdrop-blur-sm transition-all duration-300 bg-gray-50 dark:bg-neutral-800 hover:border-brand/50">
+                  <Card className="group h-full p-6 backdrop-blur-sm transition-all duration-300 bg-gray-50 dark:bg-neutral-800 hover:border-primary/50">
                     <Icon
-                      className="h-6 w-6 mb-2 text-brand"
+                      className="h-6 w-6 mb-2 text-primary"
                       strokeWidth={2}
                     />
                     <h3 className="mb-2 text-lg font-semibold">
@@ -129,13 +126,13 @@ export function Guarantee() {
             transition={{ duration: 0.6, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="mt-12 rounded-xl border bg-gray-50 border-gray-300 dark:bg-neutral-800 dark:border-neutral-900 p-8 backdrop-blur-sm"
           >
-            <h3 className="mb-4 text-xl font-semibold text-white">
+            <h3 className="mb-4 text-xl font-semibold">
               How We Measure ROI
             </h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <CheckCircle
-                  className="mt-0.5 h-5 w-5 shrink-0 text-brand"
+                  className="mt-0.5 h-5 w-5 shrink-0 text-primary"
                   strokeWidth={2}
                 />
                 <p className="text-sm">
@@ -149,7 +146,7 @@ export function Guarantee() {
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle
-                  className="mt-0.5 h-5 w-5 shrink-0 text-brand"
+                  className="mt-0.5 h-5 w-5 shrink-0 text-primary"
                   strokeWidth={2}
                 />
                 <p className="text-sm">
@@ -161,7 +158,7 @@ export function Guarantee() {
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle
-                  className="mt-0.5 h-5 w-5 shrink-0 text-brand"
+                  className="mt-0.5 h-5 w-5 shrink-0 text-primary"
                   strokeWidth={2}
                 />
                 <p className="text-sm">
@@ -194,7 +191,7 @@ export function Guarantee() {
               Ready to see results?{' '}
               <a
                 href="#booking-form"
-                className="font-semibold text-accent-amber underline decoration-brand/30 transition-colors hover:text-accent-amber/90 hover:decoration-accent-amber"
+                className="font-semibold text-accent-amber underline decoration-primary/30 transition-colors hover:text-accent-amber/90 hover:decoration-accent-amber"
               >
                 Book a call
               </a>

@@ -4,8 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Card, CardDescription, CardTitle } from "../agentic-intelligence/card";
 import React, { useEffect, useRef, useState } from "react";
 
-import Balancer from "react-wrap-balancer";
-import { Button } from "~/components/button";
+import { Button } from "../ui/Button";
 import { CONSTANTS } from "~/constants/links";
 import Link from "next/link";
 import { NativeIcon } from "~/icons/bento-icons";
@@ -74,78 +73,35 @@ export function Hero() {
       />
 
       <div className="text-balance relative z-20 mx-auto mb-4 mt-4 max-w-4xl text-center text-3xl font-semibold tracking-tight text-gray-700 dark:text-neutral-300 md:text-7xl">
-        <Balancer>
-          <motion.h2>
-            {"Recover 20+ Hours Weekly or Add $100K to Your Pipeline in 90 Days"
-              .split(" ")
-              .map((word, index) => (
-                <motion.span
-                  initial={{
-                    filter: "blur(10px)",
-                    opacity: 0,
-                    y: 10,
-                  }}
-                  animate={{
-                    filter: "blur(0px)",
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  transition={{
-                    duration: 0.4,
-                    delay: index * 0.05,
-                  }}
-                  className="inline-block"
-                  key={index}
-                >
-                  {word}&nbsp;
-                </motion.span>
-              ))}
-          </motion.h2>
-        </Balancer>
+        <h2>Recover 20+ Hours Weekly or Add $100K to Your Pipeline in 90 Days</h2>
       </div>
-      <motion.p
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2, delay: 0.5 }}
-        className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center text-base/6 text-gray-600 dark:text-gray-200"
-      >
+      <p className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center text-base/6 text-gray-600 dark:text-gray-200">
         End-to-End AI sales agents, from Customer enquiry &rarr; Quote.
         <br />
         For service businesses spending 20+ hours a week quoting.
-      </motion.p>
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2, delay: 0.7 }}
-        className="mb-10 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-20"
+      </p>
+      <div className="mb-10 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-20"
       >
-        <Button
-          variant="dark"
-          as={Link}
+      <Button asChild variant="secondary">
+        <Link
           href="/"
           className="hidden md:block w-40 text-center"
         >
           Watch demo
-        </Button>
+        </Link>
+      </Button>
 
         <Button
           data-cal-namespace={calOptions.namespace}
           data-cal-link={CONSTANTS.CALCOM_LINK}
           data-cal-config={`{"layout":"${calOptions.layout}"}`}
-          as="button"
           variant="primary"
           className="hidden md:block w-40"
         >
           Book a call
         </Button>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.9, ease: "easeOut" }}
-        ref={containerRef}
-        className="relative mx-auto max-w-7xl rounded-4xl border border-neutral-200/50 bg-neutral-100 p-2 backdrop-blur-lg dark:border-neutral-700 dark:bg-neutral-800/50 md:p-4"
-      >
+      </div>
+      <div className="relative mx-auto max-w-7xl rounded-4xl border border-neutral-200/50 bg-neutral-100 p-2 backdrop-blur-lg dark:border-neutral-700 dark:bg-neutral-800/50 md:p-4">
         <div className="rounded-3xl border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-black">
           <div className="w-full">
             <Card className="relative w-full max-w-none overflow-hidden">
@@ -162,7 +118,7 @@ export function Hero() {
             </Card>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

@@ -110,12 +110,12 @@ export function FAQ() {
             <h2 className="mb-4 font-sans text-4xl font-bold tracking-tight">
               Frequently Asked Questions
             </h2>
-            <p className="mx-auto max-w-lg text-center text-base text-neutral-600 dark:text-neutral-50">
+            <p className="mx-auto max-w-lg text-center text-base text-neutral-600 dark:text-neutral-400">
               We are here to help you with any questions you may have. If you
               don&apos;t find what you need, please contact us at{" "}
               <a
                 href="mailto:support@rekurve.ai"
-                className="text-brand underline"
+                className="text-primary underline"
               >
                 support@rekurve.ai
               </a>
@@ -133,7 +133,7 @@ export function FAQ() {
                 placeholder="Search questions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-neutral-800 py-4 pl-12 pr-4 font-mono text-sm  transition-all focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/80"
+                className="w-full rounded-lg border border-gray-300 dark:border-neutral-800 py-4 pl-12 pr-4 font-mono text-sm  transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/80"
               />
             </div>
           </div>
@@ -154,13 +154,13 @@ export function FAQ() {
                   value={item.id}
                   className={`rounded-lg border-l-4 bg-gray-50 dark:bg-neutral-800 p-6 shadow-sm transition-all hover:bg-gray-200 dark:hover:bg-neutral-900 ${
                     openItems.includes(item.id)
-                      ? 'border-l-brand'
+                      ? 'border-l-primary'
                       : 'border-l-gray-300 dark:border-l-neutral-700'
                   }`}
                 >
                   <AccordionTrigger className="text-left hover:no-underline">
                     <div>
-                      <div className="mb-1 text-xs font-mono text-brand uppercase tracking-wide">
+                      <div className="mb-1 text-xs font-mono text-primary uppercase tracking-wide">
                         {item.category}
                       </div>
                       <div className="text-lg font-semibold text-black dark:text-white">
@@ -183,7 +183,7 @@ export function FAQ() {
               </p>
               <button
                 onClick={() => setSearchQuery('')}
-                className="mt-4 font-mono text-sm text-brand hover:text-brand/70 transition-colors"
+                className="mt-4 font-mono text-sm text-primary hover:text-primary/70 transition-colors"
               >
                 Clear search
               </button>

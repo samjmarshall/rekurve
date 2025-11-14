@@ -37,98 +37,13 @@ The UI must convey: **Technical precision, operational confidence, and intellige
 
 ## Typography: Distinctive & Purposeful
 
-**Avoid:** Inter, Roboto, Arial, system fonts, Space Grotesk (overused)
-
-**Consider instead:**
-
-For this B2B enterprise context, choose fonts that signal precision and modernity:
-
-- **IBM Plex Sans** or **IBM Plex Mono** - Technical precision, excellent for data-heavy interfaces, distinctive personality
-- **Manrope** - Geometric but warm, great for UI with rounded corners
-- **DM Sans** - Clean, modern, slightly condensed for efficient space usage
-- **Archivo** - Strong geometric forms, excellent for headings and data labels
-- **JetBrains Mono** (for code/IDs) - Perfect for conversation IDs, technical identifiers
-
-**Implementation:**
-```typescript
-// app/layout.tsx
-import { IBM_Plex_Sans, JetBrains_Mono } from 'next/font/google'
-
-const ibmPlexSans = IBM_Plex_Sans({
-  weight: ['400', '500', '600', '700'],
-  subsets: ['latin'],
-  variable: '--font-sans'
-})
-
-const jetbrainsMono = JetBrains_Mono({
-  weight: ['400', '500'],
-  subsets: ['latin'],
-  variable: '--font-mono'
-})
-```
-
-**Typographic hierarchy:**
-- Use font weight and size variation to create clear hierarchy
-- Consider using tabular figures for numbers (font-variant-numeric: tabular-nums)
-- Use monospace for IDs, timestamps, technical data
-- Tighter letter-spacing (-0.02em) for headings to increase density
+Refer to the brand-guidelines skill.
 
 ## Color & Theme: Beyond the Basics
 
-**Current palette analysis:**
-- Primary: `#071D33` (dark navy) - good foundation, signals trust
-- Using oklch color space - excellent choice for perceptual uniformity
+**Critical rule:** Use color strategically, not uniformly. A single color badge on a neutral card is more powerful than rainbow soup.
 
-**Avoid:** Purple gradients on white, teal + purple combos, pastel everything
-
-**Distinctive approaches for this project:**
-
-### Option 1: Data Visualization Inspired
-Draw from modern data viz tools (Observable, Grafana dark themes):
-- Keep the dark navy primary
-- Add distinctive accent: amber/gold (`oklch(0.75 0.15 75)`) for urgent items
-- Electric cyan (`oklch(0.70 0.15 195)`) for active/in-progress states
-- Coral (`oklch(0.65 0.18 25)`) for attention states
-- Use subtle gradients in backgrounds, not buttons
-
-### Option 2: Terminal Aesthetic
-Professional developers appreciate terminal-inspired UIs:
-- Rich dark backgrounds with subtle texture
-- Green (`oklch(0.70 0.18 145)`) for success/completed
-- Bright blue (`oklch(0.65 0.20 230)`) for information
-- Matrix-style subtle scan lines or grid patterns
-- Monospace for data-heavy sections
-
-### Option 3: Sophisticated Neutral
-High-end B2B SaaS (Linear, Stripe Dashboard):
-- Sophisticated grays with subtle warm undertones
-- Single powerful accent color (deep orange `oklch(0.60 0.18 40)` or saturated blue)
-- Use of transparency and layering
-- Dominant neutrals with strategic color deployment
-
-**Implementation approach:**
-```css
-/* globals.css - extend existing theme */
-:root {
-  /* Keep existing vars, add distinctive accents */
-  --accent-primary: oklch(0.75 0.15 75); /* Amber */
-  --accent-active: oklch(0.70 0.15 195); /* Cyan */
-  --accent-attention: oklch(0.65 0.18 25); /* Coral */
-
-  /* Semantic state colors that aren't generic */
-  --state-success: oklch(0.70 0.18 145);
-  --state-warning: oklch(0.75 0.15 75);
-  --state-error: oklch(0.58 0.22 25);
-  --state-info: oklch(0.65 0.20 230);
-
-  /* Subtle background gradients */
-  --bg-gradient-subtle: linear-gradient(135deg,
-    oklch(1 0 0) 0%,
-    oklch(0.99 0.002 250) 100%);
-}
-```
-
-**Critical rule:** Use color strategically, not uniformly. A single amber badge on a neutral card is more powerful than rainbow soup.
+Refer to the brand-guidelines skill.
 
 ## Motion: High-Impact Moments
 
@@ -140,8 +55,6 @@ High-end B2B SaaS (Linear, Stripe Dashboard):
 **Performance:** Prefer transform and opacity. Avoid animating width, height, or color.
 
 ## Backgrounds: Depth & Atmosphere
-
-**Avoid:** Solid white/gray backgrounds everywhere
 
 **Distinctive approaches:**
 
@@ -186,20 +99,7 @@ For dark mode, go beyond just inverting:
 
 ## Technical Implementation Checklist
 
-When implementing UI components:
-
-- [ ] Choose distinctive font (not Inter/Roboto/Arial)
-- [ ] Define custom color accents (not just default Tailwind palette)
-- [ ] Add CSS variables for all custom colors
-- [ ] Implement at least one page-load orchestration
-- [ ] Add hover states with transform (not just opacity)
-- [ ] Create atmospheric background (not solid color)
-- [ ] Use semantic HTML for accessibility
-- [ ] Test with reduced motion preference
-- [ ] Ensure 4.5:1 contrast ratios minimum
-- [ ] Add loading states with skeleton screens or progressive reveal
-
-Comprehensive design checklist: [design-checklist](./design-checklist.md)
+When implementing UI components, follow this comprehensive design checklist: [design-checklist](./design-checklist.md)
 
 ## Anti-Patterns to Avoid
 

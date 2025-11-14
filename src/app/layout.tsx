@@ -3,7 +3,6 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "~/components/Analytics";
-import { cn } from "~/lib/utils";
 import { ThemeProvider } from "~/context/providers";
 import { Navbar } from "~/components/navbar";
 import { Footer } from "~/components/sections/Footer";
@@ -63,7 +62,6 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
     creator: "@rekurve_ai",
   },
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
   metadataBase: new URL("https://rekurve.ai"),
   alternates: {
     canonical: "https://rekurve.ai",

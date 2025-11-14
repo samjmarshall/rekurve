@@ -160,7 +160,7 @@ export function BookingForm() {
                 />
               </div>
             </div>
-            <h2 className="mb-4 text-3xl font-bold text-white">
+            <h2 className="mb-4 text-3xl font-bold">
               Thank You! We&apos;ll Be In Touch Soon
             </h2>
             <p className="mb-8 text-lg text-gray-600">
@@ -168,9 +168,9 @@ export function BookingForm() {
               time that works for you...
             </p>
             <div className="flex items-center justify-center gap-2">
-              <div className="h-2 w-2 animate-bounce rounded-full bg-brand [animation-delay:-0.3s]" />
-              <div className="h-2 w-2 animate-bounce rounded-full bg-brand [animation-delay:-0.15s]" />
-              <div className="h-2 w-2 animate-bounce rounded-full bg-brand" />
+              <div className="h-2 w-2 animate-bounce rounded-full bg-primary [animation-delay:-0.3s]" />
+              <div className="h-2 w-2 animate-bounce rounded-full bg-primary [animation-delay:-0.15s]" />
+              <div className="h-2 w-2 animate-bounce rounded-full bg-primary" />
             </div>
           </motion.div>
         </div>
@@ -220,8 +220,8 @@ export function BookingForm() {
                             isCompleted
                               ? 'border-accent-amber bg-accent-amber'
                               : isActive
-                                ? 'border-brand bg-brand text-white ring-2 ring-brand/30 ring-offset-2 ring-offset-neutral-900'
-                                : 'border-neutral-700 bg-neutral-800 text-gray-600'
+                                ? 'border-primary bg-primary ring-2 ring-primary/30 ring-offset-2 ring-offset-neutral-100 dark:ring-offset-neutral-900'
+                                : 'border-neutral-200 bg-neutral-100 dark:dark:border-neutral-700 dark:bg-neutral-800 text-gray-600'
                           }
                         `}
                         aria-current={isActive ? 'step' : undefined}
@@ -236,7 +236,7 @@ export function BookingForm() {
                       <span
                         className={`
                           mt-2 hidden text-xs font-medium md:block
-                          ${isActive || isCompleted ? 'text-white' : 'text-gray-600'}
+                          ${!(isActive || isCompleted) && 'text-gray-600'}
                         `}
                       >
                         {step.title}
@@ -260,7 +260,7 @@ export function BookingForm() {
           </div>
 
           {/* Form */}
-          <Card className="border-neutral-800 bg-neutral-900/50 p-8 backdrop-blur-sm">
+          <Card className="border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 p-8 backdrop-blur-sm">
             <form onSubmit={handleSubmit(onSubmit)}>
               <AnimatePresence mode="wait">
                 {/* Step 1: Basic Info */}
@@ -273,7 +273,7 @@ export function BookingForm() {
                     transition={{ duration: 0.3 }}
                     className="space-y-6"
                   >
-                    <h3 className="text-xl font-semibold text-white">
+                    <h3 className="text-xl font-semibold">
                       Let&apos;s start with your information
                     </h3>
 
@@ -289,7 +289,7 @@ export function BookingForm() {
                           {...register('firstName')}
                           type="text"
                           id="firstName"
-                          className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                          className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                           placeholder="John"
                         />
                         <p className="mt-1 text-sm text-accent-coral">
@@ -308,7 +308,7 @@ export function BookingForm() {
                           {...register('lastName')}
                           type="text"
                           id="lastName"
-                          className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                          className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                           placeholder="Smith"
                         />
                         <p className="mt-1 text-sm text-accent-coral">
@@ -328,7 +328,7 @@ export function BookingForm() {
                         {...register('email')}
                         type="email"
                         id="email"
-                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="john.smith@company.com"
                       />
                       <p className="mt-1 text-sm text-accent-coral">
@@ -347,7 +347,7 @@ export function BookingForm() {
                         {...register('phone')}
                         type="tel"
                         id="phone"
-                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="+61 4XX XXX XXX"
                       />
                     </div>
@@ -364,7 +364,7 @@ export function BookingForm() {
                     transition={{ duration: 0.3 }}
                     className="space-y-6"
                   >
-                    <h3 className="text-xl font-semibold text-white">
+                    <h3 className="text-xl font-semibold">
                       Tell us about your company
                     </h3>
 
@@ -379,7 +379,7 @@ export function BookingForm() {
                         {...register('company')}
                         type="text"
                         id="company"
-                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="Acme Professional Services"
                       />
                       <p className="mt-1 text-sm text-accent-coral">
@@ -397,7 +397,7 @@ export function BookingForm() {
                       <select
                         {...register('companySize')}
                         id="companySize"
-                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                       >
                         <option value="">Select company size</option>
                         <option value="1-10">1-10 employees</option>
@@ -422,7 +422,7 @@ export function BookingForm() {
                         {...register('industry')}
                         type="text"
                         id="industry"
-                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="e.g., Consulting, Accounting, Marketing"
                       />
                       <p className="mt-1 text-sm text-accent-coral">
@@ -441,7 +441,7 @@ export function BookingForm() {
                         {...register('location')}
                         type="text"
                         id="location"
-                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="Brisbane, Australia"
                       />
                       <p className="mt-1 text-sm text-accent-coral">
@@ -461,7 +461,7 @@ export function BookingForm() {
                     transition={{ duration: 0.3 }}
                     className="space-y-6"
                   >
-                    <h3 className="text-xl font-semibold text-white">
+                    <h3 className="text-xl font-semibold">
                       What are your biggest challenges?
                     </h3>
                     <p className="text-sm text-gray-600">
@@ -479,7 +479,7 @@ export function BookingForm() {
                               ${
                                 isSelected
                                   ? 'border-accent-amber bg-accent-amber/10'
-                                  : 'border-neutral-700 bg-neutral-900 hover:border-neutral-700'
+                                  : 'dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 hover:dark:border-neutral-700'
                               }
                             `}
                           >
@@ -487,7 +487,7 @@ export function BookingForm() {
                               {...register('challenges')}
                               type="checkbox"
                               value={challenge}
-                              className="mt-0.5 h-5 w-5 rounded border-neutral-700 bg-neutral-900 focus:ring-2 focus:ring-brand/20 focus:ring-offset-0"
+                              className="mt-0.5 h-5 w-5 rounded dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 focus:ring-2 focus:ring-primary/20 focus:ring-offset-0"
                             />
                             <span className="text-sm">
                               {challenge}
@@ -528,7 +528,7 @@ export function BookingForm() {
                         {...register('goals')}
                         id="goals"
                         rows={4}
-                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="e.g., Generate 50+ qualified leads per month, reduce manual prospecting time, improve conversion rates..."
                       />
                       <p className="mt-1 text-sm text-accent-coral">
@@ -547,7 +547,7 @@ export function BookingForm() {
                       <select
                         {...register('timeline')}
                         id="timeline"
-                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                       >
                         <option value="">Select timeline</option>
                         <option value="immediate">Immediately</option>
@@ -570,7 +570,7 @@ export function BookingForm() {
                       <select
                         {...register('currentMRR')}
                         id="currentMRR"
-                        className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                       >
                         <option value="">Prefer not to say</option>
                         <option value="0-50k">$0 - $50K</option>

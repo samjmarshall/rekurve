@@ -67,7 +67,7 @@ export function AboutFounder() {
           >
             {/* Founder photo placeholder */}
             <div className="relative mx-auto w-fit lg:mx-0">
-              <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-transparent bg-linear-to-br from-accent-amber via-brand to-accent-coral p-1 shadow-2xl">
+              <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-transparent bg-linear-to-br from-accent-amber via-primary to-accent-coral p-1 shadow-2xl">
                 <div className="flex h-full w-full items-center justify-center rounded-full bg-black">
                   <div className="text-center text-white">
                     <div className="text-5xl font-bold">SM</div>
@@ -104,13 +104,13 @@ export function AboutFounder() {
                 <CardContent className="p-6">
                   
                   <p className="italic flex leading-relaxed text-gray-600 max-w-prose">
-                    <span className="mb-3 pr-2 text-5xl leading-none text-brand">
+                    <span className="mb-3 pr-2 text-5xl leading-none text-primary">
                       &ldquo;
                     </span>
                     I saw small to medium business struggling with problems I&apos;d
                     solved in Enterprise. Manual, repetitive work that took sales reps and business owners away from growing their businesses. Now I build AI agents with production-grade
                     reliability, not marketing hype.
-                    <span className="mt-auto rotate-180 text-5xl leading-none text-brand">
+                    <span className="mt-auto rotate-180 text-5xl leading-none text-primary">
                       &ldquo;
                     </span>
                   </p>
@@ -152,13 +152,13 @@ export function AboutFounder() {
                     transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                   >
                     <Card
-                      className="border-l-4 backdrop-blur-sm transition-all duration-300 bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 border-gray-300 dark:hover:border-brand hover:border-brand"
+                      className="border-l-4 backdrop-blur-sm transition-all duration-300 bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 border-gray-300 dark:hover:border-primary hover:border-primary"
                     >
                       <CardContent className="flex items-center gap-4 p-4">
                         <div
                           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg"
                         >
-                          <Icon className="h-6 w-6 text-brand" />
+                          <Icon className="h-6 w-6 text-primary" />
                         </div>
                         <div className="flex-1">
                           <div className="mb-1 text-sm font-semibold">

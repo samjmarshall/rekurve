@@ -65,7 +65,7 @@ const timelineData = phases.map((phase) => {
       <div className="space-y-4">
         {/* Icon and phase number */}
         <div className="flex items-center gap-4">
-          <Icon className="size-8 text-brand" />
+          <Icon className="size-8 text-primary" />
           <div className="flex flex-col">
             <span className="font-mono text-xs text-gray-600">Phase {phase.number}</span>
             <span className="font-mono text-sm font-medium text-gray-600">{phase.duration}</span>

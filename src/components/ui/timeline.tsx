@@ -39,8 +39,8 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
     >
       {/* Background pattern */}
       <div className="absolute inset-0">
-        <div className="absolute z-10 inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.98),rgba(0,0,0,0.95),rgba(0,0,0,0.95),rgba(0,0,0,0.98))]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-size-[4rem_4rem]" />
+        <div className="absolute z-10 inset-0 dark:bg-[linear-gradient(to_bottom,rgba(0,0,0,0.98),rgba(0,0,0,0.95),rgba(0,0,0,0.95),rgba(0,0,0,0.98))]" />
+        <div className="absolute inset-0 dark:bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-size-[4rem_4rem]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-20 md:px-8 lg:px-10">
@@ -99,7 +99,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
                 height: heightTransform,
                 opacity: opacityTransform,
               }}
-              className="absolute inset-x-0 top-0 w-[2px] rounded-full bg-gradient-to-b from-accent-cyan via-accent-amber via-brand to-accent-coral from-[0%] via-[33%] via-[66%]"
+              className="absolute inset-x-0 top-0 w-[2px] rounded-full bg-gradient-to-b from-accent-cyan via-accent-amber via-primary to-accent-coral from-[0%] via-[33%] via-[66%]"
             />
           </div>
         </div>

@@ -9,7 +9,7 @@ import {
 import { Menu, X } from "lucide-react";
 import React, { useRef, useState } from "react";
 
-import { Button } from "./button";
+import { Button } from "./ui/Button";
 import { CONSTANTS } from "~/constants/links";
 import Link from "next/link";
 import { Logo } from "./logo";
@@ -125,43 +125,10 @@ const DesktopNav = ({ navItems, visible }: NavbarProps) => {
       </motion.div>
       <div className="flex items-center gap-4">
         <ModeToggle />
-
-        <AnimatePresence mode="popLayout" initial={false}>
-          {!visible && (
-            <motion.div
-              initial={{
-                x: 100,
-                opacity: 0,
-              }}
-              animate={{
-                x: 0,
-                opacity: [0, 0, 1],
-              }}
-              exit={{
-                x: 100,
-                opacity: [0, 0, 0],
-              }}
-              transition={{
-                duration: 0.5,
-                ease: "easeOut",
-              }}
-            >
-              <Button
-                as={Link}
-                href={CONSTANTS.LOGIN_LINK}
-                variant="secondary"
-                className="hidden md:block "
-              >
-                Login
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
         <Button
           data-cal-namespace={calOptions.namespace}
           data-cal-link={CONSTANTS.CALCOM_LINK}
           data-cal-config={`{"layout":"${calOptions.layout}"}`}
-          as="button"
           variant="primary"
           className="hidden md:block "
         >
@@ -246,19 +213,9 @@ const MobileNav = ({ navItems, visible }: NavbarProps) => {
                 </Link>
               ))}
               <Button
-                as={Link}
-                onClick={() => setOpen(false)}
-                href={CONSTANTS.LOGIN_LINK}
-                variant="primary"
-                className="block md:hidden w-full"
-              >
-                Login
-              </Button>
-              <Button
                 data-cal-namespace={calOptions.namespace}
                 data-cal-link={`manu-arora-vesr9s/chat-with-manu-demo`}
                 data-cal-config={`{"layout":"${calOptions.layout}"}`}
-                as="button"
                 onClick={() => setOpen(false)}
                 variant="primary"
                 className="block md:hidden w-full"

@@ -60,6 +60,7 @@ www/                                    # Next.js 15 landing page application
 │   ├── commands/                      # Slash commands (/create_plan, /implement_plan, etc.)
 │   └── skills/                        # Reusable skills
 │       └── ui-aesthetics/             # Distinctive UI design principles
+│       └── brand-guidelines           # Rekurve's official brand guidelines
 ├── thoughts/                          # Implementation plans and notes
 │   └── plans/                         # Detailed implementation plans
 ├── CLAUDE.md                          # This file (project instructions)

@@ -163,10 +163,10 @@ export const Grid = ({
   pattern,
   size,
 }: {
-  pattern?: number[][];
+  pattern?: [number, number][];
   size: number;
 }) => {
-  const p = pattern ?? [
+  const p: [number, number][] = pattern ?? [
     [Math.floor(Math.random() * 4) + 7, Math.floor(Math.random() * 6) + 1],
     [Math.floor(Math.random() * 4) + 7, Math.floor(Math.random() * 6) + 1],
     [Math.floor(Math.random() * 4) + 7, Math.floor(Math.random() * 6) + 1],
@@ -201,7 +201,7 @@ export function GridPattern({
   height: number;
   x: number | string;
   y: number | string;
-  squares: number[][];
+  squares: [number, number][];
 } & React.SVGProps<SVGSVGElement>) {
   const patternId = useId();
 
@@ -227,14 +227,14 @@ export function GridPattern({
       />
       {squares && (
         <svg x={x} y={y} className="overflow-visible">
-          {squares.map(([x, y], index) => (
+          {squares.map(([squareX, squareY], index) => (
             <rect
               strokeWidth="0"
               key={index}
               width={width + 1}
               height={height + 1}
-              x={x * width}
-              y={y * height}
+              x={squareX * width}
+              y={squareY * height}
             />
           ))}
         </svg>

@@ -1,7 +1,8 @@
 "use client"
 
-import { Code2, Lightbulb, RefreshCw, Search } from "lucide-react"
+import { ArrowRight, Code2, Lightbulb, RefreshCw, Search } from "lucide-react"
 
+import { Card } from "../ui/Card"
 import { Timeline } from "~/components/ui/timeline"
 
 const phases = [
@@ -76,13 +77,13 @@ const timelineData = phases.map((phase) => {
         <p className="text-base leading-relaxed">{phase.description}</p>
 
         {/* Deliverables */}
-        <div className="space-y-1.5 rounded-lg bg-gray-50 dark:bg-neutral-800 p-4">
+        <Card className="space-y-1.5 p-4">
           {phase.deliverables.map((deliverable, idx) => (
             <div key={idx} className="font-mono text-sm text-gray-600">
-              &gt; {deliverable}
+              <ArrowRight className="inline-block mr-2 h-4 w-4 text-gray-600" /> {deliverable}
             </div>
           ))}
-        </div>
+        </Card>
       </div>
     ),
   }

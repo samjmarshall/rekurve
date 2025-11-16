@@ -65,7 +65,7 @@ export function CaseStudies() {
   const ResultsIcon = caseStudy.results.icon
 
   return (
-    <section className="relative overflow-hidden bg-slate-50 py-20">
+    <section className="relative overflow-hidden bg-gray-50 py-20">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#071D33_1px,transparent_1px)] bg-size-[2rem_2rem]" />
@@ -83,7 +83,7 @@ export function CaseStudies() {
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-primary sm:text-4xl">
             Client Success Stories
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-slate-600">
+          <p className="mx-auto max-w-2xl text-lg text-gray-600">
             Real implementations, real results. See how our AI agents transform
             sales operations.
           </p>
@@ -97,7 +97,7 @@ export function CaseStudies() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <Card className="overflow-hidden border-2 border-state-success/20 bg-gradient-to-br from-white to-slate-50 shadow-2xl">
+          <Card className="overflow-hidden border-2 shadow-2xl">
             <CardContent className="p-8 sm:p-12">
               {/* Case study header */}
               <div className="mb-8">
@@ -120,12 +120,12 @@ export function CaseStudies() {
                   secondImage="/case-studies/after-ai-agent.svg"
                   firstImageClassName="object-contain"
                   secondImageClassname="object-contain"
-                  className="h-[500px] w-full rounded-lg border-2 border-state-success/20 bg-slate-50"
+                  className="h-[500px] w-full rounded-lg border-2 border-state-success/20 bg-gray-50"
                   slideMode="hover"
                   autoplay={true}
                   autoplayDuration={5000}
                 />
-                <div className="mt-4 flex justify-between px-4 text-sm text-slate-600">
+                <div className="mt-4 flex justify-between px-4 text-sm text-gray-600">
                   <span className="font-mono">← Manual Process (40% time wasted)</span>
                   <span className="font-mono">AI Agent (20+ hrs saved) →</span>
                 </div>
@@ -150,7 +150,7 @@ export function CaseStudies() {
                       {caseStudy.challenge.points.map((point, index) => (
                         <li
                           key={index}
-                          className="flex items-start gap-2 text-slate-700"
+                          className="flex items-start gap-2 text-neutral-700"
                         >
                           <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-coral" />
                           <span>{point}</span>
@@ -177,7 +177,7 @@ export function CaseStudies() {
                       {caseStudy.solution.points.map((point, index) => (
                         <li
                           key={index}
-                          className="flex items-start gap-2 text-slate-700"
+                          className="flex items-start gap-2 text-neutral-700"
                         >
                           <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-amber" />
                           <span>{point}</span>
@@ -202,7 +202,7 @@ export function CaseStudies() {
                   <AccordionContent>
                     <div className="ml-13 space-y-6 border-l-4 border-state-success/20 pl-6">
                       {/* Timeline */}
-                      <p className="font-mono text-sm text-slate-600">
+                      <p className="font-mono text-sm text-gray-600">
                         {caseStudy.results.timeline}
                       </p>
 
@@ -216,7 +216,7 @@ export function CaseStudies() {
                             <div className="mb-1 font-mono text-2xl font-bold text-state-success">
                               {metric.value}
                             </div>
-                            <div className="text-xs text-slate-600">
+                            <div className="text-xs text-gray-600">
                               {metric.label}
                             </div>
                           </div>
@@ -228,7 +228,7 @@ export function CaseStudies() {
                         {caseStudy.results.details.map((detail, index) => (
                           <li
                             key={index}
-                            className="flex items-start gap-2 text-slate-700"
+                            className="flex items-start gap-2 text-neutral-700"
                           >
                             <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-state-success" />
                             <span>{detail}</span>
@@ -254,7 +254,7 @@ export function CaseStudies() {
           <h3 className="mb-4 text-2xl font-bold text-primary">
             More Success Stories Coming Soon
           </h3>
-          <p className="text-slate-600">
+          <p className="text-gray-600">
             We&apos;re collecting additional case studies from our clients. Check back soon for more transformative results.
           </p>
           {/* Future: AnimatedTestimonials carousel will be implemented here with multiple case studies */}

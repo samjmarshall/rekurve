@@ -30,23 +30,23 @@ To access Rekurve's official brand identity and style resources, use this skill.
 
 ### Typography
 
-- **Headings**: Poppins (with Arial fallback)
-- **Body Text**: Lora (with Georgia fallback)
+- **Headings**: Play (with Arial fallback)
+- **Body Text**: IBM Plex Sans (with Arial fallback)
 - **Note**: Fonts should be pre-installed in your environment for best results
 
 ## Features
 
 ### Smart Font Application
 
-- Applies Poppins font to headings (24pt and larger)
-- Applies Lora font to body text
+- Applies Play font to headings (24pt and larger)
+- Applies IBM Plex Sans font to body text
 - Automatically falls back to Arial/Georgia if custom fonts unavailable
 - Preserves readability across all systems
 
 ### Text Styling
 
-- Headings (24pt+): Poppins font
-- Body text: Lora font
+- Headings (24pt+): Play font
+- Body text: IBM Plex Sans font
 - Smart color selection based on background
 - Preserves text hierarchy and formatting
 
@@ -60,10 +60,10 @@ To access Rekurve's official brand identity and style resources, use this skill.
 
 ### Font Management
 
-- Uses system-installed Poppins and Lora fonts when available
+- Uses system-installed Play and IBM Plex Sans fonts when available
 - Provides automatic fallback to Arial (headings) and Georgia (body)
 - No font installation required - works with existing system fonts
-- For best results, pre-install Poppins and Lora fonts in your environment
+- For best results, pre-install Play and IBM Plex Sans fonts in your environment
 
 ### Color Application
 

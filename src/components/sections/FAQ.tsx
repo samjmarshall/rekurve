@@ -103,14 +103,14 @@ export function FAQ() {
   })
 
   return (
-    <section className="relative bg-white dark:bg-black py-24">
+    <section className="relative bg-background py-24">
       <div className="container relative mx-auto max-w-4xl px-6">
         <ScrollReveal>
           <div className="mb-12 text-center">
             <h2 className="mb-4 font-sans text-4xl font-bold tracking-tight">
               Frequently Asked Questions
             </h2>
-            <p className="mx-auto max-w-lg text-center text-base text-neutral-600 dark:text-neutral-400">
+            <p className="mx-auto max-w-lg text-center text-base text-gray-600">
               We are here to help you with any questions you may have. If you
               don&apos;t find what you need, please contact us at{" "}
               <a
@@ -133,7 +133,7 @@ export function FAQ() {
                 placeholder="Search questions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-neutral-800 py-4 pl-12 pr-4 font-mono text-sm  transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/80"
+                className="w-full rounded-lg border border-border py-4 pl-12 pr-4 font-mono text-sm transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/80"
               />
             </div>
           </div>
@@ -152,10 +152,10 @@ export function FAQ() {
                 <AccordionItem
                   key={item.id}
                   value={item.id}
-                  className={`rounded-lg border-l-4 bg-gray-50 dark:bg-neutral-800 p-6 shadow-sm transition-all hover:bg-gray-200 dark:hover:bg-neutral-900 ${
+                  className={`rounded-lg border-l-4 bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-200 dark:hover:bg-neutral-900 ${
                     openItems.includes(item.id)
                       ? 'border-l-primary'
-                      : 'border-l-gray-300 dark:border-l-neutral-700'
+                      : 'border-l-border'
                   }`}
                 >
                   <AccordionTrigger className="text-left hover:no-underline">
@@ -163,7 +163,7 @@ export function FAQ() {
                       <div className="mb-1 text-xs font-mono text-primary uppercase tracking-wide">
                         {item.category}
                       </div>
-                      <div className="text-lg font-semibold text-black dark:text-white">
+                      <div className="text-lg font-semibold text-foreground">
                         {item.question}
                       </div>
                     </div>
@@ -199,7 +199,7 @@ export function FAQ() {
             </p>
             <a
               href="#booking-form"
-              className="inline-flex items-center font-mono text-accent-amber hover:text-accent-amber/70 transition-colors underline underline-offset-4"
+              className="inline-flex items-center font-mono text-accent-blue hover:text-accent-blue/70 transition-colors underline underline-offset-4"
             >
               Book a free 30-minute call
             </a>

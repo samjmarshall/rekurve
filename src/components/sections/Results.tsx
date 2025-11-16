@@ -3,6 +3,7 @@
 import { Card, CardContent } from "~/components/ui/Card"
 import { Clock, DollarSign, TrendingUp, Zap } from "lucide-react"
 
+import { CardDescription } from "../agentic-intelligence/card";
 import React from "react";
 import { motion } from "framer-motion"
 
@@ -34,7 +35,7 @@ const metrics = [
 
 export function Results() {
   return (
-    <section className="relative overflow-hidden bg-white dark:bg-black py-20">
+    <section className="relative overflow-hidden bg-background py-20">
       <div className="container relative z-10 mx-auto px-4">
         {/* Section header */}
         <motion.div
@@ -47,7 +48,7 @@ export function Results() {
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
             Real Results from Real Clients
           </h2>
-          <p className="mx-auto max-w-2xl text-lg">
+          <p className="mx-auto max-w-2xl text-lg text-gray-600">
             These aren&apos;t projections! They&apos;re actual outcomes from our autonomous
             AI sales agents.
           </p>
@@ -65,7 +66,7 @@ export function Results() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.15 }}
               >
-                <Card className="group relative h-full overflow-hidden bg-gray-50 border-gray-50/20 dark:bg-neutral-900 dark:border-neutral-900/20 bg-linear-to-br from-gray-50/80 dark:from-neutral-900/80 to-gray-50 dark:to-neutral-900 backdrop-blur-sm transition-all duration-300 hover:border-gray-50/40 dark:hover:border-neutral-900/40 hover:shadow-2xl hover:shadow-primary/10">
+                <Card className="group relative h-full overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:-translate-y-0.5">
                   <CardContent className="flex flex-col p-8">
                     <Icon className="size-8 mb-4 text-primary" />
 
@@ -82,14 +83,13 @@ export function Results() {
                     </div>
 
                     {/* Description */}
-                    <p className="text-sm text-gray-600">{metric.description}</p>
+                    <CardDescription className="text-sm">{metric.description}</CardDescription>
 
                     {/* Accent line at bottom */}
                     <div
                       className="absolute bottom-0 left-0 h-1 w-full bg-linear-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                     />
                   </CardContent>
-                  <GradientBeam />
                   <Bars />
                 </Card>
               </motion.div>

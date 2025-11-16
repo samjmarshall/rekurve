@@ -1,7 +1,7 @@
 import "~/styles/globals.css";
 
 import { type Metadata } from "next";
-import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
+import { Play, IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "~/components/Analytics";
 import { ThemeProvider } from "~/context/providers";
 import { Navbar } from "~/components/navbar";
@@ -122,7 +122,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body className="font-sans antialiased dark:bg-black bg-white">
+      <body className="font-sans antialiased bg-background">
         <ThemeProvider
             attribute="class"
             defaultTheme="system"

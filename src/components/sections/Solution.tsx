@@ -8,7 +8,7 @@ import { ScrollReveal } from '~/components/motion/ScrollReveal'
 
 export default function Solution() {
   return (
-    <section className="relative py-24 bg-white dark:bg-black">
+    <section className="relative py-24 bg-background">
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Heading */}
         <ScrollReveal>
@@ -66,41 +66,41 @@ export function GlowingBento() {
           <div className="flex w-full items-center gap-3 text-sm font-mono">
             {/* Step 1: Lead Research */}
             <div className="flex items-center gap-2 opacity-100">
-              <div className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse" />
-              <span className="text-slate-300">Lead Research</span>
+              <div className="w-2.5 h-2.5 rounded-full bg-accent-blue animate-pulse" />
+              <span className="text-stone-300">Lead Research</span>
             </div>
 
             {/* Connector 1 */}
-            <div className="flex-1 h-[1px] bg-gradient-to-r from-accent-cyan/60 to-accent-cyan/30 min-w-[20px]" />
+            <div className="flex-1 h-px bg-linear-to-r from-accent-blue/60 to-accent-blue/30 min-w-5" />
 
             {/* Step 2: Qualification */}
             <div className="flex items-center gap-2 opacity-70">
               <div
-                className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse"
+                className="w-2.5 h-2.5 rounded-full bg-accent-blue animate-pulse"
                 style={{ animationDelay: '0.3s' }}
               />
-              <span className="text-slate-400">Qualification</span>
+              <span className="text-stone-400">Qualification</span>
             </div>
 
             {/* Connector 2 */}
-            <div className="flex-1 h-px bg-linear-to-r from-accent-cyan/30 to-accent-cyan/20 min-w-[20px]" />
+            <div className="flex-1 h-px bg-linear-to-r from-accent-blue/30 to-accent-blue/20 min-w-5" />
 
             {/* Step 3: Follow-up */}
             <div className="flex items-center gap-2 opacity-50">
               <div
-                className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse"
+                className="w-2.5 h-2.5 rounded-full bg-accent-blue animate-pulse"
                 style={{ animationDelay: '0.6s' }}
               />
-              <span className="text-slate-500">Follow-up</span>
+              <span className="text-stone-500">Follow-up</span>
             </div>
 
             {/* Connector 3 */}
             <div className="flex-1">
-              <div className="relative left-24 w-20 h-px bg-linear-to-r from-accent-cyan/20 to-state-success/60 min-w-5" />
-              <div className="relative left-24 h-5 w-px bg-state-success/30" />
-              <div className="h-px w-24.25 bg-linear-to-r from-accent-cyan/20 to-state-success/30 min-w-5" />
-              <div className="relative left-24 h-5 w-px bg-state-success/30" />
-              <div className="relative left-24 w-20 h-px bg-linear-to-r bg-state-success/30 to-state-success/60 min-w-5" />
+              <div className="relative left-24 w-20 h-px bg-linear-to-r from-accent-blue/20 to-accent-green/60 min-w-5" />
+              <div className="relative left-24 h-5 w-px bg-accent-green/30" />
+              <div className="h-px w-24.25 bg-linear-to-r from-accent-blue/20 to-accent-green/30 min-w-5" />
+              <div className="relative left-24 h-5 w-px bg-accent-green/30" />
+              <div className="relative left-24 w-20 h-px bg-linear-to-r bg-accent-green/30 to-accent-green/60 min-w-5" />
             </div>
             
 
@@ -108,17 +108,17 @@ export function GlowingBento() {
             <div className="flex flex-col gap-5.5">
               <div className="flex items-center space-x-2 opacity-100">
                 <div
-                  className="w-3 h-3 rounded-full bg-state-success animate-pulse shadow-lg shadow-state-success/50"
+                  className="w-3 h-3 rounded-full bg-accent-green animate-pulse shadow-lg shadow-accent-green/50"
                   style={{ animationDelay: '0.9s' }}
                 />
-                <span className="text-state-success font-semibold">Meeting Booked</span>
+                <span className="text-accent-green font-semibold">Meeting Booked</span>
               </div>
               <div className="flex items-center space-x-2 opacity-100">
                 <div
-                  className="w-3 h-3 rounded-full bg-state-success animate-pulse shadow-lg shadow-state-success/50"
+                  className="w-3 h-3 rounded-full bg-accent-green animate-pulse shadow-lg shadow-accent-green/50"
                   style={{ animationDelay: '0.9s' }}
                 />
-                <span className="text-state-success font-semibold">Quote Sent</span>
+                <span className="text-accent-green font-semibold">Quote Sent</span>
               </div>
             </div>
           </div>
@@ -160,7 +160,7 @@ interface GridItemProps {
 const GridItem = ({ area, icon, title, description, children }: React.PropsWithChildren<GridItemProps>) => {
   return (
     <li className={`min-h-56 list-none ${area}`}>
-      <div className="relative h-full rounded-2xl shadow-md border border-gray-300 dark:border-neutral-800 p-2 md:rounded-3xl md:p-3">
+      <div className="relative h-full rounded-2xl shadow-md border bg-card border-border p-2 md:rounded-3xl md:p-3">
         <GlowingEffect
           spread={40}
           glow={true}
@@ -171,7 +171,7 @@ const GridItem = ({ area, icon, title, description, children }: React.PropsWithC
         <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl p-6 md:p-6 dark:shadow-[0px_0px_27px_0px_#2D2D2D]">
           <div className="relative flex flex-1 flex-col justify-between gap-3">
             {icon && (
-              <div className="w-fit rounded-lg border border-gray-300 dark:border-neutral-800 p-2">
+              <div className="w-fit rounded-lg border border-border p-2">
                 {icon}
               </div>
             )}

@@ -44,17 +44,7 @@ const techStack = [
 
 export function AboutFounder() {
   return (
-    <section className="relative overflow-hidden bg-white dark:bg-black py-20">
-      {/* Background pattern - subtle code/terminal aesthetic */}
-      <div className="absolute inset-0 opacity-[0.03]">
-        <div
-          className="h-full w-full"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='20' font-family='monospace' font-size='12' fill='%23ffffff'%3E{'%3E'}%3C/text%3E%3Ctext x='10' y='40' font-family='monospace' font-size='12' fill='%23ffffff'%3E  code()%3C/text%3E%3Ctext x='10' y='60' font-family='monospace' font-size='12' fill='%23ffffff'%3E{'}'}%3C/text%3E%3C/svg%3E")`,
-          }}
-        />
-      </div>
-
+    <section className="relative overflow-hidden bg-background py-20">
       <div className="container relative z-10 mx-auto px-4">
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[40%_60%]">
           {/* Left side - Founder positioning */}
@@ -67,7 +57,7 @@ export function AboutFounder() {
           >
             {/* Founder photo placeholder */}
             <div className="relative mx-auto w-fit lg:mx-0">
-              <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-transparent bg-linear-to-br from-accent-amber via-primary to-accent-coral p-1 shadow-2xl">
+              <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-transparent bg-linear-to-br from-accent-blue via-primary to-primary p-1 shadow-2xl">
                 <div className="flex h-full w-full items-center justify-center rounded-full bg-black">
                   <div className="text-center text-white">
                     <div className="text-5xl font-bold">SM</div>
@@ -100,9 +90,8 @@ export function AboutFounder() {
               </div>
 
               {/* Quote block */}
-              <Card className="bg-gray-50 dark:bg-neutral-800 backdrop-blur-sm">
+              <Card className="backdrop-blur-sm">
                 <CardContent className="p-6">
-                  
                   <p className="italic flex leading-relaxed text-gray-600 max-w-prose">
                     <span className="mb-3 pr-2 text-5xl leading-none text-primary">
                       &ldquo;
@@ -152,7 +141,7 @@ export function AboutFounder() {
                     transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                   >
                     <Card
-                      className="border-l-4 backdrop-blur-sm transition-all duration-300 bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 border-gray-300 dark:hover:border-primary hover:border-primary"
+                      className="border-l-4 backdrop-blur-sm transition-all duration-300 hover:border-primary"
                     >
                       <CardContent className="flex items-center gap-4 p-4">
                         <div

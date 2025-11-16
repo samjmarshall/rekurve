@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, Mail } from 'lucide-react'
+import { ArrowRight, Mail, MoveRight } from 'lucide-react'
 
 import { BrandShimmer } from '../brand-shimmer';
 import { Button } from '../ui/Button';
@@ -29,11 +29,11 @@ export function FinalCTA() {
   
           <ScrollReveal delay={0.2}>
             <div className="flex items-start sm:items-center flex-col sm:flex-row sm:gap-4">
-              <Button variant="primary" className="mt-8 flex items-center space-x-2">
+              <Button variant="primary" className="group mt-8 gap-1 flex items-center space-x-2">
                 Book Your Call
-                <ArrowRight className="group-hover:translate-x-1 h-5 w-5 stroke-1 transition-transform duration-200" />
+                <ArrowRight className="group-hover:translate-x-1 h-4 w-4 stroke-1.25 transition-transform duration-200" />
               </Button>
-              <Button variant="ghost" className="mt-8 flex items-center">
+              <Button variant="ghost" className="group mt-8 gap-1 flex items-center">
                 Or email us: contact@rekurve.ai
                 <Mail className="group-hover:translate-x-1 stroke-1 transition-transform duration-200" />
               </Button>
@@ -78,7 +78,7 @@ const GridLineHorizontal = ({
           "--height": "1px",
           "--width": "5px",
           "--fade-stop": "90%",
-          "--offset": offset || "200px", //-100px if you want to keep the line inside
+          "--offset": offset ?? "200px", //-100px if you want to keep the line inside
           "--color-dark": "rgba(255, 255, 255, 0.2)",
           maskComposite: "exclude",
         } as React.CSSProperties
@@ -113,7 +113,7 @@ const GridLineVertical = ({
           "--height": "5px",
           "--width": "1px",
           "--fade-stop": "90%",
-          "--offset": offset || "150px", //-100px if you want to keep the line inside
+          "--offset": offset ?? "150px", //-100px if you want to keep the line inside
           "--color-dark": "rgba(255, 255, 255, 0.2)",
           maskComposite: "exclude",
         } as React.CSSProperties

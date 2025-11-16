@@ -17,8 +17,8 @@ const pricingTiers: PricingTier[] = [
     setupFee: 9500,
     monthlyFee: 2500,
     features: [
+      'Basic Email Quote Generation',
       'CRM setup & integration',
-      'Simple Quote Generation',
       'Basic lead research automation',
       'Email sequence automation (3-5 sequences)',
       'Basic lead scoring',
@@ -37,7 +37,7 @@ const pricingTiers: PricingTier[] = [
     monthlyFee: 4500,
     features: [
       'Everything in Foundation',
-      'Multi-channel outreach (Email + LinkedIn + SMS)',
+      'Multi-channel integration (Email + Social Media + SMS)',
       'AI-powered lead qualification',
       'Adaptive messaging based on engagement',
       'Real-time lead enrichment (Clay, Clearbit)',
@@ -59,11 +59,10 @@ const pricingTiers: PricingTier[] = [
     features: [
       'Everything in Growth',
       'Custom AI decision logic',
-      'Multi-language support',
       'Advanced CRM integrations (Salesforce, HubSpot, Pipedrive)',
       'Dedicated account manager',
       'Custom training & onboarding',
-      '6-month managed service',
+      '6-months active service management',
       '99.9% uptime SLA',
       'White-glove support (phone + video)',
     ],

@@ -213,7 +213,7 @@ export function BookingForm() {
                   <div key={step.id} className="flex items-center">
                     <div
                       className={cn("mr-2 mb-6 h-0.5 w-full transition-colors duration-300",
-                        isCompleted ? 'bg-accent-green' : 'bg-neutral-800',
+                        currentStep > step.id || currentStep === step.id ? 'bg-accent-green' : 'bg-neutral-800',
                         index === 0 ? 'h-0' : 'h-0.5'
                       )}
                     />

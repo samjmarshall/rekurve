@@ -17,7 +17,7 @@ const metrics = [
     icon: TrendingUp,
     value: "43%",
     suffix: " increase",
-    description: "Marketing Qualified Lead to Sales Qualified Lead conversion",
+    description: "Lead conversion to quote acceptance & booked work",
   },
   {
     icon: DollarSign,

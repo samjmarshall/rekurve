@@ -111,7 +111,7 @@ export function GlowingBento() {
                   className="w-3 h-3 rounded-full bg-accent-green animate-pulse shadow-lg shadow-accent-green/50"
                   style={{ animationDelay: '0.9s' }}
                 />
-                <span className="text-accent-green font-semibold">Meeting Booked</span>
+                <span className="text-accent-green font-semibold">Job Booked</span>
               </div>
               <div className="flex items-center space-x-2 opacity-100">
                 <div

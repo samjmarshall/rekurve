@@ -17,7 +17,7 @@ const techStack = [
   {
     layer: "Intelligence Layer",
     icon: Brain,
-    content: "OpenAI, Anthropic + Proprietary Models",
+    content: "Gemini, Anthropic + Proprietary Models",
   },
   {
     layer: "Orchestration Layer",

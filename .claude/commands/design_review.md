@@ -33,6 +33,6 @@ Review the complete diff above. This contains all code changes in the PR.
 
 
 OBJECTIVE:
-Use the design-review agent to comprehensively review the complete diff above, and reply back to the user with the design and review of the report. Your final reply must contain the markdown report and nothing else.
+Use the design-review agent to comprehensively review the complete diff above, and reply back to the user with the design and review report. Your final reply must contain the markdown report and nothing else.
 
-Follow and implement the design principles and style guide located in the .claude/skills/ui-aesthetics/SKILL.md and .claude/skills/ui-aesthetics/design-checklist.md docs.
+Follow and implement the design principles and brand guidelines located in the .claude/skills/ui-aesthetics/SKILL.md, .claude/skills/ui-aesthetics/design-checklist.md and .claude/skills/brand-guidelines/SKILL.md docs.

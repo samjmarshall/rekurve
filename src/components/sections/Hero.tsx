@@ -28,7 +28,7 @@ export function Hero() {
   return (
     <div
       ref={parentRef}
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 md:px-8 md:py-40 bg-neutral-50 dark:bg-neutral-900"
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 md:px-8 md:py-40 bg-background"
     >
       <BackgroundGrids />
       <CollisionMechanism
@@ -72,10 +72,10 @@ export function Hero() {
         }}
       />
 
-      <div className="text-balance relative z-20 mx-auto mb-4 mt-4 max-w-4xl text-center text-3xl font-semibold tracking-tight text-gray-700 dark:text-neutral-300 md:text-7xl">
+      <div className="text-balance relative z-20 mx-auto mb-4 mt-4 max-w-4xl text-center text-3xl font-semibold tracking-tight md:text-7xl">
         <h2>Recover 20+ Hours Weekly or Add $100K to Your Pipeline in 90 Days</h2>
       </div>
-      <p className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center text-base/6 text-gray-600 dark:text-gray-200">
+      <p className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center text-base/6">
         End-to-End AI sales agents, from Customer enquiry &rarr; Quote.
         <br />
         For service businesses spending 20+ hours a week quoting.
@@ -101,11 +101,10 @@ export function Hero() {
           Book a call
         </Button>
       </div>
-      <div className="relative mx-auto max-w-7xl rounded-4xl border border-neutral-200/50 bg-neutral-100 p-2 backdrop-blur-lg dark:border-neutral-700 dark:bg-neutral-800/50 md:p-4">
-        <div className="rounded-3xl border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-black">
+      <div className="relative mx-auto max-w-7xl rounded-4xl border border-border bg-neutral-100 p-2 backdrop-blur-lg dark:border-charcoal-700 dark:bg-charcoal-800/50 md:p-4">
+        <div className="rounded-3xl border border-border bg-card p-2 dark:border-charcoal-700">
           <div className="w-full">
             <Card className="relative w-full max-w-none overflow-hidden">
-              {/* <div className="pointer-events-none absolute inset-0 h-full w-full bg-[radial-gradient(var(--color-dots)_1px,transparent_1px)] mask-radial-from-10% [background-size:10px_10px]"></div> */}
               <div className="flex items-center gap-2">
                 <NativeIcon />
                 <CardTitle>Native Integration</CardTitle>
@@ -163,7 +162,7 @@ const CollisionMechanism = React.forwardRef<
       repeatDelay?: number;
     };
   }
->(({ parentRef, containerRef, beamOptions = {} }, ref) => {
+>(({ parentRef, containerRef, beamOptions = {} }, _ref) => {
   const beamRef = useRef<HTMLDivElement>(null);
   const [collision, setCollision] = useState<{
     detected: boolean;
@@ -237,24 +236,24 @@ const CollisionMechanism = React.forwardRef<
         ref={beamRef}
         animate="animate"
         initial={{
-          translateY: beamOptions.initialY || "-200px",
-          translateX: beamOptions.initialX || "0px",
-          rotate: beamOptions.rotate || -45,
+          translateY: beamOptions.initialY ?? "-200px",
+          translateX: beamOptions.initialX ?? "0px",
+          rotate: beamOptions.rotate ?? -45,
         }}
         variants={{
           animate: {
-            translateY: beamOptions.translateY || "800px",
-            translateX: beamOptions.translateX || "700px",
-            rotate: beamOptions.rotate || -45,
+            translateY: beamOptions.translateY ?? "800px",
+            translateX: beamOptions.translateX ?? "700px",
+            rotate: beamOptions.rotate ?? -45,
           },
         }}
         transition={{
-          duration: beamOptions.duration || 8,
+          duration: beamOptions.duration ?? 8,
           repeat: Infinity,
           repeatType: "loop",
           ease: "linear",
-          delay: beamOptions.delay || 0,
-          repeatDelay: beamOptions.repeatDelay || 0,
+          delay: beamOptions.delay ?? 0,
+          repeatDelay: beamOptions.repeatDelay ?? 0,
         }}
         className={cn(
           "absolute left-96 top-20 m-auto h-14 w-px rounded-full bg-linear-to-t from-orange-500 via-yellow-500 to-transparent",
@@ -331,7 +330,7 @@ const GridLineVertical = ({
           "--height": "5px",
           "--width": "1px",
           "--fade-stop": "90%",
-          "--offset": offset || "150px", //-100px if you want to keep the line inside
+          "--offset": offset ?? "150px", //-100px if you want to keep the line inside
           "--color-dark": "rgba(255, 255, 255, 0.3)",
           maskComposite: "exclude",
         } as React.CSSProperties

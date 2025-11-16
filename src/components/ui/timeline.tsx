@@ -34,15 +34,9 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-white dark:bg-black py-20"
+      className="relative w-full overflow-hidden bg-background py-20"
       ref={containerRef}
     >
-      {/* Background pattern */}
-      <div className="absolute inset-0">
-        <div className="absolute z-10 inset-0 dark:bg-[linear-gradient(to_bottom,rgba(0,0,0,0.98),rgba(0,0,0,0.95),rgba(0,0,0,0.95),rgba(0,0,0,0.98))]" />
-        <div className="absolute inset-0 dark:bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-size-[4rem_4rem]" />
-      </div>
-
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-20 md:px-8 lg:px-10">
         {/* Section header */}
         <motion.div
@@ -70,8 +64,8 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
               role="listitem"
             >
               <div className="sticky top-40 z-40 flex max-w-xs flex-col items-center self-start md:w-full md:flex-row lg:max-w-sm">
-                <div className="absolute left-3 flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-black md:left-3">
-                  <div className="h-4 w-4 rounded-full border-2 border-gray-300 shadow dark:border-neutral-800 bg-white dark:bg-black p-2" />
+                <div className="absolute flex h-10 w-10 items-center justify-center rounded-full bg-background md:left-3">
+                  <div className="h-4 w-4 relative left-px rounded-full border-2 border-border shadow bg-card p-2" />
                 </div>
                 <h3 className="hidden pl-20 text-xl font-bold md:block md:text-4xl">
                   {item.title}
@@ -92,14 +86,14 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
             style={{
               height: height + "px",
             }}
-            className="absolute left-8 top-0 w-[2px] overflow-hidden bg-[linear-gradient(to_bottom,var(--tw-gradient-stops))] from-transparent from-[0%] via-slate-200 to-transparent to-[99%] [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)] md:left-8"
+            className="absolute left-8 top-0 w-0.5 overflow-hidden bg-[linear-gradient(to_bottom,var(--tw-gradient-stops))] from-transparent from-0% via-stone-200 to-transparent to-99% [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)] md:left-8"
           >
             <motion.div
               style={{
                 height: heightTransform,
                 opacity: opacityTransform,
               }}
-              className="absolute inset-x-0 top-0 w-[2px] rounded-full bg-gradient-to-b from-accent-cyan via-accent-amber via-primary to-accent-coral from-[0%] via-[33%] via-[66%]"
+              className="absolute inset-x-0 top-0 w-0.5 rounded-full bg-linear-to-b from-accent-blue via-accent-green to-primary from-0% via-66%"
             />
           </div>
         </div>

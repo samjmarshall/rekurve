@@ -1,9 +1,8 @@
 "use client";
 
-import { AppWindowMac, Book, BookOpen, CalendarDays, DollarSign, LayoutList, Mail, MessageSquare, Package, Search } from "lucide-react";
+import { AppWindowMac, BookOpen, LayoutList, Mail, MessageSquare, Package, Search } from "lucide-react";
 import {
   Hubspot,
-  SalesOps,
   SlackLogo,
   Xero,
 } from "~/icons/general";
@@ -31,7 +30,7 @@ export const NativeIntegrationSkeleton = () => {
             </TextIconBlock>
           </div>
           <div className="relative h-16 w-16 overflow-hidden rounded-md bg-gray-200 p-px shadow-xl dark:bg-neutral-700">
-            <div className="absolute inset-0 scale-[1.4] animate-spin rounded-full bg-conic bg-[conic-gradient(at_center,transparent,var(--color-blue-500)_20%,transparent_30%)] animation-duration-[2s]"></div>
+            <div className="absolute inset-0 scale-[1.4] animate-spin rounded-full bg-conic bg-[conic-gradient(at_center,transparent,var(--color-accent-blue)_20%,transparent_30%)] animation-duration-[2s]"></div>
             <div className="absolute inset-0 scale-[1.4] animate-spin rounded-full bg-[conic-gradient(at_center,transparent,var(--color-primary)_20%,transparent_30%)] [animation-delay:1s] animation-duration-[2s]"></div>
             <div className="relative z-20 flex h-full w-full items-center justify-center rounded-[5px] bg-white dark:bg-neutral-900">
               <NativeIcon className="size-6 text-primary" />
@@ -41,7 +40,7 @@ export const NativeIntegrationSkeleton = () => {
         <div className="relative flex h-full w-full items-center justify-start">
           <RightSideSVG />
           <div className="relative flex flex-col items-center gap-2">
-            <span className="relative z-20 rounded-sm border border-blue-500 bg-blue-50 px-2 py-0.5 text-xs text-blue-500 dark:bg-blue-900 dark:text-white">
+            <span className="relative z-20 rounded-sm border border-accent-blue bg-blue-50 px-2 py-0.5 text-xs text-accent-blue dark:bg-accent-blue/50 dark:text-white">
               Connected
             </span>
             <div className="absolute inset-x-0 -top-30 flex h-full flex-col items-center">
@@ -137,7 +136,7 @@ const VerticalLine = (
           gradientUnits="userSpaceOnUse"
         >
           <stop stopColor="var(--color-line)" />
-          <stop offset="0.5" stopColor="#F17463" />
+          <stop offset="0.5" stopColor="var(--color-primary)" />
           <stop offset="1" stopColor="var(--color-line)" />
         </motion.linearGradient>
       </defs>
@@ -196,7 +195,7 @@ const RightSideSVG = (props: React.SVGProps<SVGSVGElement>) => {
           gradientUnits="userSpaceOnUse"
         >
           <stop stopColor="var(--color-line)" />
-          <stop offset="0.5" stopColor="var(--color-blue-500)" />
+          <stop offset="0.5" stopColor="var(--color-accent-blue)" />
           <stop offset="1" stopColor="var(--color-line)" />
         </motion.linearGradient>
       </defs>
@@ -264,8 +263,8 @@ const TopSVG = (props: React.SVGProps<SVGSVGElement>) => {
           }}
         >
           <stop stopColor="var(--color-line)" />
-          <stop offset="0.33" stopColor="#F17463" />
-          <stop offset="0.66" stopColor="#F17463" />
+          <stop offset="0.33" stopColor="var(--color-primary)" />
+          <stop offset="0.66" stopColor="var(--color-primary)" />
           <stop offset="1" stopColor="var(--color-line)" />
         </motion.linearGradient>
       </defs>
@@ -324,8 +323,8 @@ export const MiddleSVG = (props: React.SVGProps<SVGSVGElement>) => {
           }}
         >
           <stop stopColor="var(--color-line)" />
-          <stop offset="0.33" stopColor="var(--color-blue-500)" />
-          <stop offset="0.66" stopColor="var(--color-blue-500)" />
+          <stop offset="0.33" stopColor="var(--color-accent-blue)" />
+          <stop offset="0.66" stopColor="var(--color-accent-blue)" />
           <stop offset="1" stopColor="var(--color-line)" />
         </motion.linearGradient>
       </defs>
@@ -378,8 +377,8 @@ export const BottomSVG = (props: React.SVGProps<SVGSVGElement>) => {
           }}
         >
           <stop stopColor="var(--color-line)" />
-          <stop offset="0.33" stopColor="var(--color-yellow-500)" />
-          <stop offset="0.66" stopColor="var(--color-yellow-500)" />
+          <stop offset="0.33" stopColor="var(--color-accent-green)" />
+          <stop offset="0.66" stopColor="var(--color-accent-green)" />
           <stop offset="1" stopColor="var(--color-line)" />
         </motion.linearGradient>
       </defs>

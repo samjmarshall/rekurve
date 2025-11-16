@@ -32,7 +32,7 @@ const painPoints = [
 
 export default function Problem() {
   return (
-    <section className="relative py-24 bg-white dark:bg-black">
+    <section className="relative py-24 bg-background">
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Heading */}
         <ScrollReveal>
@@ -44,7 +44,7 @@ export default function Problem() {
               Your Sales Team Is Losing{' '}
               <span className="text-primary">$250K+</span> Annually to Manual Work
             </h2>
-            {/* <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            {/* <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Here&apos;s exactly what it&apos;s costing you:
             </p> */}
             <BrandShimmer text="Here&apos;s exactly what it&apos;s costing you:" />
@@ -58,7 +58,7 @@ export default function Problem() {
               <ScrollReveal key={index} delay={index * 0.1}>
                 <div
                   key={"card" + index}
-                  className="group/card relative overflow-hidden p-10 shadow-md rounded-md dark:border dark:border-neutral-900"
+                  className="group/card relative overflow-hidden p-10 shadow-md rounded-md bg-card dark:border dark:border-neutral-900"
                 >
                   <Grid size={20} />
                   <EdgeElement />
@@ -192,7 +192,7 @@ export const Grid = ({
 
   return (
     <div className="pointer-events-none absolute left-1/2 top-0 -ml-20 -mt-2 h-full w-full [mask-image:linear-gradient(white,transparent)]">
-      <div className="absolute inset-0 bg-gradient-to-r from-zinc-100/30 to-zinc-300/30 opacity-100 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)] dark:from-zinc-900/30 dark:to-zinc-900/30">
+      <div className="absolute inset-0 bg-linear-to-r from-zinc-100/30 to-zinc-300/30 opacity-100 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)] dark:from-zinc-900/30 dark:to-zinc-900/30">
         <GridPattern
           width={size ?? 20}
           height={size ?? 20}

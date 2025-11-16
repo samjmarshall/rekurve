@@ -30,7 +30,7 @@ export function Guarantee() {
   return (
     <section
       id="guarantee"
-      className="relative overflow-hidden bg-white dark:bg-black py-24"
+      className="relative overflow-hidden bg-background py-24"
     >
       <div className="container relative mx-auto px-4">
         <motion.div
@@ -101,7 +101,7 @@ export function Guarantee() {
                     },
                   }}
                 >
-                  <Card className="group h-full p-6 backdrop-blur-sm transition-all duration-300 bg-gray-50 dark:bg-neutral-800 hover:border-primary/50">
+                  <Card className="group h-full p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary">
                     <Icon
                       className="h-6 w-6 mb-2 text-primary"
                       strokeWidth={2}
@@ -124,7 +124,7 @@ export function Guarantee() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.6, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-12 rounded-xl border bg-gray-50 border-gray-300 dark:bg-neutral-800 dark:border-neutral-900 p-8 backdrop-blur-sm"
+            className="mt-12 rounded-lg border border-border bg-card shadow-sm transition-shadow hover:shadow-md p-8"
           >
             <h3 className="mb-4 text-xl font-semibold">
               How We Measure ROI
@@ -191,7 +191,7 @@ export function Guarantee() {
               Ready to see results?{' '}
               <a
                 href="#booking-form"
-                className="font-semibold text-accent-amber underline decoration-primary/30 transition-colors hover:text-accent-amber/90 hover:decoration-accent-amber"
+                className="font-semibold text-accent-blue underline decoration-primary/30 transition-colors hover:text-accent-blue/90 hover:decoration-accent-blue"
               >
                 Book a call
               </a>

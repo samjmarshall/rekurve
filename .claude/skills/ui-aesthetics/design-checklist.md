@@ -20,7 +20,7 @@
     *   [ ] **Dark Mode Palette:** Create a corresponding accessible dark mode palette.
     *   [ ] **Accessibility Check:** Ensure all color combinations meet WCAG AA contrast ratios.
 *   [ ] **Establish a Typographic Scale:**
-    *   [ ] **Primary Font Family:** Choose a clean, legible sans-serif font (e.g., Inter, Manrope, system-ui).
+    *   [ ] **Primary Font Family:** Choose a clean, legible sans-serif font (e.g., Play, IBM Plex Sans, Manrope, system-ui).
     *   [ ] **Modular Scale:** Define distinct sizes for H1, H2, H3, H4, Body Large, Body Medium (Default), Body Small/Caption. (e.g., H1: 32px, Body: 14px/16px).
     *   [ ] **Font Weights:** Utilize a limited set of weights (e.g., Regular, Medium, SemiBold, Bold).
     *   [ ] **Line Height:** Ensure generous line height for readability (e.g., 1.5-1.7 for body text).

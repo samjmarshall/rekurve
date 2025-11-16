@@ -9,12 +9,12 @@ interface CalEmbedOptions {
     };
   };
   hideEventTypeDetails?: boolean;
-  layout?: "month_view" | "week_view" | "day_view" | any;
+  layout?: "month_view" | "week_view" | "column_view";
 }
 
 export const useCalEmbed = (options: CalEmbedOptions) => {
   useEffect(() => {
-    (async function () {
+    void (async function () {
       const cal = await getCalApi({ namespace: options.namespace });
       cal("ui", {
         styles: options.styles,

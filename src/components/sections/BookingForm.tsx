@@ -14,6 +14,7 @@ import {
 
 import { Button } from '~/components/ui/Button'
 import { Card } from '~/components/ui/Card'
+import { cn } from '~/lib/utils'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { z } from 'zod'
@@ -141,7 +142,7 @@ export function BookingForm() {
     return (
       <section
         id="booking-form"
-        className="relative overflow-hidden bg-white dark:bg-black py-24"
+        className="relative overflow-hidden bg-background py-24"
       >
         <div className="container relative mx-auto px-4">
           <motion.div
@@ -179,7 +180,7 @@ export function BookingForm() {
   return (
     <section
       id="booking-form"
-      className="relative overflow-hidden bg-white dark:bg-black py-24"
+      className="relative overflow-hidden bg-background py-24"
     >
       <div className="container relative mx-auto px-4">
         <motion.div
@@ -202,23 +203,29 @@ export function BookingForm() {
 
           {/* Progress Bar */}
           <div className="mb-8">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 grid grid-cols-5 items-center">
               {steps.map((step, index) => {
                 const Icon = step.icon
                 const isActive = currentStep === step.id
                 const isCompleted = currentStep > step.id
 
                 return (
-                  <div key={step.id} className="flex flex-1 items-center">
-                    <div className="flex flex-col items-center">
+                  <div key={step.id} className="flex items-center">
+                    <div
+                      className={cn("mr-2 mb-6 h-0.5 w-full transition-colors duration-300",
+                        isCompleted ? 'bg-accent-green' : 'bg-neutral-800',
+                        index === 0 ? 'h-0' : 'h-0.5'
+                      )}
+                    />
+                    <div className="flex min-w-16 flex-col items-center">
                       <div
                         className={`
                           flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300
                           ${
                             isCompleted
-                              ? 'border-accent-amber bg-accent-amber'
+                              ? 'border-accent-green bg-accent-green'
                               : isActive
-                                ? 'border-primary bg-primary ring-2 ring-primary/30 ring-offset-2 ring-offset-neutral-100 dark:ring-offset-neutral-900'
+                                ? 'border-accent-blue bg-accent-blue ring-2 ring-accent-blue/30 ring-offset-2 ring-offset-neutral-100 dark:ring-offset-neutral-900'
                                 : 'border-neutral-200 bg-neutral-100 dark:dark:border-neutral-700 dark:bg-neutral-800 text-gray-600'
                           }
                         `}
@@ -233,21 +240,19 @@ export function BookingForm() {
                       </div>
                       <span
                         className={`
-                          mt-2 hidden text-xs font-medium md:block
+                          mt-2 hidden text-nowrap text-xs font-medium md:block
                           ${!(isActive || isCompleted) && 'text-gray-600'}
                         `}
                       >
                         {step.title}
                       </span>
                     </div>
-                    {index < steps.length - 1 && (
-                      <div
-                        className={`
-                          mx-2 mb-6 h-0.5 flex-1 transition-colors duration-300
-                          ${isCompleted ? 'bg-accent-amber' : 'bg-neutral-800'}
-                        `}
-                      />
-                    )}
+                    <div
+                      className={cn("ml-2 mb-6 w-full transition-colors duration-300",
+                        isCompleted ? 'bg-accent-green' : 'bg-neutral-800',
+                        index === steps.length - 1 ? 'h-0' : 'h-0.5'
+                      )}
+                    />
                   </div>
                 )
               })}
@@ -258,7 +263,7 @@ export function BookingForm() {
           </div>
 
           {/* Form */}
-          <Card className="border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 p-8 backdrop-blur-sm">
+          <Card className="p-8 backdrop-blur-sm">
             <form onSubmit={handleSubmit(onSubmit)}>
               <AnimatePresence mode="wait">
                 {/* Step 1: Basic Info */}

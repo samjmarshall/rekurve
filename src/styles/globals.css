@@ -5,8 +5,7 @@
 
 @theme {
   /* Custom fonts - will be overridden by Next.js font variables */
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
 
   --color-charcoal-900: #202020;
@@ -20,6 +19,13 @@
   --color-gray-500: #c0c0c0;
   --color-gray-600: #8b8b8b;
 
+  /*
+    - Dark: `#141413` - Primary text and dark backgrounds
+    - Light: `#faf9f5` - Light backgrounds and text on dark
+    - Mid Gray: `#b0aea5` - Secondary elements
+    - Light Gray: `#e8e6dc` - Subtle backgrounds
+  */
+
   --shadow-aceternity:
     0px 2px 3px -1px rgba(0, 0, 0, 0.1), 0px 1px 0px 0px rgba(25, 28, 33, 0.02),
     0px 0px 0px 1px rgba(25, 28, 33, 0.08);
@@ -30,10 +36,12 @@
   /* Distinctive accents (NOT generic purple) - use strategically, ONE per context */
   --color-accent-amber: oklch(0.75 0.15 75);
   /* Urgent/highlight */
-  --color-accent-cyan: oklch(0.80 0.15 195);
+  --color-accent-blue: #6a9bcc;
   /* Active/in-progress - increased luminance for WCAG AA on dark backgrounds */
   --color-accent-coral: oklch(0.65 0.18 25);
   /* Attention states */
+  --color-accent-green: #788c5d;
+  /* Success/complete */
 
   /* Semantic states (data viz inspired) */
   --color-state-success: oklch(0.7 0.18 145);
@@ -53,35 +61,33 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
+  --background: #faf9f5;
+  --foreground: #141413;
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --dots: var(--color-gray-300);
+  --card-foreground: #141413;
   --line: var(--color-neutral-200);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
+  --popover-foreground: #141413;
+  --secondary: #e8e6dc;
+  --secondary-foreground: #141413;
+  --muted: #b0aea5;
   --muted-foreground: oklch(0.552 0.016 285.938);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
+  --border: #e8e6dc;
+  --input: #e8e6dc;
   --ring: oklch(0.705 0.015 286.067);
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
+  --background: #141413;
+  --foreground: #faf9f5;
   --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --dots: var(--color-neutral-900);
+  --card-foreground: #faf9f5;
   --line: var(--color-neutral-700);
   --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
+  --popover-foreground: #faf9f5;
   --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
+  --secondary-foreground: #faf9f5;
   --muted: oklch(0.274 0.006 286.033);
   --muted-foreground: oklch(0.705 0.015 286.067);
   --destructive: oklch(0.704 0.191 22.216);
@@ -100,7 +106,6 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-  --color-dots: var(--dots);
   --color-line: var(--line);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
@@ -200,7 +205,7 @@
 
   0%,
   100% {
-    box-shadow: 0 0 0 0 var(--color-accent-cyan);
+    box-shadow: 0 0 0 0 var(--color-accent-blue);
   }
 
   50% {

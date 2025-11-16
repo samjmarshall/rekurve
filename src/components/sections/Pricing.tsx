@@ -1,11 +1,12 @@
 'use client'
 
+import { cn, formatCurrency } from '~/lib/utils'
+
 import { Badge } from '~/components/ui/Badge'
 import { BrandShimmer } from '../brand-shimmer'
 import { Button } from '~/components/ui/Button'
 import { Check } from 'lucide-react'
 import type { PricingTier } from '~/types'
-import { formatCurrency } from '~/lib/utils'
 import { motion } from 'framer-motion'
 
 const pricingTiers: PricingTier[] = [
@@ -98,7 +99,7 @@ export function Pricing() {
   return (
     <section
       id="pricing"
-      className="relative overflow-hidden bg-white dark:bg-black py-24"
+      className="relative overflow-hidden bg-background py-24"
     >
       <div className="container relative mx-auto px-4">
         {/* Heading */}
@@ -143,7 +144,7 @@ export function Pricing() {
                   transition-all duration-300
                   hover:-translate-y-2 hover:shadow-2xl
                   ${borderColor}
-                  ${tier.highlighted ? 'lg:scale-105 lg:shadow-xl shadow-primary/15 relative bg-[radial-gradient(164.75%_100%_at_50%_0%,var(--color-gray-50)_0%,var(--color-white)_48.73%)] dark:bg-[radial-gradient(164.75%_100%_at_50%_0%,var(--color-neutral-900)_0%,var(--color-neutral-950)_48.73%)] shadow-2xl' : ''}
+                  ${tier.highlighted ? 'lg:scale-105 lg:shadow-lg shadow-primary/15 relative bg-card shadow-xl' : 'bg-card/50'}
                 `}
               >
                 {/* Badge (Most Popular) */}
@@ -220,7 +221,7 @@ export function Pricing() {
                     >
                       <Check
                         className={`mt-0.5 h-5 w-5 shrink-0 ${
-                          !tier.highlighted && 'text-gray-600'
+                          !tier.highlighted &&'text-gray-600'
                         }`}
                         strokeWidth={2.5}
                       />
@@ -233,7 +234,7 @@ export function Pricing() {
                 <Button
                   variant={tier.highlighted ? 'primary' : 'outline'}
                   size="lg"
-                  className="w-full"
+                  className={cn('w-full', tier.highlighted && 'border-accent-green')}
                   asChild
                 >
                   <a href="#booking-form">{tier.cta}</a>
@@ -262,7 +263,7 @@ export function Pricing() {
             . Questions?{' '}
             <a
               href="#faq"
-              className="font-semibold text-slate-200 underline decoration-slate-400/30 transition-colors hover:text-white hover:decoration-slate-400"
+              className="font-semibold underline decoration-stone-400/30 transition-colors hover:text-stone-300 hover:decoration-stone-400"
             >
               View FAQ
             </a>

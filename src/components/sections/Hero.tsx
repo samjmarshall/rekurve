@@ -73,16 +73,16 @@ export function Hero() {
       </p>
       <div className="mb-10 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-20"
       >
-      <Button asChild variant="secondary">
+      <Button asChild variant="secondary" className="w-full sm:w-40">
         <Link
-          href="/"
-          className="hidden md:block w-40 text-center"
+          href="#how-it-works"
+          className="text-center"
         >
-          Watch demo
+          How it Works
         </Link>
       </Button>
-      <Button asChild variant="primary" className="hidden md:block w-40">
-        <Link href="#booking-form">
+      <Button asChild variant="primary" className="w-full sm:w-40">
+        <Link href="#booking-form" className="text-center">
           Book a call
         </Link>
       </Button>

@@ -76,7 +76,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: #e8e6dc;
   --input: #e8e6dc;
-  --ring: oklch(0.705 0.015 286.067);
+  --ring: var(--color-primary);
 }
 
 .dark {
@@ -94,7 +94,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.016 285.938);
+  --ring: var(--color-primary);
 }
 
 @theme inline {

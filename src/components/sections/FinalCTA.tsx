@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, Mail, MoveRight } from 'lucide-react'
+import { ArrowRight, Link, Mail, MoveRight } from 'lucide-react'
 
 import { BrandShimmer } from '../brand-shimmer';
 import { Button } from '../ui/Button';
@@ -29,13 +29,17 @@ export function FinalCTA() {
   
           <ScrollReveal delay={0.2}>
             <div className="flex items-start sm:items-center flex-col sm:flex-row sm:gap-4">
-              <Button variant="primary" className="group mt-8 gap-1 flex items-center space-x-2">
-                Book Your Call
-                <ArrowRight className="group-hover:translate-x-1 h-4 w-4 stroke-1.25 transition-transform duration-200" />
+              <Button asChild variant="primary" className="group mt-8 gap-1 flex items-center space-x-2">
+                <Link href="#booking-form">
+                  Book Your Call
+                  <ArrowRight className="group-hover:translate-x-1 h-4 w-4 stroke-1.25 transition-transform duration-200" />
+                </Link>
               </Button>
-              <Button variant="ghost" className="group mt-8 gap-1 flex items-center">
-                Or email us: contact@rekurve.ai
-                <Mail className="group-hover:translate-x-1 stroke-1 transition-transform duration-200" />
+              <Button asChild variant="ghost" className="group mt-8 gap-1 flex items-center">
+                <Link href="mailto:contact@rekurve.ai">
+                  Or email us: contact@rekurve.ai
+                  <Mail className="group-hover:translate-x-1 stroke-1 transition-transform duration-200" />
+                </Link>
               </Button>
             </div>
           </ScrollReveal>

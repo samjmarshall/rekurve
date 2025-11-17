@@ -28,13 +28,11 @@ import {
 import { useEffect, useState } from 'react'
 
 import { Button } from '~/components/ui/Button'
-import { CONSTANTS } from '~/constants/links'
 import { Card } from '~/components/ui/Card'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import { cn } from '~/lib/utils'
-import { useCalEmbed } from '~/hooks/useCalEmbed'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -73,7 +71,7 @@ const steps = [
   { id: 2, title: 'Company', icon: Building },
   { id: 3, title: 'Challenges', icon: Target },
   { id: 4, title: 'Goals', icon: Target },
-  { id: 5, title: 'Book a Call', icon: Calendar },
+  { id: 5, title: 'Reserve Your Spot', icon: Calendar },
 ]
 
 const challengeOptions = [
@@ -89,16 +87,13 @@ const challengeOptions = [
 export function BookingForm() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const calOptions = useCalEmbed({
-      namespace: CONSTANTS.CALCOM_NAMESPACE,
-      styles: {
-        branding: {
-          brandColor: CONSTANTS.CALCOM_BRAND_COLOR,
-        },
-      },
-      hideEventTypeDetails: CONSTANTS.CALCOM_HIDE_EVENT_TYPE_DETAILS,
-      layout: CONSTANTS.CALCOM_LAYOUT,
-    });
+
+  // Calculate the intake month (1 month from today)
+  const intakeMonth = (() => {
+    const nextMonth = new Date()
+    nextMonth.setMonth(nextMonth.getMonth() + 1)
+    return nextMonth.toLocaleString('en-US', { month: 'long' })
+  })()
 
   const {
     register,
@@ -235,11 +230,12 @@ export function BookingForm() {
           {/* Heading */}
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-              Book Your Call
+              Apply for {intakeMonth} Intake
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-gray-600">
-              Let&apos;s discuss how an AI sales agent can transform your sales
-              process. Takes less than 2 minutes to complete.
+              We can only accept a limited number of new clients each month.
+              The application below takes less than 2 minutes to complete.
+              We&apos;ll reach out as soon as possible to discuss next steps.
             </p>
           </div>
 
@@ -687,7 +683,7 @@ export function BookingForm() {
                     variant="primary"
                     size="lg"
                   >
-                    Book Your Call
+                    Submit
                   </Button>
                 ) : (
                   <Button

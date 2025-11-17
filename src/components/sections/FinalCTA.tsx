@@ -30,14 +30,14 @@ export function FinalCTA() {
   
           <ScrollReveal delay={0.2}>
             <div className="flex items-start sm:items-center flex-col sm:flex-row sm:gap-4">
-              <Button asChild variant="primary" className="group mt-8 gap-1 flex items-center space-x-2">
-                <Link href="#booking-form">
+              <Button asChild variant="primary" className="group mt-8">
+                <Link href="#booking-form" className="flex items-center gap-1">
                   Book Your Call
                   <ArrowRight className="group-hover:translate-x-1 h-4 w-4 stroke-1.25 transition-transform duration-200" />
                 </Link>
               </Button>
-              <Button asChild variant="ghost" className="group mt-8 gap-1 flex items-center">
-                <Link href="mailto:contact@rekurve.ai">
+              <Button asChild variant="ghost" className="group mt-8">
+                <Link href="mailto:contact@rekurve.ai" className="flex items-center gap-1">
                   Or email us: contact@rekurve.ai
                   <Mail className="group-hover:translate-x-1 stroke-1 transition-transform duration-200" />
                 </Link>

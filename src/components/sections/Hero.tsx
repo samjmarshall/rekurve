@@ -5,26 +5,27 @@ import { Card, CardDescription, CardTitle } from "../agentic-intelligence/card";
 import React, { useEffect, useRef, useState } from "react";
 
 import { Button } from "../ui/Button";
-import { CONSTANTS } from "~/constants/links";
+// import { CONSTANTS } from "~/constants/links";
 import Link from "next/link";
 import { NativeIcon } from "~/icons/bento-icons";
 import { NativeIntegrationSkeleton } from "../agentic-intelligence/skeletons";
 import { cn } from "~/lib/utils";
-import { useCalEmbed } from "~/hooks/useCalEmbed";
+
+// import { useCalEmbed } from "~/hooks/useCalEmbed";
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const parentRef = useRef<HTMLDivElement>(null);
-  const calOptions = useCalEmbed({
-    namespace: CONSTANTS.CALCOM_NAMESPACE,
-    styles: {
-      branding: {
-        brandColor: CONSTANTS.CALCOM_BRAND_COLOR,
-      },
-    },
-    hideEventTypeDetails: CONSTANTS.CALCOM_HIDE_EVENT_TYPE_DETAILS,
-    layout: CONSTANTS.CALCOM_LAYOUT,
-  });
+  // const calOptions = useCalEmbed({
+  //   namespace: CONSTANTS.CALCOM_NAMESPACE,
+  //   styles: {
+  //     branding: {
+  //       brandColor: CONSTANTS.CALCOM_BRAND_COLOR,
+  //     },
+  //   },
+  //   hideEventTypeDetails: CONSTANTS.CALCOM_HIDE_EVENT_TYPE_DETAILS,
+  //   layout: CONSTANTS.CALCOM_LAYOUT,
+  // });
   return (
     <div
       ref={parentRef}
@@ -94,7 +95,7 @@ export function Hero() {
         </Link>
       </Button>
 
-        <Button
+        {/* <Button
           data-cal-namespace={calOptions.namespace}
           data-cal-link={CONSTANTS.CALCOM_LINK}
           data-cal-config={`{"layout":"${calOptions.layout}"}`}
@@ -102,6 +103,11 @@ export function Hero() {
           className="hidden md:block w-40"
         >
           Book a call
+        </Button> */}
+        <Button asChild variant="primary" className="hidden md:block w-40">
+          <Link href="#booking-form">
+            Book a call
+          </Link>
         </Button>
       </div>
       <div className="relative mx-auto max-w-7xl rounded-4xl border border-border bg-neutral-100 p-2 backdrop-blur-lg dark:border-charcoal-700 dark:bg-charcoal-800/50 md:p-4">

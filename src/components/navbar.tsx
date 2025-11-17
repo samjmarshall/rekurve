@@ -10,12 +10,10 @@ import { Menu, X } from "lucide-react";
 import React, { useRef, useState } from "react";
 
 import { Button } from "./ui/Button";
-import { CONSTANTS } from "~/constants/links";
 import Link from "next/link";
 import { Logo } from "./logo";
 import { ModeToggle } from "./mode-toggle";
 import { cn } from "~/lib/utils";
-import { useCalEmbed } from "~/hooks/useCalEmbed";
 
 interface NavbarProps {
   navItems: {
@@ -37,7 +35,7 @@ export const Navbar = () => {
     },
     {
       name: "Contact",
-      link: "/#contact",
+      link: "/#booking-form",
     },
   ];
 
@@ -66,17 +64,6 @@ export const Navbar = () => {
 
 const DesktopNav = ({ navItems, visible }: NavbarProps) => {
   const [hovered, setHovered] = useState<number | null>(null);
-
-  const calOptions = useCalEmbed({
-    namespace: CONSTANTS.CALCOM_NAMESPACE,
-    styles: {
-      branding: {
-        brandColor: CONSTANTS.CALCOM_BRAND_COLOR,
-      },
-    },
-    hideEventTypeDetails: CONSTANTS.CALCOM_HIDE_EVENT_TYPE_DETAILS,
-    layout: CONSTANTS.CALCOM_LAYOUT,
-  });
 
   return (
     <motion.div
@@ -125,14 +112,10 @@ const DesktopNav = ({ navItems, visible }: NavbarProps) => {
       </motion.div>
       <div className="flex items-center gap-4">
         <ModeToggle />
-        <Button
-          data-cal-namespace={calOptions.namespace}
-          data-cal-link={CONSTANTS.CALCOM_LINK}
-          data-cal-config={`{"layout":"${calOptions.layout}"}`}
-          variant="primary"
-          className="hidden md:block "
-        >
-          Book a call
+        <Button asChild variant="primary" className="hidden md:block">
+          <Link href="#booking-form">
+            Book a call
+          </Link>
         </Button>
       </div>
     </motion.div>
@@ -141,17 +124,6 @@ const DesktopNav = ({ navItems, visible }: NavbarProps) => {
 
 const MobileNav = ({ navItems, visible }: NavbarProps) => {
   const [open, setOpen] = useState(false);
-
-  const calOptions = useCalEmbed({
-    namespace: "chat-with-manu-demo",
-    styles: {
-      branding: {
-        brandColor: "#000000",
-      },
-    },
-    hideEventTypeDetails: false,
-    layout: "month_view",
-  });
 
   return (
     <>
@@ -213,14 +185,14 @@ const MobileNav = ({ navItems, visible }: NavbarProps) => {
                 </Link>
               ))}
               <Button
-                data-cal-namespace={calOptions.namespace}
-                data-cal-link={`manu-arora-vesr9s/chat-with-manu-demo`}
-                data-cal-config={`{"layout":"${calOptions.layout}"}`}
-                onClick={() => setOpen(false)}
+                asChild
                 variant="primary"
-                className="block md:hidden w-full"
+                className="hidden md:block w-full"
+                onClick={() => setOpen(false)}
               >
-                Book a call
+                <Link href="#booking-form">
+                  Book a call
+                </Link>
               </Button>
             </motion.div>
           )}

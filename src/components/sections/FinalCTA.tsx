@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, Link, Mail, MoveRight } from 'lucide-react'
+import { ArrowRight, Link, Mail } from 'lucide-react'
 
 import { BrandShimmer } from '../brand-shimmer';
 import { Button } from '../ui/Button';

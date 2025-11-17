@@ -17,13 +17,13 @@ const faqData: FAQItem[] = [
   {
     id: "1",
     question: "How quickly will I see ROI from the AI sales agent?",
-    answer: "Most clients see measurable results within the first 30 days—qualified leads in your pipeline, meetings booked, and time recovered. Our 5x ROI guarantee ensures you'll see $5 in value for every $1 invested within 120 days, or we'll work for free until you do.",
+    answer: "Most clients see measurable results within the first 30 days - qualified leads in your pipeline, meetings booked, and time recovered. Our 5x ROI guarantee ensures you'll see $5 in value for every $1 invested within 120 days, or we'll work for free until you do.",
     category: "ROI & Results"
   },
   {
     id: "2",
     question: "What's the difference between the AI-Assisted and Intelligent packages?",
-    answer: "The AI-Assisted package provides semi-automated workflows with manual oversight—you'll review leads before outreach. The Intelligent package deploys a fully autonomous agent that researches, qualifies, and reaches out 24/7 without your input. It's the difference between a helpful tool and a virtual SDR.",
+    answer: "The AI-Assisted package provides semi-automated workflows with manual oversight - you'll review leads before outreach. The Intelligent package deploys a fully autonomous agent that researches, qualifies, and reaches out 24/7 without your input. It's the difference between a helpful tool and a virtual SDR.",
     category: "Pricing"
   },
   {
@@ -35,13 +35,13 @@ const faqData: FAQItem[] = [
   {
     id: "4",
     question: "Will the AI agent sound robotic or spammy?",
-    answer: "No. Our agents use GPT-4 to generate personalized, conversational messages based on each prospect's industry, role, and recent activity. Messages are reviewed for quality and tone during setup. Response rates average 15-25%—significantly higher than generic automation.",
+    answer: "No. Our agents use GPT-4 to generate personalized, conversational messages based on each prospect's industry, role, and recent activity. Messages are reviewed for quality and tone during setup. Response rates average 15-25% - significantly higher than generic automation.",
     category: "Technical"
   },
   {
     id: "5",
     question: "What happens if the agent makes a mistake?",
-    answer: "We build enterprise-grade safeguards: manual approval queues for high-value prospects, quality checks before sending, and idempotent operations to prevent duplicate sends. You'll have a dedicated dashboard to monitor all activity. If issues arise, we fix them immediately—backed by our 99.9% uptime SLA.",
+    answer: "We build enterprise-grade safeguards: manual approval queues for high-value prospects, quality checks before sending, and idempotent operations to prevent duplicate sends. You'll have a dedicated dashboard to monitor all activity. If issues arise, we fix them immediately - backed by our 99.9% uptime SLA.",
     category: "Technical"
   },
   {
@@ -83,7 +83,7 @@ const faqData: FAQItem[] = [
   {
     id: "12",
     question: "What makes your AI agents different from other automation tools?",
-    answer: "Unlike simple workflow automation (Zapier, Make), our agents make intelligent decisions: researching prospects, adapting messaging based on engagement, and learning from patterns. We're not a DIY tool—we build, deploy, and maintain your agent for you. Think virtual SDR, not software license.",
+    answer: "Unlike simple workflow automation (Zapier, Make), our agents make intelligent decisions: researching prospects, adapting messaging based on engagement, and learning from patterns. We're not a DIY tool - we build, deploy, and maintain your agent for you. Think virtual SDR, not software license.",
     category: "Technical"
   }
 ]

@@ -5,7 +5,7 @@ import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "~/components/Analytics";
 import { ThemeProvider } from "~/context/providers";
 import { Navbar } from "~/components/navbar";
-import { Footer } from "~/components/sections/Footer";
+// import { Footer } from "~/components/sections/Footer";
 
 export const metadata: Metadata = {
   title: "AI Sales Agents for Service Businesses | Rekurve",
@@ -132,7 +132,7 @@ export default function RootLayout({
           <Navbar />
           <Analytics />
           {children}
-          <Footer />
+          {/* <Footer /> */}
         </ThemeProvider>
       </body>
     </html>

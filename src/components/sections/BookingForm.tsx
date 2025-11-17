@@ -11,11 +11,27 @@ import {
   Target,
   User,
 } from 'lucide-react'
+import { Controller, useForm } from 'react-hook-form'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '~/components/ui/field'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select'
 
 import { Button } from '~/components/ui/Button'
 import { Card } from '~/components/ui/Card'
+import { Checkbox } from '~/components/ui/checkbox'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
 import { cn } from '~/lib/utils'
-import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -75,15 +91,14 @@ export function BookingForm() {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors },
     trigger,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    mode: 'onChange',
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
   })
-
-  const challenges = watch('challenges') || []
 
   const handleNextStep = async () => {
     let fieldsToValidate: (keyof FormData)[] = []
@@ -280,80 +295,67 @@ export function BookingForm() {
                       Let&apos;s start with your information
                     </h3>
 
-                    <div className="grid gap-6 md:grid-cols-2">
-                      <div>
-                        <label
-                          htmlFor="firstName"
-                          className="mb-2 block text-sm font-medium"
-                        >
+                    <FieldGroup className="grid gap-6 md:grid-cols-2">
+                      <Field data-invalid={!!errors.firstName}>
+                        <FieldLabel htmlFor="firstName">
                           First Name <span className="text-accent-coral">*</span>
-                        </label>
-                        <input
+                        </FieldLabel>
+                        <Input
                           {...register('firstName')}
                           type="text"
                           id="firstName"
-                          className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                           placeholder="John"
+                          aria-invalid={!!errors.firstName}
                         />
-                        <p className="mt-1 text-sm text-accent-coral">
-                          {errors.firstName?.message}
-                        </p>
-                      </div>
+                        {errors.firstName && (
+                          <FieldError>{errors.firstName.message}</FieldError>
+                        )}
+                      </Field>
 
-                      <div>
-                        <label
-                          htmlFor="lastName"
-                          className="mb-2 block text-sm font-medium"
-                        >
+                      <Field data-invalid={!!errors.lastName}>
+                        <FieldLabel htmlFor="lastName">
                           Last Name <span className="text-accent-coral">*</span>
-                        </label>
-                        <input
+                        </FieldLabel>
+                        <Input
                           {...register('lastName')}
                           type="text"
                           id="lastName"
-                          className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                           placeholder="Smith"
+                          aria-invalid={!!errors.lastName}
                         />
-                        <p className="mt-1 text-sm text-accent-coral">
-                          {errors.lastName?.message}
-                        </p>
-                      </div>
-                    </div>
+                        {errors.lastName && (
+                          <FieldError>{errors.lastName.message}</FieldError>
+                        )}
+                      </Field>
+                    </FieldGroup>
 
-                    <div>
-                      <label
-                        htmlFor="email"
-                        className="mb-2 block text-sm font-medium"
-                      >
-                        Email <span className="text-accent-coral">*</span>
-                      </label>
-                      <input
-                        {...register('email')}
-                        type="email"
-                        id="email"
-                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        placeholder="john.smith@company.com"
-                      />
-                      <p className="mt-1 text-sm text-accent-coral">
-                        {errors.email?.message}
-                      </p>
-                    </div>
+                    <FieldGroup className="grid gap-6 md:grid-cols-2">
+                      <Field data-invalid={!!errors.email}>
+                        <FieldLabel htmlFor="email">
+                          Email <span className="text-accent-coral">*</span>
+                        </FieldLabel>
+                        <Input
+                          {...register('email')}
+                          type="email"
+                          id="email"
+                          placeholder="john.smith@company.com"
+                          aria-invalid={!!errors.email}
+                        />
+                        {errors.email && (
+                          <FieldError>{errors.email.message}</FieldError>
+                        )}
+                      </Field>
 
-                    <div>
-                      <label
-                        htmlFor="phone"
-                        className="mb-2 block text-sm font-medium"
-                      >
-                        Phone (Optional)
-                      </label>
-                      <input
-                        {...register('phone')}
-                        type="tel"
-                        id="phone"
-                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        placeholder="+61 4XX XXX XXX"
-                      />
-                    </div>
+                      <Field>
+                        <FieldLabel htmlFor="phone">Phone (Optional)</FieldLabel>
+                        <Input
+                          {...register('phone')}
+                          type="tel"
+                          id="phone"
+                          placeholder="+61 4XX XXX XXX"
+                        />
+                      </Field>
+                    </FieldGroup>
                   </motion.div>
                 )}
 
@@ -371,86 +373,94 @@ export function BookingForm() {
                       Tell us about your company
                     </h3>
 
-                    <div>
-                      <label
-                        htmlFor="company"
-                        className="mb-2 block text-sm font-medium"
-                      >
+                    <Field data-invalid={!!errors.company}>
+                      <FieldLabel htmlFor="company">
                         Company Name <span className="text-accent-coral">*</span>
-                      </label>
-                      <input
+                      </FieldLabel>
+                      <Input
                         {...register('company')}
                         type="text"
                         id="company"
-                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="Acme Professional Services"
+                        aria-invalid={!!errors.company}
                       />
-                      <p className="mt-1 text-sm text-accent-coral">
-                        {errors.company?.message}
-                      </p>
-                    </div>
+                      {errors.company && (
+                        <FieldError>{errors.company.message}</FieldError>
+                      )}
+                    </Field>
 
-                    <div>
-                      <label
-                        htmlFor="companySize"
-                        className="mb-2 block text-sm font-medium"
-                      >
-                        Company Size <span className="text-accent-coral">*</span>
-                      </label>
-                      <select
-                        {...register('companySize')}
-                        id="companySize"
-                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                      >
-                        <option value="">Select company size</option>
-                        <option value="1-10">1-10 employees</option>
-                        <option value="11-20">11-20 employees</option>
-                        <option value="21-50">21-50 employees</option>
-                        <option value="51-100">51-100 employees</option>
-                        <option value="100+">100+ employees</option>
-                      </select>
-                      <p className="mt-1 text-sm text-accent-coral">
-                        {errors.companySize?.message}
-                      </p>
-                    </div>
+                    <Controller
+                      name="companySize"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel>
+                            Company Size{' '}
+                            <span className="text-accent-coral">*</span>
+                          </FieldLabel>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger aria-invalid={fieldState.invalid}>
+                              <SelectValue placeholder="Select company size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1-10">
+                                1-10 employees
+                              </SelectItem>
+                              <SelectItem value="11-20">
+                                11-20 employees
+                              </SelectItem>
+                              <SelectItem value="21-50">
+                                21-50 employees
+                              </SelectItem>
+                              <SelectItem value="51-100">
+                                51-100 employees
+                              </SelectItem>
+                              <SelectItem value="100+">
+                                100+ employees
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {fieldState.error && (
+                            <FieldError>{fieldState.error.message}</FieldError>
+                          )}
+                        </Field>
+                      )}
+                    />
 
-                    <div>
-                      <label
-                        htmlFor="industry"
-                        className="mb-2 block text-sm font-medium"
-                      >
+                    <Field data-invalid={!!errors.industry}>
+                      <FieldLabel htmlFor="industry">
                         Industry <span className="text-accent-coral">*</span>
-                      </label>
-                      <input
+                      </FieldLabel>
+                      <Input
                         {...register('industry')}
                         type="text"
                         id="industry"
-                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="e.g., Consulting, Accounting, Marketing"
+                        aria-invalid={!!errors.industry}
                       />
-                      <p className="mt-1 text-sm text-accent-coral">
-                        {errors.industry?.message}
-                      </p>
-                    </div>
+                      {errors.industry && (
+                        <FieldError>{errors.industry.message}</FieldError>
+                      )}
+                    </Field>
 
-                    <div>
-                      <label
-                        htmlFor="location"
-                        className="mb-2 block text-sm font-medium"
-                      >
+                    <Field data-invalid={!!errors.location}>
+                      <FieldLabel htmlFor="location">
                         Location <span className="text-accent-coral">*</span>
-                      </label>
-                      <input
+                      </FieldLabel>
+                      <Input
                         {...register('location')}
                         type="text"
                         id="location"
-                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="Brisbane, Australia"
+                        aria-invalid={!!errors.location}
                       />
-                      <p className="mt-1 text-sm text-accent-coral">
-                        {errors.location?.message}
-                      </p>
-                    </div>
+                      {errors.location && (
+                        <FieldError>{errors.location.message}</FieldError>
+                      )}
+                    </Field>
                   </motion.div>
                 )}
 
@@ -471,37 +481,56 @@ export function BookingForm() {
                       Select all that apply
                     </p>
 
-                    <div className="space-y-3">
-                      {challengeOptions.map((challenge, index) => {
-                        const isSelected = challenges.includes(challenge)
-                        return (
-                          <label
-                            key={index}
-                            className={`
-                              flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-all duration-200
-                              ${
-                                isSelected
-                                  ? 'border-accent-amber bg-accent-amber/10'
-                                  : 'dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 hover:dark:border-neutral-700'
-                              }
-                            `}
-                          >
-                            <input
-                              {...register('challenges')}
-                              type="checkbox"
-                              value={challenge}
-                              className="mt-0.5 h-5 w-5 rounded dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 focus:ring-2 focus:ring-primary/20 focus:ring-offset-0"
-                            />
-                            <span className="text-sm">
-                              {challenge}
-                            </span>
-                          </label>
-                        )
-                      })}
-                    </div>
-                    <p className="text-sm text-accent-coral">
-                      {errors.challenges?.message}
-                    </p>
+                    <Controller
+                      name="challenges"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldGroup className="space-y-3">
+                            {challengeOptions.map((challenge, index) => {
+                              const isSelected =
+                                field.value?.includes(challenge) || false
+                              return (
+                                <label
+                                  key={index}
+                                  className={`
+                                    flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-all duration-200
+                                    ${
+                                      isSelected
+                                        ? 'border-accent-amber bg-accent-amber/10'
+                                        : 'dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 hover:dark:border-neutral-700'
+                                    }
+                                  `}
+                                >
+                                  <Checkbox
+                                    checked={isSelected}
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        field.onChange([
+                                          ...(field.value || []),
+                                          challenge,
+                                        ])
+                                      } else {
+                                        field.onChange(
+                                          (field.value || []).filter(
+                                            (v: string) => v !== challenge,
+                                          ),
+                                        )
+                                      }
+                                    }}
+                                    className="mt-0.5"
+                                  />
+                                  <span className="text-sm">{challenge}</span>
+                                </label>
+                              )
+                            })}
+                          </FieldGroup>
+                          {fieldState.error && (
+                            <FieldError>{fieldState.error.message}</FieldError>
+                          )}
+                        </Field>
+                      )}
+                    />
                   </motion.div>
                 )}
 
@@ -519,69 +548,90 @@ export function BookingForm() {
                       What are your goals?
                     </h3>
 
-                    <div>
-                      <label
-                        htmlFor="goals"
-                        className="mb-2 block text-sm font-medium"
-                      >
+                    <Field data-invalid={!!errors.goals}>
+                      <FieldLabel htmlFor="goals">
                         Describe your sales goals{' '}
                         <span className="text-accent-coral">*</span>
-                      </label>
-                      <textarea
+                      </FieldLabel>
+                      <Textarea
                         {...register('goals')}
                         id="goals"
                         rows={4}
-                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 placeholder-gray-600 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="e.g., Generate 50+ qualified leads per month, reduce manual prospecting time, improve conversion rates..."
+                        aria-invalid={!!errors.goals}
                       />
-                      <p className="mt-1 text-sm text-accent-coral">
-                        {errors.goals?.message}
-                      </p>
-                    </div>
+                      {errors.goals && (
+                        <FieldError>{errors.goals.message}</FieldError>
+                      )}
+                    </Field>
 
-                    <div>
-                      <label
-                        htmlFor="timeline"
-                        className="mb-2 block text-sm font-medium"
-                      >
-                        When do you want to start?{' '}
-                        <span className="text-accent-coral">*</span>
-                      </label>
-                      <select
-                        {...register('timeline')}
-                        id="timeline"
-                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                      >
-                        <option value="">Select timeline</option>
-                        <option value="immediate">Immediately</option>
-                        <option value="1-3-months">In 1-3 months</option>
-                        <option value="3-6-months">In 3-6 months</option>
-                        <option value="6-12-months">In 6-12 months</option>
-                      </select>
-                      <p className="mt-1 text-sm text-accent-coral">
-                        {errors.timeline?.message}
-                      </p>
-                    </div>
+                    <Controller
+                      name="timeline"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel>
+                            When do you want to start?{' '}
+                            <span className="text-accent-coral">*</span>
+                          </FieldLabel>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger aria-invalid={fieldState.invalid}>
+                              <SelectValue placeholder="Select timeline" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="immediate">
+                                Immediately
+                              </SelectItem>
+                              <SelectItem value="1-3-months">
+                                In 1-3 months
+                              </SelectItem>
+                              <SelectItem value="3-6-months">
+                                In 3-6 months
+                              </SelectItem>
+                              <SelectItem value="6-12-months">
+                                In 6-12 months
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {fieldState.error && (
+                            <FieldError>{fieldState.error.message}</FieldError>
+                          )}
+                        </Field>
+                      )}
+                    />
 
-                    <div>
-                      <label
-                        htmlFor="currentMRR"
-                        className="mb-2 block text-sm font-medium"
-                      >
-                        Current Monthly Revenue (Optional)
-                      </label>
-                      <select
-                        {...register('currentMRR')}
-                        id="currentMRR"
-                        className="w-full rounded-lg border dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                      >
-                        <option value="">Prefer not to say</option>
-                        <option value="0-50k">$0 - $50K</option>
-                        <option value="50k-200k">$50K - $200K</option>
-                        <option value="200k-500k">$200K - $500K</option>
-                        <option value="500k+">$500K+</option>
-                      </select>
-                    </div>
+                    <Controller
+                      name="currentMRR"
+                      control={control}
+                      render={({ field }) => (
+                        <Field>
+                          <FieldLabel>
+                            Current Monthly Revenue (Optional)
+                          </FieldLabel>
+                          <Select
+                            value={field.value ?? ''}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Prefer not to say" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="0-50k">$0 - $50K</SelectItem>
+                              <SelectItem value="50k-200k">
+                                $50K - $200K
+                              </SelectItem>
+                              <SelectItem value="200k-500k">
+                                $200K - $500K
+                              </SelectItem>
+                              <SelectItem value="500k+">$500K+</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </Field>
+                      )}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>

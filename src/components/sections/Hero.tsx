@@ -61,11 +61,11 @@ export function Hero() {
       />
 
       <div className="text-balance relative z-20 mx-auto mb-4 mt-4 max-w-4xl text-center text-3xl font-semibold tracking-tight md:text-7xl">
-        <h2>Recover 20+ Hours Weekly or Add $100K to Your Pipeline in 90 Days</h2>
+        <h1>Recover 20+ Hours Weekly or Add $100K to Your Pipeline in 90 Days</h1>
       </div>
-      <h3 className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center font-mono font-medium text-base/6">
+      <p className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center font-mono font-medium text-base/6">
         Customer Enquiry <span className="text-primary">&rarr;</span> Quote Generated.
-      </h3>
+      </p>
       <p className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center text-base/6">
         AI Service Quote Automation - Automate the admin and follow-up.
         <br />

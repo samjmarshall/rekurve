@@ -1,6 +1,6 @@
 "use client";
 
-import { AppWindowMac, BookOpen, LayoutList, Mail, MessageSquare, Package, Search } from "lucide-react";
+import { AppWindowMac, Mail, MessageSquare } from "lucide-react";
 import {
   Hubspot,
   SlackLogo,
@@ -40,11 +40,11 @@ export const NativeIntegrationSkeleton = () => {
         <div className="relative flex h-full w-full items-center justify-start">
           <RightSideSVG />
           <div className="relative flex flex-col items-center gap-2">
-            <span className="relative z-20 rounded-sm border border-accent-blue bg-blue-50 px-2 py-0.5 text-xs text-accent-blue dark:bg-accent-blue/50 dark:text-white">
+            <span className="relative z-20 rounded-sm border border-blue-500 bg-blue-50 px-2 py-0.5 text-xs text-blue-500 dark:bg-accent-blue/50 dark:text-white">
               Connected
             </span>
             <div className="absolute inset-x-0 -top-30 flex h-full flex-col items-center">
-              <IconBlock icon={<Catalogue />} className="h-14 w-14" />
+              <IconBlock icon={<Catalogue className="size-11" />} className="h-14 w-14" />
               <VerticalLine />
               <VerticalLine />
               <IconBlock icon={<SlackLogo className="size-6" />} />
@@ -73,16 +73,37 @@ export const Calendar = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 )
 
-const Catalogue = () => {
-  return (
-    <div className="flex my-auto items-center">
-      <BookOpen className="my-auto text-neutral-500 dark:text-neutral-600 stroke-[0.75px] size-12" />
-      <Package className="absolute text-stone-600 dark:text-stone-400 top-4.25 left-2.5 size-4" />
-      <LayoutList className="absolute top-4.25 right-2.5 size-4" />
-      <Search className="absolute text-gray-600 top-8 right-1.5 size-4" />
-    </div>
-  );
-}
+const Catalogue = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 40 40" {...props}>
+    {/* Price book base */}
+    <path fill="#8899A6" d="M33 4H7a3 3 0 0 0-3 3v22a3 3 0 0 0 3 3h26a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"></path>
+    <path fill="#fff" d="M32 6H8a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h24V6z"></path>
+    {/* Product list rows */}
+    <rect fill="#E1E8ED" x="8" y="9" width="22" height="5" rx="1"></rect>
+    <rect fill="#E1E8ED" x="8" y="16" width="22" height="5" rx="1"></rect>
+    <rect fill="#E1E8ED" x="8" y="23" width="22" height="5" rx="1"></rect>
+    {/* Product boxes */}
+    <rect fill="#66757F" x="9" y="10" width="3" height="3" rx="0.5"></rect>
+    <rect fill="#66757F" x="9" y="17" width="3" height="3" rx="0.5"></rect>
+    <rect fill="#66757F" x="9" y="24" width="3" height="3" rx="0.5"></rect>
+    {/* Product names */}
+    <rect fill="#99AAB5" x="14" y="10.5" width="9" height="2"></rect>
+    <rect fill="#99AAB5" x="14" y="17.5" width="9" height="2"></rect>
+    <rect fill="#99AAB5" x="14" y="24.5" width="9" height="2"></rect>
+    {/* Price tags */}
+    {/* <rect fill="#77B255" x="24" y="10" width="5" height="3" rx="0.5"></rect>
+    <rect fill="#77B255" x="24" y="17" width="5" height="3" rx="0.5"></rect>
+    <rect fill="#77B255" x="24" y="24" width="5" height="3" rx="0.5"></rect> */}
+    {/* Dollar signs on price tags */}
+    <text x="25" y="13" fill="#77B255" fontSize="5" fontWeight="bold">$</text>
+    <text x="25" y="20" fill="#77B255" fontSize="5" fontWeight="bold">$</text>
+    <text x="25" y="27" fill="#77B255" fontSize="5" fontWeight="bold">$</text>
+    {/* Search magnifying glass overlay */}
+    <circle fill="#55ACEE" cx="30" cy="30" r="6"></circle>
+    <circle fill="#fff" cx="30" cy="30" r="4"></circle>
+    <path fill="#3B88C3" d="M34 35l3 3a1 1 0 0 0 1.5 0a1 1 0 0 0 0-1.5l-3-3l-1.5 1.5z"></path>
+  </svg>
+);
 
 const VerticalLine = (
   props: React.SVGProps<SVGSVGElement> & { stopColor?: string },
@@ -136,7 +157,7 @@ const VerticalLine = (
           gradientUnits="userSpaceOnUse"
         >
           <stop stopColor="var(--color-line)" />
-          <stop offset="0.5" stopColor="var(--color-primary)" />
+          <stop offset="0.5" stopColor="#F17463" />
           <stop offset="1" stopColor="var(--color-line)" />
         </motion.linearGradient>
       </defs>
@@ -263,8 +284,8 @@ const TopSVG = (props: React.SVGProps<SVGSVGElement>) => {
           }}
         >
           <stop stopColor="var(--color-line)" />
-          <stop offset="0.33" stopColor="var(--color-primary)" />
-          <stop offset="0.66" stopColor="var(--color-primary)" />
+          <stop offset="0.33" stopColor="#F17463" />
+          <stop offset="0.66" stopColor="#F17463" />
           <stop offset="1" stopColor="var(--color-line)" />
         </motion.linearGradient>
       </defs>
@@ -377,8 +398,8 @@ export const BottomSVG = (props: React.SVGProps<SVGSVGElement>) => {
           }}
         >
           <stop stopColor="var(--color-line)" />
-          <stop offset="0.33" stopColor="var(--color-accent-green)" />
-          <stop offset="0.66" stopColor="var(--color-accent-green)" />
+          <stop offset="0.33" stopColor="var(--color-yellow-500)" />
+          <stop offset="0.66" stopColor="var(--color-yellow-500)" />
           <stop offset="1" stopColor="var(--color-line)" />
         </motion.linearGradient>
       </defs>

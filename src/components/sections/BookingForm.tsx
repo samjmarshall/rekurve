@@ -25,14 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select'
+import { useEffect, useState } from 'react'
 
 import { Button } from '~/components/ui/Button'
+import { CONSTANTS } from '~/constants/links'
 import { Card } from '~/components/ui/Card'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import { cn } from '~/lib/utils'
-import { useState } from 'react'
+import { useCalEmbed } from '~/hooks/useCalEmbed'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -75,18 +77,28 @@ const steps = [
 ]
 
 const challengeOptions = [
-  'Lead generation is too manual and time-consuming',
-  'Sales team spends 40%+ time on admin work',
+  'Quote generation is too manual and time-consuming',
+  'Unable to respond to leads quickly',
+  'Team spends 40%+ time on sales admin work',
   'Inconsistent follow-up with prospects',
-  'Difficulty qualifying leads at scale',
-  'Low response rates to cold outreach',
-  'Can\'t personalize at scale',
+  'Difficulty researching & qualifying leads at scale',
+  'Low customer response rates',
   'Poor visibility into sales pipeline',
 ]
 
 export function BookingForm() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const calOptions = useCalEmbed({
+      namespace: CONSTANTS.CALCOM_NAMESPACE,
+      styles: {
+        branding: {
+          brandColor: CONSTANTS.CALCOM_BRAND_COLOR,
+        },
+      },
+      hideEventTypeDetails: CONSTANTS.CALCOM_HIDE_EVENT_TYPE_DETAILS,
+      layout: CONSTANTS.CALCOM_LAYOUT,
+    });
 
   const {
     register,
@@ -94,11 +106,26 @@ export function BookingForm() {
     control,
     formState: { errors },
     trigger,
+    watch,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   })
+
+  // Watch all form values to re-validate fields with errors on change
+  const watchedValues = watch()
+  const watchedValuesString = JSON.stringify(watchedValues)
+
+  // Re-validate fields that have errors when their values change
+  useEffect(() => {
+    const fieldsWithErrors = Object.keys(errors) as (keyof FormData)[]
+    if (fieldsWithErrors.length > 0) {
+      // Re-trigger validation for fields that have errors
+      void trigger(fieldsWithErrors)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedValuesString, trigger])
 
   const handleNextStep = async () => {
     let fieldsToValidate: (keyof FormData)[] = []
@@ -373,94 +400,98 @@ export function BookingForm() {
                       Tell us about your company
                     </h3>
 
-                    <Field data-invalid={!!errors.company}>
-                      <FieldLabel htmlFor="company">
-                        Company Name <span className="text-accent-coral">*</span>
-                      </FieldLabel>
-                      <Input
-                        {...register('company')}
-                        type="text"
-                        id="company"
-                        placeholder="Acme Professional Services"
-                        aria-invalid={!!errors.company}
-                      />
-                      {errors.company && (
-                        <FieldError>{errors.company.message}</FieldError>
-                      )}
-                    </Field>
+                    <FieldGroup className="grid gap-6 md:grid-cols-2">
+                      <Field data-invalid={!!errors.company}>
+                        <FieldLabel htmlFor="company">
+                          Company Name <span className="text-accent-coral">*</span>
+                        </FieldLabel>
+                        <Input
+                          {...register('company')}
+                          type="text"
+                          id="company"
+                          placeholder="Acme Professional Services"
+                          aria-invalid={!!errors.company}
+                        />
+                        {errors.company && (
+                          <FieldError>{errors.company.message}</FieldError>
+                        )}
+                      </Field>
 
-                    <Controller
-                      name="companySize"
-                      control={control}
-                      render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                          <FieldLabel>
-                            Company Size{' '}
-                            <span className="text-accent-coral">*</span>
-                          </FieldLabel>
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger aria-invalid={fieldState.invalid}>
-                              <SelectValue placeholder="Select company size" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="1-10">
-                                1-10 employees
-                              </SelectItem>
-                              <SelectItem value="11-20">
-                                11-20 employees
-                              </SelectItem>
-                              <SelectItem value="21-50">
-                                21-50 employees
-                              </SelectItem>
-                              <SelectItem value="51-100">
-                                51-100 employees
-                              </SelectItem>
-                              <SelectItem value="100+">
-                                100+ employees
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          {fieldState.error && (
-                            <FieldError>{fieldState.error.message}</FieldError>
-                          )}
-                        </Field>
-                      )}
-                    />
-
-                    <Field data-invalid={!!errors.industry}>
-                      <FieldLabel htmlFor="industry">
-                        Industry <span className="text-accent-coral">*</span>
-                      </FieldLabel>
-                      <Input
-                        {...register('industry')}
-                        type="text"
-                        id="industry"
-                        placeholder="e.g., Consulting, Accounting, Marketing"
-                        aria-invalid={!!errors.industry}
+                      <Controller
+                        name="companySize"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel>
+                              Company Size{' '}
+                              <span className="text-accent-coral">*</span>
+                            </FieldLabel>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger aria-invalid={fieldState.invalid}>
+                                <SelectValue placeholder="Select company size" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="1-10">
+                                  1-10 employees
+                                </SelectItem>
+                                <SelectItem value="11-20">
+                                  11-20 employees
+                                </SelectItem>
+                                <SelectItem value="21-50">
+                                  21-50 employees
+                                </SelectItem>
+                                <SelectItem value="51-100">
+                                  51-100 employees
+                                </SelectItem>
+                                <SelectItem value="100+">
+                                  100+ employees
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                            {fieldState.error && (
+                              <FieldError>{fieldState.error.message}</FieldError>
+                            )}
+                          </Field>
+                        )}
                       />
-                      {errors.industry && (
-                        <FieldError>{errors.industry.message}</FieldError>
-                      )}
-                    </Field>
+                    </FieldGroup>
 
-                    <Field data-invalid={!!errors.location}>
-                      <FieldLabel htmlFor="location">
-                        Location <span className="text-accent-coral">*</span>
-                      </FieldLabel>
-                      <Input
-                        {...register('location')}
-                        type="text"
-                        id="location"
-                        placeholder="Brisbane, Australia"
-                        aria-invalid={!!errors.location}
-                      />
-                      {errors.location && (
-                        <FieldError>{errors.location.message}</FieldError>
-                      )}
-                    </Field>
+                    <FieldGroup className="grid gap-6 md:grid-cols-2">
+                      <Field data-invalid={!!errors.industry}>
+                        <FieldLabel htmlFor="industry">
+                          Industry <span className="text-accent-coral">*</span>
+                        </FieldLabel>
+                        <Input
+                          {...register('industry')}
+                          type="text"
+                          id="industry"
+                          placeholder="e.g., Consulting, Accounting, Marketing"
+                          aria-invalid={!!errors.industry}
+                        />
+                        {errors.industry && (
+                          <FieldError>{errors.industry.message}</FieldError>
+                        )}
+                      </Field>
+
+                      <Field data-invalid={!!errors.location}>
+                        <FieldLabel htmlFor="location">
+                          Location <span className="text-accent-coral">*</span>
+                        </FieldLabel>
+                        <Input
+                          {...register('location')}
+                          type="text"
+                          id="location"
+                          placeholder="Brisbane, Australia"
+                          aria-invalid={!!errors.location}
+                        />
+                        {errors.location && (
+                          <FieldError>{errors.location.message}</FieldError>
+                        )}
+                      </Field>
+                    </FieldGroup>
                   </motion.div>
                 )}
 
@@ -486,45 +517,43 @@ export function BookingForm() {
                       control={control}
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                          <FieldGroup className="space-y-3">
-                            {challengeOptions.map((challenge, index) => {
-                              const isSelected =
-                                field.value?.includes(challenge) || false
-                              return (
-                                <label
-                                  key={index}
-                                  className={`
-                                    flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-all duration-200
-                                    ${
-                                      isSelected
-                                        ? 'border-accent-amber bg-accent-amber/10'
-                                        : 'dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 hover:dark:border-neutral-700'
+                          {challengeOptions.map((challenge, index) => {
+                            const isSelected =
+                              field.value?.includes(challenge) || false
+                            return (
+                              <label
+                                key={index}
+                                className={`
+                                  flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-all duration-200
+                                  ${
+                                    isSelected
+                                      ? 'border-primary bg-primary/10'
+                                      : 'dark:border-neutral-700 bg-gray-50 dark:bg-neutral-950 hover:dark:border-neutral-700'
+                                  }
+                                `}
+                              >
+                                <Checkbox
+                                  checked={isSelected}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      field.onChange([
+                                        ...(field.value || []),
+                                        challenge,
+                                      ])
+                                    } else {
+                                      field.onChange(
+                                        (field.value || []).filter(
+                                          (v: string) => v !== challenge,
+                                        ),
+                                      )
                                     }
-                                  `}
-                                >
-                                  <Checkbox
-                                    checked={isSelected}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        field.onChange([
-                                          ...(field.value || []),
-                                          challenge,
-                                        ])
-                                      } else {
-                                        field.onChange(
-                                          (field.value || []).filter(
-                                            (v: string) => v !== challenge,
-                                          ),
-                                        )
-                                      }
-                                    }}
-                                    className="mt-0.5"
-                                  />
-                                  <span className="text-sm">{challenge}</span>
-                                </label>
-                              )
-                            })}
-                          </FieldGroup>
+                                  }}
+                                  className="mt-0.5"
+                                />
+                                <span className="text-sm">{challenge}</span>
+                              </label>
+                            )
+                          })}
                           {fieldState.error && (
                             <FieldError>{fieldState.error.message}</FieldError>
                           )}
@@ -557,7 +586,7 @@ export function BookingForm() {
                         {...register('goals')}
                         id="goals"
                         rows={4}
-                        placeholder="e.g., Generate 50+ qualified leads per month, reduce manual prospecting time, improve conversion rates..."
+                        placeholder="e.g., Reduce manual quoting time, improve conversion rates, respond to all my customers within minutes..."
                         aria-invalid={!!errors.goals}
                       />
                       {errors.goals && (
@@ -565,73 +594,75 @@ export function BookingForm() {
                       )}
                     </Field>
 
-                    <Controller
-                      name="timeline"
-                      control={control}
-                      render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                          <FieldLabel>
-                            When do you want to start?{' '}
-                            <span className="text-accent-coral">*</span>
-                          </FieldLabel>
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger aria-invalid={fieldState.invalid}>
-                              <SelectValue placeholder="Select timeline" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="immediate">
-                                Immediately
-                              </SelectItem>
-                              <SelectItem value="1-3-months">
-                                In 1-3 months
-                              </SelectItem>
-                              <SelectItem value="3-6-months">
-                                In 3-6 months
-                              </SelectItem>
-                              <SelectItem value="6-12-months">
-                                In 6-12 months
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          {fieldState.error && (
-                            <FieldError>{fieldState.error.message}</FieldError>
-                          )}
-                        </Field>
-                      )}
-                    />
+                    <FieldGroup className="grid gap-6 md:grid-cols-2">
+                      <Controller
+                        name="timeline"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel>
+                              When do you want to start?{' '}
+                              <span className="text-accent-coral">*</span>
+                            </FieldLabel>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger aria-invalid={fieldState.invalid}>
+                                <SelectValue placeholder="Select timeline" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="immediate">
+                                  Immediately
+                                </SelectItem>
+                                <SelectItem value="1-3-months">
+                                  In 1-3 months
+                                </SelectItem>
+                                <SelectItem value="3-6-months">
+                                  In 3-6 months
+                                </SelectItem>
+                                <SelectItem value="6-12-months">
+                                  In 6-12 months
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                            {fieldState.error && (
+                              <FieldError>{fieldState.error.message}</FieldError>
+                            )}
+                          </Field>
+                        )}
+                      />
 
-                    <Controller
-                      name="currentMRR"
-                      control={control}
-                      render={({ field }) => (
-                        <Field>
-                          <FieldLabel>
-                            Current Monthly Revenue (Optional)
-                          </FieldLabel>
-                          <Select
-                            value={field.value ?? ''}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Prefer not to say" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="0-50k">$0 - $50K</SelectItem>
-                              <SelectItem value="50k-200k">
-                                $50K - $200K
-                              </SelectItem>
-                              <SelectItem value="200k-500k">
-                                $200K - $500K
-                              </SelectItem>
-                              <SelectItem value="500k+">$500K+</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </Field>
-                      )}
-                    />
+                      <Controller
+                        name="currentMRR"
+                        control={control}
+                        render={({ field }) => (
+                          <Field>
+                            <FieldLabel>
+                              Current Monthly Revenue (Optional)
+                            </FieldLabel>
+                            <Select
+                              value={field.value ?? ''}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Prefer not to say" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="0-50k">$0 - $50K</SelectItem>
+                                <SelectItem value="50k-200k">
+                                  $50K - $200K
+                                </SelectItem>
+                                <SelectItem value="200k-500k">
+                                  $200K - $500K
+                                </SelectItem>
+                                <SelectItem value="500k+">$500K+</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </Field>
+                        )}
+                      />
+                    </FieldGroup>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -644,14 +675,18 @@ export function BookingForm() {
                   size="lg"
                   onClick={handlePrevStep}
                   disabled={currentStep === 1}
-                  className="gap-2"
+                  className="gap-2 group"
                 >
-                  <ArrowLeft className="h-4 w-4" />
+                  <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-all duration-300" />
                   Back
                 </Button>
 
                 {currentStep === 4 ? (
-                  <Button type="submit" variant="primary" size="lg">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                  >
                     Book Your Call
                   </Button>
                 ) : (
@@ -660,10 +695,10 @@ export function BookingForm() {
                     variant="primary"
                     size="lg"
                     onClick={handleNextStep}
-                    className="gap-2"
+                    className="gap-2 group"
                   >
                     Next
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-all duration-300" />
                   </Button>
                 )}
               </div>

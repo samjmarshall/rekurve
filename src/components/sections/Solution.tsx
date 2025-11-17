@@ -8,7 +8,7 @@ import { ScrollReveal } from '~/components/motion/ScrollReveal'
 
 export default function Solution() {
   return (
-    <section className="relative py-24 bg-background">
+    <section id="features" className="relative py-24 bg-background">
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Heading */}
         <ScrollReveal>

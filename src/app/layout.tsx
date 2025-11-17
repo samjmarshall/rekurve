@@ -1,7 +1,7 @@
 import "~/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Play, IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
+import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "~/components/Analytics";
 import { ThemeProvider } from "~/context/providers";
 import { Navbar } from "~/components/navbar";

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { GripVertical } from "lucide-react";
+import Image from "next/image";
 import { SparklesCore } from "~/components/ui/sparkles";
 import { cn } from "~/lib/utils";
 
@@ -210,7 +211,7 @@ export const Compare = ({
               }}
               transition={{ duration: 0 }}
             >
-              <img
+              <Image
                 alt="first image"
                 src={firstImage}
                 className={cn(

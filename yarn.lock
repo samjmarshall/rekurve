@@ -2119,6 +2119,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tsparticles/interaction-external-trail@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/interaction-external-trail@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+  checksum: 67d7233e51900a064a69ca0dbf25657dfbbbf1df9a421c7641bef92d1c02c292c4586a3f00c5f8e45d987c43ff29a77d88db77318b635ca660fd4eefaad24138
+  languageName: node
+  linkType: hard
+
 "@tsparticles/interaction-particles-attract@npm:3.9.1":
   version: 3.9.1
   resolution: "@tsparticles/interaction-particles-attract@npm:3.9.1"
@@ -2164,12 +2173,50 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tsparticles/plugin-absorbers@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/plugin-absorbers@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+  checksum: cbc4be03da2e5d791663ab423131f9771f91486c2eb0afbfa6ec5d7033dd3e8e0d7c46a63b399de2f1176c4dd4ca970f0c74ab3fb99f9a0a641363f0a5535232
+  languageName: node
+  linkType: hard
+
 "@tsparticles/plugin-easing-quad@npm:3.9.1":
   version: 3.9.1
   resolution: "@tsparticles/plugin-easing-quad@npm:3.9.1"
   dependencies:
     "@tsparticles/engine": 3.9.1
   checksum: d6f72e518590e10fd5ca1215090658fdf333c0398b91d964b9ef1ad7dbd6ac330cd9e813152c906ffd4d99eb7cd2073d7937d18340d1ea33ae40b64929591844
+  languageName: node
+  linkType: hard
+
+"@tsparticles/plugin-emitters-shape-circle@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/plugin-emitters-shape-circle@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+    "@tsparticles/plugin-emitters": 3.9.1
+  checksum: 711633c2f9111c7873188bea13a68200a36205875d1b4340cabc7fea56033fa8c34f841040168a3dbbb313f5d543d27bbf08cc9efe7507b84c0f8f96854c8daa
+  languageName: node
+  linkType: hard
+
+"@tsparticles/plugin-emitters-shape-square@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/plugin-emitters-shape-square@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+    "@tsparticles/plugin-emitters": 3.9.1
+  checksum: 251c2592298ca65417c6d91fbcfb0d3154fc86d1e751b1dcbd8074a49c8bc2a2be27601fa8b0dfb650a4b77d847513e536dc562f577aaa79f7db57bdbe2f3788
+  languageName: node
+  linkType: hard
+
+"@tsparticles/plugin-emitters@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/plugin-emitters@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+  checksum: 2fbd19ff681c0b6df26f4a7134da603e2d5d3803cffc99517508d586b80be75683fd7778db24a02acef998b239f2d5f1b349527e2bf5c3051bc207f99ed38727
   languageName: node
   linkType: hard
 
@@ -2274,7 +2321,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsparticles/slim@npm:^3.9.1":
+"@tsparticles/shape-text@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/shape-text@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+  checksum: 9d962e48fcb5193dc42be54d46d9a5232f3b9293e67a48dddf9bb7dea679b343ae3fa9966f6406a92c9d7d6fceeee31dae92515896a6e22ff9ee332ed481e01e
+  languageName: node
+  linkType: hard
+
+"@tsparticles/slim@npm:3.9.1, @tsparticles/slim@npm:^3.9.1":
   version: 3.9.1
   resolution: "@tsparticles/slim@npm:3.9.1"
   dependencies:
@@ -2317,6 +2373,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tsparticles/updater-destroy@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/updater-destroy@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+  checksum: 27d8020e9fff85ba544a374020d06c779c0f5e9d397976925962ecfa1f3024e70d0b0aaa1ab3e3d6e70f9bbd4df3ada3bfe681a576726e3b5b3d92e29e9cbeb8
+  languageName: node
+  linkType: hard
+
 "@tsparticles/updater-life@npm:3.9.1":
   version: 3.9.1
   resolution: "@tsparticles/updater-life@npm:3.9.1"
@@ -2344,6 +2409,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tsparticles/updater-roll@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/updater-roll@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+  checksum: 6aeb4000871d296263b3d9fa8b63b53ad141392b5a5a4092fa875bd57dd836648fecf4e29b6fb3638184b36eb6b65937c03d19caa84ba345020d3b0e235653ef
+  languageName: node
+  linkType: hard
+
 "@tsparticles/updater-rotate@npm:3.9.1":
   version: 3.9.1
   resolution: "@tsparticles/updater-rotate@npm:3.9.1"
@@ -2368,6 +2442,33 @@ __metadata:
   dependencies:
     "@tsparticles/engine": 3.9.1
   checksum: 4292b8450ec453ec3d488fff76efc3266d2a7a83802eb97c0d3799d6b768e0d9ad7c6244959dc0b89e87358d090885514b36f75ceb2a60b9183e55e912a1d86e
+  languageName: node
+  linkType: hard
+
+"@tsparticles/updater-tilt@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/updater-tilt@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+  checksum: e3a0af3700be61909ad051c8182d806255d25dc4166a20005e1db2676317cace757954c918575a075a109d50c510f39a78c498a3221b54576df69cc768ef819c
+  languageName: node
+  linkType: hard
+
+"@tsparticles/updater-twinkle@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/updater-twinkle@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+  checksum: 434a8803445df816df9285c57521089f97e7535da6da1362308ef9f32e6172f799a09709f13d6d4c2a88c065b76f3a44e2a79bb2bcb4d158041f8d78f185bd39
+  languageName: node
+  linkType: hard
+
+"@tsparticles/updater-wobble@npm:3.9.1":
+  version: 3.9.1
+  resolution: "@tsparticles/updater-wobble@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+  checksum: 102c0f0e820b5f12da8543892a2d2ff356ae5f3e6b3fa042cb1265f62aa913381e2a41a6d97f21d1fc091ea0554b6a6a63cb5a554e59d27fdfff9a94bd10a2a3
   languageName: node
   linkType: hard
 
@@ -7328,6 +7429,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tsparticles@npm:^3.9.1":
+  version: 3.9.1
+  resolution: "tsparticles@npm:3.9.1"
+  dependencies:
+    "@tsparticles/engine": 3.9.1
+    "@tsparticles/interaction-external-trail": 3.9.1
+    "@tsparticles/plugin-absorbers": 3.9.1
+    "@tsparticles/plugin-emitters": 3.9.1
+    "@tsparticles/plugin-emitters-shape-circle": 3.9.1
+    "@tsparticles/plugin-emitters-shape-square": 3.9.1
+    "@tsparticles/shape-text": 3.9.1
+    "@tsparticles/slim": 3.9.1
+    "@tsparticles/updater-destroy": 3.9.1
+    "@tsparticles/updater-roll": 3.9.1
+    "@tsparticles/updater-tilt": 3.9.1
+    "@tsparticles/updater-twinkle": 3.9.1
+    "@tsparticles/updater-wobble": 3.9.1
+  checksum: 553fd7dcd06223b32776ef3de22fd4c414bd28afffcc247638aeecdf7f457d40d21cf9bb3693602274ed3a84f3d37218656a8dac686dec344b4bea7656426f77
+  languageName: node
+  linkType: hard
+
 "tw-animate-css@npm:^1.4.0":
   version: 1.4.0
   resolution: "tw-animate-css@npm:1.4.0"
@@ -7794,6 +7916,7 @@ __metadata:
     simplex-noise: ^4.0.3
     tailwind-merge: ^3.3.1
     tailwindcss: ^4.0.15
+    tsparticles: ^3.9.1
     tw-animate-css: ^1.4.0
     typescript: ^5.8.2
     typescript-eslint: ^8.27.0

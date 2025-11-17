@@ -8,9 +8,9 @@ import { Navbar } from "~/components/navbar";
 // import { Footer } from "~/components/sections/Footer";
 
 export const metadata: Metadata = {
-  title: "AI Sales Agents for Service Businesses | Rekurve",
+  title: "AI Quote Automation for Service Businesses | Rekurve",
   description:
-    "Recover 20+ hours weekly or add $100K to your pipeline in 90 days with autonomous AI sales agents.",
+    "Recover 20+ hours weekly or add $100K to your pipeline in 90 days with AI service quote automation.",
   keywords: [
     "AI sales agents",
     "Brisbane",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     "virtual SDR",
     "lead generation automation",
     "B2B sales automation",
-    "quote automation",
+    "service quote automation",
   ],
   authors: [{ name: "Rekurve AI" }],
   creator: "Rekurve AI",
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_AU",
     url: "https://rekurve.ai",
-    title: "AI Sales Agents for Service Businesses | Rekurve",
+    title: "AI Quote Automation for Service Businesses | Rekurve",
     description:
-      "Recover 20+ hours weekly or add $100K to your pipeline in 90 days with autonomous AI sales agents.",
+      "Recover 20+ hours weekly or add $100K to your pipeline in 90 days with AI service quote automation.",
     siteName: "Rekurve AI",
     images: [
       {
@@ -57,9 +57,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Sales Agents for Service Businesses | Rekurve",
+    title: "AI Quote Automation for Service Businesses | Rekurve",
     description:
-      "Recover 20+ hours weekly or add $100K to your pipeline in 90 days with autonomous AI sales agents.",
+      "Recover 20+ hours weekly or add $100K to your pipeline in 90 days with AI service quote automation.",
     images: ["/og-image.png"],
     creator: "@rekurve_ai",
   },
@@ -91,7 +91,7 @@ export default function RootLayout({
     "@type": "ProfessionalService",
     name: "Rekurve AI",
     description:
-      "Autonomous AI sales agents for professional services firms in Brisbane and Melbourne",
+      "AI quote automation for for Service Businesses in Brisbane and Melbourne",
     url: "https://rekurve.ai",
     logo: "https://rekurve.ai/logo.png",
     address: {
@@ -101,7 +101,7 @@ export default function RootLayout({
       addressCountry: "AU",
     },
     areaServed: ["Brisbane", "Melbourne"],
-    serviceType: "AI Sales Automation",
+    serviceType: "AI Quote Automation",
     priceRange: "$$$",
     aggregateRating: {
       "@type": "AggregateRating",

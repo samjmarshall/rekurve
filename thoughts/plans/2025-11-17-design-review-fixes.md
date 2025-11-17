@@ -145,9 +145,9 @@ Apply same change to:
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `yarn check` passes (lint + typecheck)
-- [ ] `yarn build` completes successfully
-- [ ] HTML has exactly one `<h1>` element per page
+- [x] `yarn check` passes (lint + typecheck)
+- [x] `yarn build` completes successfully
+- [x] HTML has exactly one `<h1>` element per page
 
 #### Manual Verification:
 - [ ] Hero CTAs visible and tappable on 375px mobile viewport

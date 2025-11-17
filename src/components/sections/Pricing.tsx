@@ -95,11 +95,74 @@ const cardVariants = {
 }
 
 export function Pricing() {
+  // Generate Service schema for SEO
+  const servicesSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": pricingTiers.map((tier, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Service",
+        "name": tier.name,
+        "description": tier.tagline,
+        "provider": {
+          "@type": "Organization",
+          "name": "Rekurve AI",
+          "url": "https://rekurve.ai"
+        },
+        "areaServed": ["Brisbane", "Melbourne"],
+        "serviceType": "AI Sales Automation",
+        ...(tier.setupFee > 0 && tier.monthlyFee > 0 ? {
+          "offers": {
+            "@type": "AggregateOffer",
+            "priceCurrency": "AUD",
+            "lowPrice": tier.monthlyFee,
+            "highPrice": tier.setupFee + tier.monthlyFee,
+            "offerCount": 2,
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Setup Fee",
+                "price": tier.setupFee,
+                "priceCurrency": "AUD"
+              },
+              {
+                "@type": "Offer",
+                "name": "Monthly Fee",
+                "price": tier.monthlyFee,
+                "priceCurrency": "AUD",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": tier.monthlyFee,
+                  "priceCurrency": "AUD",
+                  "unitCode": "MON",
+                  "billingIncrement": 1
+                }
+              }
+            ]
+          }
+        } : {
+          "offers": {
+            "@type": "Offer",
+            "price": "Contact for pricing",
+            "priceCurrency": "AUD"
+          }
+        })
+      }
+    }))
+  }
+
   return (
     <section
       id="pricing"
       className="relative overflow-hidden bg-background py-24"
     >
+      {/* Service Schema Markup for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesSchema) }}
+      />
       <div className="container relative mx-auto px-4">
         {/* Heading */}
         <motion.div

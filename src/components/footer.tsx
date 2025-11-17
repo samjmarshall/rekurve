@@ -6,19 +6,19 @@ export function Footer() {
   const pages = [
     {
       title: "Home",
-      href: "#",
+      href: "/",
     },
     {
       title: "Features",
-      href: "#",
+      href: "/#features",
     },
     {
       title: "Pricing",
-      href: "#",
+      href: "/#pricing",
     },
     {
       title: "Contact",
-      href: "#",
+      href: "/#booking-form",
     },
     {
       title: "Blog",
@@ -61,16 +61,12 @@ export function Footer() {
 
   const signups = [
     {
-      title: "Sign Up",
-      href: "#",
-    },
-    {
       title: "Login",
       href: "#",
     },
     {
       title: "Book a demo",
-      href: "#",
+      href: "/#booking-form",
     },
   ];
   return (

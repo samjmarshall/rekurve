@@ -184,16 +184,12 @@ const MobileNav = ({ navItems, visible }: NavbarProps) => {
                   <motion.span className="block">{navItem.name} </motion.span>
                 </Link>
               ))}
-              <Button
-                asChild
-                variant="primary"
-                className="hidden md:block w-full"
+              <Link
+                href="#booking-form"
                 onClick={() => setOpen(false)}
-              >
-                <Link href="#booking-form">
-                  Book a call
-                </Link>
-              </Button>
+                className="relative text-neutral-600 dark:text-neutral-300">
+                Book a call
+              </Link>
             </motion.div>
           )}
         </AnimatePresence>

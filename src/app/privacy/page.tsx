@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { env } from "~/env"
 import openGraph from "~/lib/open-graph"
 import { type Metadata } from "next"
 import { canonicalUrl } from "~/lib/canonical-url"
@@ -42,10 +41,10 @@ export default function Privacy() {
           with this Policy. If you have any questions about our Policy or your
           Personal Information, please contact us at{" "}
           <Link
-            href={`mailto:${env.CUSTOMER_CONTACT_EMAIL}`}
+            href="mailto:contact@rekurve.ai"
             title="Customer Contact Email"
           >
-            {env.CUSTOMER_CONTACT_EMAIL}
+            contact@rekurve.ai
           </Link>
           .
         </p>
@@ -385,10 +384,10 @@ export default function Privacy() {
         </p>
         <p>
           <Link
-            href={`mailto:${env.CUSTOMER_CONTACT_EMAIL}`}
+            href="mailto:contact@rekurve.ai"
             title="Customer Contact Email"
           >
-            {env.CUSTOMER_CONTACT_EMAIL}
+            contact@rekurve.ai
           </Link>
         </p>
         <h2>Changes to the Policy</h2>

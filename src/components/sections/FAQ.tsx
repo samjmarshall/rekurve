@@ -13,7 +13,7 @@ interface FAQItem {
   category: string
 }
 
-const faqData: FAQItem[] = [
+export const faqData: FAQItem[] = [
   {
     id: "1",
     question: "How quickly will I see ROI from the AI sales agent?",
@@ -102,8 +102,27 @@ export function FAQ() {
     )
   })
 
+  // Generate FAQ schema for SEO
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqData.map((item) => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer
+      }
+    }))
+  }
+
   return (
-    <section className="relative bg-background py-24">
+    <section id="faq" className="relative bg-background py-24">
+      {/* FAQ Schema Markup for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="container relative mx-auto max-w-4xl px-6">
         <ScrollReveal>
           <div className="mb-12 text-center">

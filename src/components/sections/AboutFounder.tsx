@@ -71,11 +71,11 @@ export function AboutFounder() {
 
             {/* Bio section */}
             <div className="space-y-4">
-              <h3 className="text-2xl font-semibold">
+              <h2 className="text-2xl font-semibold">
                 Built by Sam Marshall
                 <br />
                 <BrandShimmer text="Principal AI Engineer" className="text-lg" />
-              </h3>
+              </h2>
 
               {/* Credentials */}
               <div className="space-y-3">

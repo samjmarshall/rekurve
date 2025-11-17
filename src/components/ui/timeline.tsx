@@ -34,6 +34,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
 
   return (
     <section
+      id="how-it-works"
       className="relative w-full overflow-hidden bg-background py-20"
       ref={containerRef}
     >

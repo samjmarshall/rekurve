@@ -49,16 +49,14 @@ export function FinalCTA() {
         <ScrollReveal delay={0.4}>
           <div className="border-t h-full md:border-t-0 md:border-l border-dashed p-8 md:p-14">
             <p className="text-base text-neutral-700 dark:text-neutral-200">
-              &quot;This is the best product & service ever when it comes to sales automation. 10/10 recommended.
-              I can&apos;t wait to see what happens with this
-              product.&quot;
+              &quot;The AI agent transformed our quote process. What used to take 4 hours now happens in minutes. Our team can finally focus on closing deals instead of chasing leads.&quot;
             </p>
             <div className="flex flex-col text-sm items-start mt-4 gap-1">
               <p className="font-bold text-neutral-800 dark:text-neutral-200">
-                Michael Scarn
+                Service Business Owner
               </p>
               <p className="text-gray-600 dark:text-neutral-400">
-                Side projects builder
+                Brisbane, Australia
               </p>
             </div>
           </div>

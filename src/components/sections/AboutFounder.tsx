@@ -58,12 +58,9 @@ export function AboutFounder() {
             {/* Founder photo placeholder */}
             <div className="relative mx-auto w-fit lg:mx-0">
               <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-transparent bg-linear-to-br from-accent-blue via-primary to-primary p-1 shadow-2xl">
-                <div className="flex h-full w-full items-center justify-center rounded-full bg-black">
-                  <div className="text-center text-white">
-                    <div className="text-5xl font-bold">SM</div>
-                    <div className="mt-2 text-xs">
-                      Photo here
-                    </div>
+                <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-neutral-800 to-black">
+                  <div className="text-4xl font-bold text-white tracking-wide">
+                    SM
                   </div>
                 </div>
               </div>

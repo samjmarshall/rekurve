@@ -6,7 +6,7 @@ import { Analytics } from "~/components/Analytics";
 import { ThemeProvider } from "~/context/providers";
 import { Navbar } from "~/components/navbar";
 import { canonicalUrl } from "~/lib/canonical-url";
-import { Footer } from "~/components/sections/Footer";
+// import { Footer } from "~/components/footer";
 import openGraph from "~/lib/open-graph";
 
 const canonical = canonicalUrl("/")
@@ -123,7 +123,7 @@ export default function RootLayout({
           <Navbar />
           <Analytics />
           {children}
-          <Footer />
+          {/* <Footer /> */}
         </ThemeProvider>
       </body>
     </html>

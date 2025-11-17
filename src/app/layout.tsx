@@ -5,7 +5,11 @@ import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "~/components/Analytics";
 import { ThemeProvider } from "~/context/providers";
 import { Navbar } from "~/components/navbar";
-// import { Footer } from "~/components/sections/Footer";
+import { canonicalUrl } from "~/lib/canonical-url";
+import { Footer } from "~/components/sections/Footer";
+import openGraph from "~/lib/open-graph";
+
+const canonical = canonicalUrl("/")
 
 export const metadata: Metadata = {
   title: "AI Quote Automation for Service Businesses | Rekurve",
@@ -39,21 +43,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    type: "website",
-    locale: "en_AU",
-    url: "https://rekurve.ai",
-    title: "AI Quote Automation for Service Businesses | Rekurve",
-    description:
-      "Recover 20+ hours weekly or add $100K to your pipeline in 90 days with AI service quote automation.",
-    siteName: "Rekurve AI",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Rekurve AI Sales Agents - Autonomous AI for Service Businesses",
-      },
-    ],
+    ...openGraph,
+    url: canonical,
   },
   twitter: {
     card: "summary_large_image",
@@ -63,9 +54,9 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
     creator: "@rekurve_ai",
   },
-  metadataBase: new URL("https://rekurve.ai"),
+  metadataBase: new URL(canonical),
   alternates: {
-    canonical: "https://rekurve.ai",
+    canonical,
   },
 };
 
@@ -132,7 +123,7 @@ export default function RootLayout({
           <Navbar />
           <Analytics />
           {children}
-          {/* <Footer /> */}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

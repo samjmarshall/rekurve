@@ -4,8 +4,8 @@
 
 This audit identifies **18 high-to-low priority issues** across SEO and AIO optimization for the Rekurve AI landing page. The site has strong foundational metadata but critical gaps in heading structure, technical SEO files, and AI-discoverability patterns.
 
-**Overall SEO Score: 7.2/10** (was 6.5/10)
-**AIO Readiness Score: 6.0/10** (was 5/10)
+**Overall SEO Score: 7.5/10** (was 6.5/10)
+**AIO Readiness Score: 7.0/10** (was 5/10)
 
 ### Completed Fixes (2025-11-17)
 - ✅ robots.txt and sitemap.xml created
@@ -14,6 +14,8 @@ This audit identifies **18 high-to-low priority issues** across SEO and AIO opti
 - ✅ Dead "Watch demo" link fixed (now points to #features)
 - ✅ AboutFounder H3 changed to H2 (proper hierarchy)
 - ✅ FAQ section ID added (#faq for deep linking)
+- ✅ llms.txt created for AI assistant optimization
+- ✅ Service schema added for pricing tiers (3 services with structured pricing)
 
 ---
 
@@ -70,10 +72,14 @@ This audit identifies **18 high-to-low priority issues** across SEO and AIO opti
 **Bonus**: Added `id="faq"` for deep linking support
 **Verified**: Schema properly embedded in page HTML
 
-### 7. ⚠️ No Service Schema for Pricing Tiers
-**Impact**: Pricing won't appear in search results
+### 7. ✅ FIXED: No Service Schema for Pricing Tiers
+**Status**: COMPLETED
 **Location**: `src/components/sections/Pricing.tsx`
-**Fix**: Add Service schema with price information
+**Implementation**: Added ItemList schema with 3 Service schemas:
+- AI-Assisted Sales System: $9,500 setup + $2,500/mo
+- Intelligent Sales Agent: $20,000 setup + $4,500/mo
+- Autonomous AI Sales Agent: Custom pricing
+**Includes**: Provider info, area served, structured pricing with AUD currency
 
 ### 8. ⚠️ Thin Hero Section Content (47 words)
 **Impact**: Primary landing content too sparse for AI comprehension
@@ -202,10 +208,11 @@ According to our client data across 12 service businesses..."
 
 ### Should Have (Progress)
 - [x] FAQ Page schema markup ✅ COMPLETED
-- [ ] Service schema for pricing
+- [x] Service schema for pricing ✅ COMPLETED
 - [ ] Review schema (if real reviews exist)
 - [ ] Organization schema (partial in layout.tsx)
 - [ ] Alt text on all icons/images
+- [x] llms.txt for AI assistants ✅ COMPLETED
 
 ### Nice to Have
 - [ ] Breadcrumb schema (single page, not applicable)
@@ -254,7 +261,7 @@ According to our client data across 12 service businesses..."
 2. ✅ Add section IDs to all sections (FAQ added) - PARTIAL
 3. [ ] Make FAQ questions H3 elements
 4. [ ] Add semantic markup to testimonial
-5. [ ] Create Service schema for pricing
+5. ✅ Create Service schema for pricing - DONE
 
 ### Week 4 (AIO Enhancement)
 1. [ ] Add definitional "What are AI Sales Agents?" section
@@ -282,6 +289,7 @@ After fixes, validate with:
 ### SEO Improvements Achieved
 - ✅ **H1 Fix**: Proper heading hierarchy for crawlers
 - ✅ **FAQ Schema Markup**: FAQ rich results now possible in SERPs
+- ✅ **Service Schema**: Pricing tiers with structured data for rich results
 - ✅ **robots.txt/sitemap.xml**: Search engines can now efficiently crawl
 - ✅ **Dead Links Fixed**: No broken internal navigation
 - ✅ **Heading Hierarchy**: AboutFounder now uses H2 properly
@@ -291,17 +299,28 @@ After fixes, validate with:
 - ⏸️ **Meta Images**: 40% higher social share CTR (needs design assets)
 - [ ] **Content Expansion**: Better keyword density (Hero, Results sections)
 - [ ] **Accessibility**: Aria-labels for screen readers
-- [ ] **Service Schema**: Pricing rich results
 
 ### AIO Improvements Achieved
 - ✅ **FAQ Schema**: Voice assistant compatibility, AI-parseable Q&A structure
-- ✅ **Structured Data**: Higher likelihood of AI citation for FAQs
+- ✅ **Service Schema**: Structured pricing data for AI comprehension
+- ✅ **llms.txt**: Direct AI assistant guidance with brand positioning
+- ✅ **Structured Data**: Higher likelihood of AI citation for FAQs and services
 - ✅ **Entity Recognition**: Consistent brand name usage maintained
 
 **Current Scores**:
-- SEO: 7.2/10 (up from 6.5/10)
-- AIO: 6.0/10 (up from 5/10)
+- SEO: 7.5/10 (up from 6.5/10)
+- AIO: 7.0/10 (up from 5/10)
+
+**Schemas on Page**:
+1. ProfessionalService (layout.tsx)
+2. FAQPage with 12 Q&A pairs
+3. ItemList with 3 Service schemas (pricing)
+
+**Additional Files**:
+- llms.txt (AI assistant optimization)
+- robots.txt (crawler guidance)
+- sitemap.xml (page discovery)
 
 **Next Target After Remaining Fixes**:
 - SEO: 8.5/10
-- AIO: 7.5/10
+- AIO: 8.0/10

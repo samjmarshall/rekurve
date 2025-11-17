@@ -81,6 +81,19 @@ www/                                    # Next.js 15 landing page application
 
 ---
 
+## AI Search Optimization (llms.txt)
+
+**File**: `public/llms.txt`
+
+Provides structured information for AI assistants (ChatGPT, Claude, Perplexity). Update when:
+- Pricing changes
+- Service offerings change
+- New features added
+- Founder credentials update
+- Guarantee terms change
+
+---
+
 ## Strategic Document Reference
 
 **Business Strategy**:

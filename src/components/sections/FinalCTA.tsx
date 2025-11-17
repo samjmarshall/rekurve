@@ -1,9 +1,10 @@
 "use client"
 
-import { ArrowRight, Link, Mail } from 'lucide-react'
+import { ArrowRight, Mail } from 'lucide-react'
 
 import { BrandShimmer } from '../brand-shimmer';
 import { Button } from '../ui/Button';
+import Link from 'next/link';
 import React from "react";
 import { ScrollReveal } from '~/components/motion/ScrollReveal'
 import { cn } from "~/lib/utils";

@@ -62,6 +62,7 @@ You are tasked with generating a clear and concise pull request description foll
 ## Important notes:
 - This command works across different repositories - always read the local template
 - Be thorough but concise - descriptions should be scannable
+- Use writing-clearly-and-concisely skill if available
 - Focus on the "why" as much as the "what"
 - Include any breaking changes or migration notes prominently
 - If the PR touches multiple components, organize the description accordingly

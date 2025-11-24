@@ -262,7 +262,7 @@ After structure approval:
 ````
 3. Use writing-clearly-and-concisely skill if available
 
-### Step 5: Sync and Review
+### Step 5: Review
 
 1. **Present the draft plan location**:
    ```

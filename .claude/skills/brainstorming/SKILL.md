@@ -32,12 +32,14 @@ Start by understanding the current project context, then ask questions one at a 
 - Ask after each section whether it looks right so far
 - Cover: architecture, components, data flow, error handling, testing
 - Be ready to go back and clarify if something doesn't make sense
+- **DO NOT write to file yet** - only output text in your response
 
-## After the Design
+## After Validation
 
-**Documentation:**
-- Write the validated design to `thoughts/designs/YYYY-MM-DD-<topic>.md`
+**Documentation (REQUIRED - do not skip this step):**
+- Once the user has validated the design sections, write the complete design to `thoughts/designs/YYYY-MM-DD-<topic>.md`
 - Use writing-clearly-and-concisely skill if available
+- **You must always write to file** - never just present the design in chat without saving it
 
 ## Key Principles
 

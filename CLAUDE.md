@@ -103,9 +103,6 @@ Provides structured information for AI assistants (ChatGPT, Claude, Perplexity).
 **Market Positioning**:
 - `docs/ai_agent_positioning_guide.md` - Critical for messaging (why "AI Agent" wins, messaging by buyer type, objection handling)
 
-**Product Design**:
-- `docs/landing_page_prompt.md` - Complete landing page specification (Next.js 15+ implementation, 12 optimized sections, accessibility, performance targets)
-
 **Pricing & Packaging**:
 - `docs/value_based_pricing_proposals.md` - How to price based on value, not hours
 - `docs/pricing-ladder.md` - Three-tier structure with clear differentiation

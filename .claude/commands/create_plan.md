@@ -105,7 +105,7 @@ After getting initial clarifications:
    - **codebase-pattern-finder** - To find similar features we can model after
 
    **For historical context:**
-   - **thoughts-locator** - To find any research, plans, or decisions about this area
+   - **thoughts-locator** - To find any designs, research, plans, or decisions about this area
    - **thoughts-analyzer** - To extract key insights from the most relevant documents
 
    Each agent knows how to:
@@ -260,6 +260,7 @@ After structure approval:
 - Related research: `thoughts/research/[relevant].md`
 - Similar implementation: `[file:line]`
 ````
+3. Use writing-clearly-and-concisely skill if available
 
 ### Step 5: Sync and Review
 

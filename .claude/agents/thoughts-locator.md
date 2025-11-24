@@ -48,7 +48,11 @@ Structure your findings like this:
 ```
 ## Thought Documents about [Topic]
 
+### Design decisions
+- `thoughts/designs/2024-01-15_rate_limiting.md` - Rate limiting design and decision record
+
 ### Tickets
+- `thoughts/epics/eng_123.md` - Rate limiting
 - `thoughts/tickets/eng_1234.md` - Implement rate limiting for API
 - `thoughts/tickets/eng_1235.md` - Rate limit configuration design
 

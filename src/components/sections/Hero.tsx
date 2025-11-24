@@ -61,15 +61,39 @@ export function Hero() {
       />
 
       <div className="text-balance relative z-20 mx-auto mb-4 mt-4 max-w-4xl text-center text-3xl font-semibold tracking-tight md:text-7xl">
-        <h1>Recover 20+ Hours Weekly or Add $100K to Your Pipeline in 90 Days</h1>
+        {/* <h1>Recover 20+ Hours Weekly or Add $100K to Your Pipeline in 90 Days</h1> */}
+        <h1>Speed to Lead and Quote Automation for Service Businesses</h1>
       </div>
-      <p className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center font-mono font-medium text-base/6">
-        Customer Enquiry <span className="text-primary">&rarr;</span> Quote Generated.
+      <p className="relative z-20 mx-auto mt-4 px-4 text-center font-mono font-medium text-base/6">
+        Customer Enquiry <span className="text-primary">&rarr;</span> Quote Generated <span className="text-primary">&rarr;</span> Job Booked.
       </p>
-      <p className="relative z-20 mx-auto mt-4 max-w-lg px-4 text-center text-base/6">
-        AI Service Quote Automation - Automate the admin and follow-up.
+      <p className="relative z-20 mx-auto mt-4 px-4 text-center text-base/6">
+        For service businesses spending 20+ hours a week quoting or simply taking too long to respond to leads, or even missing them entirely.
         <br />
-        For service businesses spending 20+ hours a week quoting.
+        <div>
+          <h2>Stats</h2>
+          <span className="font-semibold">Immediate response:</span> Responding to a lead within one minute can increase conversion rates by up to 391%.
+          <br />
+          <span className="font-semibold">Loss of deals:</span> Up to 60% of potential deals can be lost if a company fails to connect with a lead within the first hour. A study by InsideView found that 74% of buyers choose the salesperson who responds first.
+          <br />
+          <span className="font-semibold">Automation&apos;s role:</span> Using AI and automation can reduce delays, boost conversion rates by an average of 20-30%, and reduce delays by up to 82%.
+          <br />
+          <span className="font-semibold">10-minute rule:</span> The odds of qualifying a lead drop by 80% if you wait over 5 minutes, and plummet by 400% if you wait 10 minutes compared to 5 minutes.
+          <br />
+          <span className="font-semibold">One-hour rule:</span> Companies that respond to leads within one hour are seven times more likely to qualify them than those who wait longer.
+          <br />
+          <span className="font-semibold">Impact of slow response:</span> The chance of qualifying a lead falls by 60% if the response time increases from within an hour to 24 hours or longer.
+          <br />
+          <span className="font-semibold">Buyer expectations:</span> Approximately 66% of buyers expect a response within 10 minutes to any inquiry.
+          <br />
+          <span className="font-semibold">Customer expectations: </span> An immediate response (within 10 minutes) is considered important or very important by 82% of consumers for sales inquiries.
+          <br />
+          <span className="font-semibold">Missed opportunities:</span> 35-50% of sales go to the vendor that responds first, highlighting the critical importance of rapid lead engagement.
+          <br />
+          <span className="font-semibold">Competitive advantage:</span> 78% of customers buy from the first responder. Particularly in competitive industries, a fast response can be the deciding factor in converting a lead before a competitor does.
+          <br />
+          <span className="font-semibold">Customer acquisition cost:</span> Speed to lead can reduce customer acquisition costs by up to 50% by improving conversion rates and reducing the sales cycle length.
+        </div>
       </p>
       <div className="mb-10 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-20"
       >

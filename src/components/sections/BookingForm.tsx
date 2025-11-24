@@ -329,9 +329,10 @@ export function BookingForm() {
                           id="firstName"
                           placeholder="John"
                           aria-invalid={!!errors.firstName}
+                          aria-describedby={errors.firstName ? 'firstName-error' : undefined}
                         />
                         {errors.firstName && (
-                          <FieldError>{errors.firstName.message}</FieldError>
+                          <FieldError id="firstName-error">{errors.firstName.message}</FieldError>
                         )}
                       </Field>
 
@@ -345,9 +346,10 @@ export function BookingForm() {
                           id="lastName"
                           placeholder="Smith"
                           aria-invalid={!!errors.lastName}
+                          aria-describedby={errors.lastName ? 'lastName-error' : undefined}
                         />
                         {errors.lastName && (
-                          <FieldError>{errors.lastName.message}</FieldError>
+                          <FieldError id="lastName-error">{errors.lastName.message}</FieldError>
                         )}
                       </Field>
                     </FieldGroup>
@@ -363,9 +365,10 @@ export function BookingForm() {
                           id="email"
                           placeholder="john.smith@company.com"
                           aria-invalid={!!errors.email}
+                          aria-describedby={errors.email ? 'email-error' : undefined}
                         />
                         {errors.email && (
-                          <FieldError>{errors.email.message}</FieldError>
+                          <FieldError id="email-error">{errors.email.message}</FieldError>
                         )}
                       </Field>
 
@@ -407,9 +410,10 @@ export function BookingForm() {
                           id="company"
                           placeholder="Acme Professional Services"
                           aria-invalid={!!errors.company}
+                          aria-describedby={errors.company ? 'company-error' : undefined}
                         />
                         {errors.company && (
-                          <FieldError>{errors.company.message}</FieldError>
+                          <FieldError id="company-error">{errors.company.message}</FieldError>
                         )}
                       </Field>
 
@@ -466,9 +470,10 @@ export function BookingForm() {
                           id="industry"
                           placeholder="e.g., Consulting, Accounting, Marketing"
                           aria-invalid={!!errors.industry}
+                          aria-describedby={errors.industry ? 'industry-error' : undefined}
                         />
                         {errors.industry && (
-                          <FieldError>{errors.industry.message}</FieldError>
+                          <FieldError id="industry-error">{errors.industry.message}</FieldError>
                         )}
                       </Field>
 
@@ -482,9 +487,10 @@ export function BookingForm() {
                           id="location"
                           placeholder="Brisbane, Australia"
                           aria-invalid={!!errors.location}
+                          aria-describedby={errors.location ? 'location-error' : undefined}
                         />
                         {errors.location && (
-                          <FieldError>{errors.location.message}</FieldError>
+                          <FieldError id="location-error">{errors.location.message}</FieldError>
                         )}
                       </Field>
                     </FieldGroup>
@@ -584,9 +590,10 @@ export function BookingForm() {
                         rows={4}
                         placeholder="e.g., Reduce manual quoting time, improve conversion rates, respond to all my customers within minutes..."
                         aria-invalid={!!errors.goals}
+                        aria-describedby={errors.goals ? 'goals-error' : undefined}
                       />
                       {errors.goals && (
-                        <FieldError>{errors.goals.message}</FieldError>
+                        <FieldError id="goals-error">{errors.goals.message}</FieldError>
                       )}
                     </Field>
 

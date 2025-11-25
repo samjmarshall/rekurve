@@ -68,13 +68,13 @@ If the user's feedback requires understanding new code patterns or validating as
    Use the right agent for each type of research:
 
    **For code investigation:**
-   - **codebase-locator** - To find relevant files
-   - **codebase-analyzer** - To understand implementation details
-   - **codebase-pattern-finder** - To find similar patterns
+   - **@agent-codebase-locator** - To find relevant files
+   - **@agent-codebase-analyzer** - To understand implementation details
+   - **@agent-codebase-pattern-finder** - To find similar patterns
 
    **For historical context:**
-   - **thoughts-locator** - To find related research or decisions
-   - **thoughts-analyzer** - To extract insights from documents
+   - **@agent-thoughts-locator** - To find related research or decisions
+   - **@agent-thoughts-analyzer** - To extract insights from documents
 
 3. **Read any new files identified by research**:
    - Read them FULLY into the main context

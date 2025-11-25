@@ -10,6 +10,7 @@ import { NativeIcon } from "~/icons/bento-icons";
 import { NativeIntegrationSkeleton } from "../agentic-intelligence/skeletons";
 import { StatsMarquee } from "~/components/stats";
 import { cn } from "~/lib/utils";
+import { analytics } from "~/lib/posthog";
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,12 +70,12 @@ export function Hero() {
         Customer Enquiry <span className="text-primary">&rarr;</span> Quote Generated <span className="text-primary">&rarr;</span> Job Booked.
       </p>
       <div className="mb-8 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-14">
-        <Link href="#how-it-works" className="w-full sm:w-40">
+        <Link href="#how-it-works" className="w-full sm:w-40" onClick={() => analytics.cta.click('hero_secondary')}>
           <Button asChild variant="secondary" className="w-full text-center">
             How it Works
           </Button>
         </Link>
-        <Link href="#booking-form" className="w-full sm:w-40">
+        <Link href="#booking-form" className="w-full sm:w-40" onClick={() => analytics.cta.click('hero_primary')}>
           <Button asChild variant="primary" className="w-full text-center">
             Book a call
           </Button>

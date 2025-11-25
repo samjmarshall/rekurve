@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "~/components/Analytics";
+import { AnalyticsProvider } from "~/components/providers/AnalyticsProvider";
 import { ThemeProvider } from "~/context/providers";
 import { Navbar } from "~/components/navbar";
 import { canonicalUrl } from "~/lib/canonical-url";
@@ -120,10 +121,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-          <Navbar />
-          <Analytics />
-          {children}
-          <Footer />
+          <AnalyticsProvider>
+            <Navbar />
+            <Analytics />
+            {children}
+            <Footer />
+          </AnalyticsProvider>
         </ThemeProvider>
       </body>
     </html>

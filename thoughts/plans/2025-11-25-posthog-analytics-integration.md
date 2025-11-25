@@ -169,8 +169,8 @@ import { analytics } from '~/lib/posthog'
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes (lint + typecheck)
-- [ ] No TypeScript errors on analytics imports
+- [x] `yarn check` passes (lint + typecheck)
+- [x] No TypeScript errors on analytics imports
 
 #### Manual Verification
 - [ ] Click each CTA and verify `cta_clicked` event in PostHog Live Events
@@ -336,8 +336,8 @@ useEffect(() => {
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes
-- [ ] No TypeScript errors
+- [x] `yarn check` passes
+- [x] No TypeScript errors
 
 #### Manual Verification
 - [ ] Focus first field triggers `booking_form_started` event
@@ -381,7 +381,7 @@ import { analytics } from '~/lib/posthog'
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes
+- [x] `yarn check` passes
 
 #### Manual Verification
 - [ ] Click Foundation CTA triggers `cta_clicked` with location='pricing_foundation'
@@ -472,7 +472,7 @@ onChange={(e) => {
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes
+- [x] `yarn check` passes
 
 #### Manual Verification
 - [ ] Expand FAQ item triggers `faq_expanded` with question and category
@@ -526,8 +526,8 @@ import { AnalyticsProvider } from '~/components/providers/AnalyticsProvider'
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes
-- [ ] `yarn build` succeeds
+- [x] `yarn check` passes
+- [x] `yarn build` succeeds
 
 #### Manual Verification
 - [ ] Visit page with UTM params (e.g., `?utm_source=test&utm_medium=cpc`)
@@ -579,8 +579,8 @@ Comprehensive testing of all tracking implementations.
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes
-- [ ] `yarn build` succeeds
+- [x] `yarn check` passes
+- [x] `yarn build` succeeds
 - [ ] No console errors in browser
 
 #### Manual Verification

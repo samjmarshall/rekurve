@@ -20,7 +20,7 @@ Start by understanding the current project context, then ask questions one at a 
    - **@agent-codebase-pattern-finder** - To find similar features we can model after
    - **@agent-thoughts-locator** - To find any research, plans, or decisions about this area
    - **@agent-thoughts-analyzer** - To extract key insights from the most relevant documents
-- Use the **@agent-web-search-researcher** for all WebSearch and WebFetch tool calls for documentation, articles, blog posts etc..
+- **ALWAYS use @agent-web-search-researcher** for web research - NEVER call WebSearch or WebFetch directly. The agent handles documentation, articles, blog posts, and any external web content.
 
 **Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs
@@ -41,6 +41,14 @@ Start by understanding the current project context, then ask questions one at a 
 - Once the user has validated the design sections, write the complete design to `thoughts/designs/YYYY-MM-DD-<topic>.md`
 - Use writing-clearly-and-concisely skill if available
 - **You must always write to file** - never just present the design in chat without saving it
+
+**STOP after writing the design document. Do NOT:**
+- Write any code or implementation
+- Create any files in `src/`
+- Edit any existing source files
+- Proceed to implementation planning
+
+The user will use `/create_plan` separately to create an implementation plan.
 
 ## Key Principles
 

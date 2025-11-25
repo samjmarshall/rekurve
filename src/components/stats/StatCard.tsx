@@ -29,7 +29,7 @@ export function StatCard({ stat, className }: StatCardProps) {
           <p className="text-xl font-bold md:text-xl">
             {stat.headline}
           </p>
-          <p className="mt-1 line-clamp-2 text-sm text-neutral-600 dark:text-neutral-400 md:text-sm">
+          <p className="mt-1 line-clamp-2 text-sm text-neutral-700 dark:text-neutral-400 md:text-sm">
             {stat.subtext}
           </p>
           <a
@@ -37,7 +37,7 @@ export function StatCard({ stat, className }: StatCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`View source: ${citationText} (opens in new tab)`}
-            className="mt-2 inline-flex items-center gap-1 text-xs text-gray-600 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900 md:text-xs"
+            className="mt-2 inline-flex items-center gap-1 text-xs text-neutral-500 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900 md:text-xs"
           >
             — {citationText}
             <ExternalLink className="h-3 w-3" />

@@ -31,14 +31,14 @@ export function FinalCTA() {
           <ScrollReveal delay={0.2}>
             <div className="flex items-start sm:items-center flex-col sm:flex-row sm:gap-4">
               <Link href="#booking-form" className="mt-8">
-                <Button asChild variant="primary" className="group flex items-center gap-1">
+                <Button variant="primary" className="group flex items-center gap-1">
                   Book Your Call
                   <ArrowRight className="group-hover:translate-x-1 h-4 w-4 stroke-1.25 transition-transform duration-200" />
                 </Button>
               </Link>
 
               <Link href="mailto:contact@rekurve.ai?cc=support@rekurve.ai&subject=Rekurve%20Online%20Inquiry&body=Hi,%0A%0AI%20would%20like%20to%20know%20more." className="mt-8">
-                <Button asChild variant="ghost" className="group flex items-center gap-1">
+                <Button variant="ghost" className="group flex items-center gap-1">
                   Or email us: contact@rekurve.ai
                   <Mail className="group-hover:translate-x-1 stroke-1 transition-transform duration-200" />
                 </Button>
@@ -56,7 +56,7 @@ export function FinalCTA() {
               <p className="font-bold text-neutral-800 dark:text-neutral-200">
                 Service Business Owner
               </p>
-              <p className="text-gray-600 dark:text-neutral-400">
+              <p className="text-neutral-600 dark:text-neutral-400">
                 Brisbane, Australia
               </p>
             </div>

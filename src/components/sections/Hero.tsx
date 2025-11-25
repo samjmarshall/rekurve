@@ -68,29 +68,33 @@ export function Hero() {
       <p className="relative z-20 mx-auto mt-4 px-4 text-center font-mono font-medium text-base/6">
         Customer Enquiry <span className="text-primary">&rarr;</span> Quote Generated <span className="text-primary">&rarr;</span> Job Booked.
       </p>
-       <div className="mb-10 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-20"
-      >
-        <Button asChild variant="secondary" className="w-full sm:w-40">
-          <Link
-            href="#how-it-works"
-            className="text-center"
-          >
+      <div className="mb-8 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-14">
+        <Link href="#how-it-works" className="w-full sm:w-40">
+          <Button asChild variant="secondary" className="w-full text-center">
             How it Works
-          </Link>
-        </Button>
-        <Button asChild variant="primary" className="w-full sm:w-40">
-          <Link href="#booking-form" className="text-center">
+          </Button>
+        </Link>
+        <Link href="#booking-form" className="w-full sm:w-40">
+          <Button asChild variant="primary" className="w-full text-center">
             Book a call
-          </Link>
-        </Button>
+          </Button>
+        </Link>
       </div>
-      <p className="relative z-20 mx-auto mt-4 max-w-2xl px-4 text-center text-base/6">
-        For service businesses spending 20+ hours a week quoting or simply taking too long to respond to leads, possibly missing leads entirely.
-      </p>
 
-      <div className="relative z-20 mx-auto mt-8 w-full">
-        <StatsMarquee />
+      <div className="relative mx-auto h-full w-full max-w-7xl overflow-hidden px-4 md:px-8 mb-20 md:mb-30">
+        <p className="relative z-20 mx-auto max-w-2xl p-4 mb-2 md:mb-4 text-center text-base/6">
+          For service businesses spending 20+ hours a week quoting or simply taking too long to respond to leads, possibly missing leads entirely.
+        </p>
+
+        <div
+          aria-label="Speed to lead statistics"
+          ref={containerRef}
+          className="relative w-full overflow-hidden"
+        >
+          <StatsMarquee />
+        </div>
       </div>
+
       <div className="relative mx-auto max-w-7xl rounded-4xl border border-border bg-neutral-100 p-2 backdrop-blur-lg dark:border-charcoal-700 dark:bg-charcoal-800/50 md:p-4">
         <div className="rounded-3xl border border-border bg-card p-2 dark:border-charcoal-700">
           <div className="w-full">

@@ -14,7 +14,7 @@ const buttonVariants = cva(
         secondary:
           "bg-neutral-800 dark:bg-neutral-950 text-white border-neutral-500 dark:border-neutral-800 border-b-3 focus-visible:ring-secondary/50 shadow",
         outline:
-          "border-2 border-primary/30 text-primary hover:bg-primary/5 hover:border-primary/50 focus-visible:ring-primary/30",
+          "border-1 border-b-3 border-primary/30 text-primary hover:bg-primary/5 hover:border-primary/50 focus-visible:ring-primary/30",
         ghost:
           "text-primary hover:bg-primary/10 hover:text-primary/90 focus-visible:ring-primary/30",
       },

@@ -7,12 +7,12 @@ import { Button } from '../ui/Button';
 import Link from 'next/link';
 import React from "react";
 import { ScrollReveal } from '~/components/motion/ScrollReveal'
-import { cn } from "~/lib/utils";
 import { analytics } from "~/lib/posthog";
+import { cn } from "~/lib/utils";
 
 export function FinalCTA() {
   return (
-    <section className="w-full grid grid-cols-1 md:grid-cols-3 my-20 md:my-40 justify-start relative z-20 max-w-7xl mx-auto bg-linear-to-br from-gray-100 to-white dark:from-neutral-900 dark:to-neutral-950">
+    <section className="w-full md:w-[calc(100%-200px)] grid grid-cols-1 md:grid-cols-3 my-20 md:my-40 justify-start relative z-20 max-w-7xl mx-auto bg-linear-to-br from-gray-100 to-white dark:from-neutral-900 dark:to-neutral-950 overflow-hidden md:overflow-visible">
         <GridLineHorizontal className="top-0" offset="200px" />
         <GridLineHorizontal className="bottom-0 top-auto" offset="200px" />
         <GridLineVertical className="left-0" offset="80px" />

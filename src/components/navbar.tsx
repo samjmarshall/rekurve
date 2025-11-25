@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Logo } from "./logo";
 import { ModeToggle } from "./mode-toggle";
 import { cn } from "~/lib/utils";
+import { analytics } from "~/lib/posthog";
 
 interface NavbarProps {
   navItems: {
@@ -112,7 +113,7 @@ const DesktopNav = ({ navItems, visible }: NavbarProps) => {
       </motion.div>
       <div className="flex items-center gap-4">
         <ModeToggle />
-        <Link href="#booking-form">
+        <Link href="#booking-form" onClick={() => analytics.cta.click('header')}>
           <Button variant="primary">
             Book a call
           </Button>
@@ -186,7 +187,10 @@ const MobileNav = ({ navItems, visible }: NavbarProps) => {
               ))}
               <Link
                 href="#booking-form"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  analytics.cta.click('mobile_nav')
+                  setOpen(false)
+                }}
                 className="relative text-neutral-600 dark:text-neutral-300">
                 Book a call
               </Link>

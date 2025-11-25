@@ -595,7 +595,7 @@ export function calculateLeadScore(factors: LeadScoreFactors): number {
     '100+': 30,
   }
   if (factors.company_size) {
-    score += companySizeScores[factors.company_size] || 10
+    score += companySizeScores[factors.company_size] ?? 10
   }
 
   // Timeline scoring (more urgent = higher score)
@@ -606,7 +606,7 @@ export function calculateLeadScore(factors: LeadScoreFactors): number {
     '6-12-months': 5,
   }
   if (factors.timeline) {
-    score += timelineScores[factors.timeline] || 5
+    score += timelineScores[factors.timeline] ?? 5
   }
 
   // MRR scoring (higher revenue = higher score)
@@ -617,7 +617,7 @@ export function calculateLeadScore(factors: LeadScoreFactors): number {
     '500k+': 30,
   }
   if (factors.current_mrr) {
-    score += mrrScores[factors.current_mrr] || 0
+    score += mrrScores[factors.current_mrr] ?? 0
   }
 
   // Challenges count (more challenges = more pain = higher score)
@@ -651,7 +651,7 @@ export function updateEngagementScore(action: string): void {
     section_viewed: 1,
   }
 
-  const scoreIncrement = actionScores[action] || 1
+  const scoreIncrement = actionScores[action] ?? 1
 
   // PostHog will handle incrementing
   posthog.setPersonPropertiesForFlags({

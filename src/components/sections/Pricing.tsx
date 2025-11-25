@@ -8,6 +8,7 @@ import { Button } from '~/components/ui/Button'
 import { Check } from 'lucide-react'
 import type { PricingTier } from '~/types'
 import { motion } from 'framer-motion'
+import { analytics } from '~/lib/posthog'
 
 const pricingTiers: PricingTier[] = [
   {
@@ -298,6 +299,7 @@ export function Pricing() {
                   size="lg"
                   className={cn('w-full', tier.highlighted && 'border-accent-green')}
                   asChild
+                  onClick={() => analytics.cta.click(`pricing_${tier.id}` as 'pricing_foundation' | 'pricing_growth' | 'pricing_enterprise')}
                 >
                   <a href="#booking-form">{tier.cta}</a>
                 </Button>

@@ -25,8 +25,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { analytics } from '~/lib/posthog'
 import { Button } from '~/components/ui/Button'
 import { Card } from '~/components/ui/Card'
 import { Checkbox } from '~/components/ui/checkbox'
@@ -87,6 +88,8 @@ const challengeOptions = [
 export function BookingForm() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [formStarted, setFormStarted] = useState(false)
+  const stepStartTimeRef = useRef<number>(Date.now())
 
   // Calculate the intake month (1 month from today)
   const intakeMonth = (() => {
@@ -122,6 +125,40 @@ export function BookingForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedValuesString, trigger])
 
+  // Track form start on first interaction
+  const handleFormStart = useCallback(() => {
+    if (!formStarted) {
+      analytics.form.started()
+      setFormStarted(true)
+    }
+  }, [formStarted])
+
+  // Get step name for analytics
+  const getStepName = (step: number): 'basic_info' | 'company_details' | 'challenges' | 'goals' | 'booking_preference' => {
+    const names: Record<number, 'basic_info' | 'company_details' | 'challenges' | 'goals' | 'booking_preference'> = {
+      1: 'basic_info',
+      2: 'company_details',
+      3: 'challenges',
+      4: 'goals',
+      5: 'booking_preference',
+    }
+    return names[step] ?? 'basic_info'
+  }
+
+  // Track form abandonment on page leave
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (formStarted && !isSubmitted) {
+        analytics.form.abandoned(currentStep as 1 | 2 | 3 | 4 | 5, undefined, 'page_leave')
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [formStarted, isSubmitted, currentStep])
+
   const handleNextStep = async () => {
     let fieldsToValidate: (keyof FormData)[] = []
 
@@ -143,7 +180,34 @@ export function BookingForm() {
 
     const isValid = await trigger(fieldsToValidate)
     if (isValid && currentStep < 5) {
+      // Track step completion
+      const timeSpentMs = Date.now() - stepStartTimeRef.current
+      analytics.form.stepCompleted({
+        step: currentStep as 1 | 2 | 3 | 4 | 5,
+        step_name: getStepName(currentStep),
+        fields_completed: fieldsToValidate,
+        fields_with_errors: [],
+        time_spent_ms: timeSpentMs,
+      })
+
+      // Reset timer for next step
+      stepStartTimeRef.current = Date.now()
       setCurrentStep(currentStep + 1)
+    } else if (!isValid) {
+      // Track validation errors
+      const errorFields = Object.keys(errors) as (keyof FormData)[]
+      errorFields.forEach(field => {
+        const errorMessage = errors[field]?.message
+        if (errorMessage) {
+          analytics.form.fieldInteraction({
+            field,
+            step: currentStep as 1 | 2 | 3 | 4 | 5,
+            action: 'error',
+            has_error: true,
+            error_message: errorMessage,
+          })
+        }
+      })
     }
   }
 
@@ -154,6 +218,16 @@ export function BookingForm() {
   }
 
   const onSubmit = (data: FormData) => {
+    // Track form submission with lead data
+    analytics.form.submitted({
+      company_size: data.companySize,
+      industry: data.industry,
+      timeline: data.timeline,
+      current_mrr: data.currentMRR,
+      challenges: data.challenges,
+      booking_method: data.bookingMethod,
+    })
+
     console.log('Form submitted:', data)
     setIsSubmitted(true)
 
@@ -330,6 +404,7 @@ export function BookingForm() {
                           placeholder="John"
                           aria-invalid={!!errors.firstName}
                           aria-describedby={errors.firstName ? 'firstName-error' : undefined}
+                          onFocus={handleFormStart}
                         />
                         {errors.firstName && (
                           <FieldError id="firstName-error">{errors.firstName.message}</FieldError>

@@ -4,7 +4,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/
 
 import { ScrollReveal } from '~/components/motion/ScrollReveal'
 import { Search } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import { analytics, type FAQCategory } from '~/lib/posthog'
 
 interface FAQItem {
   id: string
@@ -91,6 +92,20 @@ export const faqData: FAQItem[] = [
 export function FAQ() {
   const [searchQuery, setSearchQuery] = useState('')
   const [openItems, setOpenItems] = useState<string[]>([])
+  const prevOpenItemsRef = useRef<string[]>([])
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Debounced search tracking
+  const trackSearch = useCallback((query: string, resultsCount: number) => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      if (query.length > 0) {
+        analytics.faq.searched(query, resultsCount)
+      }
+    }, 500) // Debounce 500ms
+  }, [])
 
   // Filter FAQ items based on search query
   const filteredFAQs = faqData.filter((item) => {
@@ -151,7 +166,11 @@ export function FAQ() {
                 type="text"
                 placeholder="Search questions..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  const query = e.target.value
+                  setSearchQuery(query)
+                  trackSearch(query, filteredFAQs.length)
+                }}
                 className="w-full rounded-lg border border-border py-4 pl-12 pr-4 font-mono text-sm transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/80"
               />
             </div>
@@ -164,7 +183,19 @@ export function FAQ() {
             <Accordion
               type="multiple"
               value={openItems}
-              onValueChange={setOpenItems}
+              onValueChange={(newOpenItems) => {
+                // Find newly opened items
+                const newlyOpened = newOpenItems.filter(id => !prevOpenItemsRef.current.includes(id))
+                newlyOpened.forEach(id => {
+                  const item = faqData.find(f => f.id === id)
+                  if (item) {
+                    analytics.faq.expanded(id, item.question, item.category as FAQCategory)
+                  }
+                })
+
+                prevOpenItemsRef.current = newOpenItems
+                setOpenItems(newOpenItems)
+              }}
               className="space-y-4"
             >
               {filteredFAQs.map((item) => (
@@ -218,6 +249,7 @@ export function FAQ() {
             </p>
             <a
               href="#booking-form"
+              onClick={() => analytics.cta.click('faq_bottom')}
               className="inline-flex items-center font-mono text-accent-blue hover:text-accent-blue/70 transition-colors underline underline-offset-4"
             >
               Book a free 30-minute call

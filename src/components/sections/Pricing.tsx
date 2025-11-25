@@ -15,9 +15,9 @@ const pricingTiers: PricingTier[] = [
     name: 'AI-Assisted Sales System',
     tagline: 'For small teams testing AI sales',
     setupFee: 9500,
-    monthlyFee: 2500,
+    monthlyFee: 1500,
     features: [
-      'Basic Email Quote Generation',
+      'Single Channel Quote Generation (e.g. Email)',
       'CRM setup & integration',
       'Basic lead research automation',
       'Email sequence automation (3-5 sequences)',

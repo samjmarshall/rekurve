@@ -62,13 +62,29 @@ export function Hero() {
 
       <div className="text-balance relative z-20 mx-auto mb-4 mt-4 max-w-4xl text-center text-3xl font-semibold tracking-tight md:text-7xl">
         {/* <h1>Recover 20+ Hours Weekly or Add $100K to Your Pipeline in 90 Days</h1> */}
-        <h1>Speed to Lead and Quote Automation for Service Businesses</h1>
+        <h1>Service Business AI Quote Generation & Speed to Lead Automation</h1>
       </div>
       <p className="relative z-20 mx-auto mt-4 px-4 text-center font-mono font-medium text-base/6">
         Customer Enquiry <span className="text-primary">&rarr;</span> Quote Generated <span className="text-primary">&rarr;</span> Job Booked.
       </p>
+       <div className="mb-10 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-20"
+      >
+        <Button asChild variant="secondary" className="w-full sm:w-40">
+          <Link
+            href="#how-it-works"
+            className="text-center"
+          >
+            How it Works
+          </Link>
+        </Button>
+        <Button asChild variant="primary" className="w-full sm:w-40">
+          <Link href="#booking-form" className="text-center">
+            Book a call
+          </Link>
+        </Button>
+      </div>
       <p className="relative z-20 mx-auto mt-4 px-4 text-center text-base/6">
-        For service businesses spending 20+ hours a week quoting or simply taking too long to respond to leads, or even missing them entirely.
+        For service businesses spending 20+ hours a week quoting or simply taking too long to respond to leads, possibly missing leads entirely.
         <br />
         <div>
           <h2>Stats</h2>
@@ -95,22 +111,6 @@ export function Hero() {
           <span className="font-semibold">Customer acquisition cost:</span> Speed to lead can reduce customer acquisition costs by up to 50% by improving conversion rates and reducing the sales cycle length.
         </div>
       </p>
-      <div className="mb-10 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-20"
-      >
-      <Button asChild variant="secondary" className="w-full sm:w-40">
-        <Link
-          href="#how-it-works"
-          className="text-center"
-        >
-          How it Works
-        </Link>
-      </Button>
-      <Button asChild variant="primary" className="w-full sm:w-40">
-        <Link href="#booking-form" className="text-center">
-          Book a call
-        </Link>
-      </Button>
-      </div>
       <div className="relative mx-auto max-w-7xl rounded-4xl border border-border bg-neutral-100 p-2 backdrop-blur-lg dark:border-charcoal-700 dark:bg-charcoal-800/50 md:p-4">
         <div className="rounded-3xl border border-border bg-card p-2 dark:border-charcoal-700">
           <div className="w-full">

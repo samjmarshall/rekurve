@@ -12,7 +12,7 @@ export function StatsMarquee() {
   );
 
   return (
-    <div className="mask-[linear-gradient(to_right,transparent_0%,white_10%,white_90%,transparent_100%)]">
+    <div className="mask-[linear-gradient(to_right,transparent_0%,white_5%,white_95%,transparent_100%)]">
       <Marquee
         direction="right"
         pauseOnHover

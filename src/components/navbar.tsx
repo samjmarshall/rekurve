@@ -113,7 +113,7 @@ const DesktopNav = ({ navItems, visible }: NavbarProps) => {
       <div className="flex items-center gap-4">
         <ModeToggle />
         <Link href="#booking-form">
-          <Button asChild variant="primary">
+          <Button variant="primary">
             Book a call
           </Button>
         </Link>

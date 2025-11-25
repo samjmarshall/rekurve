@@ -15,11 +15,12 @@ Start by understanding the current project context, then ask questions one at a 
 
 **Understanding the idea:**
 - Check out the current project state first (files, docs, recent commits)
-   - **codebase-locator** - To find more specific files (e.g., "find all files that handle [specific component]")
-   - **codebase-analyzer** - To understand implementation details (e.g., "analyze how [system] works")
-   - **codebase-pattern-finder** - To find similar features we can model after
-   - **thoughts-locator** - To find any research, plans, or decisions about this area
-   - **thoughts-analyzer** - To extract key insights from the most relevant documents
+   - **@agent-codebase-locator** - To find more specific files (e.g., "find all files that handle [specific component]")
+   - **@agent-codebase-analyzer** - To understand implementation details (e.g., "analyze how [system] works")
+   - **@agent-codebase-pattern-finder** - To find similar features we can model after
+   - **@agent-thoughts-locator** - To find any research, plans, or decisions about this area
+   - **@agent-thoughts-analyzer** - To extract key insights from the most relevant documents
+- Use the **@agent-web-search-researcher** for all WebSearch and WebFetch tool calls for documentation, articles, blog posts etc..
 
 **Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs

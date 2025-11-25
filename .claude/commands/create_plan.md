@@ -44,9 +44,9 @@ Then wait for the user's input.
 2. **Spawn initial research tasks to gather context**:
    Before asking the user any questions, use specialized agents to research in parallel:
 
-   - Use the **codebase-locator** agent to find all files related to the ticket/task
-   - Use the **codebase-analyzer** agent to understand how the current implementation works
-   - If relevant, use the **thoughts-locator** agent to find any existing thoughts documents about this feature
+   - Use the **@agent-codebase-locator** agent to find all files related to the ticket/task
+   - Use the **@agent-codebase-analyzer** agent to understand how the current implementation works
+   - If relevant, use the **@agent-thoughts-locator** agent to find any existing thoughts documents about this feature
    - If a JIRA ticket is mentioned, use the `mcp__atlassian__` tools to get full details
 
    These agents will:
@@ -100,13 +100,13 @@ After getting initial clarifications:
    - Use the right agent for each type of research:
 
    **For deeper investigation:**
-   - **codebase-locator** - To find more specific files (e.g., "find all files that handle [specific component]")
-   - **codebase-analyzer** - To understand implementation details (e.g., "analyze how [system] works")
-   - **codebase-pattern-finder** - To find similar features we can model after
+   - **@agent-codebase-locator** - To find more specific files (e.g., "find all files that handle [specific component]")
+   - **@agent-codebase-analyzer** - To understand implementation details (e.g., "analyze how [system] works")
+   - **@agent-codebase-pattern-finder** - To find similar features we can model after
 
    **For historical context:**
-   - **thoughts-locator** - To find any designs, research, plans, or decisions about this area
-   - **thoughts-analyzer** - To extract key insights from the most relevant documents
+   - **@agent-thoughts-locator** - To find any designs, research, plans, or decisions about this area
+   - **@agent-thoughts-analyzer** - To extract key insights from the most relevant documents
 
    Each agent knows how to:
    - Find the right files and code patterns

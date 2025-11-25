@@ -120,7 +120,7 @@ Provides structured information for AI assistants (ChatGPT, Claude, Perplexity).
 **Before Starting**:
 1. Read relevant strategic docs (see Common Tasks Reference table)
 2. Understand the "why" before implementing the "what"
-3. Check if similar patterns exist in the codebase using the @agent-codebase-analyzer
+3. Check if similar patterns exist in the codebase using the **@agent-codebase-analyzer**
 
 **During Development**:
 1. Follow the ui-aesthetics skill exactly (no generic Tailwind defaults)
@@ -167,7 +167,7 @@ Fix any errors before proceeding to design review.
    - [ ] Typography match brand guidelines (not Inter/Roboto)
 
 4. **Run design review**:
-   Use @agent-design-review to comprehensively review the changes, and reply back to the user with the design and review report. Your final reply must contain the markdown report and nothing else.
+   Use **@agent-design-review** to comprehensively review the changes, and reply back to the user with the design and review report. Your final reply must contain the markdown report and nothing else.
 
 5. **Address feedback**:
    - Fix any [Blocker] or [High-Priority] issues immediately
@@ -176,7 +176,7 @@ Fix any errors before proceeding to design review.
 
 6. **Iterate if needed**:
    - Make adjustments based on feedback
-   - Use @agent-design-review again for significant changes
+   - Use **@agent-design-review** again for significant changes
    - Repeat until approved or high-priority issues resolved
 
 7. **Document verification** in your commit or PR:

@@ -5,16 +5,16 @@ const openGraph: OpenGraph = {
   type: "website",
   locale: "en_AU",
   url: getBaseUrl(),
-  title: "AI Quote Automation for Service Businesses | Rekurve",
+  title: "AI Quote Generation & Speed to Lead | Rekurve",
   description:
-    "Recover 20+ hours weekly or add $100K to your pipeline in 90 days with AI service quote automation.",
+    "Customer Enquiry → Quote Generated → Job Booked. AI agents for service businesses spending 20+ hours weekly quoting or missing leads.",
   siteName: "Rekurve AI",
   images: [
     {
       url: "/og-image.png",
       width: 1200,
       height: 630,
-      alt: "Rekurve AI - Quote Automation for Service Businesses",
+      alt: "Rekurve AI - Quote Generation & Speed to Lead for Service Businesses",
     },
   ],
 }

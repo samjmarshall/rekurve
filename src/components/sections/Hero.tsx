@@ -9,8 +9,8 @@ import Link from "next/link";
 import { NativeIcon } from "~/icons/bento-icons";
 import { NativeIntegrationSkeleton } from "../agentic-intelligence/skeletons";
 import { StatsMarquee } from "~/components/stats";
-import { cn } from "~/lib/utils";
 import { analytics } from "~/lib/posthog";
+import { cn } from "~/lib/utils";
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,7 +64,7 @@ export function Hero() {
 
       <div className="text-balance relative z-20 mx-auto mb-4 mt-4 max-w-4xl text-center text-3xl font-semibold tracking-tight md:text-7xl">
         {/* <h1>Recover 20+ Hours Weekly or Add $100K to Your Pipeline in 90 Days</h1> */}
-        <h1>Service Business AI Quote Generation & Speed to Lead Automation</h1>
+        <h1>Service Business AI Agent Quote Generation & Speed to Lead</h1>
       </div>
       <p className="relative z-20 mx-auto mt-4 px-4 text-center font-mono font-medium text-base/6">
         Customer Enquiry <span className="text-primary">&rarr;</span> Quote Generated <span className="text-primary">&rarr;</span> Job Booked.

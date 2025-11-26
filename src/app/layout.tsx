@@ -2,9 +2,8 @@ import "~/styles/globals.css";
 
 import { type Metadata } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
-import { Analytics } from "~/components/Analytics";
-import { AnalyticsProvider } from "~/components/providers/AnalyticsProvider";
-import { ThemeProvider } from "~/context/providers";
+import { AnalyticsProvider } from "~/providers/AnalyticsProvider";
+import { ThemeProvider } from "~/providers/ThemeProvider";
 import { Navbar } from "~/components/navbar";
 import { canonicalUrl } from "~/lib/canonical-url";
 import { Footer } from "~/components/footer";
@@ -126,7 +125,6 @@ export default function RootLayout({
           >
           <AnalyticsProvider>
             <Navbar />
-            <Analytics />
             {children}
             <Footer />
           </AnalyticsProvider>

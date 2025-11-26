@@ -8,6 +8,8 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
+    POSTHOG_ERROR_TRACKING_API_KEY: z.string(),
+    POSTHOG_PROJECT_ID: z.string().regex(/^\d+$/, "Must be a numeric string"),
   },
 
   /**
@@ -28,6 +30,8 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    POSTHOG_ERROR_TRACKING_API_KEY: process.env.POSTHOG_ERROR_TRACKING_API_KEY,
+    POSTHOG_PROJECT_ID: process.env.POSTHOG_PROJECT_ID,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

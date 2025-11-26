@@ -1,11 +1,12 @@
+import type { NextConfig } from "next";
+import { env } from "~/env";
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
  */
-import "./src/env.js";
+import { withPostHogConfig } from "@posthog/nextjs-config";
 
-/** @type {import("next").NextConfig} */
-const config = {
+const config: NextConfig = {
   eslint: {
     // Allow production builds to complete even with ESLint errors
     // (Errors are in third-party @aceternity components, not our code)
@@ -64,4 +65,13 @@ const config = {
   reactStrictMode: true,
 };
 
-export default config;
+export default withPostHogConfig(config, {
+  personalApiKey: env.POSTHOG_ERROR_TRACKING_API_KEY,
+  envId: env.POSTHOG_PROJECT_ID,
+  host: env.NEXT_PUBLIC_POSTHOG_HOST, // (optional)
+  sourcemaps: { // (optional)
+    enabled: process.env.CI === "true", // (optional) Enable sourcemaps generation and upload, default to true on production builds
+    project: "Rekurve", // (optional) Project name, defaults to repository name
+    deleteAfterUpload: true, // (optional) Delete sourcemaps after upload, defaults to true
+  },
+});

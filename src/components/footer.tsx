@@ -20,28 +20,24 @@ export function Footer() {
       title: "Contact",
       href: "/#booking-form",
     },
-    {
-      title: "Blog",
-      href: "#",
-    },
+    // {
+    //   title: "Blog",
+    //   href: "#",
+    // },
   ];
 
   const socials = [
     {
       title: "Facebook",
-      href: "#",
+      href: "https://www.facebook.com/people/Rekurve/61560714929578/",
     },
     {
       title: "Instagram",
-      href: "#",
-    },
-    {
-      title: "Twitter",
-      href: "#",
+      href: "https://www.instagram.com/rekurve.ai/",
     },
     {
       title: "LinkedIn",
-      href: "#",
+      href: "https://www.linkedin.com/company/rekurve",
     },
   ];
   const legals = [
@@ -60,10 +56,10 @@ export function Footer() {
   ];
 
   const signups = [
-    {
-      title: "Login",
-      href: "#",
-    },
+    // {
+    //   title: "Login",
+    //   href: "#",
+    // },
     {
       title: "Book a demo",
       href: "/#booking-form",

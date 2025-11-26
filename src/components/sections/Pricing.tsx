@@ -6,9 +6,10 @@ import { Badge } from '~/components/ui/Badge'
 import { BrandShimmer } from '../brand-shimmer'
 import { Button } from '~/components/ui/Button'
 import { Check } from 'lucide-react'
+import Link from 'next/link'
 import type { PricingTier } from '~/types'
-import { motion } from 'framer-motion'
 import { analytics } from '~/lib/posthog'
+import { motion } from 'framer-motion'
 
 const pricingTiers: PricingTier[] = [
   {
@@ -113,7 +114,7 @@ export function Pricing() {
           "url": "https://rekurve.ai"
         },
         "areaServed": ["Brisbane", "Melbourne"],
-        "serviceType": "AI Sales Automation",
+        "serviceType": "AI Sales Agents",
         ...(tier.setupFee > 0 && tier.monthlyFee > 0 ? {
           "offers": {
             "@type": "AggregateOffer",
@@ -294,15 +295,20 @@ export function Pricing() {
                 </ul>
 
                 {/* CTA Button */}
-                <Button
-                  variant={tier.highlighted ? 'primary' : 'outline'}
-                  size="lg"
-                  className={cn('w-full', tier.highlighted && 'border-accent-green')}
-                  asChild
+                <Link
+                  href="#booking-form"
+                  className='w-full'
                   onClick={() => analytics.cta.click(`pricing_${tier.id}` as 'pricing_foundation' | 'pricing_growth' | 'pricing_enterprise')}
                 >
-                  <a href="#booking-form">{tier.cta}</a>
-                </Button>
+                  <Button
+                    asChild
+                    variant={tier.highlighted ? 'primary' : 'outline'}
+                    size="lg"
+                    className={cn('w-full', tier.highlighted && 'border-accent-green')}
+                  >
+                    {tier.cta}
+                  </Button>
+                </Link>
               </motion.div>
             )
           })}

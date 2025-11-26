@@ -28,7 +28,7 @@
 ---
 
 ### **Slide 4 – Our Approach**
-**Title:** Done-For-You AI Sales Automation  
+**Title:** Done-For-You AI Sales Agents  
 **Visual:** 4-step process icons (Audit → Build → Launch → Optimize).  
 **Bullets:**
 1. Audit your sales process.

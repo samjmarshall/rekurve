@@ -13,21 +13,24 @@ import openGraph from "~/lib/open-graph";
 const canonical = canonicalUrl("/")
 
 export const metadata: Metadata = {
-  title: "AI Quote Automation for Service Businesses | Rekurve",
+  title: "AI Quote Generation & Speed to Lead for Service Businesses | Rekurve",
   description:
-    "Recover 20+ hours weekly or add $100K to your pipeline in 90 days with AI service quote automation.",
+    "Customer Enquiry → Quote Generated → Job Booked. AI agents for service businesses spending 20+ hours weekly quoting or missing leads due to slow response times.",
   keywords: [
-    "AI sales agents",
-    "Brisbane",
-    "Melbourne",
-    "sales automation",
-    "service businesses",
-    "autonomous AI",
-    "sales AI",
-    "virtual SDR",
-    "lead generation automation",
-    "B2B sales automation",
+    "AI quote generation",
+    "speed to lead",
     "service quote automation",
+    "Brisbane",
+    "Sydney",
+    "Melbourne",
+    "Perth",
+    "Australia",
+    "service businesses",
+    "AI sales agents",
+    "lead response automation",
+    "quote automation",
+    "B2B sales automation",
+    "autonomous AI",
   ],
   authors: [{ name: "Rekurve AI" }],
   creator: "Rekurve AI",
@@ -49,9 +52,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Quote Automation for Service Businesses | Rekurve",
+    title: "AI Quote Generation & Speed to Lead | Rekurve",
     description:
-      "Recover 20+ hours weekly or add $100K to your pipeline in 90 days with AI service quote automation.",
+      "Customer Enquiry → Quote Generated → Job Booked. AI agents for service businesses spending 20+ hours weekly quoting or missing leads.",
     images: ["/og-image.png"],
     creator: "@rekurve_ai",
   },
@@ -83,7 +86,7 @@ export default function RootLayout({
     "@type": "ProfessionalService",
     name: "Rekurve AI",
     description:
-      "AI quote automation for for Service Businesses in Brisbane and Melbourne",
+      "AI quote generation and speed to lead automation for service businesses in Australia.",
     url: "https://rekurve.ai",
     logo: "https://rekurve.ai/logo.png",
     address: {
@@ -92,8 +95,8 @@ export default function RootLayout({
       addressRegion: "QLD",
       addressCountry: "AU",
     },
-    areaServed: ["Brisbane", "Melbourne"],
-    serviceType: "AI Quote Automation",
+    areaServed: ["Brisbane", "Sydney", "Melbourne", "Perth", "Australia"],
+    serviceType: "AI Quote Generation & Speed to Lead",
     priceRange: "$$$",
     aggregateRating: {
       "@type": "AggregateRating",

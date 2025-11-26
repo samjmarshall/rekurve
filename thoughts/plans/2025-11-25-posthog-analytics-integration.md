@@ -365,17 +365,22 @@ Add CTA click tracking for each pricing tier.
 import { analytics } from '~/lib/posthog'
 ```
 
-**Modify CTA button (line 295-303):**
+**Modify CTA button (line 296-311):**
 ```typescript
-<Button
-  variant={tier.highlighted ? 'primary' : 'outline'}
-  size="lg"
-  className={cn('w-full', tier.highlighted && 'border-accent-green')}
-  asChild
+<Link
+  href="#booking-form"
+  className='w-full'
   onClick={() => analytics.cta.click(`pricing_${tier.id}` as 'pricing_foundation' | 'pricing_growth' | 'pricing_enterprise')}
 >
-  <a href="#booking-form">{tier.cta}</a>
-</Button>
+  <Button
+    asChild
+    variant={tier.highlighted ? 'primary' : 'outline'}
+    size="lg"
+    className={cn('w-full', tier.highlighted && 'border-accent-green')}
+  >
+    {tier.cta}
+  </Button>
+</Link>
 ```
 
 ### Success Criteria

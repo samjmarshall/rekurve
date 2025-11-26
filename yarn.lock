@@ -5937,17 +5937,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-view-transitions@npm:^0.3.4":
-  version: 0.3.4
-  resolution: "next-view-transitions@npm:0.3.4"
-  peerDependencies:
-    next: ">=14.0.0"
-    react: ^18.2.0
-    react-dom: ^18.2.0
-  checksum: 034874bf7ef89f3d4438e4a86e47261b8538d63d698a330a62f1e38d245cdcb002475aec93f6d74eb69b91e7a88a8d47957c430aeca16bf84c199a5f8757cfd4
-  languageName: node
-  linkType: hard
-
 "next@npm:^15.2.3":
   version: 15.5.6
   resolution: "next@npm:15.5.6"
@@ -6704,15 +6693,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-wrap-balancer@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "react-wrap-balancer@npm:1.1.1"
-  peerDependencies:
-    react: ">=16.8.0 || ^17.0.0 || ^18"
-  checksum: 68d9417efa751eced4a8c9f7e3f1f43d59fbf9ecf42dfd90b7b4c33f5af855766bb21bf967c9fc8a0f09f6ca4a58071c1dd47af2c813b33b3813ebe7efcb32f2
-  languageName: node
-  linkType: hard
-
 "react@npm:^19.0.0":
   version: 19.2.0
   resolution: "react@npm:19.2.0"
@@ -7235,13 +7215,6 @@ __metadata:
   version: 4.1.0
   resolution: "signal-exit@npm:4.1.0"
   checksum: 64c757b498cb8629ffa5f75485340594d2f8189e9b08700e69199069c8e3070fb3e255f7ab873c05dc0b3cec412aea7402e10a5990cb6a050bd33ba062a6c549
-  languageName: node
-  linkType: hard
-
-"simplex-noise@npm:^4.0.3":
-  version: 4.0.3
-  resolution: "simplex-noise@npm:4.0.3"
-  checksum: b47720a540695947cd60b0571b4427b68392b1c75e76e27278e3c1b7ea13301d46d60fe9a81ff6a42b1048f2548c9c6687630b984ec0b59d7ab4e79969052462
   languageName: node
   linkType: hard
 
@@ -8125,7 +8098,6 @@ __metadata:
     motion: ^12.23.24
     next: ^15.2.3
     next-themes: ^0.4.6
-    next-view-transitions: ^0.3.4
     postcss: ^8.5.3
     posthog-js: ^1.298.0
     posthog-node: ^5.14.0
@@ -8135,9 +8107,7 @@ __metadata:
     react-dom: ^19.0.0
     react-fast-marquee: ^1.6.5
     react-hook-form: ^7.66.0
-    react-wrap-balancer: ^1.1.1
     shadcn: latest
-    simplex-noise: ^4.0.3
     tailwind-merge: ^3.3.1
     tailwindcss: ^4.0.15
     tw-animate-css: ^1.4.0

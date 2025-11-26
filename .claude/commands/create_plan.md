@@ -48,6 +48,8 @@ Then wait for the user's input.
    - Use the **@agent-codebase-analyzer** agent to understand how the current implementation works
    - If relevant, use the **@agent-thoughts-locator** agent to find any existing thoughts documents about this feature
    - If a JIRA ticket is mentioned, use the `mcp__atlassian__` tools to get full details
+   - If a Linear ticket is mentioned, use the `mcp__linear__` tools to get full details
+   - If a GitHub issues is mentioned, use the `gh` cli to get full details
 
    These agents will:
    - Find relevant source files, configs, and tests

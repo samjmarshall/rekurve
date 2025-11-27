@@ -159,10 +159,10 @@ Expand the function signature to accept full lead details and capture them in th
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes (lint + typecheck)
+- [x] `yarn check` passes (lint + typecheck)
 
 #### Manual Verification
-- [ ] TypeScript compiles without errors on the new signature
+- [x] TypeScript compiles without errors on the new signature
 
 ---
 
@@ -207,8 +207,8 @@ Update the `onSubmit` handler to pass all form fields to the analytics function.
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes
-- [ ] `yarn build` succeeds
+- [x] `yarn check` passes
+- [x] `yarn build` succeeds
 
 #### Manual Verification
 - [ ] Submit form and verify `booking_form_submitted` event in PostHog Live Events

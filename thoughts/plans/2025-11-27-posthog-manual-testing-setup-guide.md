@@ -89,13 +89,23 @@ For each step (2, 3, 4):
 #### Step 5: Form Submission
 - [ ] Submit the form on final step
 - [ ] Verify `booking_form_submitted` event with properties:
-  - `company_size`
-  - `industry`
-  - `timeline`
-  - `challenges_count`
+  - `lead_name` (full name)
+  - `lead_email`
+  - `lead_phone` (if provided)
+  - `lead_company`
+  - `lead_company_size`
+  - `lead_industry`
+  - `lead_location`
+  - `lead_challenges` (comma-separated)
+  - `lead_goals`
+  - `lead_timeline`
+  - `lead_mrr` (if provided)
+  - `lead_score` (0-100)
   - `booking_method`
+  - Legacy: `company_size`, `industry`, `timeline`, `current_mrr`, `challenges_count`
 - [ ] Verify person properties are set:
   - `form_completed: true`
+  - `form_completed_at` (ISO timestamp)
   - `lead_score` (0-100 range)
   - `company_size`
   - `timeline`
@@ -149,17 +159,30 @@ For each step (2, 3, 4):
 After completing a full form submission, verify person profile in PostHog:
 
 1. Go to PostHog → Persons
-2. Find your test person (by email or distinct ID)
+2. Find your test person (by email - now used as distinct ID)
 3. Verify these properties exist:
-   - [ ] `form_started: true`
-   - [ ] `form_completed: true`
-   - [ ] `lead_score` (calculated value)
+
+**From `posthog.identify()` call:**
+   - [ ] `name` (full name)
+   - [ ] `email`
+   - [ ] `phone` (if provided)
+   - [ ] `company`
    - [ ] `company_size`
    - [ ] `industry`
+   - [ ] `location`
    - [ ] `timeline`
+   - [ ] `current_mrr` (if provided)
    - [ ] `challenges_count`
+   - [ ] `lead_score` (calculated value)
+
+**From `setPersonProperties()` call:**
+   - [ ] `form_started: true`
+   - [ ] `form_completed: true`
+   - [ ] `form_completed_at` (ISO timestamp)
+
+**From `setPersonPropertiesForFlags()` call:**
    - [ ] `is_lead: true`
-   - [ ] `conversion_date`
+   - [ ] `conversion_date` (ISO timestamp)
 
 ---
 
@@ -386,23 +409,22 @@ https://us.posthog.com/project/254485/person/{{ event.distinct_id }}
 
 ---
 
-## Part 6: Required Code Update for Lead Notifications
+## Part 6: Code Update Status ✅
 
-**Important:** The current `formTracking.submitted()` function does not include contact details (name, email, phone). To enable the workflow email template above, update the function signature.
+**Status:** COMPLETED
 
-**File:** `src/lib/posthog.ts` (lines 380-419)
+The following code changes have been implemented:
 
-**Current implementation captures:**
-- `company_size`, `industry`, `timeline`, `current_mrr`, `challenges`, `booking_method`
+**File:** `src/lib/posthog.ts` (lines 380-469)
+- ✅ `formTracking.submitted()` expanded to accept full lead details
+- ✅ Event now includes all `lead_*` properties for workflow email templates
+- ✅ `posthog.identify()` call links submissions to person records
+- ✅ Lead score calculated and included in event properties
 
-**Required additions for workflow:**
-- `first_name`, `last_name`, `email`, `phone`
-- `company`, `location`, `goals`
-- Computed `lead_name`, `lead_email`, `lead_company` properties
+**File:** `src/components/sections/BookingForm.tsx` (lines 220-236)
+- ✅ `onSubmit` handler passes all 13 form fields to analytics
 
-**Also update:** `src/components/sections/BookingForm.tsx` to pass the full form data.
-
-See `thoughts/designs/2025-11-26-posthog-dashboards-funnels-alerts.md` for the complete code changes.
+**Implementation Plan:** `thoughts/plans/2025-11-27-posthog-dashboards-funnels-alerts.md`
 
 ---
 
@@ -462,9 +484,9 @@ See `thoughts/designs/2025-11-26-posthog-dashboards-funnels-alerts.md` for the c
 - [ ] "New Lead Notification" workflow created and activated
 - [ ] Daily dashboard digest subscribed
 
-### Code Updates (Part 6)
-- [ ] `formTracking.submitted()` updated with full lead details
-- [ ] `BookingForm.tsx` passes complete form data
+### Code Updates (Part 6) ✅
+- [x] `formTracking.submitted()` updated with full lead details
+- [x] `BookingForm.tsx` passes complete form data
 - [ ] Workflow tested with real form submission
 
 ### Session Recordings (Part 8)
@@ -505,5 +527,7 @@ See `thoughts/designs/2025-11-26-posthog-dashboards-funnels-alerts.md` for the c
 - Design document: `thoughts/designs/2025-11-25-posthog-analytics-implementation.md`
 - Dashboard & alerts design: `thoughts/designs/2025-11-26-posthog-dashboards-funnels-alerts.md`
 - Integration plan: `thoughts/plans/2025-11-25-posthog-analytics-integration.md`
-- Analytics library: `src/lib/posthog.ts`
+- **Dashboard/funnel/alerts implementation**: `thoughts/plans/2025-11-27-posthog-dashboards-funnels-alerts.md`
+- Analytics library: `src/lib/posthog.ts` (lines 380-469 for form submission)
+- BookingForm component: `src/components/sections/BookingForm.tsx` (lines 220-236 for onSubmit)
 - PostHog Project: https://us.posthog.com/project/254485

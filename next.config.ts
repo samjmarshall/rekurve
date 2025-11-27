@@ -46,14 +46,14 @@ const config: NextConfig = {
           value: [
             "default-src 'none';",
             "base-uri 'none';",
-            "connect-src 'self';",
+            "connect-src 'self' https://*.posthog.com;",
             "font-src 'self' https://fonts.gstatic.com;",
             "frame-ancestors 'none';",
             "frame-src 'self';",
             "img-src 'self' https://fonts.gstatic.com;",
             "manifest-src 'self';",
             "script-src 'self' 'unsafe-eval';",
-            "script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js;",
+            "script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js https://us-assets.i.posthog.com;",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
             "upgrade-insecure-requests;",
           ].join(' '),
@@ -63,23 +63,12 @@ const config: NextConfig = {
   ],
   poweredByHeader: false,
   reactStrictMode: true,
-  rewrites: async () => [
-    {
-      source: "/relay-HYIX/static/:path*",
-      destination: "https://us-assets.i.posthog.com/static/:path*",
-    },
-    {
-      source: "/relay-HYIX/:path*",
-      destination: "https://us.i.posthog.com/:path*",
-    },
-  ],
-  // This is required to support PostHog trailing slash API requests
-  skipTrailingSlashRedirect: true,
 };
 
 export default withPostHogConfig(config, {
   personalApiKey: env.POSTHOG_ERROR_TRACKING_API_KEY,
   envId: env.POSTHOG_PROJECT_ID,
+  host: env.NEXT_PUBLIC_POSTHOG_HOST, // (optional)
   sourcemaps: { // (optional)
     enabled: process.env.CI === "true", // (optional) Enable sourcemaps generation and upload, default to true on production builds
     project: "Rekurve", // (optional) Project name, defaults to repository name

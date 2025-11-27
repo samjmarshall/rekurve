@@ -68,6 +68,7 @@ const config: NextConfig = {
 export default withPostHogConfig(config, {
   personalApiKey: env.POSTHOG_ERROR_TRACKING_API_KEY,
   envId: env.POSTHOG_PROJECT_ID,
+  host: env.NEXT_PUBLIC_POSTHOG_HOST, // (optional)
   sourcemaps: { // (optional)
     enabled: process.env.CI === "true", // (optional) Enable sourcemaps generation and upload, default to true on production builds
     project: "Rekurve", // (optional) Project name, defaults to repository name

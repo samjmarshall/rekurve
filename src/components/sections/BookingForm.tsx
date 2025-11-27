@@ -90,6 +90,7 @@ export function BookingForm() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [formStarted, setFormStarted] = useState(false)
   const stepStartTimeRef = useRef<number>(Date.now())
+  const lastIdentifiedEmailRef = useRef<string | null>(null)
 
   // Calculate the intake month (1 month from today)
   const intakeMonth = (() => {
@@ -159,6 +160,19 @@ export function BookingForm() {
     }
   }, [formStarted, isSubmitted, currentStep])
 
+  // Handle email changes when user goes back to step 1
+  useEffect(() => {
+    // Only check if we're on step 1 and have previously identified
+    if (currentStep === 1 && lastIdentifiedEmailRef.current) {
+      const currentEmail = watch('email')
+      if (currentEmail && currentEmail !== lastIdentifiedEmailRef.current) {
+        // User changed their email, reset identity
+        analytics.form.resetIdentity()
+        lastIdentifiedEmailRef.current = null
+      }
+    }
+  }, [currentStep, watch])
+
   const handleNextStep = async () => {
     let fieldsToValidate: (keyof FormData)[] = []
 
@@ -189,6 +203,18 @@ export function BookingForm() {
         fields_with_errors: [],
         time_spent_ms: timeSpentMs,
       })
+
+      // Early identification after Step 1 (when we have email)
+      if (currentStep === 1) {
+        const formValues = watch()
+        analytics.form.identifyLead({
+          email: formValues.email,
+          firstName: formValues.firstName,
+          lastName: formValues.lastName,
+          phone: formValues.phone,
+        })
+        lastIdentifiedEmailRef.current = formValues.email
+      }
 
       // Reset timer for next step
       stepStartTimeRef.current = Date.now()

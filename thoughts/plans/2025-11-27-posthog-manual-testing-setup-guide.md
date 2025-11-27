@@ -27,7 +27,30 @@ Before testing, ensure the environment is ready:
 - [x] Navigate to `http://localhost:3000` (development) or production URL
 - [x] Clear any existing PostHog cookies/data for clean testing (optional)
 
-### 1.2 CTA Click Tracking Verification
+### 1.2 Anonymous vs Identified User Verification (Cost Optimization)
+
+**Purpose:** Verify `person_profiles: 'identified_only'` configuration is working correctly.
+
+#### Test 1: Anonymous Browsing (No Person Profile)
+- [ ] Open site in incognito/private browsing mode
+- [ ] Navigate around the page (scroll, view sections)
+- [ ] Click some CTAs (but do NOT start the form)
+- [ ] Check PostHog Live Events - events should appear with anonymous distinct_id
+- [ ] Check PostHog Persons tab - **NO new person profile should be created**
+- [ ] Verify events are recorded but not linked to a person profile
+
+#### Test 2: Form Start Without Step 1 Completion (No Person Profile)
+- [ ] Open site in incognito/private browsing mode
+- [ ] Focus on the first form field (triggers `booking_form_started`)
+- [ ] Do NOT complete Step 1 (don't click Next)
+- [ ] Check PostHog Persons tab - **NO person profile should be created yet**
+
+#### Test 3: Step 1 Completion (Person Profile Created)
+- [ ] Complete Step 1 fields and click "Next"
+- [ ] Check PostHog Persons tab - **Person profile NOW exists** with email as distinct_id
+- [ ] Verify all previous anonymous events are linked to this person
+
+### 1.3 CTA Click Tracking Verification
 
 Test each CTA location and verify the event appears in PostHog Live Events:
 
@@ -55,23 +78,32 @@ Test each CTA location and verify the event appears in PostHog Live Events:
 - [x] Mobile nav closes after clicking CTA (functional behavior preserved)
 - [x] Events fire correctly on mobile viewport
 
-### 1.3 Form Funnel Tracking Verification
+### 1.4 Form Funnel Tracking Verification
 
 Complete the form while monitoring PostHog:
 
 #### Step 1: Form Start
 - [x] Focus the "First Name" field
 - [x] Verify `booking_form_started` event fires
-- [ ] Verify session recording starts (check PostHog Recordings tab)
+- [x] Verify session recording starts (check PostHog Recordings tab)
 - [x] Verify person property `form_started: true` is set
 
-#### Step 2: Complete Step 1 (Basic Info)
+#### Step 2: Complete Step 1 (Basic Info) - Early Identification
 - [ ] Fill First Name, Last Name, Email
 - [ ] Click "Next"
 - [ ] Verify `form_step_completed` event with:
   - `step: 1`
   - `step_name: "basic_info"`
   - `time_spent_ms` is populated
+- [ ] Verify `lead_identified` event fires with:
+  - `identification_point: "step_1_complete"`
+- [ ] Verify **person profile is created** in PostHog Persons tab (email as distinct ID)
+- [ ] Verify person has `$set` properties:
+  - `email`, `name`, `first_name`, `last_name`, `phone`
+- [ ] Verify person has `$set_once` properties:
+  - `first_seen` (ISO timestamp)
+  - `initial_referrer`, `initial_landing_page`
+  - `initial_utm_source`, `initial_utm_medium`, `initial_utm_campaign` (if present in URL)
 
 #### Step 3: Trigger Validation Error
 - [ ] Leave a required field empty and click "Next"
@@ -118,7 +150,7 @@ For each step (2, 3, 4):
   - `last_step` (the step you were on)
   - `reason: "page_leave"` or `"component_unmount"`
 
-### 1.4 FAQ Tracking Verification
+### 1.5 FAQ Tracking Verification
 
 - [ ] Expand an FAQ item
 - [ ] Verify `faq_expanded` event with:
@@ -132,7 +164,7 @@ For each step (2, 3, 4):
   - `results_count`
   - `has_results`
 
-### 1.5 Session Initialization & UTM Tracking
+### 1.6 Session Initialization & UTM Tracking
 
 - [ ] Visit page with UTM parameters:
   ```
@@ -146,7 +178,7 @@ For each step (2, 3, 4):
   - `device_type`
 - [ ] Verify person properties include UTM values
 
-### 1.6 Error Handling & Graceful Degradation
+### 1.7 Error Handling & Graceful Degradation
 
 - [ ] Block PostHog in browser (uBlock/AdBlock or DevTools Network blocking)
 - [ ] Navigate the site
@@ -154,7 +186,27 @@ For each step (2, 3, 4):
 - [ ] Verify page functions normally
 - [ ] Verify form submission still works (just without tracking)
 
-### 1.7 Person Properties Verification
+### 1.8 Email Change & Identity Reset Testing
+
+**Purpose:** Verify identity reset works correctly when user changes email mid-form.
+
+#### Test: Email Change Scenario
+- [ ] Open site in incognito mode
+- [ ] Complete Step 1 with email "email1@test.com"
+- [ ] Click "Next" - verify `lead_identified` event fires
+- [ ] Check PostHog Persons - person profile created for "email1@test.com"
+- [ ] Click "Back" to return to Step 1
+- [ ] Change email to "email2@test.com"
+- [ ] Click "Next" again
+- [ ] Verify `identity_reset` event fires with:
+  - `reason: "email_changed"`
+- [ ] Verify `lead_identified` event fires again for new email
+- [ ] Check PostHog Persons - **TWO separate person profiles** should exist:
+  - "email1@test.com" with initial events
+  - "email2@test.com" with subsequent events
+- [ ] Verify events are properly attributed to correct persons
+
+### 1.9 Person Properties Verification
 
 After completing a full form submission, verify person profile in PostHog:
 
@@ -162,10 +214,26 @@ After completing a full form submission, verify person profile in PostHog:
 2. Find your test person (by email - now used as distinct ID)
 3. Verify these properties exist:
 
-**From `posthog.identify()` call:**
-   - [ ] `name` (full name)
+**From Early Identification (`identifyLead()` after Step 1):**
+
+`$set` properties (can be overwritten):
    - [ ] `email`
+   - [ ] `name` (full name)
+   - [ ] `first_name`
+   - [ ] `last_name`
    - [ ] `phone` (if provided)
+
+`$set_once` properties (first-touch attribution, immutable):
+   - [ ] `first_seen` (ISO timestamp)
+   - [ ] `initial_referrer` ("direct" or referrer URL)
+   - [ ] `initial_landing_page` (pathname)
+   - [ ] `initial_utm_source` (if UTM params present)
+   - [ ] `initial_utm_medium` (if UTM params present)
+   - [ ] `initial_utm_campaign` (if UTM params present)
+
+**From Form Submission (`submitted()` call):**
+
+`$set` properties (updated on each submission):
    - [ ] `company`
    - [ ] `company_size`
    - [ ] `industry`
@@ -173,7 +241,17 @@ After completing a full form submission, verify person profile in PostHog:
    - [ ] `timeline`
    - [ ] `current_mrr` (if provided)
    - [ ] `challenges_count`
-   - [ ] `lead_score` (calculated value)
+   - [ ] `lead_score` (calculated 0-100)
+   - [ ] `last_form_submission` (ISO timestamp - updates each time)
+
+`$set_once` properties (first conversion data, immutable):
+   - [ ] `first_form_submission` (ISO timestamp)
+   - [ ] `first_challenges` (comma-separated list)
+   - [ ] `first_goals`
+   - [ ] `first_timeline`
+   - [ ] `first_company_size`
+   - [ ] `first_lead_score`
+   - [ ] `conversion_source` (referrer at time of conversion)
 
 **From `setPersonProperties()` call:**
    - [ ] `form_started: true`
@@ -415,16 +493,34 @@ https://us.posthog.com/project/254485/person/{{ event.distinct_id }}
 
 The following code changes have been implemented:
 
-**File:** `src/lib/posthog.ts` (lines 380-469)
+### Original Form Submission Implementation
+**File:** `src/lib/posthog.ts` (lines 436-526)
 - ✅ `formTracking.submitted()` expanded to accept full lead details
 - ✅ Event now includes all `lead_*` properties for workflow email templates
-- ✅ `posthog.identify()` call links submissions to person records
 - ✅ Lead score calculated and included in event properties
 
 **File:** `src/components/sections/BookingForm.tsx` (lines 220-236)
 - ✅ `onSubmit` handler passes all 13 form fields to analytics
 
-**Implementation Plan:** `thoughts/plans/2025-11-27-posthog-dashboards-funnels-alerts.md`
+### User Identification Enhancement (NEW)
+**File:** `src/instrumentation-client.ts` (line 6)
+- ✅ Added `person_profiles: 'identified_only'` config for cost optimization
+- Anonymous visitors no longer create person profiles
+
+**File:** `src/lib/posthog.ts` (lines 350-407)
+- ✅ Added `identifyLead()` function for early identification after Step 1
+- ✅ Added `resetIdentity()` function to handle email changes
+- ✅ `posthog.identify()` now uses proper `$set` vs `$set_once` property handling
+- First-touch attribution data preserved in `$set_once` properties
+
+**File:** `src/components/sections/BookingForm.tsx` (lines 93, 163-174, 194-204)
+- ✅ Added `lastIdentifiedEmailRef` to track identified email
+- ✅ Calls `identifyLead()` after Step 1 completion
+- ✅ useEffect detects email changes and calls `resetIdentity()`
+
+**Implementation Plans:**
+- `thoughts/plans/2025-11-27-posthog-dashboards-funnels-alerts.md`
+- `thoughts/plans/2025-11-27-posthog-user-identification.md` (NEW)
 
 ---
 
@@ -466,14 +562,17 @@ The following code changes have been implemented:
 ## Summary: Post-Implementation Checklist
 
 ### Manual Testing (Part 1)
-- [ ] All 10 CTA locations tracked correctly
-- [ ] Form funnel events fire for all 4 steps
-- [ ] Form submission captures all properties
-- [ ] Form abandonment tracked on page leave
-- [ ] FAQ expansion and search tracked
-- [ ] UTM parameters captured
-- [ ] No console errors with PostHog blocked
-- [ ] Person properties populated correctly
+- [ ] Anonymous browsing does NOT create person profiles (1.2)
+- [ ] All 10 CTA locations tracked correctly (1.3)
+- [ ] Form funnel events fire for all 4 steps (1.4)
+- [ ] Early identification (`lead_identified`) fires after Step 1 (1.4)
+- [ ] Form submission captures all properties (1.4)
+- [ ] Form abandonment tracked on page leave (1.4)
+- [ ] FAQ expansion and search tracked (1.5)
+- [ ] UTM parameters captured (1.6)
+- [ ] No console errors with PostHog blocked (1.7)
+- [ ] Email change triggers `identity_reset` event (1.8)
+- [ ] Person properties use correct `$set` vs `$set_once` structure (1.9)
 
 ### PostHog Configuration (Parts 2-7)
 - [ ] "Lead Generation Overview" dashboard created
@@ -487,6 +586,10 @@ The following code changes have been implemented:
 ### Code Updates (Part 6) ✅
 - [x] `formTracking.submitted()` updated with full lead details
 - [x] `BookingForm.tsx` passes complete form data
+- [x] `person_profiles: 'identified_only'` configured for cost optimization
+- [x] `identifyLead()` and `resetIdentity()` functions added
+- [x] Early identification after Step 1 implemented
+- [x] `$set` vs `$set_once` property handling implemented
 - [ ] Workflow tested with real form submission
 
 ### Session Recordings (Part 8)
@@ -524,10 +627,27 @@ The following code changes have been implemented:
 
 ## References
 
+### Design Documents
 - Design document: `thoughts/designs/2025-11-25-posthog-analytics-implementation.md`
 - Dashboard & alerts design: `thoughts/designs/2025-11-26-posthog-dashboards-funnels-alerts.md`
+
+### Implementation Plans
 - Integration plan: `thoughts/plans/2025-11-25-posthog-analytics-integration.md`
-- **Dashboard/funnel/alerts implementation**: `thoughts/plans/2025-11-27-posthog-dashboards-funnels-alerts.md`
-- Analytics library: `src/lib/posthog.ts` (lines 380-469 for form submission)
-- BookingForm component: `src/components/sections/BookingForm.tsx` (lines 220-236 for onSubmit)
+- Dashboard/funnel/alerts implementation: `thoughts/plans/2025-11-27-posthog-dashboards-funnels-alerts.md`
+- **User identification implementation**: `thoughts/plans/2025-11-27-posthog-user-identification.md`
+
+### Source Code
+- PostHog initialization: `src/instrumentation-client.ts` (person_profiles config)
+- Analytics library: `src/lib/posthog.ts`
+  - Form submission: lines 436-538
+  - Early identification (`identifyLead`): lines 350-393
+  - Identity reset (`resetIdentity`): lines 395-407
+- BookingForm component: `src/components/sections/BookingForm.tsx`
+  - Form submission: lines 220-256
+  - Early identification call: lines 194-204
+  - Email change detection: lines 163-174
+
+### External Resources
 - PostHog Project: https://us.posthog.com/project/254485
+- PostHog Identify docs: https://posthog.com/docs/product-analytics/identify
+- PostHog Person Properties docs: https://posthog.com/docs/product-analytics/person-properties

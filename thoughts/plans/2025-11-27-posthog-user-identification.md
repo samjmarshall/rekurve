@@ -71,7 +71,7 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY as string, {
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes
+- [x] `yarn check` passes (TypeScript passes, build succeeds)
 
 #### Manual Verification
 - [ ] Visit site without submitting form - no person profile created in PostHog
@@ -241,7 +241,7 @@ if (currentStep === 1) {
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes
+- [x] `yarn check` passes (TypeScript passes, build succeeds)
 
 #### Manual Verification
 - [ ] Complete Step 1 with email "test1@example.com" - person profile created
@@ -300,7 +300,7 @@ posthog.identify(formData.email, {
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `yarn check` passes
+- [x] `yarn check` passes (TypeScript passes, build succeeds)
 
 #### Manual Verification
 - [ ] Submit form - person has both `$set` and `$set_once` properties

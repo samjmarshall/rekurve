@@ -62,7 +62,7 @@ Complete the form while monitoring PostHog:
 #### Step 1: Form Start
 - [x] Focus the "First Name" field
 - [x] Verify `booking_form_started` event fires
-- [ ] Verifyq session recording starts (check PostHog Recordings tab)
+- [ ] Verify session recording starts (check PostHog Recordings tab)
 - [x] Verify person property `form_started: true` is set
 
 #### Step 2: Complete Step 1 (Basic Info)

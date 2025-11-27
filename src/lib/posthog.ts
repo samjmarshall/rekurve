@@ -348,6 +348,65 @@ export const formTracking = {
   },
 
   /**
+   * Identify user early when email is captured (Step 1 complete)
+   * This links all subsequent events to this person
+   */
+  identifyLead: (leadData: {
+    email: string
+    firstName: string
+    lastName: string
+    phone?: string
+  }) => {
+    if (!isPostHogReady()) return
+
+    const { email, firstName, lastName, phone } = leadData
+
+    // Check if we're already identified with this email
+    const currentId = posthog.get_distinct_id()
+    if (currentId === email) {
+      return // Already identified with this email
+    }
+
+    posthog.identify(email, {
+      // Properties that can be updated
+      $set: {
+        email: email,
+        name: `${firstName} ${lastName}`,
+        first_name: firstName,
+        last_name: lastName,
+        phone: phone,
+      },
+      // Properties that should only be set once (first-touch attribution)
+      $set_once: {
+        first_seen: new Date().toISOString(),
+        initial_referrer: document.referrer || 'direct',
+        initial_landing_page: window.location.pathname,
+        initial_utm_source: new URLSearchParams(window.location.search).get('utm_source'),
+        initial_utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
+        initial_utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign'),
+      },
+    })
+
+    safeCapture('lead_identified', {
+      identification_point: 'step_1_complete',
+    })
+  },
+
+  /**
+   * Reset identification when user changes email
+   * Call this before re-identifying with a new email
+   */
+  resetIdentity: () => {
+    if (!isPostHogReady()) return
+
+    posthog.reset()
+
+    safeCapture('identity_reset', {
+      reason: 'email_changed',
+    })
+  },
+
+  /**
    * Track form abandonment (when user leaves without completing)
    */
   abandoned: (
@@ -435,19 +494,35 @@ export const formTracking = {
       challenges_count: formData.challenges.length,
     })
 
-    // Identify the person for session recordings linkage
+    // Identify the person with proper property handling
     posthog.identify(formData.email, {
-      name: `${formData.first_name} ${formData.last_name}`,
-      email: formData.email,
-      phone: formData.phone,
-      company: formData.company,
-      company_size: formData.company_size,
-      industry: formData.industry,
-      location: formData.location,
-      timeline: formData.timeline,
-      current_mrr: formData.current_mrr,
-      challenges_count: formData.challenges.length,
-      lead_score: leadScore,
+      // Properties that should update on each submission
+      $set: {
+        email: formData.email,
+        name: `${formData.first_name} ${formData.last_name}`,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        phone: formData.phone,
+        company: formData.company,
+        company_size: formData.company_size,
+        industry: formData.industry,
+        location: formData.location,
+        timeline: formData.timeline,
+        current_mrr: formData.current_mrr,
+        challenges_count: formData.challenges.length,
+        lead_score: leadScore,
+        last_form_submission: new Date().toISOString(),
+      },
+      // Properties that should only be set once (first conversion)
+      $set_once: {
+        first_form_submission: new Date().toISOString(),
+        first_challenges: formData.challenges.join(', '),
+        first_goals: formData.goals,
+        first_timeline: formData.timeline,
+        first_company_size: formData.company_size,
+        first_lead_score: leadScore,
+        conversion_source: document.referrer || 'direct',
+      },
     })
 
     // Set comprehensive person properties for lead scoring

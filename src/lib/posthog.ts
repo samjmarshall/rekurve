@@ -375,23 +375,79 @@ export const formTracking = {
   },
 
   /**
-   * Track successful form submission
+   * Track successful form submission with full lead details
    */
   submitted: (formData: {
+    // Contact info
+    first_name: string
+    last_name: string
+    email: string
+    phone?: string
+
+    // Company info
+    company: string
     company_size: string
     industry: string
+    location: string
+
+    // Qualification
+    challenges: string[]
+    goals: string
     timeline: string
     current_mrr?: string
-    challenges: string[]
     booking_method: string
   }) => {
+    const leadScore = calculateLeadScore({
+      company_size: formData.company_size,
+      timeline: formData.timeline,
+      current_mrr: formData.current_mrr,
+      challenges_count: formData.challenges.length,
+    })
+
+    // Capture event with full lead details for workflow email template
     safeCapture('booking_form_submitted', {
+      // Contact info (prefixed with lead_ for workflow template)
+      lead_name: `${formData.first_name} ${formData.last_name}`,
+      lead_email: formData.email,
+      lead_phone: formData.phone,
+
+      // Company info
+      lead_company: formData.company,
+      lead_company_size: formData.company_size,
+      lead_industry: formData.industry,
+      lead_location: formData.location,
+
+      // Qualification
+      lead_challenges: formData.challenges.join(', '),
+      lead_goals: formData.goals,
+      lead_timeline: formData.timeline,
+      lead_mrr: formData.current_mrr,
+      lead_score: leadScore,
+
+      // Booking preference
+      booking_method: formData.booking_method,
+
+      // Legacy properties for existing dashboards
       company_size: formData.company_size,
       industry: formData.industry,
       timeline: formData.timeline,
       current_mrr: formData.current_mrr,
       challenges_count: formData.challenges.length,
-      booking_method: formData.booking_method,
+    })
+
+    // Identify the person for session recordings linkage
+    posthog.identify(formData.email, {
+      name: `${formData.first_name} ${formData.last_name}`,
+      email: formData.email,
+      phone: formData.phone,
+      company: formData.company,
+      company_size: formData.company_size,
+      industry: formData.industry,
+      location: formData.location,
+      timeline: formData.timeline,
+      current_mrr: formData.current_mrr,
+      challenges_count: formData.challenges.length,
+      lead_score: leadScore,
     })
 
     // Set comprehensive person properties for lead scoring
@@ -403,12 +459,7 @@ export const formTracking = {
       timeline: formData.timeline,
       current_mrr: formData.current_mrr,
       challenges_count: formData.challenges.length,
-      lead_score: calculateLeadScore({
-        company_size: formData.company_size,
-        timeline: formData.timeline,
-        current_mrr: formData.current_mrr,
-        challenges_count: formData.challenges.length,
-      }),
+      lead_score: leadScore,
     })
 
     // Identify as a converted lead

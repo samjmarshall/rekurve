@@ -218,13 +218,20 @@ export function BookingForm() {
   }
 
   const onSubmit = (data: FormData) => {
-    // Track form submission with lead data
+    // Track form submission with full lead data
     analytics.form.submitted({
+      first_name: data.firstName,
+      last_name: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      company: data.company,
       company_size: data.companySize,
       industry: data.industry,
+      location: data.location,
+      challenges: data.challenges,
+      goals: data.goals,
       timeline: data.timeline,
       current_mrr: data.currentMRR,
-      challenges: data.challenges,
       booking_method: data.bookingMethod,
     })
 

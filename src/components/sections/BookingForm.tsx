@@ -27,12 +27,12 @@ import {
 } from '~/components/ui/select'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { analytics } from '~/lib/posthog'
 import { Button } from '~/components/ui/Button'
 import { Card } from '~/components/ui/Card'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
+import { analytics } from '~/lib/posthog'
 import { cn } from '~/lib/utils'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'

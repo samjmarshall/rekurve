@@ -22,10 +22,10 @@ This guide covers the **manual tasks** required after the technical PostHog anal
 
 Before testing, ensure the environment is ready:
 
-- [ ] Open PostHog Live Events view: `https://us.posthog.com/project/254485/events`
-- [ ] Open browser DevTools Console to monitor for errors
-- [ ] Navigate to `http://localhost:3000` (development) or production URL
-- [ ] Clear any existing PostHog cookies/data for clean testing (optional)
+- [x] Open PostHog Live Events view: `https://us.posthog.com/project/254485/events`
+- [x] Open browser DevTools Console to monitor for errors
+- [x] Navigate to `http://localhost:3000` (development) or production URL
+- [x] Clear any existing PostHog cookies/data for clean testing (optional)
 
 ### 1.2 CTA Click Tracking Verification
 
@@ -52,18 +52,18 @@ Test each CTA location and verify the event appears in PostHog Live Events:
 5. Verify `page_section` property is populated
 
 **Mobile-specific tests:**
-- [ ] Mobile nav closes after clicking CTA (functional behavior preserved)
-- [ ] Events fire correctly on mobile viewport
+- [x] Mobile nav closes after clicking CTA (functional behavior preserved)
+- [x] Events fire correctly on mobile viewport
 
 ### 1.3 Form Funnel Tracking Verification
 
 Complete the form while monitoring PostHog:
 
 #### Step 1: Form Start
-- [ ] Focus the "First Name" field
-- [ ] Verify `booking_form_started` event fires
-- [ ] Verify session recording starts (check PostHog Recordings tab)
-- [ ] Verify person property `form_started: true` is set
+- [x] Focus the "First Name" field
+- [x] Verify `booking_form_started` event fires
+- [ ] Verifyq session recording starts (check PostHog Recordings tab)
+- [x] Verify person property `form_started: true` is set
 
 #### Step 2: Complete Step 1 (Basic Info)
 - [ ] Fill First Name, Last Name, Email

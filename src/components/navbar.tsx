@@ -113,7 +113,7 @@ const DesktopNav = ({ navItems, visible }: NavbarProps) => {
       </motion.div>
       <div className="flex items-center gap-4">
         <ModeToggle />
-        <Link href="#booking-form" onClick={() => analytics.cta.click('header')}>
+        <Link href="#booking-form" onClick={() => analytics.cta.click('header')} data-testid="navbar-cta-desktop">
           <Button variant="primary">
             Book a call
           </Button>
@@ -152,22 +152,24 @@ const MobileNav = ({ navItems, visible }: NavbarProps) => {
       >
         <div className="flex flex-row justify-between items-center w-full">
           <Logo />
-          {open ? (
-            <X
-              className="text-black dark:text-white"
+          <button
+              data-testid="navbar-mobile-menu-btn"
               onClick={() => setOpen(!open)}
-            />
-          ) : (
-            <Menu
-              className="text-black dark:text-white"
-              onClick={() => setOpen(!open)}
-            />
-          )}
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+            >
+              {open ? (
+                <X className="text-black dark:text-white" />
+              ) : (
+                <Menu className="text-black dark:text-white" />
+              )}
+            </button>
         </div>
 
         <AnimatePresence>
           {open && (
             <motion.div
+              data-testid="navbar-mobile-menu"
               initial={{
                 opacity: 0,
               }}
@@ -191,6 +193,7 @@ const MobileNav = ({ navItems, visible }: NavbarProps) => {
                   analytics.cta.click('mobile_nav')
                   setOpen(false)
                 }}
+                data-testid="navbar-cta-mobile"
                 className="relative text-neutral-600 dark:text-neutral-300">
                 Book a call
               </Link>

@@ -19,6 +19,8 @@ Autonomous AI sales agents that handle lead research, qualification, multi-chann
 yarn dev              # Development server (Turbo mode)
 yarn check            # Lint + TypeCheck
 yarn build            # Production build
+yarn test:e2e         # Run E2E tests
+yarn check:e2e        # Run E2E tests (CI mode)
 ```
 
 **Status**: Landing page fully implemented with analytics tracking
@@ -97,6 +99,14 @@ www/                                    # Next.js 15 landing page application
 │       ├── ticket-writer/              # Jira/Linear ticket templates
 │       ├── brainstorming/              # Idea refinement process
 │       └── writing-clearly-and-concisely/
+├── e2e/                                # Playwright E2E tests
+│   ├── fixtures/                       # Test fixtures
+│   ├── pages/                          # Page object models
+│   │   └── sections/                   # Section page objects
+│   ├── data/                           # Test data factories
+│   ├── utils/                          # Test utilities (analytics helper)
+│   ├── features/                       # Feature-specific tests
+│   └── journeys/                       # End-to-end journey tests
 ├── thoughts/                           # Implementation notes
 │   ├── plans/                          # Detailed implementation plans
 │   └── designs/                        # Design explorations

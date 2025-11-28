@@ -12,7 +12,7 @@ import { cn } from "~/lib/utils";
 
 export function FinalCTA() {
   return (
-    <section className="w-full md:w-[calc(100%-200px)] grid grid-cols-1 md:grid-cols-3 my-20 md:my-40 justify-start relative z-20 max-w-7xl mx-auto bg-linear-to-br from-gray-100 to-white dark:from-neutral-900 dark:to-neutral-950 overflow-hidden md:overflow-visible">
+    <section data-testid="final-cta-section" className="w-full md:w-[calc(100%-200px)] grid grid-cols-1 md:grid-cols-3 my-20 md:my-40 justify-start relative z-20 max-w-7xl mx-auto bg-linear-to-br from-gray-100 to-white dark:from-neutral-900 dark:to-neutral-950 overflow-hidden md:overflow-visible">
         <GridLineHorizontal className="top-0" offset="200px" />
         <GridLineHorizontal className="bottom-0 top-auto" offset="200px" />
         <GridLineVertical className="left-0" offset="80px" />
@@ -31,7 +31,7 @@ export function FinalCTA() {
 
           <ScrollReveal delay={0.2}>
             <div className="flex items-start sm:items-center flex-col sm:flex-row sm:gap-4">
-              <Link href="#booking-form" className="mt-8" onClick={() => analytics.cta.click('final_cta_primary')}>
+              <Link href="#booking-form" className="mt-8" onClick={() => analytics.cta.click('final_cta_primary')} data-testid="final-cta-primary">
                 <Button variant="primary" className="group flex items-center gap-1">
                   Book Your Call
                   <ArrowRight className="group-hover:translate-x-1 h-4 w-4 stroke-1.25 transition-transform duration-200" />
@@ -45,6 +45,7 @@ export function FinalCTA() {
                   analytics.cta.click('final_cta_email')
                   analytics.link.emailClick('contact@rekurve.ai', 'final_cta')
                 }}
+                data-testid="final-cta-email"
               >
                 <Button variant="ghost" className="group flex items-center gap-1">
                   Or email us: contact@rekurve.ai

@@ -1,6 +1,6 @@
 # Rekurve AI Sales Agents
 
-Autonomous AI sales agents that handle lead research, qualification, multi-channel follow-up, meeting booking and quote generation. Delivering 20+ hours weekly in time savings and $100K+ pipeline growth.
+Autonomous AI sales agents that handle lead research, qualification, follow-up, meeting booking and quote generation.
 
 ---
 

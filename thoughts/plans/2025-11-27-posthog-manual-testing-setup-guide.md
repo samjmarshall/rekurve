@@ -31,236 +31,96 @@ Before testing, ensure the environment is ready:
 
 **Purpose:** Verify `person_profiles: 'identified_only'` configuration is working correctly.
 
-#### Test 1: Anonymous Browsing (No Person Profile)
-- [ ] Open site in incognito/private browsing mode
-- [ ] Navigate around the page (scroll, view sections)
-- [ ] Click some CTAs (but do NOT start the form)
-- [ ] Check PostHog Live Events - events should appear with anonymous distinct_id
-- [ ] Check PostHog Persons tab - **NO new person profile should be created**
-- [ ] Verify events are recorded but not linked to a person profile
-
-#### Test 2: Form Start Without Step 1 Completion (No Person Profile)
-- [ ] Open site in incognito/private browsing mode
-- [ ] Focus on the first form field (triggers `booking_form_started`)
-- [ ] Do NOT complete Step 1 (don't click Next)
-- [ ] Check PostHog Persons tab - **NO person profile should be created yet**
-
-#### Test 3: Step 1 Completion (Person Profile Created)
-- [ ] Complete Step 1 fields and click "Next"
-- [ ] Check PostHog Persons tab - **Person profile NOW exists** with email as distinct_id
-- [ ] Verify all previous anonymous events are linked to this person
+> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-identity-profiles.md` (Phases 1-3)
+>
+> Use **@agent-ui-navigator** to execute the automated tests covering:
+> - Anonymous browsing (no person profile created)
+> - Form start without Step 1 completion (no profile)
+> - Step 1 completion (person profile created with email as distinct_id)
 
 ### 1.3 CTA Click Tracking Verification
 
-Test each CTA location and verify the event appears in PostHog Live Events:
-
-| CTA | Action | Expected Event | Expected `location` Property |
-|-----|--------|----------------|------------------------------|
-| Header "Book a call" | Click desktop nav CTA | `cta_clicked` | `header` |
-| Mobile nav "Book a call" | Open mobile menu, click CTA | `cta_clicked` | `mobile_nav` |
-| Hero "How it Works" | Click secondary hero CTA | `cta_clicked` | `hero_secondary` |
-| Hero "Book a call" | Click primary hero CTA | `cta_clicked` | `hero_primary` |
-| Pricing Foundation | Click Foundation tier CTA | `cta_clicked` | `pricing_foundation` |
-| Pricing Growth | Click Growth tier CTA | `cta_clicked` | `pricing_growth` |
-| Pricing Enterprise | Click Enterprise tier CTA | `cta_clicked` | `pricing_enterprise` |
-| Final CTA "Book Your Call" | Click primary final CTA | `cta_clicked` | `final_cta_primary` |
-| Final CTA email link | Click email CTA | `cta_clicked` + `email_link_clicked` | `final_cta_email` |
-| FAQ bottom link | Click "Book a free 30-minute call" | `cta_clicked` | `faq_bottom` |
-
-**Verification steps for each:**
-1. Click the CTA
-2. Check PostHog Live Events for `cta_clicked` event
-3. Verify `location` property matches expected value
-4. Verify `cta_text` property is populated
-5. Verify `page_section` property is populated
-
-**Mobile-specific tests:**
-- [x] Mobile nav closes after clicking CTA (functional behavior preserved)
-- [x] Events fire correctly on mobile viewport
+> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-cta-tracking.md`
+>
+> Use **@agent-ui-navigator** to execute the automated tests covering all 10 CTA locations:
+> - Header, Mobile Nav, Hero (primary/secondary)
+> - Pricing tiers (Foundation, Growth, Enterprise)
+> - Final CTA (primary, email), FAQ bottom link
+>
+> **Human verification required:** Login to PostHog dashboard to verify events in Live Events view.
 
 ### 1.4 Form Funnel Tracking Verification
 
-Complete the form while monitoring PostHog:
-
-#### Step 1: Form Start
-- [x] Focus the "First Name" field
-- [x] Verify `booking_form_started` event fires
-- [x] Verify session recording starts (check PostHog Recordings tab)
-- [x] Verify person property `form_started: true` is set
-
-#### Step 2: Complete Step 1 (Basic Info) - Early Identification
-- [ ] Fill First Name, Last Name, Email
-- [ ] Click "Next"
-- [ ] Verify `form_step_completed` event with:
-  - `step: 1`
-  - `step_name: "basic_info"`
-  - `time_spent_ms` is populated
-- [ ] Verify `lead_identified` event fires with:
-  - `identification_point: "step_1_complete"`
-- [ ] Verify **person profile is created** in PostHog Persons tab (email as distinct ID)
-- [ ] Verify person has `$set` properties:
-  - `email`, `name`, `first_name`, `last_name`, `phone`
-- [ ] Verify person has `$set_once` properties:
-  - `first_seen` (ISO timestamp)
-  - `initial_referrer`, `initial_landing_page`
-  - `initial_utm_source`, `initial_utm_medium`, `initial_utm_campaign` (if present in URL)
-
-#### Step 3: Trigger Validation Error
-- [ ] Leave a required field empty and click "Next"
-- [ ] Verify `form_field_interaction` event with:
-  - `action: "error"`
-  - `has_error: true`
-  - `error_message` is populated
-
-#### Step 4: Complete Remaining Steps
-For each step (2, 3, 4):
-- [ ] Complete all fields
-- [ ] Click "Next"
-- [ ] Verify `form_step_completed` event fires with correct step number
-
-#### Step 5: Form Submission
-- [ ] Submit the form on final step
-- [ ] Verify `booking_form_submitted` event with properties:
-  - `lead_name` (full name)
-  - `lead_email`
-  - `lead_phone` (if provided)
-  - `lead_company`
-  - `lead_company_size`
-  - `lead_industry`
-  - `lead_location`
-  - `lead_challenges` (comma-separated)
-  - `lead_goals`
-  - `lead_timeline`
-  - `lead_mrr` (if provided)
-  - `lead_score` (0-100)
-  - `booking_method`
-  - Legacy: `company_size`, `industry`, `timeline`, `current_mrr`, `challenges_count`
-- [ ] Verify person properties are set:
-  - `form_completed: true`
-  - `form_completed_at` (ISO timestamp)
-  - `lead_score` (0-100 range)
-  - `company_size`
-  - `timeline`
-
-#### Step 6: Form Abandonment
-- [ ] Start a new form (focus first field)
-- [ ] Complete step 1
-- [ ] Navigate away from page (or close tab)
-- [ ] Verify `booking_form_abandoned` event with:
-  - `last_step` (the step you were on)
-  - `reason: "page_leave"` or `"component_unmount"`
+> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-form-funnel.md`
+>
+> Use **@agent-ui-navigator** to execute the automated tests covering:
+> - Form start event and session recording trigger
+> - Step 1-4 completion events with timing properties
+> - Early identification (`lead_identified`) after Step 1
+> - Validation error tracking
+> - Full form submission with all `lead_*` properties
+> - Form abandonment detection on page leave
+>
+> **Human verification required:** Login to PostHog dashboard to verify events, person profiles, and session recordings.
 
 ### 1.5 FAQ Tracking Verification
 
-- [ ] Expand an FAQ item
-- [ ] Verify `faq_expanded` event with:
-  - `question_id`
-  - `question` (the actual question text)
-  - `category` (e.g., "ROI & Results")
-
-- [ ] Type in FAQ search box (wait 500ms after typing)
-- [ ] Verify `faq_searched` event with:
-  - `query` (your search text)
-  - `results_count`
-  - `has_results`
+> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-faq-tracking.md`
+>
+> Use **@agent-ui-navigator** to execute the automated tests covering:
+> - FAQ expansion events with `question_id`, `question`, `category`
+> - FAQ collapse events
+> - FAQ search with debounce (`query`, `results_count`, `has_results`)
+> - Multiple FAQ interactions in sequence
+>
+> **Human verification required:** Login to PostHog dashboard to verify events appear correctly.
 
 ### 1.6 Session Initialization & UTM Tracking
 
-- [ ] Visit page with UTM parameters:
-  ```
-  http://localhost:3000/?utm_source=test&utm_medium=cpc&utm_campaign=launch
-  ```
-- [ ] Verify `utm_captured` event fires with all UTM params
-- [ ] Verify `page_viewed` event includes:
-  - `referrer`
-  - `landing_page`
-  - `viewport_width`, `viewport_height`
-  - `device_type`
-- [ ] Verify person properties include UTM values
+> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-utm-session.md` (Phases 1-4, 6)
+>
+> Use **@agent-ui-navigator** to execute the automated tests covering:
+> - Full UTM parameter capture (source, medium, campaign, term, content)
+> - Partial UTM parameter handling
+> - `page_viewed` event with viewport, referrer, landing page
+> - Device type detection (desktop, mobile, tablet viewports)
+>
+> **Human verification required:** Login to PostHog dashboard to verify UTM events and person properties.
 
 ### 1.7 Error Handling & Graceful Degradation
 
-- [ ] Block PostHog in browser (uBlock/AdBlock or DevTools Network blocking)
-- [ ] Navigate the site
-- [ ] Verify NO console errors appear
-- [ ] Verify page functions normally
-- [ ] Verify form submission still works (just without tracking)
+> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-utm-session.md` (Phase 5)
+>
+> Use **@agent-ui-navigator** to execute the automated tests covering:
+> - Blocking PostHog network requests
+> - Verifying NO console errors when PostHog is blocked
+> - Confirming page navigation and form submission still work
+>
+> **Human verification required:** Observe browser console for errors during blocked test.
 
 ### 1.8 Email Change & Identity Reset Testing
 
 **Purpose:** Verify identity reset works correctly when user changes email mid-form.
 
-#### Test: Email Change Scenario
-- [ ] Open site in incognito mode
-- [ ] Complete Step 1 with email "email1@test.com"
-- [ ] Click "Next" - verify `lead_identified` event fires
-- [ ] Check PostHog Persons - person profile created for "email1@test.com"
-- [ ] Click "Back" to return to Step 1
-- [ ] Change email to "email2@test.com"
-- [ ] Click "Next" again
-- [ ] Verify `identity_reset` event fires with:
-  - `reason: "email_changed"`
-- [ ] Verify `lead_identified` event fires again for new email
-- [ ] Check PostHog Persons - **TWO separate person profiles** should exist:
-  - "email1@test.com" with initial events
-  - "email2@test.com" with subsequent events
-- [ ] Verify events are properly attributed to correct persons
+> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-identity-profiles.md` (Phase 4)
+>
+> Use **@agent-ui-navigator** to execute the automated tests covering:
+> - Email change mid-form triggers `identity_reset` event
+> - New `lead_identified` event fires for changed email
+> - Two separate person profiles created in PostHog
+> - Events properly attributed to correct persons
+>
+> **Human verification required:** Check PostHog Persons tab for two separate profiles with correct event attribution.
 
 ### 1.9 Person Properties Verification
 
-After completing a full form submission, verify person profile in PostHog:
-
-1. Go to PostHog → Persons
-2. Find your test person (by email - now used as distinct ID)
-3. Verify these properties exist:
-
-**From Early Identification (`identifyLead()` after Step 1):**
-
-`$set` properties (can be overwritten):
-   - [ ] `email`
-   - [ ] `name` (full name)
-   - [ ] `first_name`
-   - [ ] `last_name`
-   - [ ] `phone` (if provided)
-
-`$set_once` properties (first-touch attribution, immutable):
-   - [ ] `first_seen` (ISO timestamp)
-   - [ ] `initial_referrer` ("direct" or referrer URL)
-   - [ ] `initial_landing_page` (pathname)
-   - [ ] `initial_utm_source` (if UTM params present)
-   - [ ] `initial_utm_medium` (if UTM params present)
-   - [ ] `initial_utm_campaign` (if UTM params present)
-
-**From Form Submission (`submitted()` call):**
-
-`$set` properties (updated on each submission):
-   - [ ] `company`
-   - [ ] `company_size`
-   - [ ] `industry`
-   - [ ] `location`
-   - [ ] `timeline`
-   - [ ] `current_mrr` (if provided)
-   - [ ] `challenges_count`
-   - [ ] `lead_score` (calculated 0-100)
-   - [ ] `last_form_submission` (ISO timestamp - updates each time)
-
-`$set_once` properties (first conversion data, immutable):
-   - [ ] `first_form_submission` (ISO timestamp)
-   - [ ] `first_challenges` (comma-separated list)
-   - [ ] `first_goals`
-   - [ ] `first_timeline`
-   - [ ] `first_company_size`
-   - [ ] `first_lead_score`
-   - [ ] `conversion_source` (referrer at time of conversion)
-
-**From `setPersonProperties()` call:**
-   - [ ] `form_started: true`
-   - [ ] `form_completed: true`
-   - [ ] `form_completed_at` (ISO timestamp)
-
-**From `setPersonPropertiesForFlags()` call:**
-   - [ ] `is_lead: true`
-   - [ ] `conversion_date` (ISO timestamp)
+> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-identity-profiles.md` (Phases 5-6)
+>
+> Use **@agent-ui-navigator** to execute the form submission, then manually verify person properties in PostHog:
+> - `$set` properties (updatable): email, name, company, lead_score, etc.
+> - `$set_once` properties (immutable first-touch): first_seen, initial_referrer, first_form_submission, etc.
+>
+> **Human verification required:** Navigate to PostHog → Persons → find test person → verify all properties listed in the automated test plan's Phase 5 success criteria.
 
 ---
 
@@ -507,13 +367,13 @@ The following code changes have been implemented:
 - ✅ Added `person_profiles: 'identified_only'` config for cost optimization
 - Anonymous visitors no longer create person profiles
 
-**File:** `src/lib/posthog.ts` (lines 350-407)
+**File:** `src/lib/posthog.ts` (lines 354-407)
 - ✅ Added `identifyLead()` function for early identification after Step 1
 - ✅ Added `resetIdentity()` function to handle email changes
 - ✅ `posthog.identify()` now uses proper `$set` vs `$set_once` property handling
 - First-touch attribution data preserved in `$set_once` properties
 
-**File:** `src/components/sections/BookingForm.tsx` (lines 93, 163-174, 194-204)
+**File:** `src/components/sections/BookingForm.tsx` (lines 93, 164-174, 208-216)
 - ✅ Added `lastIdentifiedEmailRef` to track identified email
 - ✅ Calls `identifyLead()` after Step 1 completion
 - ✅ useEffect detects email changes and calls `resetIdentity()`
@@ -561,18 +421,22 @@ The following code changes have been implemented:
 
 ## Summary: Post-Implementation Checklist
 
-### Manual Testing (Part 1)
-- [ ] Anonymous browsing does NOT create person profiles (1.2)
-- [ ] All 10 CTA locations tracked correctly (1.3)
-- [ ] Form funnel events fire for all 4 steps (1.4)
-- [ ] Early identification (`lead_identified`) fires after Step 1 (1.4)
-- [ ] Form submission captures all properties (1.4)
-- [ ] Form abandonment tracked on page leave (1.4)
-- [ ] FAQ expansion and search tracked (1.5)
-- [ ] UTM parameters captured (1.6)
-- [ ] No console errors with PostHog blocked (1.7)
-- [ ] Email change triggers `identity_reset` event (1.8)
-- [ ] Person properties use correct `$set` vs `$set_once` structure (1.9)
+### Automated Testing (Part 1) - Use @agent-ui-navigator
+
+Execute the following test plans using **@agent-ui-navigator** with Playwright MCP:
+
+| Test Plan | Sections Covered |
+|-----------|------------------|
+| `2025-11-28-posthog-test-identity-profiles.md` | 1.2, 1.8, 1.9 |
+| `2025-11-28-posthog-test-cta-tracking.md` | 1.3 |
+| `2025-11-28-posthog-test-form-funnel.md` | 1.4 |
+| `2025-11-28-posthog-test-faq-tracking.md` | 1.5 |
+| `2025-11-28-posthog-test-utm-session.md` | 1.6, 1.7 |
+
+**After automated tests, manually verify in PostHog dashboard:**
+- [ ] All events appear correctly in Live Events
+- [ ] Person profiles created with correct properties
+- [ ] Session recordings triggered on form start
 
 ### PostHog Configuration (Parts 2-7)
 - [ ] "Lead Generation Overview" dashboard created
@@ -636,16 +500,23 @@ The following code changes have been implemented:
 - Dashboard/funnel/alerts implementation: `thoughts/plans/2025-11-27-posthog-dashboards-funnels-alerts.md`
 - **User identification implementation**: `thoughts/plans/2025-11-27-posthog-user-identification.md`
 
+### Automated Test Plans (Use @agent-ui-navigator)
+- CTA tracking: `thoughts/plans/2025-11-28-posthog-test-cta-tracking.md`
+- Form funnel: `thoughts/plans/2025-11-28-posthog-test-form-funnel.md`
+- FAQ tracking: `thoughts/plans/2025-11-28-posthog-test-faq-tracking.md`
+- UTM/session: `thoughts/plans/2025-11-28-posthog-test-utm-session.md`
+- Identity/profiles: `thoughts/plans/2025-11-28-posthog-test-identity-profiles.md`
+
 ### Source Code
 - PostHog initialization: `src/instrumentation-client.ts` (person_profiles config)
 - Analytics library: `src/lib/posthog.ts`
-  - Form submission: lines 436-538
-  - Early identification (`identifyLead`): lines 350-393
-  - Identity reset (`resetIdentity`): lines 395-407
+  - Form submission: lines 439-545
+  - Early identification (`identifyLead`): lines 354-393
+  - Identity reset (`resetIdentity`): lines 399-407
 - BookingForm component: `src/components/sections/BookingForm.tsx`
-  - Form submission: lines 220-256
-  - Early identification call: lines 194-204
-  - Email change detection: lines 163-174
+  - Form submission: lines 246-262
+  - Early identification call: lines 208-216
+  - Email change detection: lines 164-174
 
 ### External Resources
 - PostHog Project: https://us.posthog.com/project/254485

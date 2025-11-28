@@ -18,109 +18,101 @@ This guide covers the **manual tasks** required after the technical PostHog anal
 
 ## Part 1: Manual Testing Checklist
 
+### Testing Approach: Playwright + PostHog Dashboard
+
+**UI Behavior**: Covered by Playwright E2E tests (`yarn test:e2e`)
+- CTA clicks and navigation
+- Form step transitions and validation
+- FAQ expand/collapse and search
+- Responsive behavior
+
+**Analytics Verification**: Requires manual PostHog dashboard inspection
+- Playwright cannot verify PostHog events (they batch and send on page unload)
+- Human must check Live Events, Person Profiles, and Properties in PostHog
+
 ### 1.1 Pre-Testing Setup
 
 Before testing, ensure the environment is ready:
 
-- [x] Open PostHog Live Events view: `https://us.posthog.com/project/254485/events`
-- [x] Open browser DevTools Console to monitor for errors
-- [x] Navigate to `http://localhost:3000` (development) or production URL
-- [x] Clear any existing PostHog cookies/data for clean testing (optional)
+1. **Run Playwright E2E tests** to confirm UI behavior works:
+   ```bash
+   yarn test:e2e
+   ```
 
-### 1.2 Anonymous vs Identified User Verification (Cost Optimization)
+2. **Open PostHog Live Events** for manual analytics verification:
+   - URL: `https://us.posthog.com/project/254485/events`
+   - Keep browser DevTools Console open to monitor for errors
 
-**Purpose:** Verify `person_profiles: 'identified_only'` configuration is working correctly.
+3. **Open site** at `http://localhost:3000` (or production URL)
 
-> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-identity-profiles.md` (Phases 1-3)
->
-> Use **@agent-ui-navigator** to execute the automated tests covering:
-> - Anonymous browsing (no person profile created)
-> - Form start without Step 1 completion (no profile)
-> - Step 1 completion (person profile created with email as distinct_id)
+### 1.2 CTA Click Tracking Verification
 
-### 1.3 CTA Click Tracking Verification
+**UI Behavior**: ✅ Covered by `e2e/features/cta-tracking.spec.ts`
+- Verifies CTAs navigate to booking form
 
-> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-cta-tracking.md`
->
-> Use **@agent-ui-navigator** to execute the automated tests covering all 10 CTA locations:
-> - Header, Mobile Nav, Hero (primary/secondary)
-> - Pricing tiers (Foundation, Growth, Enterprise)
-> - Final CTA (primary, email), FAQ bottom link
->
-> **Human verification required:** Login to PostHog dashboard to verify events in Live Events view.
+**Manual PostHog Verification Required:**
+1. Click each CTA in the browser
+2. Check PostHog Live Events for `cta_clicked` events
+3. Verify `location` property matches expected value:
+   - `header`, `mobile_nav`, `hero_primary`, `hero_secondary`
+   - `pricing_foundation`, `pricing_growth`, `pricing_enterprise`
+   - `final_cta_primary`, `final_cta_email`, `faq_bottom`
 
-### 1.4 Form Funnel Tracking Verification
+### 1.3 Form Funnel Tracking Verification
 
-> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-form-funnel.md`
->
-> Use **@agent-ui-navigator** to execute the automated tests covering:
-> - Form start event and session recording trigger
-> - Step 1-4 completion events with timing properties
-> - Early identification (`lead_identified`) after Step 1
-> - Validation error tracking
-> - Full form submission with all `lead_*` properties
-> - Form abandonment detection on page leave
->
-> **Human verification required:** Login to PostHog dashboard to verify events, person profiles, and session recordings.
+**UI Behavior**: ✅ Covered by `e2e/features/booking-form.spec.ts`
+- Step transitions work
+- Validation errors appear
+- Back/forward navigation works
 
-### 1.5 FAQ Tracking Verification
+**Manual PostHog Verification Required:**
+1. Start form (focus first field) → verify `booking_form_started` event
+2. Complete Step 1 → verify `form_step_completed` with `step: 1`
+3. Verify `lead_identified` fires after Step 1
+4. Complete remaining steps → verify `form_step_completed` for each
+5. Submit form → verify `booking_form_submitted` with all `lead_*` properties
+6. Check Person Profile has correct properties
 
-> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-faq-tracking.md`
->
-> Use **@agent-ui-navigator** to execute the automated tests covering:
-> - FAQ expansion events with `question_id`, `question`, `category`
-> - FAQ collapse events
-> - FAQ search with debounce (`query`, `results_count`, `has_results`)
-> - Multiple FAQ interactions in sequence
->
-> **Human verification required:** Login to PostHog dashboard to verify events appear correctly.
+### 1.4 FAQ Tracking Verification
 
-### 1.6 Session Initialization & UTM Tracking
+**UI Behavior**: ✅ Covered by `e2e/features/faq-interactions.spec.ts`
+- Accordion expand/collapse works
+- Search filtering works
 
-> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-utm-session.md` (Phases 1-4, 6)
->
-> Use **@agent-ui-navigator** to execute the automated tests covering:
-> - Full UTM parameter capture (source, medium, campaign, term, content)
-> - Partial UTM parameter handling
-> - `page_viewed` event with viewport, referrer, landing page
-> - Device type detection (desktop, mobile, tablet viewports)
->
-> **Human verification required:** Login to PostHog dashboard to verify UTM events and person properties.
+**Manual PostHog Verification Required:**
+1. Expand FAQ item → verify `faq_expanded` event with `question_id`, `question`, `category`
+2. Collapse FAQ → verify `faq_collapsed` event
+3. Search for "pricing" → verify `faq_searched` event with `query`, `results_count`
 
-### 1.7 Error Handling & Graceful Degradation
+### 1.5 UTM & Session Tracking Verification
 
-> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-utm-session.md` (Phase 5)
->
-> Use **@agent-ui-navigator** to execute the automated tests covering:
-> - Blocking PostHog network requests
-> - Verifying NO console errors when PostHog is blocked
-> - Confirming page navigation and form submission still work
->
-> **Human verification required:** Observe browser console for errors during blocked test.
+**UI Behavior**: ✅ Covered by `e2e/journeys/lead-conversion.spec.ts`
+- Page loads with UTM parameters in URL
 
-### 1.8 Email Change & Identity Reset Testing
+**Manual PostHog Verification Required:**
+1. Navigate with UTM params: `?utm_source=test&utm_medium=cpc&utm_campaign=launch`
+2. Verify `utm_captured` event with all parameters
+3. Verify `page_viewed` event with `device_type`, `viewport_width`
+4. Check Person Properties for first-touch attribution data
 
-**Purpose:** Verify identity reset works correctly when user changes email mid-form.
+### 1.6 Identity & Person Profile Verification
 
-> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-identity-profiles.md` (Phase 4)
->
-> Use **@agent-ui-navigator** to execute the automated tests covering:
-> - Email change mid-form triggers `identity_reset` event
-> - New `lead_identified` event fires for changed email
-> - Two separate person profiles created in PostHog
-> - Events properly attributed to correct persons
->
-> **Human verification required:** Check PostHog Persons tab for two separate profiles with correct event attribution.
+**UI Behavior**: Form completion flows covered by existing tests
 
-### 1.9 Person Properties Verification
+**Manual PostHog Verification Required:**
+1. **Anonymous browsing**: Navigate site without form interaction → verify NO person profile created
+2. **Early identification**: Complete Step 1 with email → verify person profile created
+3. **Email change**: Change email mid-form → verify `identity_reset` event and second person created
+4. **Properties**: Verify `$set` vs `$set_once` properties on person profile
 
-> **📋 Automated Test Plan:** See `thoughts/plans/2025-11-28-posthog-test-identity-profiles.md` (Phases 5-6)
->
-> Use **@agent-ui-navigator** to execute the form submission, then manually verify person properties in PostHog:
-> - `$set` properties (updatable): email, name, company, lead_score, etc.
-> - `$set_once` properties (immutable first-touch): first_seen, initial_referrer, first_form_submission, etc.
->
-> **Human verification required:** Navigate to PostHog → Persons → find test person → verify all properties listed in the automated test plan's Phase 5 success criteria.
+### 1.7 Form Abandonment Verification
+
+**UI Behavior**: ✅ Covered by `e2e/journeys/form-abandonment.spec.ts`
+- Form navigation and partial completion works
+
+**Manual PostHog Verification Required:**
+1. Start form, complete Step 1, navigate away
+2. Verify `booking_form_abandoned` event with `last_step`, `reason`
 
 ---
 
@@ -421,21 +413,31 @@ The following code changes have been implemented:
 
 ## Summary: Post-Implementation Checklist
 
-### Automated Testing (Part 1) - Use @agent-ui-navigator
+### Automated Testing (Playwright E2E)
 
-Execute the following test plans using **@agent-ui-navigator** with Playwright MCP:
+Run Playwright to verify UI behavior works:
 
-| Test Plan | Sections Covered |
-|-----------|------------------|
-| `2025-11-28-posthog-test-identity-profiles.md` | 1.2, 1.8, 1.9 |
-| `2025-11-28-posthog-test-cta-tracking.md` | 1.3 |
-| `2025-11-28-posthog-test-form-funnel.md` | 1.4 |
-| `2025-11-28-posthog-test-faq-tracking.md` | 1.5 |
-| `2025-11-28-posthog-test-utm-session.md` | 1.6, 1.7 |
+```bash
+yarn test:e2e
+```
 
-**After automated tests, manually verify in PostHog dashboard:**
-- [ ] All events appear correctly in Live Events
-- [ ] Person profiles created with correct properties
+This covers:
+- ✅ CTA clicks navigate correctly
+- ✅ Form step transitions and validation
+- ✅ FAQ accordion and search functionality
+- ✅ Lead conversion journey navigation
+
+### Manual PostHog Dashboard Verification
+
+After running E2E tests, manually verify analytics in PostHog:
+- [ ] `cta_clicked` events fire with correct `location` properties
+- [ ] `booking_form_started` fires on form focus
+- [ ] `form_step_completed` fires for each step
+- [ ] `lead_identified` fires after Step 1
+- [ ] `booking_form_submitted` includes all `lead_*` properties
+- [ ] `faq_expanded`/`faq_searched` events fire correctly
+- [ ] `utm_captured` fires when URL has UTM params
+- [ ] Person profiles created with correct `$set`/`$set_once` properties
 - [ ] Session recordings triggered on form start
 
 ### PostHog Configuration (Parts 2-7)
@@ -500,12 +502,12 @@ Execute the following test plans using **@agent-ui-navigator** with Playwright M
 - Dashboard/funnel/alerts implementation: `thoughts/plans/2025-11-27-posthog-dashboards-funnels-alerts.md`
 - **User identification implementation**: `thoughts/plans/2025-11-27-posthog-user-identification.md`
 
-### Automated Test Plans (Use @agent-ui-navigator)
-- CTA tracking: `thoughts/plans/2025-11-28-posthog-test-cta-tracking.md`
-- Form funnel: `thoughts/plans/2025-11-28-posthog-test-form-funnel.md`
-- FAQ tracking: `thoughts/plans/2025-11-28-posthog-test-faq-tracking.md`
-- UTM/session: `thoughts/plans/2025-11-28-posthog-test-utm-session.md`
-- Identity/profiles: `thoughts/plans/2025-11-28-posthog-test-identity-profiles.md`
+### Playwright E2E Tests (UI Behavior Verification)
+- CTA tracking: `e2e/features/cta-tracking.spec.ts`
+- Booking form: `e2e/features/booking-form.spec.ts`
+- FAQ interactions: `e2e/features/faq-interactions.spec.ts`
+- Form abandonment: `e2e/journeys/form-abandonment.spec.ts`
+- Lead conversion: `e2e/journeys/lead-conversion.spec.ts`
 
 ### Source Code
 - PostHog initialization: `src/instrumentation-client.ts` (person_profiles config)

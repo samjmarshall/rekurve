@@ -1,6 +1,7 @@
 ---
 name: brainstorming
 description: Use when creating or developing, before writing code or implementation plans - refines rough ideas into fully-formed designs through collaborative questioning, alternative exploration, and incremental validation. Don't use during clear 'mechanical' processes
+skills: writing-clearly-and-concisely
 ---
 
 # Brainstorming Ideas Into Designs

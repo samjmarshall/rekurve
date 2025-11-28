@@ -1,3 +1,6 @@
+---
+skills: writing-clearly-and-concisely
+---
 # Generate PR Description
 
 You are tasked with generating a clear and concise pull request description following the repository's standard template.

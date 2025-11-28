@@ -1,6 +1,7 @@
 ---
 name: ticket-writer
 description: Interactive guide for writing clear, actionable Jira, Linear, GitHub, or File tickets through collaborative refinement. Use when users want to create, review, or improve tickets, user stories, bugs, epics, technical tasks, or spikes. Helps eliminate ambiguity by challenging vague requirements and ensuring tickets contain complete context, testable acceptance criteria, and actionable requirements before development begins. Also use for breaking down large work, writing acceptance criteria, or ensuring tickets are "ready for development."
+skills: writing-clearly-and-concisely
 ---
 
 # Ticket Writer Skill

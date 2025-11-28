@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devoli Impact Analysis: AI Sales Automation | Rekurve</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Combined version taking the best of both V1 and V2 -->
+  <!-- V2: Navigation, Metric Cards, Workflow, Financial Toggles, Strategic Grid, Footer -->
+  <!-- V1: Hero gradient/animation, Assumptions Grid, Custom Scrollbar -->
+  <!-- Combined: Enhanced Simulator with 3 inputs and prioritized outputs -->
+
+  <style>
+    body {
+      font-family: 'IBM Plex Sans', Arial, sans-serif;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Play', Arial, sans-serif;
+    }
+
+    /* V1: Custom scrollbar for cleaner look */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #faf9f5; }
+    ::-webkit-scrollbar-thumb { background: #b0aea5; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #141413; }
+
+    /* V1: Animation classes */
+    .fade-in-up { animation: fadeInUp 0.8s ease-out; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* V1: Gradient text */
+    .gradient-text {
+      background: linear-gradient(to right, #d97857, #6a9bcc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 350px;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 1024px) {
+      .chart-container {
+        height: 400px;
+      }
+    }
+
+    /* V2: Workflow connector lines */
+    .workflow-step::after {
+      content: '';
+      position: absolute;
+      left: 1.25rem;
+      top: 2rem;
+      bottom: -1rem;
+      width: 2px;
+      background-color: #e8e6dc;
+      z-index: 0;
+    }
+
+    .workflow-step:last-child::after {
+      display: none;
+    }
+
+    .workflow-step-ai::after {
+      background-color: #d97857;
+    }
+
+    /* V2: Tab button states */
+    .tab-active {
+      background-color: #d97857;
+      color: white;
+      border-color: #d97857;
+    }
+
+    .tab-inactive {
+      background-color: white;
+      color: #b0aea5;
+      border-color: #e8e6dc;
+    }
+
+    .tab-inactive:hover {
+      background-color: #faf9f5;
+    }
+
+    /* Mobile menu transitions */
+    #mobile-menu {
+      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    }
+
+    #mobile-menu.hidden {
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+    }
+
+    #mobile-menu:not(.hidden) {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Custom focus states */
+    *:focus {
+      outline: none;
+    }
+
+    *:focus-visible {
+      outline: 2px solid #d97857;
+      outline-offset: 2px;
+    }
+
+    /* Range input focus */
+    input[type="range"]:focus-visible {
+      outline: 2px solid #d97857;
+      outline-offset: 4px;
+    }
+
+    /* Button focus */
+    button:focus-visible {
+      outline: 2px solid #d97857;
+      outline-offset: 2px;
+    }
+
+    /* Link focus */
+    a:focus-visible {
+      outline: 2px solid #d97857;
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    /* Screen reader only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    .focus\:not-sr-only:focus {
+      position: absolute;
+      width: auto;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+    }
+  </style>
+</head>
+
+<body class="bg-[#faf9f5] text-[#141413] antialiased">
+  <a href="#executive" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#d97857] focus:text-white focus:rounded-md">
+    Skip to main content
+  </a>
+
+  <!-- V2: Navigation -->
+  <nav role="navigation" aria-label="Main navigation" class="bg-white border-b border-[#e8e6dc] sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <span class="text-xl font-bold text-[#141413] tracking-tight">Rekurve <span class="text-[#d97857]">/ Devoli
+              Analysis</span></span>
+        </div>
+        <div class="hidden md:flex space-x-8 items-center">
+          <a href="#executive" class="text-sm font-medium text-[#b0aea5] hover:text-[#d97857]">Executive Summary</a>
+          <a href="#process" class="text-sm font-medium text-[#b0aea5] hover:text-[#d97857]">Process</a>
+          <a href="#financials" class="text-sm font-medium text-[#b0aea5] hover:text-[#d97857]">Financials</a>
+          <a href="#simulator"
+            class="px-4 py-2 bg-[#d97857] text-white text-sm font-medium rounded hover:bg-[#c56847] transition">ROI
+            Simulator</a>
+        </div>
+        <!-- Mobile menu button -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md hover:bg-[#e8e6dc]/50 transition" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
+          <svg id="menu-icon" class="w-6 h-6 text-[#141413]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg id="close-icon" class="w-6 h-6 text-[#141413] hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile menu panel -->
+    <div id="mobile-menu" class="hidden md:hidden absolute top-16 inset-x-0 bg-white border-b border-[#e8e6dc] shadow-lg z-40">
+      <div class="px-4 py-6 space-y-4">
+        <a href="#executive" class="mobile-nav-link block text-base font-medium text-[#141413] hover:text-[#d97857] transition">Executive Summary</a>
+        <a href="#process" class="mobile-nav-link block text-base font-medium text-[#141413] hover:text-[#d97857] transition">Process</a>
+        <a href="#financials" class="mobile-nav-link block text-base font-medium text-[#141413] hover:text-[#d97857] transition">Financials</a>
+        <a href="#simulator" class="mobile-nav-link block w-full text-center px-4 py-3 bg-[#d97857] text-white font-medium rounded-md hover:bg-[#c56847] transition">ROI Simulator</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+  <!-- Executive Dashboard: V1 Hero styling + V2 Cards -->
+  <section id="executive" class="bg-white pt-16 pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- V1: Hero with gradient and animation -->
+      <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+        <h1 class="text-4xl font-extrabold tracking-tight text-[#141413] sm:text-5xl md:text-6xl mb-6">
+          <span class="block">Operational Velocity</span>
+          <span class="block gradient-text">Decoupled from Headcount</span>
+        </h1>
+        <p class="text-lg text-[#b0aea5] leading-relaxed">
+          A strategic analysis of transitioning Devoli from manual lead bottlenecks to autonomous AI sales agents.
+          Unlocking capacity, reducing costs, and accelerating revenue.
+        </p>
+      </div>
+
+      <!-- V2: Key Metrics Cards with hover effects -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Metric 1: Speed to Lead -->
+        <div
+          class="bg-[#faf9f5] rounded-xl p-8 border border-[#e8e6dc] shadow-sm relative overflow-hidden group hover:shadow-md transition">
+          <div
+            class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition text-6xl font-black text-[#d97857]">
+            &#9889;
+          </div>
+          <p class="text-sm font-bold text-[#b0aea5] uppercase tracking-wider mb-1">Speed to Lead</p>
+          <div class="flex items-baseline">
+            <span class="text-4xl font-extrabold text-[#141413]">&lt; 1 Hour</span>
+            <span class="ml-2 text-sm font-medium text-red-500 line-through">3-6 Days</span>
+          </div>
+          <div class="mt-4 pt-4 border-t border-[#e8e6dc]">
+            <p class="text-sm text-[#b0aea5]">Drastic reduction in lead decay, capitalizing on the "Golden Window" of
+              interest.</p>
+          </div>
+          <div class="mt-3 inline-block px-2 py-1 bg-[#d97857]/10 text-[#d97857] text-xs font-bold rounded">
+            391% Potential Conv. Uplift
+          </div>
+        </div>
+
+        <!-- Metric 2: Cost Per Lead -->
+        <div
+          class="bg-[#faf9f5] rounded-xl p-8 border border-[#e8e6dc] shadow-sm relative overflow-hidden group hover:shadow-md transition">
+          <div
+            class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition text-6xl font-black text-[#788c5d]">
+            $
+          </div>
+          <p class="text-sm font-bold text-[#b0aea5] uppercase tracking-wider mb-1">Cost Per Lead</p>
+          <div class="flex items-baseline">
+            <span class="text-4xl font-extrabold text-[#788c5d]">$16.60</span>
+            <span class="ml-2 text-sm font-medium text-red-500 line-through">$155.00</span>
+          </div>
+          <div class="mt-4 pt-4 border-t border-[#e8e6dc]">
+            <p class="text-sm text-[#b0aea5]">89% reduction in operational processing costs per opportunity.</p>
+          </div>
+          <div class="mt-3 inline-block px-2 py-1 bg-[#788c5d]/10 text-[#788c5d] text-xs font-bold rounded">
+            Margin Expansion
+          </div>
+        </div>
+
+        <!-- Metric 3: Scalability -->
+        <div
+          class="bg-[#faf9f5] rounded-xl p-8 border border-[#e8e6dc] shadow-sm relative overflow-hidden group hover:shadow-md transition">
+          <div
+            class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition text-6xl font-black text-[#6a9bcc]">
+            &#128640;
+          </div>
+          <p class="text-sm font-bold text-[#b0aea5] uppercase tracking-wider mb-1">Monthly Capacity</p>
+          <div class="flex items-baseline">
+            <span class="text-4xl font-extrabold text-[#141413]">Uncapped</span>
+            <span class="ml-2 text-sm font-medium text-red-500">was 30/mo</span>
+          </div>
+          <div class="mt-4 pt-4 border-t border-[#e8e6dc]">
+            <p class="text-sm text-[#b0aea5]">Scale lead volume without hiring additional SDRs or Admin staff.</p>
+          </div>
+          <div class="mt-3 inline-block px-2 py-1 bg-[#d97857]/10 text-[#d97857] text-xs font-bold rounded">
+            Linear Scalability
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- V2: Process Anatomy (Current vs Future) -->
+  <section id="process" class="py-16 bg-white border-t border-[#e8e6dc]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-12">
+        <p class="text-sm text-[#d97857] font-bold tracking-wide uppercase">Process Analysis</p>
+        <h2 class="mt-2 text-3xl font-extrabold text-[#141413]">The High Cost of Friction</h2>
+        <p class="mt-4 text-[#b0aea5] max-w-2xl">
+          Devoli's current manual workflow relies on senior staff for basic qualification, creating a "leaky bucket"
+          where high-value leads decay over 3-6 days. The AI model compresses this timeline into minutes.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <!-- Manual Workflow -->
+        <div class="bg-[#faf9f5] rounded-2xl p-8 border border-[#e8e6dc]">
+          <div class="flex items-center justify-between mb-8 pb-4 border-b border-[#e8e6dc]">
+            <h3 class="text-lg font-bold text-[#141413]">&#128308; Current Manual Process</h3>
+            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">3-6 Business Days</span>
+          </div>
+
+          <div class="space-y-0 relative">
+            <!-- Step 1 -->
+            <div class="workflow-step relative pl-12 pb-8">
+              <div class="absolute left-3 top-1 w-6 h-6 bg-[#e8e6dc] rounded-full border-4 border-white shadow-sm z-10">
+              </div>
+              <h4 class="text-sm font-bold text-[#141413]">Lead Ingest</h4>
+              <p class="text-xs text-[#b0aea5] mt-1">Unstructured emails/forms arrive in inbox.</p>
+            </div>
+            <!-- Step 2 -->
+            <div class="workflow-step relative pl-12 pb-8">
+              <div class="absolute left-3 top-1 w-6 h-6 bg-red-500 rounded-full border-4 border-white shadow-sm z-10">
+              </div>
+              <h4 class="text-sm font-bold text-[#141413]">Manual Triage (Bottleneck)</h4>
+              <p class="text-xs text-[#b0aea5] mt-1">Senior staff review requirements. Often delayed by other
+                priorities.</p>
+              <div
+                class="mt-2 inline-block px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold border border-red-100 rounded">
+                DELAY: 2-3 Days</div>
+            </div>
+            <!-- Step 3 -->
+            <div class="workflow-step relative pl-12 pb-8">
+              <div class="absolute left-3 top-1 w-6 h-6 bg-[#e8e6dc] rounded-full border-4 border-white shadow-sm z-10">
+              </div>
+              <h4 class="text-sm font-bold text-[#141413]">Data Extraction</h4>
+              <p class="text-xs text-[#b0aea5] mt-1">Manual copy-paste into quoting tools.</p>
+            </div>
+            <!-- Step 4 -->
+            <div class="workflow-step relative pl-12">
+              <div class="absolute left-3 top-1 w-6 h-6 bg-[#e8e6dc] rounded-full border-4 border-white shadow-sm z-10">
+              </div>
+              <h4 class="text-sm font-bold text-[#141413]">Quote Generation</h4>
+              <p class="text-xs text-[#b0aea5] mt-1">PDF creation and manual email composition.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Workflow -->
+        <div class="bg-[#d97857]/10 rounded-2xl p-8 border border-[#d97857]/20">
+          <div class="flex items-center justify-between mb-8 pb-4 border-b border-[#d97857]/30">
+            <h3 class="text-lg font-bold text-[#141413]">&#128994; AI Agent Workflow</h3>
+            <span class="px-3 py-1 bg-[#788c5d]/20 text-[#788c5d] text-xs font-bold rounded-full">&lt; 1 Hour</span>
+          </div>
+
+          <div class="space-y-0 relative">
+            <!-- Step 1 -->
+            <div class="workflow-step workflow-step-ai relative pl-12 pb-8">
+              <div
+                class="absolute left-3 top-1 w-6 h-6 bg-[#d97857] rounded-full border-4 border-white shadow-sm z-10">
+              </div>
+              <h4 class="text-sm font-bold text-[#141413]">Instant Trigger</h4>
+              <p class="text-xs text-[#d97857] mt-1">API/Webhook instantly activates agent.</p>
+            </div>
+            <!-- Step 2 -->
+            <div class="workflow-step workflow-step-ai relative pl-12 pb-8">
+              <div
+                class="absolute left-3 top-1 w-6 h-6 bg-[#d97857] rounded-full border-4 border-white shadow-sm z-10">
+              </div>
+              <h4 class="text-sm font-bold text-[#141413]">AI Qualification & Enrichment</h4>
+              <p class="text-xs text-[#d97857] mt-1">Validates address, checks service availability, enriches data.</p>
+              <div
+                class="mt-2 inline-block px-2 py-1 bg-[#788c5d]/20 text-[#788c5d] text-[10px] font-bold border border-[#788c5d]/30 rounded">
+                TIME: ~2 Minutes</div>
+            </div>
+            <!-- Step 3 -->
+            <div class="workflow-step workflow-step-ai relative pl-12 pb-8">
+              <div
+                class="absolute left-3 top-1 w-6 h-6 bg-[#d97857] rounded-full border-4 border-white shadow-sm z-10">
+              </div>
+              <h4 class="text-sm font-bold text-[#141413]">Autonomous Negotiation</h4>
+              <p class="text-xs text-[#d97857] mt-1">Emails/Texts client for missing details automatically.</p>
+            </div>
+            <!-- Step 4 -->
+            <div class="workflow-step workflow-step-ai relative pl-12">
+              <div
+                class="absolute left-3 top-1 w-6 h-6 bg-[#d97857] rounded-full border-4 border-white shadow-sm z-10">
+              </div>
+              <h4 class="text-sm font-bold text-[#141413]">Quote Draft / Send</h4>
+              <p class="text-xs text-[#d97857] mt-1">Ready for approval or auto-sent based on confidence score.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- V2 Toggle Styling + V1 Assumptions Grid: Financial Impact -->
+  <section id="financials" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-12">
+        <h2 class="text-3xl font-extrabold text-[#141413]">Financial Impact Analysis</h2>
+        <p class="mt-2 text-lg text-[#b0aea5]">Quantifying the ROI of implementing the Rekurve AI Agent.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+        <!-- Cost Efficiency Chart -->
+        <div class="flex flex-col">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-[#141413]">Cost Efficiency Analysis</h3>
+            <!-- V2: Toggle Controls -->
+            <div class="flex bg-[#e8e6dc] p-1 rounded-lg">
+              <button id="btn-cost-monthly" class="px-3 py-1 text-xs font-semibold rounded-md transition tab-active"
+                onclick="updateCostChart('monthly')">Monthly Total</button>
+              <button id="btn-cost-unit" class="px-3 py-1 text-xs font-semibold rounded-md transition tab-inactive"
+                onclick="updateCostChart('unit')">Per Lead</button>
+            </div>
+          </div>
+          <p class="text-sm text-[#b0aea5] mb-4">Comparing the operational cost of processing 30 leads. The AI model
+            drastically reduces overhead.</p>
+          <div class="bg-white border border-[#e8e6dc] rounded-xl p-4 shadow-sm flex-grow">
+            <div class="chart-container">
+              <canvas id="costChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Scenarios Chart -->
+        <div class="flex flex-col">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-[#141413]">Projected Revenue Growth</h3>
+            <!-- V2: Toggle Controls -->
+            <div class="flex bg-[#e8e6dc] p-1 rounded-lg space-x-1">
+              <button id="btn-rev-con" class="px-2 py-1 text-xs font-semibold rounded-md transition tab-active"
+                onclick="updateRevenueChart('conservative')">Conservative</button>
+              <button id="btn-rev-mod" class="px-2 py-1 text-xs font-semibold rounded-md transition tab-inactive"
+                onclick="updateRevenueChart('moderate')">Moderate</button>
+              <button id="btn-rev-agg" class="px-2 py-1 text-xs font-semibold rounded-md transition tab-inactive"
+                onclick="updateRevenueChart('aggressive')">Aggressive</button>
+            </div>
+          </div>
+          <p class="text-sm text-[#b0aea5] mb-4">Cumulative revenue impact over 12 months based on lead volume scaling.
+          </p>
+          <div class="bg-white border border-[#e8e6dc] rounded-xl p-4 shadow-sm flex-grow">
+            <div class="chart-container">
+              <canvas id="revenueChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- V1: Assumptions Grid -->
+      <div class="mt-12 bg-[#faf9f5] rounded-xl p-6 border border-[#e8e6dc]">
+        <h4 class="text-xs font-bold text-[#b0aea5] uppercase tracking-widest mb-4">Financial Model Assumptions</h4>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div>
+            <p class="text-2xl font-bold text-[#141413]">$1,200</p>
+            <p class="text-xs text-[#b0aea5]">Avg Lead Value</p>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-[#141413]">35%</p>
+            <p class="text-xs text-[#b0aea5]">Base Conversion Rate</p>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-[#141413]">$4,500</p>
+            <p class="text-xs text-[#b0aea5]">One-time Setup</p>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-[#141413]">$1,500</p>
+            <p class="text-xs text-[#b0aea5]">Monthly AI Retainer</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- V2: Strategic Assessment Grid -->
+  <section class="py-16 bg-[#faf9f5] border-t border-[#e8e6dc]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-[#141413] mb-8">Strategic Implications</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Card 1 -->
+        <div class="bg-white p-6 rounded-lg border border-[#e8e6dc] shadow-sm">
+          <div class="text-[#d97857] font-bold mb-2">Scalability</div>
+          <h4 class="font-bold text-[#141413] mb-2">Linear Decoupling</h4>
+          <p class="text-sm text-[#b0aea5]">Revenue can now grow without a corresponding linear increase in headcount or
+            overhead costs.</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="bg-white p-6 rounded-lg border border-[#e8e6dc] shadow-sm">
+          <div class="text-[#d97857] font-bold mb-2">Consistency</div>
+          <h4 class="font-bold text-[#141413] mb-2">Zero Variance</h4>
+          <p class="text-sm text-[#b0aea5]">Every lead receives the exact same high-quality qualification process,
+            regardless of time or day.</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="bg-white p-6 rounded-lg border border-[#e8e6dc] shadow-sm">
+          <div class="text-[#d97857] font-bold mb-2">Data Integrity</div>
+          <h4 class="font-bold text-[#141413] mb-2">Structured Ingest</h4>
+          <p class="text-sm text-[#b0aea5]">AI enforces structured data entry, cleaning the CRM pipeline and enabling
+            better analytics.</p>
+        </div>
+        <!-- Card 4 -->
+        <div class="bg-white p-6 rounded-lg border border-[#e8e6dc] shadow-sm">
+          <div class="text-[#d97857] font-bold mb-2">Risk</div>
+          <h4 class="font-bold text-[#141413] mb-2">Implementation Friction</h4>
+          <p class="text-sm text-[#b0aea5]">Success requires rigorous initial setup to map existing "messy" processes to
+            AI logic.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Combined Simulator: V2 Background + 3 Inputs + Prioritized Outputs -->
+  <section id="simulator" class="py-20 bg-[#141413] text-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-extrabold tracking-tight">Project Your Impact</h2>
+        <p class="mt-4 text-[#b0aea5] max-w-2xl mx-auto">
+          Use the ROI Calculator to simulate the annual financial impact of switching to AI automation based on
+          Devoli's metrics.
+        </p>
+      </div>
+
+      <div
+        class="bg-[#1e1e1c] rounded-2xl shadow-2xl overflow-hidden border border-[#b0aea5]/30 grid grid-cols-1 lg:grid-cols-5">
+        <!-- Controls: 3 Inputs -->
+        <div class="lg:col-span-2 p-8 border-b lg:border-b-0 lg:border-r border-[#b0aea5]/30">
+          <h3 class="text-lg font-bold text-white mb-6">Simulation Inputs</h3>
+
+          <!-- Primary Input 1: Monthly Lead Volume -->
+          <div class="mb-6">
+            <label for="leadInput" class="flex justify-between text-sm font-medium text-[#e8e6dc] mb-2">
+              <span>Monthly Lead Volume</span>
+              <span class="text-[#d97857] font-bold" id="leadVal" aria-hidden="true">30</span>
+            </label>
+            <input type="range" min="10" max="200" value="30" step="5"
+              class="w-full h-2 bg-[#b0aea5]/50 rounded-lg appearance-none cursor-pointer accent-[#d97857]"
+              id="leadInput" aria-valuemin="10" aria-valuemax="200" aria-valuenow="30" aria-label="Monthly lead volume: 30">
+            <div class="flex justify-between text-xs text-[#b0aea5] mt-2">
+              <span>10</span>
+              <span>200</span>
+            </div>
+          </div>
+
+          <!-- Primary Input 2: Avg Lead Value -->
+          <div class="mb-6">
+            <label for="valInput" class="flex justify-between text-sm font-medium text-[#e8e6dc] mb-2">
+              <span>Avg. Deal Value</span>
+              <span class="text-[#d97857] font-bold" id="valVal" aria-hidden="true">$1,200</span>
+            </label>
+            <input type="range" min="500" max="5000" value="1200" step="100"
+              class="w-full h-2 bg-[#b0aea5]/50 rounded-lg appearance-none cursor-pointer accent-[#d97857]" id="valInput" aria-valuemin="500" aria-valuemax="5000" aria-valuenow="1200" aria-label="Average deal value: $1,200">
+            <div class="flex justify-between text-xs text-[#b0aea5] mt-2">
+              <span>$500</span>
+              <span>$5,000</span>
+            </div>
+          </div>
+
+          <!-- Secondary Input: Conversion Rate Improvement -->
+          <div class="mb-6 pt-4 border-t border-[#b0aea5]/30">
+            <label for="convInput" class="flex justify-between text-sm font-medium text-[#b0aea5] mb-2">
+              <span>Conversion Rate Uplift</span>
+              <span class="text-[#788c5d] font-bold" id="convVal" aria-hidden="true">+0%</span>
+            </label>
+            <input type="range" min="0" max="15" value="0" step="1"
+              class="w-full h-2 bg-[#b0aea5]/50 rounded-lg appearance-none cursor-pointer accent-[#788c5d]" id="convInput" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" aria-label="Conversion rate uplift: +0%">
+            <div class="flex justify-between text-xs text-[#b0aea5] mt-2">
+              <span>0%</span>
+              <span>+15%</span>
+            </div>
+            <p class="text-xs text-[#b0aea5] mt-2 italic">
+              Speed-to-lead can improve conversion by up to 391%. We model a conservative 0-15%.
+            </p>
+          </div>
+
+          <!-- Assumptions Box -->
+          <div class="p-4 bg-[#b0aea5]/20 rounded-lg border border-[#b0aea5]/30">
+            <p class="text-xs text-[#b0aea5] uppercase font-bold mb-1">Fixed Assumptions</p>
+            <ul class="text-xs text-[#e8e6dc] space-y-1">
+              <li>&#8226; Base Conversion: 35%</li>
+              <li>&#8226; AI Setup: $4,500 one-time</li>
+              <li>&#8226; AI Retainer: $1,500/mo</li>
+              <li>&#8226; Manual Cost: $155/lead</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Results: Prioritized Outputs -->
+        <div class="lg:col-span-3 p-8 flex flex-col justify-center bg-[#1e1e1c] relative">
+          <!-- Primary Output: Annual Profit -->
+          <div class="text-center mb-8">
+            <p class="text-xs font-bold text-[#b0aea5] uppercase tracking-widest mb-2">Projected Annual Net Profit</p>
+            <h2 class="text-5xl font-extrabold text-white tracking-tight mb-3" id="netProfit">$130,000</h2>
+            <div id="statusBadge"
+              class="inline-block px-3 py-1 bg-[#b0aea5]/30 text-[#e8e6dc] text-xs font-bold rounded-full border border-[#b0aea5]/30">
+              Base Scenario
+            </div>
+          </div>
+
+          <!-- Primary Metrics Row -->
+          <div class="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-[#b0aea5]/30">
+            <div class="text-center p-4 bg-[#b0aea5]/20 rounded-lg">
+              <p class="text-xs text-[#b0aea5] mb-1">Annual Savings vs Manual</p>
+              <p class="text-2xl font-bold text-[#788c5d]" id="opSavings">$33,300</p>
+            </div>
+            <div class="text-center p-4 bg-[#b0aea5]/20 rounded-lg">
+              <p class="text-xs text-[#b0aea5] mb-1">Break-even Point</p>
+              <p class="text-2xl font-bold text-[#d97857]" id="breakEven">~2 Months</p>
+            </div>
+          </div>
+
+          <!-- Secondary Metrics Row -->
+          <div class="grid grid-cols-3 gap-4">
+            <div class="text-center">
+              <p class="text-xs text-[#b0aea5] mb-1">Monthly Revenue</p>
+              <p class="text-lg font-bold text-[#e8e6dc]" id="monthlyRev">$12,600</p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-[#b0aea5] mb-1">Effective Conv. Rate</p>
+              <p class="text-lg font-bold text-[#e8e6dc]" id="effConv">35%</p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-[#b0aea5] mb-1">Annual AI Cost</p>
+              <p class="text-lg font-bold text-[#e8e6dc]" id="aiCost">$22,500</p>
+            </div>
+          </div>
+
+          <!-- Capacity Alert -->
+          <div id="capacityAlert"
+            class="hidden mt-6 p-3 bg-yellow-500/10 text-yellow-500 text-sm font-medium rounded-lg border border-yellow-500/20 text-center">
+            &#9888; Volume exceeds manual capacity (30/mo) - AI enables this growth
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <!-- V2: Footer -->
+  <footer class="bg-white border-t border-[#e8e6dc] py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="text-[#b0aea5] text-sm">
+        Analysis generated for Devoli. Based on "Strategic Analysis of AI-Driven Sales Automation".
+      </p>
+      <p class="text-[#b0aea5]/70 text-xs mt-2">
+        &copy; 2025 Rekurve AI.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // --- Constants ---
+    const CONSTANTS = {
+      manualCostPerLead: 155,
+      aiSetup: 4500,
+      aiMonthly: 1500,
+      baseConversion: 0.35,
+      manualCapacity: 30
+    };
+
+    let costChart;
+    let revenueChart;
+
+    // --- Initialize ---
+    document.addEventListener('DOMContentLoaded', () => {
+      initCostChart();
+      initRevenueChart();
+      initSimulator();
+      initMobileNav();
+    });
+
+    // --- Helper: Label Wrapping ---
+    function formatLabel(str, maxwidth) {
+      if (typeof str !== 'string') return str;
+      if (str.length <= maxwidth) return str;
+      const words = str.split(' ');
+      const lines = [];
+      let currentLine = words[0];
+      for (let i = 1; i < words.length; i++) {
+        if (currentLine.length + 1 + words[i].length <= maxwidth) {
+          currentLine += " " + words[i];
+        } else {
+          lines.push(currentLine);
+          currentLine = words[i];
+        }
+      }
+      lines.push(currentLine);
+      return lines;
+    }
+
+    const commonTooltip = {
+      callbacks: {
+        title: (tooltipItems) => {
+          const label = tooltipItems[0].chart.data.labels[tooltipItems[0].dataIndex];
+          return Array.isArray(label) ? label.join(' ') : label;
+        }
+      }
+    };
+
+    // --- Cost Chart ---
+    function initCostChart() {
+      const ctx = document.getElementById('costChart').getContext('2d');
+      costChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [formatLabel('Manual Process', 15), formatLabel('AI Agent', 15)],
+          datasets: [{
+            label: 'Monthly Cost (USD)',
+            data: [4650, 498],
+            backgroundColor: ['#b0aea5', '#788c5d'],
+            borderRadius: 6,
+            barThickness: 50
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              ...commonTooltip,
+              callbacks: {
+                label: (ctx) => '$' + ctx.raw.toLocaleString()
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#e8e6dc' },
+              title: { display: true, text: 'Monthly Cost (30 Leads)' }
+            },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function updateCostChart(mode) {
+      const btnMonthly = document.getElementById('btn-cost-monthly');
+      const btnUnit = document.getElementById('btn-cost-unit');
+
+      if (mode === 'monthly') {
+        btnMonthly.className = "px-3 py-1 text-xs font-semibold rounded-md transition tab-active";
+        btnUnit.className = "px-3 py-1 text-xs font-semibold rounded-md transition tab-inactive";
+        costChart.data.datasets[0].data = [4650, 498];
+        costChart.options.scales.y.title = { display: true, text: 'Monthly Cost (30 Leads)' };
+      } else {
+        btnUnit.className = "px-3 py-1 text-xs font-semibold rounded-md transition tab-active";
+        btnMonthly.className = "px-3 py-1 text-xs font-semibold rounded-md transition tab-inactive";
+        costChart.data.datasets[0].data = [155, 16.60];
+        costChart.options.scales.y.title = { display: true, text: 'Cost Per Lead' };
+      }
+      costChart.update();
+    }
+
+    // --- Revenue Chart ---
+    function initRevenueChart() {
+      const ctx = document.getElementById('revenueChart').getContext('2d');
+      const dataCon = calculateRevenueCurve(30);
+
+      revenueChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: Array.from({ length: 12 }, (_, i) => `Month ${i + 1}`),
+          datasets: [{
+            label: 'Cumulative Revenue',
+            data: dataCon,
+            borderColor: '#d97857',
+            backgroundColor: 'rgba(217, 120, 87, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#d97857',
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              ...commonTooltip,
+              callbacks: {
+                label: (ctx) => '$' + ctx.raw.toLocaleString()
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#e8e6dc' },
+              ticks: { callback: (val) => '$' + val / 1000 + 'k' }
+            },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function calculateRevenueCurve(monthlyLeads) {
+      let total = 0;
+      const monthlyRev = monthlyLeads * CONSTANTS.baseConversion * 1200;
+      return Array.from({ length: 12 }, () => {
+        total += monthlyRev;
+        return total;
+      });
+    }
+
+    function updateRevenueChart(scenario) {
+      ['con', 'mod', 'agg'].forEach(s => {
+        document.getElementById(`btn-rev-${s}`).className = `px-2 py-1 text-xs font-semibold rounded-md transition ${scenario === (s === 'con' ? 'conservative' : s === 'mod' ? 'moderate' : 'aggressive') ? 'tab-active' : 'tab-inactive'}`;
+      });
+
+      let leads = 30;
+      if (scenario === 'moderate') leads = 60;
+      if (scenario === 'aggressive') leads = 120;
+
+      revenueChart.data.datasets[0].data = calculateRevenueCurve(leads);
+      revenueChart.update();
+    }
+
+    // --- Combined Simulator ---
+    function initSimulator() {
+      const leadInput = document.getElementById('leadInput');
+      const valInput = document.getElementById('valInput');
+      const convInput = document.getElementById('convInput');
+
+      function update() {
+        const leads = parseInt(leadInput.value);
+        const dealValue = parseInt(valInput.value);
+        const addedConv = parseInt(convInput.value) / 100;
+
+        // Update display values
+        document.getElementById('leadVal').textContent = leads;
+        document.getElementById('valVal').textContent = '$' + dealValue.toLocaleString();
+        document.getElementById('convVal').textContent = '+' + parseInt(convInput.value) + '%';
+
+        // Update ARIA values
+        leadInput.setAttribute('aria-valuenow', leads);
+        leadInput.setAttribute('aria-label', `Monthly lead volume: ${leads}`);
+
+        valInput.setAttribute('aria-valuenow', dealValue);
+        valInput.setAttribute('aria-label', `Average deal value: $${dealValue.toLocaleString()}`);
+
+        convInput.setAttribute('aria-valuenow', parseInt(convInput.value));
+        convInput.setAttribute('aria-label', `Conversion rate uplift: +${parseInt(convInput.value)}%`);
+
+        // Calculate effective conversion rate
+        const effectiveConv = CONSTANTS.baseConversion + addedConv;
+
+        // Calculate revenue
+        const monthlyRev = leads * effectiveConv * dealValue;
+        const annualRev = monthlyRev * 12;
+
+        // Calculate costs
+        const annualAICost = CONSTANTS.aiSetup + (CONSTANTS.aiMonthly * 12);
+        const netProfit = annualRev - annualAICost;
+
+        // Savings vs manual
+        const manualAnnualCost = leads * CONSTANTS.manualCostPerLead * 12;
+        const savings = manualAnnualCost - annualAICost;
+
+        // Break-even calculation
+        const monthlyManualCost = leads * CONSTANTS.manualCostPerLead;
+        const monthlySavings = monthlyManualCost - CONSTANTS.aiMonthly;
+        let breakEvenMonths = monthlySavings > 0 ? CONSTANTS.aiSetup / monthlySavings : 999;
+
+        // Update primary outputs
+        document.getElementById('netProfit').textContent = '$' + Math.floor(netProfit).toLocaleString();
+        document.getElementById('opSavings').textContent = '$' + Math.floor(savings).toLocaleString();
+        document.getElementById('breakEven').textContent = breakEvenMonths < 1 ? '< 1 Month' : breakEvenMonths > 12 ? '12+ Months' : `~${Math.ceil(breakEvenMonths)} Months`;
+
+        // Update secondary outputs
+        document.getElementById('monthlyRev').textContent = '$' + Math.floor(monthlyRev).toLocaleString();
+        document.getElementById('effConv').textContent = Math.round(effectiveConv * 100) + '%';
+        document.getElementById('aiCost').textContent = '$' + annualAICost.toLocaleString();
+
+        // Status badge
+        const badge = document.getElementById('statusBadge');
+        if (leads > CONSTANTS.manualCapacity && addedConv > 0) {
+          badge.textContent = 'Growth + Conversion Optimized';
+          badge.className = 'inline-block px-3 py-1 bg-[#788c5d]/20 text-[#788c5d] text-xs font-bold rounded-full border border-[#788c5d]/30';
+        } else if (leads > CONSTANTS.manualCapacity) {
+          badge.textContent = 'Growth Unlocked';
+          badge.className = 'inline-block px-3 py-1 bg-[#d97857]/20 text-[#d97857] text-xs font-bold rounded-full border border-[#d97857]/30';
+        } else if (addedConv > 0) {
+          badge.textContent = 'Conversion Optimized';
+          badge.className = 'inline-block px-3 py-1 bg-[#788c5d]/20 text-[#788c5d] text-xs font-bold rounded-full border border-[#788c5d]/30';
+        } else {
+          badge.textContent = 'Base Scenario';
+          badge.className = 'inline-block px-3 py-1 bg-[#b0aea5]/30 text-[#e8e6dc] text-xs font-bold rounded-full border border-[#b0aea5]/30';
+        }
+
+        // Capacity alert
+        const alert = document.getElementById('capacityAlert');
+        if (leads > CONSTANTS.manualCapacity) {
+          alert.classList.remove('hidden');
+        } else {
+          alert.classList.add('hidden');
+        }
+      }
+
+      leadInput.addEventListener('input', update);
+      valInput.addEventListener('input', update);
+      convInput.addEventListener('input', update);
+      update();
+    }
+
+    // --- Mobile Navigation ---
+    function initMobileNav() {
+      const btn = document.getElementById('mobile-menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      const menuIcon = document.getElementById('menu-icon');
+      const closeIcon = document.getElementById('close-icon');
+      const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+      if (!btn || !menu) return;
+
+      function toggleMenu() {
+        const isOpen = !menu.classList.contains('hidden');
+
+        if (isOpen) {
+          // Close menu
+          menu.classList.add('hidden');
+          menuIcon.classList.remove('hidden');
+          closeIcon.classList.add('hidden');
+          btn.setAttribute('aria-expanded', 'false');
+        } else {
+          // Open menu
+          menu.classList.remove('hidden');
+          menuIcon.classList.add('hidden');
+          closeIcon.classList.remove('hidden');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      }
+
+      btn.addEventListener('click', toggleMenu);
+
+      // Close menu when nav link is clicked
+      mobileNavLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          menu.classList.add('hidden');
+          menuIcon.classList.remove('hidden');
+          closeIcon.classList.add('hidden');
+          btn.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      // Close menu on escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !menu.classList.contains('hidden')) {
+          toggleMenu();
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>

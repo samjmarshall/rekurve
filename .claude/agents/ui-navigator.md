@@ -1,7 +1,7 @@
 ---
 name: ui-navigator
 description: Use PROACTIVELY for all web UI navigation, interaction, and validation tasks. Delegates Playwright MCP operations to isolate verbose browser context from the main thread.
-tools: mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_screenshot, mcp__playwright__browser_click, mcp__playwright__browser_type, mcp__playwright__browser_select_option, mcp__playwright__browser_hover, mcp__playwright__browser_evaluate, mcp__playwright__browser_wait_for_selector, mcp__playwright__browser_resize, mcp__playwright__browser_close
+tools: mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_click, mcp__playwright__browser_type, mcp__playwright__browser_select_option, mcp__playwright__browser_hover, mcp__playwright__browser_evaluate, mcp__playwright__browser_wait_for, mcp__playwright__browser_resize, mcp__playwright__browser_close, mcp__playwright__browser_press_key
 color: green
 model: inherit
 ---

@@ -202,6 +202,33 @@ But still manually verify:
 - No regressions in related features
 - Code follows existing patterns
 
+### Browser Automation & Playwright
+
+**When to use**: Any task requiring browser interaction, navigation, clicking, form filling, or UI validation via Playwright MCP.
+
+**CRITICAL: Always delegate to @agent-ui-navigator**
+
+Do NOT use Playwright MCP tools directly (`mcp__playwright__*`). Instead, spawn the **@agent-ui-navigator** agent with a detailed prompt describing:
+1. The URL to navigate to
+2. The specific actions to perform (clicks, types, scrolls)
+3. What to observe and report back
+
+**Why**: The ui-navigator agent isolates verbose browser context from the main conversation thread, keeping the interaction clean and focused.
+
+**Example prompt for ui-navigator**:
+```
+Navigate to http://localhost:3000
+1. Take a snapshot of the page
+2. Find and click the "Book a call" button in the header
+3. Wait 2 seconds for any animations
+4. Report what happened after the click
+```
+
+**When NOT to skip ui-navigator**:
+- Even for "simple" navigation tasks, use the agent
+- Even for single click operations, use the agent
+- The overhead is minimal and consistency matters
+
 ---
 
 ## Questions? Start Here

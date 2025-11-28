@@ -10,6 +10,11 @@
 # testing
 /coverage
 /.playwright-mcp
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
 
 # database
 /prisma/db.sqlite

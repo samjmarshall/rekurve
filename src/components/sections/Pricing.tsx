@@ -203,6 +203,7 @@ export function Pricing() {
               <motion.div
                 key={tier.id}
                 variants={cardVariants}
+                data-testid={`pricing-tier-${tier.id}`}
                 className={`
                   group relative flex flex-col rounded-xl border-2 p-8 backdrop-blur-sm
                   transition-all duration-300
@@ -299,6 +300,7 @@ export function Pricing() {
                   href="#booking-form"
                   className='w-full'
                   onClick={() => analytics.cta.click(`pricing_${tier.id}` as 'pricing_foundation' | 'pricing_growth' | 'pricing_enterprise')}
+                  data-testid={`pricing-cta-${tier.id}`}
                 >
                   <Button
                     asChild

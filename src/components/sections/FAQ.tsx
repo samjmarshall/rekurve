@@ -171,6 +171,7 @@ export function FAQ() {
                   setSearchQuery(query)
                   trackSearch(query, filteredFAQs.length)
                 }}
+                data-testid="faq-search-input"
                 className="w-full rounded-lg border border-border py-4 pl-12 pr-4 font-mono text-sm transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/80"
               />
             </div>
@@ -227,13 +228,14 @@ export function FAQ() {
               ))}
             </Accordion>
           ) : (
-            <div className="rounded-lg bg-gray-50 dark:bg-neutral-900 p-12 text-center shadow-sm">
+            <div className="rounded-lg bg-gray-50 dark:bg-neutral-900 p-12 text-center shadow-sm" data-testid="faq-no-results">
               <p className="text-lg">
                 No questions found matching &ldquo;{searchQuery}&rdquo;
               </p>
               <button
                 onClick={() => setSearchQuery('')}
                 className="mt-4 font-mono text-sm text-primary hover:text-primary/70 transition-colors"
+                data-testid="faq-search-clear"
               >
                 Clear search
               </button>
@@ -250,6 +252,7 @@ export function FAQ() {
             <a
               href="#booking-form"
               onClick={() => analytics.cta.click('faq_bottom')}
+              data-testid="faq-cta-bottom"
               className="inline-flex items-center font-mono text-accent-blue hover:text-accent-blue/70 transition-colors underline underline-offset-4"
             >
               Book a free 30-minute call

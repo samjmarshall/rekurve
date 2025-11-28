@@ -17,6 +17,8 @@ export function Hero() {
   const parentRef = useRef<HTMLDivElement>(null);
   return (
     <section
+      id="hero"
+      data-testid="hero-section"
       ref={parentRef}
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 md:px-8 md:py-40 bg-background"
     >
@@ -70,12 +72,12 @@ export function Hero() {
         Customer Enquiry <span className="text-primary">&rarr;</span> Quote Generated <span className="text-primary">&rarr;</span> Job Booked.
       </p>
       <div className="mb-8 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-14">
-        <Link href="#how-it-works" className="w-full sm:w-40" onClick={() => analytics.cta.click('hero_secondary')}>
+        <Link href="#how-it-works" className="w-full sm:w-40" onClick={() => analytics.cta.click('hero_secondary')} data-testid="hero-cta-secondary">
           <Button asChild variant="secondary" className="w-full text-center">
             How it Works
           </Button>
         </Link>
-        <Link href="#booking-form" className="w-full sm:w-40" onClick={() => analytics.cta.click('hero_primary')}>
+        <Link href="#booking-form" className="w-full sm:w-40" onClick={() => analytics.cta.click('hero_primary')} data-testid="hero-cta-primary">
           <Button asChild variant="primary" className="w-full text-center">
             Book a call
           </Button>

@@ -77,14 +77,16 @@ www/                                    # Next.js 15 landing page application
 │   ├── case-studies/                   # Case study assets
 │   └── illustrations/                  # Marketing illustrations
 ├── docs/                               # Strategic documentation
-│   ├── ai-agency-roadmap.md            # 6-month implementation roadmap
-│   ├── ai_agent_positioning_guide.md   # Market positioning
-│   ├── pricing-ladder.md               # Three-tier pricing structure
-│   ├── value_based_pricing_proposals.md
-│   ├── technical_case_study_complete.md
-│   ├── high-converting_landing_pages_playbook.md
-│   ├── offer-analysis.md, grand_slam_offer_deck.md
-│   └── ai-agency-launch-blueprint.md
+│   ├── business/                       # Business strategy & validation
+│   │   ├── AI Sales Lead Automation Impact Analysis.md  # Devoli case study
+│   │   └── Rekurve MVP Business Case Validation.md      # GTM strategy
+│   ├── sales/                          # Sales assets & templates
+│   │   ├── grand-slam-offer-deck.md    # Pitch deck outline
+│   │   └── value-based-pricing-proposals.md  # Pricing templates
+│   ├── marketing/                      # Marketing & positioning
+│   │   ├── messaging-guide.md          # AI Agent positioning & language
+│   │   └── technical-case-study-guide.md     # Case study creation
+│   └── pr_template.md                  # PR description template
 ├── .claude/                            # Claude Code configuration
 │   ├── agents/                         # Custom agent definitions
 │   │   ├── design-reviewer.md          # UI/UX design review
@@ -150,20 +152,19 @@ Provides structured information for AI assistants (ChatGPT, Claude, Perplexity).
 
 ## Strategic Document Reference
 
-**Business Strategy**:
-- `docs/ai-agency-roadmap.md` - Complete 6-month launch plan (Pre-launch → $28K-38K monthly revenue)
-- `docs/ai-agency-launch-blueprint.md` - Comprehensive strategy and tactical execution
+**Business Strategy** (`docs/business/`):
+- `AI Sales Lead Automation Impact Analysis.md` - Core case study validating speed-to-lead economics, 12x capacity gain
+- `Rekurve MVP Business Case Validation.md` - GTM strategy, target personas, technical architecture recommendations
 
 **Market Positioning**:
-- `docs/ai_agent_positioning_guide.md` - Critical for messaging (why "AI Agent" wins, messaging by buyer type, objection handling)
+- `docs/marketing/messaging-guide.md` - AI Agent positioning, buyer-type messaging, objection handling, language guidelines
 
-**Pricing & Packaging**:
-- `docs/value_based_pricing_proposals.md` - How to price based on value, not hours
-- `docs/pricing-ladder.md` - Three-tier structure with clear differentiation
-- `docs/offer-analysis.md` - Grand Slam Offer framework applied
+**Sales Assets** (`docs/sales/`):
+- `value-based-pricing-proposals.md` - Value discovery framework, pricing models, proposal templates
+- `grand-slam-offer-deck.md` - 10-slide pitch deck outline
 
-**Technical Validation**:
-- `docs/technical_case_study_complete.md` - Real-world implementation examples
+**Marketing** (`docs/marketing/`):
+- `technical-case-study-guide.md` - How to create technical case studies showcasing founder expertise
 
 ---
 
@@ -287,7 +288,7 @@ Navigate to http://localhost:3000
 
 ## Questions? Start Here
 
-- **Business strategy**: `docs/ai-agency-roadmap.md`
-- **Market positioning**: `docs/ai_agent_positioning_guide.md`
-- **Landing page design**: `docs/landing_page_prompt.md`
-- **Pricing strategy**: `docs/value_based_pricing_proposals.md`
+- **Business strategy**: `docs/business/Rekurve MVP Business Case Validation.md`
+- **Market positioning & messaging**: `docs/marketing/messaging-guide.md`
+- **Pricing & proposals**: `docs/sales/value-based-pricing-proposals.md`
+- **Case study creation**: `docs/marketing/technical-case-study-guide.md`

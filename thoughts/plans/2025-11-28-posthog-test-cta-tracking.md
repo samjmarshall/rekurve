@@ -56,8 +56,8 @@ Human logs into PostHog dashboard and opens Live Events view.
 ### Success Criteria
 
 #### Manual Verification
-- [ ] PostHog dashboard logged in and Live Events visible
-- [ ] Development site loaded in Playwright browser
+- [x] PostHog dashboard logged in and Live Events visible
+- [x] Development site loaded in Playwright browser
 
 ---
 
@@ -187,18 +187,18 @@ Test all desktop-visible CTAs and verify events fire.
 ### Success Criteria
 
 #### Manual Verification (Check PostHog Live Events)
-- [ ] `cta_clicked` with `location: "header"` appears
-- [ ] `cta_clicked` with `location: "hero_primary"` appears
-- [ ] `cta_clicked` with `location: "hero_secondary"` appears
-- [ ] `cta_clicked` with `location: "pricing_foundation"` appears
-- [ ] `cta_clicked` with `location: "pricing_growth"` appears
-- [ ] `cta_clicked` with `location: "pricing_enterprise"` appears
-- [ ] `cta_clicked` with `location: "final_cta_primary"` appears
-- [ ] `cta_clicked` with `location: "final_cta_email"` appears
-- [ ] `email_link_clicked` event appears
-- [ ] `cta_clicked` with `location: "faq_bottom"` appears
-- [ ] All events have `cta_text` property populated
-- [ ] All events have `page_section` property populated
+- [x] `cta_clicked` with `location: "header"` appears
+- [x] `cta_clicked` with `location: "hero_primary"` appears
+- [x] `cta_clicked` with `location: "hero_secondary"` appears
+- [x] `cta_clicked` with `location: "pricing_foundation"` appears
+- [x] `cta_clicked` with `location: "pricing_growth"` appears
+- [x] `cta_clicked` with `location: "pricing_enterprise"` appears
+- [x] `cta_clicked` with `location: "final_cta_primary"` appears
+- [x] `cta_clicked` with `location: "final_cta_email"` appears
+- [x] `email_link_clicked` event appears
+- [x] `cta_clicked` with `location: "faq_bottom"` appears
+- [x] All events have `cta_text` property populated
+- [x] All events have `page_section` property populated
 
 ---
 
@@ -229,8 +229,8 @@ Test mobile-specific CTA (mobile nav).
 ### Success Criteria
 
 #### Manual Verification
-- [ ] `cta_clicked` with `location: "mobile_nav"` appears in PostHog
-- [ ] Mobile nav closes after clicking CTA
+- [x] `cta_clicked` with `location: "mobile_nav"` appears in PostHog
+- [x] Mobile nav closes after clicking CTA
 
 ---
 
@@ -267,9 +267,9 @@ Properties Verified:
 ### Success Criteria
 
 #### Manual Verification
-- [ ] All 10 CTAs fire correct events
-- [ ] All events have required properties
-- [ ] Test report generated
+- [x] All 10 CTAs fire correct events
+- [x] All events have required properties
+- [x] Test report generated
 
 ---
 

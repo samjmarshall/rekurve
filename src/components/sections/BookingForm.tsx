@@ -71,8 +71,7 @@ const steps = [
   { id: 1, title: 'Basic Info', icon: User },
   { id: 2, title: 'Company', icon: Building },
   { id: 3, title: 'Challenges', icon: Target },
-  { id: 4, title: 'Goals', icon: Target },
-  { id: 5, title: 'Reserve Your Spot', icon: Calendar },
+  { id: 4, title: 'Goals', icon: Calendar },
 ]
 
 const challengeOptions = [
@@ -135,13 +134,12 @@ export function BookingForm() {
   }, [formStarted])
 
   // Get step name for analytics
-  const getStepName = (step: number): 'basic_info' | 'company_details' | 'challenges' | 'goals' | 'booking_preference' => {
-    const names: Record<number, 'basic_info' | 'company_details' | 'challenges' | 'goals' | 'booking_preference'> = {
+  const getStepName = (step: number): 'basic_info' | 'company_details' | 'challenges' | 'goals' => {
+    const names: Record<number, 'basic_info' | 'company_details' | 'challenges' | 'goals'> = {
       1: 'basic_info',
       2: 'company_details',
       3: 'challenges',
       4: 'goals',
-      5: 'booking_preference',
     }
     return names[step] ?? 'basic_info'
   }
@@ -150,7 +148,7 @@ export function BookingForm() {
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (formStarted && !isSubmitted) {
-        analytics.form.abandoned(currentStep as 1 | 2 | 3 | 4 | 5, undefined, 'page_leave')
+        analytics.form.abandoned(currentStep as 1 | 2 | 3 | 4, undefined, 'page_leave')
       }
     }
 
@@ -193,11 +191,11 @@ export function BookingForm() {
     }
 
     const isValid = await trigger(fieldsToValidate)
-    if (isValid && currentStep < 5) {
+    if (isValid && currentStep < steps.length) {
       // Track step completion
       const timeSpentMs = Date.now() - stepStartTimeRef.current
       analytics.form.stepCompleted({
-        step: currentStep as 1 | 2 | 3 | 4 | 5,
+        step: currentStep as 1 | 2 | 3 | 4,
         step_name: getStepName(currentStep),
         fields_completed: fieldsToValidate,
         fields_with_errors: [],
@@ -227,7 +225,7 @@ export function BookingForm() {
         if (errorMessage) {
           analytics.form.fieldInteraction({
             field,
-            step: currentStep as 1 | 2 | 3 | 4 | 5,
+            step: currentStep as 1 | 2 | 3 | 4,
             action: 'error',
             has_error: true,
             error_message: errorMessage,
@@ -290,6 +288,7 @@ export function BookingForm() {
       >
         <div className="container relative mx-auto px-4">
           <motion.div
+            data-testid="booking-form-success"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -348,7 +347,7 @@ export function BookingForm() {
 
           {/* Progress Bar */}
           <div className="mb-8">
-            <div className="mb-4 grid grid-cols-5 items-center">
+            <div className="mb-4 grid grid-cols-4 items-center">
               {steps.map((step, index) => {
                 const Icon = step.icon
                 const isActive = currentStep === step.id
@@ -402,19 +401,20 @@ export function BookingForm() {
                 )
               })}
             </div>
-            <div className="text-center text-sm text-gray-600">
+            <div className="text-center text-sm text-gray-600" data-testid="booking-form-step-indicator">
               Step {currentStep} of {steps.length}
             </div>
           </div>
 
           {/* Form */}
           <Card className="p-8 backdrop-blur-sm">
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)} data-testid="booking-form-container">
               <AnimatePresence mode="wait">
                 {/* Step 1: Basic Info */}
                 {currentStep === 1 && (
                   <motion.div
                     key="step1"
+                    data-testid="booking-form-step-1"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
@@ -497,6 +497,7 @@ export function BookingForm() {
                 {currentStep === 2 && (
                   <motion.div
                     key="step2"
+                    data-testid="booking-form-step-2"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
@@ -538,7 +539,7 @@ export function BookingForm() {
                               value={field.value}
                               onValueChange={field.onChange}
                             >
-                              <SelectTrigger aria-invalid={fieldState.invalid}>
+                              <SelectTrigger aria-invalid={fieldState.invalid} data-testid="select-company-size">
                                 <SelectValue placeholder="Select company size" />
                               </SelectTrigger>
                               <SelectContent>
@@ -609,6 +610,7 @@ export function BookingForm() {
                 {currentStep === 3 && (
                   <motion.div
                     key="step3"
+                    data-testid="booking-form-step-3"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
@@ -626,7 +628,7 @@ export function BookingForm() {
                       name="challenges"
                       control={control}
                       render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
+                        <Field data-invalid={fieldState.invalid} data-testid="booking-form-challenges">
                           {challengeOptions.map((challenge, index) => {
                             const isSelected =
                               field.value?.includes(challenge) || false
@@ -677,6 +679,7 @@ export function BookingForm() {
                 {currentStep === 4 && (
                   <motion.div
                     key="step4"
+                    data-testid="booking-form-step-4"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
@@ -719,7 +722,7 @@ export function BookingForm() {
                               value={field.value}
                               onValueChange={field.onChange}
                             >
-                              <SelectTrigger aria-invalid={fieldState.invalid}>
+                              <SelectTrigger aria-invalid={fieldState.invalid} data-testid="select-timeline">
                                 <SelectValue placeholder="Select timeline" />
                               </SelectTrigger>
                               <SelectContent>
@@ -756,7 +759,7 @@ export function BookingForm() {
                               value={field.value ?? ''}
                               onValueChange={field.onChange}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger data-testid="select-current-mrr">
                                 <SelectValue placeholder="Prefer not to say" />
                               </SelectTrigger>
                               <SelectContent>
@@ -787,6 +790,7 @@ export function BookingForm() {
                   onClick={handlePrevStep}
                   disabled={currentStep === 1}
                   className="gap-2 group"
+                  data-testid="booking-form-back-btn"
                 >
                   <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-all duration-300" />
                   Back
@@ -797,6 +801,7 @@ export function BookingForm() {
                     type="submit"
                     variant="primary"
                     size="lg"
+                    data-testid="booking-form-submit-btn"
                   >
                     Submit
                   </Button>
@@ -807,6 +812,7 @@ export function BookingForm() {
                     size="lg"
                     onClick={handleNextStep}
                     className="gap-2 group"
+                    data-testid="booking-form-next-btn"
                   >
                     Next
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-all duration-300" />

@@ -229,7 +229,7 @@ Then I should receive a reset email within 2 minutes
 **Best practices**:
 - Leverage labels for categorization (bug, enhancement, documentation, etc.)
 - Pin important issues for visibility
-- Use Projects (beta) for kanban workflow
+- Use Projects for kanban workflow
 - Convert discussions to issues when actionable
 - Use milestones for version/sprint grouping
 
@@ -240,6 +240,38 @@ Then I should receive a reset email within 2 minutes
 - Collapsible sections: `<details><summary>...</summary></details>`
 - Tables for structured data
 - Mermaid diagrams for technical documentation
+
+#### GitHub Projects Integration
+
+When issues are added to a GitHub Project, set these fields:
+
+| Field | Description | Values |
+|-------|-------------|--------|
+| **Priority** | Urgency/importance | P0 (Critical), P1 (High), P2 (Medium), P3 (Low) |
+| **Estimate** | Days of effort | Number (e.g., 0.5, 1, 2, 3, 5) |
+| **Size** | T-shirt sizing | XS (<2hrs), S (half-day), M (1-2 days), L (3-5 days), XL (1+ week) |
+| **Iteration** | Sprint/cycle | Current iteration name or "Backlog" |
+| **Start date** | When work begins | YYYY-MM-DD format |
+| **End date** | Target completion | YYYY-MM-DD format |
+
+**Setting fields via CLI:**
+```bash
+# Add issue to project
+gh project item-add <PROJECT_NUMBER> --owner <OWNER> --url <ISSUE_URL>
+
+# Update project item fields (get item ID first)
+gh project item-list <PROJECT_NUMBER> --owner <OWNER> --format json
+
+# Use gh api for field updates
+gh api graphql -f query='mutation { updateProjectV2ItemFieldValue(...) }'
+```
+
+**Best practices for GitHub Projects:**
+- Set Priority and Size during ticket creation
+- Assign Iteration during sprint planning
+- Update Start date when work begins
+- Estimate in days, not hours (more realistic)
+- Size correlates with Estimate: XS=0.25, S=0.5, M=1-2, L=3-5, XL=5+
 
 #### Related Tickets
 

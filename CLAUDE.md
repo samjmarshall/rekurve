@@ -21,7 +21,9 @@ yarn check            # Lint + TypeCheck
 yarn build            # Production build
 ```
 
-**Status**: Landing page fully implemented with analytics tracking
+**Status**: Pre-PMF validation phase. Running free Release Pilot to validate use cases.
+
+**Project Tracking**: [GitHub Project](https://github.com/users/samjmarshall/projects/2) - all tasks, roadmap, and progress tracked via GitHub Issues.
 
 ---
 
@@ -144,17 +146,19 @@ Provides structured information for AI assistants (ChatGPT, Claude, Perplexity).
 
 **Business Strategy** (`docs/business/`):
 - `AI Sales Lead Automation Impact Analysis.md` - Core case study validating speed-to-lead economics, 12x capacity gain
-- `Rekurve MVP Business Case Validation.md` - GTM strategy, target personas, technical architecture recommendations
+- `Rekurve MVP Business Case Validation.md` - GTM strategy, target personas, technical architecture recommendations (treat as hypothesis until validated)
 
-**Market Positioning**:
-- `docs/marketing/messaging-guide.md` - AI Agent positioning, buyer-type messaging, objection handling, language guidelines
+**Sales - Active** (`docs/sales/`):
+- `pilot-program.md` - Release Pilot program overview, qualification criteria, expectations, agreement template
+- `discovery-conversation-guide.md` - Structured questions for validation conversations with prospects
 
-**Sales Assets** (`docs/sales/`):
-- `value-based-pricing-proposals.md` - Value discovery framework, pricing models, proposal templates
-- `grand-slam-offer-deck.md` - 10-slide pitch deck outline
+**Marketing - Active** (`docs/marketing/`):
+- `messaging-guide.md` - AI Agent positioning and language guidelines (simplified for pre-PMF stage)
 
-**Marketing** (`docs/marketing/`):
-- `technical-case-study-guide.md` - How to create technical case studies showcasing founder expertise
+**Archived** (`docs/sales/archive/`, `docs/marketing/archive/`):
+- `grand-slam-offer-deck.md` - Pitch deck (for post-PMF paid sales)
+- `value-based-pricing-proposals.md` - Pricing negotiation framework (for post-PMF)
+- `technical-case-study-guide.md` - Case study creation guide (for when we have completed pilots)
 
 ---
 
@@ -280,5 +284,5 @@ Navigate to http://localhost:3000
 
 - **Business strategy**: `docs/business/Rekurve MVP Business Case Validation.md`
 - **Market positioning & messaging**: `docs/marketing/messaging-guide.md`
-- **Pricing & proposals**: `docs/sales/value-based-pricing-proposals.md`
-- **Case study creation**: `docs/marketing/technical-case-study-guide.md`
+- **Pilot program details**: `docs/sales/pilot-program.md`
+- **Discovery conversations**: `docs/sales/discovery-conversation-guide.md`

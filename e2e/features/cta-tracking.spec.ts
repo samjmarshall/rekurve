@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/test';
+import { test } from '../fixtures/test';
 
 /**
  * CTA CLICK TRACKING TESTS - ALL ANALYTICS TESTS MARKED AS FIXME

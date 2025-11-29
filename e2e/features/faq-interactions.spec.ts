@@ -30,7 +30,7 @@ test.describe('FAQ Search', () => {
     const initialCount = await homePage.faq.getVisibleCount();
     expect(initialCount).toBeGreaterThan(0);
 
-    await homePage.faq.search('ROI');
+    await homePage.faq.search('CRM');
 
     // Wait for debounce and filtering
     await homePage.page.waitForTimeout(700);
@@ -59,7 +59,7 @@ test.describe('FAQ Search', () => {
 
     const initialCount = await homePage.faq.getVisibleCount();
 
-    await homePage.faq.search('ROI');
+    await homePage.faq.search('CRM');
     await homePage.page.waitForTimeout(700);
 
     const filteredCount = await homePage.faq.getVisibleCount();
@@ -75,7 +75,7 @@ test.describe('FAQ Search', () => {
    * ANALYTICS TEST - See booking-form.spec.ts for PostHog batching explanation
    */
   test.fixme('search tracks analytics event after debounce', async ({ homePage, analytics }) => {
-    await homePage.faq.search('pricing');
+    await homePage.faq.search('pilot');
     await homePage.page.waitForTimeout(1000);
 
     analytics.expectEvent('faq_searched').withPropertyPresent('query').toBeFired();
@@ -92,7 +92,7 @@ test.describe('FAQ Accordion', () => {
    * ANALYTICS TEST - See booking-form.spec.ts for PostHog batching explanation
    */
   test.fixme('expanding FAQ tracks analytics event', async ({ homePage, analytics }) => {
-    await homePage.faq.expandQuestion(/ROI/i);
+    await homePage.faq.expandQuestion(/integrate with our existing CRM/i);
     await homePage.page.waitForTimeout(500);
 
     analytics
@@ -124,7 +124,7 @@ test.describe('FAQ Accordion', () => {
     test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit accordion animation timing - see code comments');
 
     // Use partial question text to match
-    const questionText = /How quickly will I see ROI/i;
+    const questionText = /integrate with our existing CRM/i;
 
     await homePage.faq.expectQuestionCollapsed(questionText);
     await homePage.faq.expandQuestion(questionText);
@@ -138,10 +138,10 @@ test.describe('FAQ Accordion', () => {
     test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit accordion animation timing - see code comments');
 
     // Use partial question text to match
-    await homePage.faq.expandQuestion(/How quickly will I see ROI/i);
+    await homePage.faq.expandQuestion(/What is the Release Pilot program/i);
     await homePage.faq.expandQuestion(/integrate with our existing CRM/i);
 
-    await homePage.faq.expectQuestionExpanded(/How quickly will I see ROI/i);
+    await homePage.faq.expectQuestionExpanded(/What is the Release Pilot program/i);
     await homePage.faq.expectQuestionExpanded(/integrate with our existing CRM/i);
   });
 });

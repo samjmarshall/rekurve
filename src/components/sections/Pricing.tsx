@@ -77,7 +77,7 @@ const pricingTiers: PricingTier[] = [
       'White-glove support (phone + video)',
     ],
     cta: 'Contact Us',
-    badge: undefined,
+    badge: 'Custom Build',
   },
 ]
 
@@ -200,7 +200,7 @@ export function Pricing() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid gap-8 lg:grid-cols-3"
+          className="grid gap-8 pt-10 lg:grid-cols-3 lg:pt-0"
         >
           {pricingTiers.map((tier) => {
             const isCustomPricing = tier.setupFee === 0 && tier.monthlyFee === 0
@@ -256,7 +256,7 @@ export function Pricing() {
                 <div className="mb-8">
                   {tier.priceDisplay ? (
                     <div>
-                      <div className="mb-1 text-4xl font-bold">
+                      <div className="mb-1 text-4xl font-bold leading-tight">
                         {tier.priceDisplay}
                       </div>
                       {tier.priceSubtext && (

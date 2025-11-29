@@ -1,4 +1,4 @@
-import type { Page, Request } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 import pako from 'pako';
 
@@ -67,10 +67,10 @@ export class AnalyticsHelper {
 
       for (const event of eventList) {
         const e = event as Record<string, unknown>;
-        if (e && e.event) {
+        if (e?.event) {
           events.push({
             event: e.event as string,
-            properties: (e.properties as Record<string, unknown>) || {},
+            properties: (e.properties as Record<string, unknown>) ?? {},
             timestamp: Date.now(),
           });
         }

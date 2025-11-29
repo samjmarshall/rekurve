@@ -18,7 +18,7 @@ test.describe('Lead Conversion Journey', () => {
    * 2. Or mock PostHog capture calls
    * 3. Then remove the .fixme() marker
    */
-  test.fixme('complete journey from landing to form submission with analytics', async ({ homePage, analytics, page }) => {
+  test.fixme('complete journey from landing to form submission with analytics', async ({ homePage, analytics, page: _page }) => {
     const user = createTestUser();
 
     // 1. Land on homepage
@@ -75,7 +75,7 @@ test.describe('Lead Conversion Journey', () => {
     await homePage.hero.expectVisible();
   });
 
-  test('can navigate to booking form via hero CTA', async ({ homePage, page }) => {
+  test('can navigate to booking form via hero CTA', async ({ homePage, page: _page }) => {
     await homePage.goto();
     await homePage.hero.clickPrimaryCta();
 

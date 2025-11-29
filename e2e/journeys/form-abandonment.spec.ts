@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/test';
+import { test } from '../fixtures/test';
 import { createAbandonmentUser } from '../data/test-users';
 
 /**
@@ -9,7 +9,7 @@ import { createAbandonmentUser } from '../data/test-users';
  * for detailed explanation and solutions.
  */
 test.describe('Form Abandonment Tracking', () => {
-  test.fixme('abandonment tracked when leaving after step 1', async ({ homePage, analytics, page }) => {
+  test.fixme('abandonment tracked when leaving after step 1', async ({ homePage, analytics, page: _page }) => {
     const user = createAbandonmentUser();
 
     await homePage.goto();

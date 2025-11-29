@@ -10,5 +10,8 @@ start: install
 check:
 	yarn check
 
+test_e2e:
+	yarn test:e2e
+
 clean:
 	rm -rf .next node_modules .yarn/cache .yarn/install-state.gz next-env.d.ts

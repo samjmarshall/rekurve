@@ -16,8 +16,11 @@ const pricingTiers: PricingTier[] = [
     id: 'foundation',
     name: 'AI-Assisted Sales System',
     tagline: 'For small teams testing AI sales',
-    setupFee: 9500,
-    monthlyFee: 1500,
+    setupFee: 0, // Will be $9,500 once GA
+    monthlyFee: 0, // Will be $1,500 once GA
+    priceDisplay: 'Free - Release Pilot',
+    priceSubtext:
+      'Available to qualified applicants only. This will become a paid offering once Generally Available.',
     features: [
       'Single Channel Quote Generation (e.g. Email)',
       'CRM setup & integration',
@@ -28,15 +31,18 @@ const pricingTiers: PricingTier[] = [
       '30-day optimization support',
       'Email support',
     ],
-    cta: 'Get Started',
-    badge: undefined,
+    cta: 'Apply for Pilot',
+    badge: 'Now Open',
   },
   {
     id: 'growth',
     name: 'Intelligent Sales Agent',
     tagline: 'Autonomous agent for scaling outbound',
-    setupFee: 20000,
-    monthlyFee: 4500,
+    setupFee: 0, // Will be $20,000 once GA
+    monthlyFee: 0, // Will be $4,500 once GA
+    priceDisplay: 'Free - Beta',
+    priceSubtext:
+      'Restricted to qualified Release Pilot participants. You must first complete the Release Pilot to be considered.',
     features: [
       'Everything in Foundation',
       'Multi-channel integration (Email + Social Media + SMS)',
@@ -49,15 +55,17 @@ const pricingTiers: PricingTier[] = [
       'Priority email + Slack support',
     ],
     highlighted: true,
-    cta: 'Start Growing',
-    badge: 'Most Popular',
+    cta: 'Join Waitlist',
+    badge: 'Coming Soon',
   },
   {
     id: 'enterprise',
     name: 'Autonomous AI Sales Agent',
     tagline: 'Enterprise-grade autonomous sales system',
-    setupFee: 0, // Custom pricing
-    monthlyFee: 0, // Custom pricing
+    setupFee: 0,
+    monthlyFee: 0,
+    priceDisplay: 'Custom',
+    priceSubtext: 'Tailored to your needs',
     features: [
       'Everything in Growth',
       'Custom AI decision logic',
@@ -68,7 +76,7 @@ const pricingTiers: PricingTier[] = [
       '99.9% uptime SLA',
       'White-glove support (phone + video)',
     ],
-    cta: 'Contact Sales',
+    cta: 'Contact Us',
     badge: undefined,
   },
 ]
@@ -175,11 +183,14 @@ export function Pricing() {
           className="mb-16 text-center"
         >
           <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-            Simple, Transparent Pricing
+            {/* Go-live: "Simple, Transparent Pricing" */}
+            Early Access Programs
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-600">
-            All plans include our 5x ROI guarantee. If you don&apos;t see
-            results, you don&apos;t pay.
+            {/* Go-live: "All plans include our 5x ROI guarantee. If you don&apos;t see results, you don&apos;t pay."" */}
+            We&apos;re launching with a limited Release Pilot. Qualified
+            applicants get free access in exchange for feedback and case study
+            participation.
           </p>
         </motion.div>
 
@@ -238,12 +249,23 @@ export function Pricing() {
                   <h3 className="mb-2 text-2xl font-bold">
                     {tier.name}
                   </h3>
-                  <p className="text-sm text-gray-600"><span className="text-primary front-bold">{tier.id.charAt(0).toUpperCase() + tier.id.slice(1)}</span> - {tier.tagline}</p>
+                  <p className="text-sm text-gray-600"><span className="text-primary font-bold">{tier.id.charAt(0).toUpperCase() + tier.id.slice(1)}</span> - {tier.tagline}</p>
                 </div>
 
                 {/* Pricing */}
                 <div className="mb-8">
-                  {isCustomPricing ? (
+                  {tier.priceDisplay ? (
+                    <div>
+                      <div className="mb-1 text-4xl font-bold">
+                        {tier.priceDisplay}
+                      </div>
+                      {tier.priceSubtext && (
+                        <p className="text-sm text-gray-600">
+                          {tier.priceSubtext}
+                        </p>
+                      )}
+                    </div>
+                  ) : isCustomPricing ? (
                     <div>
                       <div className="mb-1 text-4xl font-bold">
                         Custom
@@ -316,7 +338,8 @@ export function Pricing() {
           })}
         </motion.div>
 
-        {/* Guarantee Notice */}
+        {/* Go-live: "Guarantee Notice" */}
+        {/* Pilot Notice */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -325,14 +348,18 @@ export function Pricing() {
           className="mt-16 text-center"
         >
           <p className="text-gray-600">
-            All plans backed by our{' '}
+            {/* Go-live: "All plans backed by our{' '}"" */}
+            Limited spots available.{' '}
             <a
-              href="#guarantee"
+              // href="#guarantee" Update link when go-live
+              href="#booking-form"
               className="font-semibold text-accent-coral underline decoration-accent-coral/30 transition-colors hover:text-accent-coral/90 hover:decoration-accent-coral"
             >
-              5x ROI Guarantee
-            </a>
-            . Questions?{' '}
+              {/* Go-live: "5x ROI Guarantee" */}
+              Apply now
+            </a>{' '}
+            {/* Go-live: ". Questions?{' '}" */}
+            to be considered for the Release Pilot. Questions?{' '}
             <a
               href="#faq"
               className="font-semibold underline decoration-stone-400/30 transition-colors hover:text-stone-300 hover:decoration-stone-400"

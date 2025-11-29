@@ -11,6 +11,10 @@ export interface PricingTier {
   tagline: string
   setupFee: number
   monthlyFee: number
+  /** Custom price display text (overrides setupFee/monthlyFee display) */
+  priceDisplay?: string
+  /** Subtext shown below the price */
+  priceSubtext?: string
   features: string[]
   highlighted?: boolean
   cta: string

@@ -3,7 +3,7 @@ import { BookingForm } from '~/components/sections/BookingForm'
 // import { CaseStudies } from '~/components/sections/CaseStudies'
 import { FAQ } from '~/components/sections/FAQ'
 import { FinalCTA } from '~/components/sections/FinalCTA'
-import { Guarantee } from '~/components/sections/Guarantee'
+// import { Guarantee } from '~/components/sections/Guarantee'
 import { Hero } from '~/components/sections/Hero'
 import { HowItWorks } from '~/components/sections/HowItWorks'
 import { Pricing } from '~/components/sections/Pricing'
@@ -23,7 +23,7 @@ export default function HomePage() {
         <HowItWorks />
         <AboutFounder />
         <Pricing />
-        <Guarantee />
+        {/* <Guarantee /> */}
         <BookingForm />
         <FAQ />
         <FinalCTA />

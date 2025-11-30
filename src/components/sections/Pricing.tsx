@@ -64,7 +64,7 @@ const pricingTiers: PricingTier[] = [
     tagline: 'Enterprise-grade autonomous sales system',
     setupFee: 0,
     monthlyFee: 0,
-    priceDisplay: 'Custom',
+    priceDisplay: 'Paid - Custom',
     priceSubtext: 'Tailored to your needs',
     features: [
       'Everything in Growth',

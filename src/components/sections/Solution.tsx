@@ -36,9 +36,10 @@ export default function Solution() {
 
 export function GlowingBento() {
   return (
-    <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-5 lg:gap-4 xl:grid-rows-3">
+    // <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-5 lg:gap-4 xl:grid-rows-3">
+    <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-5 lg:gap-4 xl:grid-rows-2">
       {/* Benefits */}
-      <GridItem
+      {/* <GridItem
         area="md:[grid-area:1/1/2/7] xl:[grid-area:1/1/1/5]"
         icon={<Clock className="h-4 w-4 text-primary" />}
         title="Recover 20+ Hours Weekly"
@@ -57,10 +58,11 @@ export function GlowingBento() {
         icon={<TrendingUp className="h-4 w-4 text-primary" />}
         title="Add $100K+ to Pipeline"
         description="Never miss a lead. Instant 24/7 response. Personalized multi-channel integration."
-      />
+      /> */}
 
       {/* Workflow */}
-      <GridItem area="md:[grid-area:1/7/2/13] xl:[grid-area:2/1/2/13]">
+      {/* <GridItem area="md:[grid-area:1/7/2/13] xl:[grid-area:2/1/2/13]"> */}
+      <GridItem area="md:[grid-area:1/1/2/7] xl:[grid-area:1/1/1/13]">
         {/* Enhanced workflow visualization */}
         <ScrollReveal delay={0.2} className="flex h-full w-full px-10 items-center justify-center">
           <div className="flex w-full items-center gap-3 text-sm font-mono">
@@ -127,21 +129,24 @@ export function GlowingBento() {
 
       {/* How it works */}
       <GridItem
-        area="md:[grid-area:1/1/2/7] xl:[grid-area:3/1/3/5]"
+        // area="md:[grid-area:1/1/2/7] xl:[grid-area:3/1/3/5]"
+        area="md:[grid-area:1/1/2/7] xl:[grid-area:2/1/2/5]"
         icon={<Search className="h-4 w-4 text-primary" />}
         title="Research"
         description="AI agents handle lead research. Analyzing prospects across multiple data sources. Enriching profiles with buying signals and data in real-time"
       />
 
       <GridItem
-        area="md:[grid-area:2/1/3/7] xl:[grid-area:3/5/3/9]"
+        // area="md:[grid-area:2/1/3/7] xl:[grid-area:3/5/3/9]"
+        area="md:[grid-area:2/1/3/7] xl:[grid-area:2/5/2/9]"
         icon={<Mail className="h-4 w-4 text-primary" />}
         title="Qualification"
         description="Coordinated engagement across Email, Social Media, and SMS with adaptive messaging that responds to prospect behavior with proven follow-up sequencing based on your unique sales process."
       />
 
       <GridItem
-        area="md:[grid-area:2/7/3/13] xl:[grid-area:3/9/3/13]"
+        // area="md:[grid-area:2/7/3/13] xl:[grid-area:3/9/3/13]"
+        area="md:[grid-area:2/7/3/13] xl:[grid-area:2/9/2/13]"
         icon={<MessageSquare className="h-4 w-4 text-primary" />}
         title="Book & Quote"
         description="Dynamic lead progression with meeting scheduling and quote generation based on your product and service offerings."

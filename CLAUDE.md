@@ -21,6 +21,7 @@ yarn check            # Lint + TypeCheck
 yarn build            # Production build
 yarn test:e2e         # Run E2E tests
 yarn check:e2e        # Run E2E tests (CI mode)
+yarn posthog:setup    # Create PostHog dashboards/cohorts (requires API key)
 ```
 
 **Status**: Pre-PMF validation phase. Running free Release Pilot to validate use cases.
@@ -113,6 +114,8 @@ www/                                    # Next.js 15 landing page application
 │   ├── utils/                          # Test utilities (analytics helper)
 │   ├── features/                       # Feature-specific tests
 │   └── journeys/                       # End-to-end journey tests
+├── scripts/                            # Utility scripts
+│   └── posthog-setup.ts                # PostHog dashboard/cohort automation
 ├── thoughts/                           # Implementation notes
 │   ├── plans/                          # Detailed implementation plans
 │   └── designs/                        # Design explorations

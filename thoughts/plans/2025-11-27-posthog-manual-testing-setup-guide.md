@@ -16,103 +16,53 @@ This guide covers the **manual tasks** required after the technical PostHog anal
 
 ---
 
-## Part 1: Manual Testing Checklist
+## Part 1: Manual Testing Checklist ✅ COMPLETED
 
-### Testing Approach: Playwright + PostHog Dashboard
+**Tested:** 2025-12-05
 
-**UI Behavior**: Covered by Playwright E2E tests (`yarn test:e2e`)
-- CTA clicks and navigation
-- Form step transitions and validation
-- FAQ expand/collapse and search
-- Responsive behavior
+### Results Summary
 
-**Analytics Verification**: Requires manual PostHog dashboard inspection
-- Playwright cannot verify PostHog events (they batch and send on page unload)
-- Human must check Live Events, Person Profiles, and Properties in PostHog
+| Event | Status | Notes |
+|-------|--------|-------|
+| `cta_clicked` | ✅ | All locations verified |
+| `email_link_clicked` | ✅ | Final CTA email link (different event name) |
+| `booking_form_started` | ✅ | Fires on form focus |
+| `form_step_completed` (1-3) | ✅ | Steps 1, 2, 3 verified |
+| `form_step_completed` (4) | ❌ | **Bug: #37** - Not firing |
+| `lead_identified` | ✅ | Fires after Step 1 |
+| `booking_form_submitted` | ❌ | **Bug: #38** - Not firing |
+| `faq_expanded` | ✅ | With question_id, question, category |
+| `faq_collapsed` | ❌ | **Post-PMF: #39** |
+| `faq_searched` | ✅ | With query, results_count |
+| `utm_captured` | ✅ | All UTM params captured |
+| `page_viewed` | ✅ | With device_type, viewport_width |
+| Anonymous browsing | ✅ | No person profile created |
+| Early identification | ✅ | Profile created after Step 1 |
+| `identity_reset` | ❌ | **Post-PMF: #40** |
 
-### 1.1 Pre-Testing Setup
+### Bugs to Fix Before Pilot Goes Live
 
-Before testing, ensure the environment is ready:
+| Issue | Priority | Description |
+|-------|----------|-------------|
+| [#38](https://github.com/samjmarshall/www/issues/38) | P1 | `booking_form_submitted` not firing |
+| [#37](https://github.com/samjmarshall/www/issues/37) | P2 | `form_step_completed` step 4 not firing |
 
-1. **Run Playwright E2E tests** to confirm UI behavior works:
-   ```bash
-   yarn test:e2e
-   ```
+### Deferred to Post-PMF
 
-2. **Open PostHog Live Events** for manual analytics verification:
-   - URL: `https://us.posthog.com/project/254485/events`
-   - Keep browser DevTools Console open to monitor for errors
+| Issue | Description |
+|-------|-------------|
+| [#39](https://github.com/samjmarshall/www/issues/39) | `faq_collapsed` not firing |
+| [#40](https://github.com/samjmarshall/www/issues/40) | `identity_reset` not firing |
+| [#41](https://github.com/samjmarshall/www/issues/41) | Remove `booking_form_abandoned` (unreliable) |
+| [#42](https://github.com/samjmarshall/www/issues/42) | Add `latest_utm_*` properties |
 
-3. **Open site** at `http://localhost:3000` (or production URL)
+### Design Decision: Form Abandonment
 
-### 1.2 CTA Click Tracking Verification
+**Removed:** `booking_form_abandoned` event tracking.
 
-**UI Behavior**: ✅ Covered by `e2e/features/cta-tracking.spec.ts`
-- Verifies CTAs navigate to booking form
-
-**Manual PostHog Verification Required:**
-1. Click each CTA in the browser
-2. Check PostHog Live Events for `cta_clicked` events
-3. Verify `location` property matches expected value:
-   - `header`, `mobile_nav`, `hero_primary`, `hero_secondary`
-   - `pricing_foundation`, `pricing_growth`, `pricing_enterprise`
-   - `final_cta_primary`, `final_cta_email`, `faq_bottom`
-
-### 1.3 Form Funnel Tracking Verification
-
-**UI Behavior**: ✅ Covered by `e2e/features/booking-form.spec.ts`
-- Step transitions work
-- Validation errors appear
-- Back/forward navigation works
-
-**Manual PostHog Verification Required:**
-1. Start form (focus first field) → verify `booking_form_started` event
-2. Complete Step 1 → verify `form_step_completed` with `step: 1`
-3. Verify `lead_identified` fires after Step 1
-4. Complete remaining steps → verify `form_step_completed` for each
-5. Submit form → verify `booking_form_submitted` with all `lead_*` properties
-6. Check Person Profile has correct properties
-
-### 1.4 FAQ Tracking Verification
-
-**UI Behavior**: ✅ Covered by `e2e/features/faq-interactions.spec.ts`
-- Accordion expand/collapse works
-- Search filtering works
-
-**Manual PostHog Verification Required:**
-1. Expand FAQ item → verify `faq_expanded` event with `question_id`, `question`, `category`
-2. Collapse FAQ → verify `faq_collapsed` event
-3. Search for "pricing" → verify `faq_searched` event with `query`, `results_count`
-
-### 1.5 UTM & Session Tracking Verification
-
-**UI Behavior**: ✅ Covered by `e2e/journeys/lead-conversion.spec.ts`
-- Page loads with UTM parameters in URL
-
-**Manual PostHog Verification Required:**
-1. Navigate with UTM params: `?utm_source=test&utm_medium=cpc&utm_campaign=launch`
-2. Verify `utm_captured` event with all parameters
-3. Verify `page_viewed` event with `device_type`, `viewport_width`
-4. Check Person Properties for first-touch attribution data
-
-### 1.6 Identity & Person Profile Verification
-
-**UI Behavior**: Form completion flows covered by existing tests
-
-**Manual PostHog Verification Required:**
-1. **Anonymous browsing**: Navigate site without form interaction → verify NO person profile created
-2. **Early identification**: Complete Step 1 with email → verify person profile created
-3. **Email change**: Change email mid-form → verify `identity_reset` event and second person created
-4. **Properties**: Verify `$set` vs `$set_once` properties on person profile
-
-### 1.7 Form Abandonment Verification
-
-**UI Behavior**: ✅ Covered by `e2e/journeys/form-abandonment.spec.ts`
-- Form navigation and partial completion works
-
-**Manual PostHog Verification Required:**
-1. Start form, complete Step 1, navigate away
-2. Verify `booking_form_abandoned` event with `last_step`, `reason`
+**Rationale:** Browser `beforeunload` and `visibilitychange` events are unreliable. Form abandonment is better derived from funnel analysis:
+- `booking_form_started` without `booking_form_submitted` = abandoned
+- `form_step_completed` with `step: N` but no higher steps = abandoned at step N
 
 ---
 
@@ -161,12 +111,6 @@ Before testing, ensure the environment is ready:
 - **Type:** Trend or Table
 - **Event:** `booking_form_submitted`
 - **Breakdown:** `utm_source`
-- **Date range:** Last 30 days
-
-#### Insight 6: Abandonment by Step (Bar Chart)
-- **Type:** Trend (Bar)
-- **Event:** `booking_form_abandoned`
-- **Breakdown:** `last_step`
 - **Date range:** Last 30 days
 
 ### 2.2 Create "CTA Performance" Dashboard
@@ -269,12 +213,6 @@ Before testing, ensure the environment is ready:
 - **Condition:** Conversion rate drops > 20% vs prior week
 - **Recipient:** `sales@rekurve.ai`
 - **Purpose:** Identify funnel issues
-
-### Alert 4: Abandonment Spike
-- **Create on:** "Abandonment by Step" trend
-- **Condition:** Increases > 50% vs prior week
-- **Recipient:** `sales@rekurve.ai`
-- **Purpose:** UX problem signal
 
 ---
 
@@ -413,52 +351,35 @@ The following code changes have been implemented:
 
 ## Summary: Post-Implementation Checklist
 
-### Automated Testing (Playwright E2E)
+### Part 1: Manual Testing ✅ COMPLETED
 
-Run Playwright to verify UI behavior works:
+Verified 2025-12-05. See Part 1 for detailed results.
 
-```bash
-yarn test:e2e
-```
+**Bugs to fix before pilot goes live:**
+- [ ] #38: `booking_form_submitted` not firing (P1)
+- [ ] #37: `form_step_completed` step 4 not firing (P2)
 
-This covers:
-- ✅ CTA clicks navigate correctly
-- ✅ Form step transitions and validation
-- ✅ FAQ accordion and search functionality
-- ✅ Lead conversion journey navigation
+### Part 6: Code Updates ✅ COMPLETED
 
-### Manual PostHog Dashboard Verification
-
-After running E2E tests, manually verify analytics in PostHog:
-- [ ] `cta_clicked` events fire with correct `location` properties
-- [ ] `booking_form_started` fires on form focus
-- [ ] `form_step_completed` fires for each step
-- [ ] `lead_identified` fires after Step 1
-- [ ] `booking_form_submitted` includes all `lead_*` properties
-- [ ] `faq_expanded`/`faq_searched` events fire correctly
-- [ ] `utm_captured` fires when URL has UTM params
-- [ ] Person profiles created with correct `$set`/`$set_once` properties
-- [ ] Session recordings triggered on form start
-
-### PostHog Configuration (Parts 2-7)
-- [ ] "Lead Generation Overview" dashboard created
-- [ ] "CTA Performance" dashboard created
-- [ ] "FAQ Engagement" dashboard created
-- [ ] 6 cohorts created
-- [ ] 4 threshold alerts configured
-- [ ] "New Lead Notification" workflow created and activated
-- [ ] Daily dashboard digest subscribed
-
-### Code Updates (Part 6) ✅
 - [x] `formTracking.submitted()` updated with full lead details
 - [x] `BookingForm.tsx` passes complete form data
 - [x] `person_profiles: 'identified_only'` configured for cost optimization
 - [x] `identifyLead()` and `resetIdentity()` functions added
 - [x] Early identification after Step 1 implemented
 - [x] `$set` vs `$set_once` property handling implemented
-- [ ] Workflow tested with real form submission
 
-### Session Recordings (Part 8)
+### Remaining Manual Tasks (Parts 2-5, 7-8)
+
+**PostHog Configuration:**
+- [ ] "Lead Generation Overview" dashboard created (Part 2.1)
+- [ ] "CTA Performance" dashboard created (Part 2.2)
+- [ ] "FAQ Engagement" dashboard created (Part 2.3)
+- [ ] 6 cohorts created (Part 3)
+- [ ] 3 threshold alerts configured (Part 4)
+- [ ] "New Lead Notification" workflow created and activated (Part 5)
+- [ ] Daily dashboard digest subscribed (Part 7)
+
+**Session Recordings (Part 8):**
 - [ ] Recording settings configured
 - [ ] High-intent trigger working
 - [ ] Test recording captured successfully

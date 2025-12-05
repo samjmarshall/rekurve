@@ -27,6 +27,8 @@ yarn check:e2e        # Run E2E tests (CI mode)
 
 **Project Tracking**: [GitHub Project](https://github.com/users/samjmarshall/projects/2) - all tasks, roadmap, and progress tracked via GitHub Issues.
 
+**GitHub Repository**: `samjmarshall/www` - use this repo for all issue creation and management.
+
 ---
 
 ## Repository Structure

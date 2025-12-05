@@ -66,129 +66,32 @@ This guide covers the **manual tasks** required after the technical PostHog anal
 
 ---
 
-## Part 2: PostHog Dashboard Configuration
+## Part 2: PostHog Dashboard Configuration ✅ COMPLETED
 
-### 2.1 Create "Lead Generation Overview" Dashboard
+**Completed:** 2025-12-05 via `yarn posthog:setup`
 
-**Location:** PostHog → Dashboards → New Dashboard
+**Dashboards Created:**
+- [Lead Generation Overview](https://us.posthog.com/project/254485/dashboard/818371) - 5 insights
+- [CTA Performance](https://us.posthog.com/project/254485/dashboard/818372) - 3 insights
+- [FAQ Engagement](https://us.posthog.com/project/254485/dashboard/818373) - 3 insights
 
-**Dashboard Name:** Lead Generation Overview
-
-**Add these insights:**
-
-#### Insight 1: Leads Today (Number)
-- **Type:** Trend
-- **Event:** `booking_form_submitted`
-- **Date range:** Today
-- **Display:** Number
-- **Compare:** Previous period
-
-#### Insight 2: Leads This Week (Trend)
-- **Type:** Trend
-- **Event:** `booking_form_submitted`
-- **Date range:** Last 7 days
-- **Display:** Line chart
-- **Breakdown:** By day
-
-#### Insight 3: Form Conversion Funnel
-- **Type:** Funnel
-- **Steps:**
-  1. `booking_form_started`
-  2. `form_step_completed` (filter: `step = 1`)
-  3. `form_step_completed` (filter: `step = 2`)
-  4. `form_step_completed` (filter: `step = 3`)
-  5. `form_step_completed` (filter: `step = 4`)
-  6. `booking_form_submitted`
-- **Date range:** Last 30 days
-
-#### Insight 4: Lead Quality (Average Lead Score)
-- **Type:** Trend
-- **Event:** `booking_form_submitted`
-- **Math:** Average of `lead_score` property
-- **Date range:** Last 30 days
-
-#### Insight 5: Traffic Sources Breakdown
-- **Type:** Trend or Table
-- **Event:** `booking_form_submitted`
-- **Breakdown:** `utm_source`
-- **Date range:** Last 30 days
-
-### 2.2 Create "CTA Performance" Dashboard
-
-**Dashboard Name:** CTA Performance
-
-**Add these insights:**
-
-#### Insight 1: CTA Clicks by Location
-- **Type:** Trend (Bar or Table)
-- **Event:** `cta_clicked`
-- **Breakdown:** `location`
-- **Date range:** Last 30 days
-
-#### Insight 2: CTA to Form Conversion
-- **Type:** Funnel
-- **Steps:**
-  1. `cta_clicked`
-  2. `booking_form_started`
-  3. `booking_form_submitted`
-- **Breakdown:** `location` (first step)
-
-#### Insight 3: Mobile vs Desktop CTAs
-- **Type:** Trend
-- **Event:** `cta_clicked`
-- **Breakdown:** `device_type` (from page_viewed or infer from location)
-
-### 2.3 Create "FAQ Engagement" Dashboard
-
-**Dashboard Name:** FAQ Engagement
-
-**Add these insights:**
-
-#### Insight 1: FAQ Expansions by Category
-- **Type:** Trend (Bar)
-- **Event:** `faq_expanded`
-- **Breakdown:** `category`
-
-#### Insight 2: FAQ Search Terms
-- **Type:** Table
-- **Event:** `faq_searched`
-- **Properties to show:** `query`, `results_count`
-
-#### Insight 3: Most Viewed Questions
-- **Type:** Table
-- **Event:** `faq_expanded`
-- **Breakdown:** `question`
-- **Sort:** Count descending
+To update dashboard configuration, modify `scripts/posthog-setup.ts` and re-run `yarn posthog:setup`.
 
 ---
 
-## Part 3: Create Cohorts
+## Part 3: Create Cohorts ✅ COMPLETED
 
-**Location:** PostHog → Cohorts → New Cohort
+**Completed:** 2025-12-05 via `yarn posthog:setup`
 
-### Cohort 1: Form Starters
-- **Name:** Form Starters
-- **Definition:** Persons where `form_started = true`
+**Cohorts Created:**
+- Form Starters (ID: 203552)
+- Form Completers (ID: 203553)
+- Form Abandoners (ID: 203554)
+- High-Intent Leads (ID: 203555)
+- Pricing Researchers (ID: 203556)
+- FAQ Researchers (ID: 203557)
 
-### Cohort 2: Form Completers
-- **Name:** Form Completers
-- **Definition:** Persons where `form_completed = true`
-
-### Cohort 3: Form Abandoners
-- **Name:** Form Abandoners
-- **Definition:** Persons where `form_started = true` AND `form_completed != true`
-
-### Cohort 4: High-Intent Leads
-- **Name:** High-Intent Leads
-- **Definition:** Persons where `lead_score >= 70`
-
-### Cohort 5: Pricing Researchers
-- **Name:** Pricing Researchers
-- **Definition:** Persons who performed `pricing_tier_viewed` event
-
-### Cohort 6: FAQ Researchers
-- **Name:** FAQ Researchers
-- **Definition:** Persons who performed `faq_expanded` event 3+ times
+To update cohort definitions, modify `scripts/posthog-setup.ts` and re-run `yarn posthog:setup`.
 
 ---
 
@@ -351,38 +254,27 @@ The following code changes have been implemented:
 
 ## Summary: Post-Implementation Checklist
 
-### Part 1: Manual Testing ✅ COMPLETED
+### Completed ✅
 
-Verified 2025-12-05. See Part 1 for detailed results.
+| Part | Description | Date |
+|------|-------------|------|
+| Part 1 | Manual Testing | 2025-12-05 |
+| Part 2 | Dashboards (3) | 2025-12-05 |
+| Part 3 | Cohorts (6) | 2025-12-05 |
+| Part 6 | Code Updates | 2025-12-05 |
 
 **Bugs to fix before pilot goes live:**
-- [ ] #38: `booking_form_submitted` not firing (P1)
-- [ ] #37: `form_step_completed` step 4 not firing (P2)
+- [ ] [#38](https://github.com/samjmarshall/www/issues/38): `booking_form_submitted` not firing (P1)
+- [ ] [#37](https://github.com/samjmarshall/www/issues/37): `form_step_completed` step 4 not firing (P2)
 
-### Part 6: Code Updates ✅ COMPLETED
+### Remaining Manual Configuration
 
-- [x] `formTracking.submitted()` updated with full lead details
-- [x] `BookingForm.tsx` passes complete form data
-- [x] `person_profiles: 'identified_only'` configured for cost optimization
-- [x] `identifyLead()` and `resetIdentity()` functions added
-- [x] Early identification after Step 1 implemented
-- [x] `$set` vs `$set_once` property handling implemented
-
-### Remaining Manual Tasks (Parts 2-5, 7-8)
-
-**PostHog Configuration:**
-- [ ] "Lead Generation Overview" dashboard created (Part 2.1)
-- [ ] "CTA Performance" dashboard created (Part 2.2)
-- [ ] "FAQ Engagement" dashboard created (Part 2.3)
-- [ ] 6 cohorts created (Part 3)
-- [ ] 3 threshold alerts configured (Part 4)
-- [ ] "New Lead Notification" workflow created and activated (Part 5)
-- [ ] Daily dashboard digest subscribed (Part 7)
-
-**Session Recordings (Part 8):**
-- [ ] Recording settings configured
-- [ ] High-intent trigger working
-- [ ] Test recording captured successfully
+| Part | Task | Location |
+|------|------|----------|
+| Part 4 | 3 threshold alerts | Insight → Alerts → New Alert |
+| Part 5 | Lead notification workflow | Data Pipeline → Destinations |
+| Part 7 | Daily dashboard digest | Dashboard → More → Subscribe |
+| Part 8 | Session recording settings | Session Recordings → Settings |
 
 ---
 
@@ -429,6 +321,12 @@ Verified 2025-12-05. See Part 1 for detailed results.
 - FAQ interactions: `e2e/features/faq-interactions.spec.ts`
 - Form abandonment: `e2e/journeys/form-abandonment.spec.ts`
 - Lead conversion: `e2e/journeys/lead-conversion.spec.ts`
+
+### Automation Scripts
+- PostHog setup script: `scripts/posthog-setup.ts`
+  - Creates 3 dashboards with 11 insights total
+  - Creates 6 cohorts
+  - Run with: `POSTHOG_PERSONAL_API_KEY=phx_xxx yarn posthog:setup`
 
 ### Source Code
 - PostHog initialization: `src/instrumentation-client.ts` (person_profiles config)

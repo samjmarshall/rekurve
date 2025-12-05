@@ -1,6 +1,6 @@
 'use client'
 
-import { Clock, Mail, MessageSquare, Search, Target, TrendingUp } from 'lucide-react'
+import { Mail, MessageSquare, Search } from 'lucide-react'
 
 import { GlowingEffect } from "~/components/ui/glowing-effect";
 import type React from 'react';

@@ -95,27 +95,78 @@ To update cohort definitions, modify `scripts/posthog-setup.ts` and re-run `yarn
 
 ---
 
-## Part 4: Configure Threshold Alerts
+## Part 4: Configure Threshold Alerts ⏳ MANUAL CONFIGURATION REQUIRED
 
-**Location:** On each Trend insight → Alerts → New Alert
+**Status:** Requires manual UI configuration (no API available)
 
-### Alert 1: Lead Volume Spike
-- **Create on:** "Leads Today" trend
-- **Condition:** Greater than 5 per day
-- **Recipient:** `sales@rekurve.ai`
-- **Purpose:** Know when to prioritize inbox
+**Why manual?** PostHog's alerts API is not publicly documented. Alerts must be created through the UI.
 
-### Alert 2: Lead Drought
-- **Create on:** "Leads Today" trend
-- **Condition:** Less than 1 for 48 hours
-- **Recipient:** `sales@rekurve.ai`
-- **Purpose:** Something may be broken
+### Step-by-Step Instructions
 
-### Alert 3: Conversion Drop
-- **Create on:** Form Conversion Funnel
-- **Condition:** Conversion rate drops > 20% vs prior week
-- **Recipient:** `sales@rekurve.ai`
-- **Purpose:** Identify funnel issues
+#### Alert 1: Lead Volume Spike
+
+1. Go to [Lead Generation Overview Dashboard](https://us.posthog.com/project/254485/dashboard/818371)
+2. Click on the "Leads Today" insight to open it
+3. Click the **Alerts** button (bell icon, top right of the insight)
+4. Click **New Alert**
+5. Configure:
+   - **Name:** `Lead Volume Spike`
+   - **Series:** Select the `booking_form_submitted` series
+   - **Threshold type:** Absolute
+   - **Condition:** Value is **greater than** `5`
+   - **Check frequency:** Daily
+   - **Notify via email:** `sales@rekurve.ai`
+6. Click **Save**
+
+**Purpose:** Know when to prioritize inbox - high lead volume day
+
+#### Alert 2: Lead Drought
+
+1. Go to [Lead Generation Overview Dashboard](https://us.posthog.com/project/254485/dashboard/818371)
+2. Click on the "Leads Today" insight to open it
+3. Click the **Alerts** button (bell icon, top right of the insight)
+4. Click **New Alert**
+5. Configure:
+   - **Name:** `Lead Drought`
+   - **Series:** Select the `booking_form_submitted` series
+   - **Threshold type:** Absolute
+   - **Condition:** Value is **less than** `1`
+   - **Check frequency:** Every 24 hours (or configure for 48-hour window if available)
+   - **Notify via email:** `sales@rekurve.ai`
+6. Click **Save**
+
+**Purpose:** Something may be broken if no leads for 48 hours
+
+#### Alert 3: Conversion Drop
+
+1. Go to [Lead Generation Overview Dashboard](https://us.posthog.com/project/254485/dashboard/818371)
+2. Click on the "Form Conversion Funnel" insight to open it
+3. Click the **Alerts** button (bell icon, top right of the insight)
+4. Click **New Alert**
+5. Configure:
+   - **Name:** `Conversion Drop`
+   - **Series:** Select the overall funnel conversion rate
+   - **Threshold type:** Relative (percentage change)
+   - **Condition:** **Decreases by** more than `20%`
+   - **Compare to:** Previous week
+   - **Check frequency:** Weekly
+   - **Notify via email:** `sales@rekurve.ai`
+6. Click **Save**
+
+**Purpose:** Identify funnel issues - significant drop in conversion
+
+### Verification Checklist
+
+After creating alerts, verify:
+- [ ] All 3 alerts appear in PostHog → Alerts section
+- [ ] Email recipient is correctly set to `sales@rekurve.ai`
+- [ ] Check frequencies are appropriate for each alert type
+
+### Notes
+
+- Alerts are supported on all trend insights
+- For relative alerts, PostHog compares percentage change to the threshold
+- Email notifications require the email channel to be configured in PostHog settings
 
 ---
 

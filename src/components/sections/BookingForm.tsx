@@ -6,7 +6,7 @@ import {
   ArrowRight,
   Building,
   CheckCircle,
-  ListChecks,
+  ListTodo,
   ShieldAlert,
   ShieldCheck,
   Target,
@@ -70,7 +70,7 @@ const steps = [
   { id: 2, title: 'Company', icon: Building },
   { id: 3, title: 'Challenges', icon: ShieldAlert },
   { id: 4, title: 'Goals', icon: Target },
-  { id: 5, title: 'Application Review', icon: ListChecks },
+  { id: 5, title: 'Application Review', icon: ListTodo },
 ]
 
 const challengeOptions = [
@@ -107,6 +107,9 @@ export function BookingForm() {
     resolver: zodResolver(formSchema),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
+    defaultValues: {
+      challenges: [],
+    },
   })
 
   // Watch all form values to re-validate fields with errors on change
@@ -310,7 +313,7 @@ return (
                               ? 'border-accent-green bg-accent-green'
                               : isActive
                                 ? 'border-accent-blue bg-accent-blue ring-2 ring-accent-blue/30 ring-offset-2 ring-offset-neutral-100 dark:ring-offset-neutral-900'
-                                : 'border-neutral-200 bg-neutral-100 dark:dark:border-neutral-700 dark:bg-neutral-800 text-gray-600'
+                                : 'border-neutral-200 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 text-gray-600'
                           }
                         `}
                         aria-current={isActive ? 'step' : undefined}
@@ -343,9 +346,9 @@ return (
             </div>
             <div className="text-center text-sm text-gray-600" data-testid="booking-form-step-indicator">
               {currentStep === 5 ? (
-                'Application Submitted'
+                'Pending Review'
               ) : (
-                <>Step {currentStep} of 4</>
+                <>Step {currentStep} of 5</>
               )}
             </div>
           </div>
@@ -747,7 +750,7 @@ return (
                       <h3 className="text-2xl font-bold">
                         Application Submitted
                       </h3>
-                      <p className="text-gray-600 max-w-md mx-auto">
+                      <p className="text-muted-foreground max-w-md mx-auto">
                         Your application has been submitted. Once we&apos;ve reviewed your
                         application, we&apos;ll reach out to book an initial discovery call
                         to confirm if we can actually help you.

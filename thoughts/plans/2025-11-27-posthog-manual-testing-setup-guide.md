@@ -2,43 +2,23 @@
 
 ## Overview
 
-This guide covers the **manual tasks** required after the technical PostHog analytics implementation to:
-1. Verify all tracking works correctly in the live environment
-2. Configure PostHog dashboards, funnels, and cohorts
-3. Set up email alerts and notifications
-4. Create the workflow for real-time lead notifications
+This guide covers the **remaining manual tasks** for PostHog setup. Most configuration has been automated via `yarn posthog:setup`.
 
-**Prerequisites:**
-- PostHog analytics library implemented (`src/lib/posthog.ts`)
-- All components integrated with analytics tracking
-- Development server running (`yarn dev`)
-- Access to PostHog dashboard (Project ID: 254485)
+**PostHog Project:** [254485](https://us.posthog.com/project/254485)
 
 ---
 
-## Part 1: Manual Testing Checklist ✅ COMPLETED
+## Completed ✅
 
-**Tested:** 2025-12-05
+| Part | Description | Date | Notes |
+|------|-------------|------|-------|
+| Part 1 | Manual Testing | 2025-12-05 | All events verified (2 bugs found) |
+| Part 2 | Dashboards (3) | 2025-12-05 | Via `yarn posthog:setup` |
+| Part 3 | Cohorts (6) | 2025-12-05 | Via `yarn posthog:setup` |
+| Part 4 | Threshold Alerts | 2025-12-08 | 2 of 3 (conversion drop deferred to paid plan) |
+| Part 6 | Code Updates | 2025-12-05 | Full lead details in events |
 
-### Results Summary
-
-| Event | Status | Notes |
-|-------|--------|-------|
-| `cta_clicked` | ✅ | All locations verified |
-| `email_link_clicked` | ✅ | Final CTA email link (different event name) |
-| `booking_form_started` | ✅ | Fires on form focus |
-| `form_step_completed` (1-3) | ✅ | Steps 1, 2, 3 verified |
-| `form_step_completed` (4) | ❌ | **Bug: #37** - Not firing |
-| `lead_identified` | ✅ | Fires after Step 1 |
-| `booking_form_submitted` | ❌ | **Bug: #38** - Not firing |
-| `faq_expanded` | ✅ | With question_id, question, category |
-| `faq_collapsed` | ❌ | **Post-PMF: #39** |
-| `faq_searched` | ✅ | With query, results_count |
-| `utm_captured` | ✅ | All UTM params captured |
-| `page_viewed` | ✅ | With device_type, viewport_width |
-| Anonymous browsing | ✅ | No person profile created |
-| Early identification | ✅ | Profile created after Step 1 |
-| `identity_reset` | ❌ | **Post-PMF: #40** |
+**To update dashboards/cohorts:** Modify `scripts/posthog-setup.ts` and run `yarn posthog:setup`.
 
 ### Bugs to Fix Before Pilot Goes Live
 
@@ -56,125 +36,13 @@ This guide covers the **manual tasks** required after the technical PostHog anal
 | [#41](https://github.com/samjmarshall/www/issues/41) | Remove `booking_form_abandoned` (unreliable) |
 | [#42](https://github.com/samjmarshall/www/issues/42) | Add `latest_utm_*` properties |
 
-### Design Decision: Form Abandonment
-
-**Removed:** `booking_form_abandoned` event tracking.
-
-**Rationale:** Browser `beforeunload` and `visibilitychange` events are unreliable. Form abandonment is better derived from funnel analysis:
-- `booking_form_started` without `booking_form_submitted` = abandoned
-- `form_step_completed` with `step: N` but no higher steps = abandoned at step N
-
 ---
 
-## Part 2: PostHog Dashboard Configuration ✅ COMPLETED
+## Remaining Manual Tasks
 
-**Completed:** 2025-12-05 via `yarn posthog:setup`
-
-**Dashboards Created:**
-- [Lead Generation Overview](https://us.posthog.com/project/254485/dashboard/818371) - 5 insights
-- [CTA Performance](https://us.posthog.com/project/254485/dashboard/818372) - 3 insights
-- [FAQ Engagement](https://us.posthog.com/project/254485/dashboard/818373) - 3 insights
-
-To update dashboard configuration, modify `scripts/posthog-setup.ts` and re-run `yarn posthog:setup`.
-
----
-
-## Part 3: Create Cohorts ✅ COMPLETED
-
-**Completed:** 2025-12-05 via `yarn posthog:setup`
-
-**Cohorts Created:**
-- Form Starters (ID: 203552)
-- Form Completers (ID: 203553)
-- Form Abandoners (ID: 203554)
-- High-Intent Leads (ID: 203555)
-- Pricing Researchers (ID: 203556)
-- FAQ Researchers (ID: 203557)
-
-To update cohort definitions, modify `scripts/posthog-setup.ts` and re-run `yarn posthog:setup`.
-
----
-
-## Part 4: Configure Threshold Alerts ⏳ MANUAL CONFIGURATION REQUIRED
-
-**Status:** Requires manual UI configuration (no API available)
-
-**Why manual?** PostHog's alerts API is not publicly documented. Alerts must be created through the UI.
-
-### Step-by-Step Instructions
-
-#### Alert 1: Lead Volume Spike
-
-1. Go to [Lead Generation Overview Dashboard](https://us.posthog.com/project/254485/dashboard/818371)
-2. Click on the "Leads Today" insight to open it
-3. Click the **Alerts** button (bell icon, top right of the insight)
-4. Click **New Alert**
-5. Configure:
-   - **Name:** `Lead Volume Spike`
-   - **Series:** Select the `booking_form_submitted` series
-   - **Threshold type:** Absolute
-   - **Condition:** Value is **greater than** `5`
-   - **Check frequency:** Daily
-   - **Notify via email:** `sales@rekurve.ai`
-6. Click **Save**
-
-**Purpose:** Know when to prioritize inbox - high lead volume day
-
-#### Alert 2: Lead Drought
-
-1. Go to [Lead Generation Overview Dashboard](https://us.posthog.com/project/254485/dashboard/818371)
-2. Click on the "Leads Today" insight to open it
-3. Click the **Alerts** button (bell icon, top right of the insight)
-4. Click **New Alert**
-5. Configure:
-   - **Name:** `Lead Drought`
-   - **Series:** Select the `booking_form_submitted` series
-   - **Threshold type:** Absolute
-   - **Condition:** Value is **less than** `1`
-   - **Check frequency:** Every 24 hours (or configure for 48-hour window if available)
-   - **Notify via email:** `sales@rekurve.ai`
-6. Click **Save**
-
-**Purpose:** Something may be broken if no leads for 48 hours
-
-#### Alert 3: Conversion Drop
-
-1. Go to [Lead Generation Overview Dashboard](https://us.posthog.com/project/254485/dashboard/818371)
-2. Click on the "Form Conversion Funnel" insight to open it
-3. Click the **Alerts** button (bell icon, top right of the insight)
-4. Click **New Alert**
-5. Configure:
-   - **Name:** `Conversion Drop`
-   - **Series:** Select the overall funnel conversion rate
-   - **Threshold type:** Relative (percentage change)
-   - **Condition:** **Decreases by** more than `20%`
-   - **Compare to:** Previous week
-   - **Check frequency:** Weekly
-   - **Notify via email:** `sales@rekurve.ai`
-6. Click **Save**
-
-**Purpose:** Identify funnel issues - significant drop in conversion
-
-### Verification Checklist
-
-After creating alerts, verify:
-- [ ] All 3 alerts appear in PostHog → Alerts section
-- [ ] Email recipient is correctly set to `sales@rekurve.ai`
-- [ ] Check frequencies are appropriate for each alert type
-
-### Notes
-
-- Alerts are supported on all trend insights
-- For relative alerts, PostHog compares percentage change to the threshold
-- Email notifications require the email channel to be configured in PostHog settings
-
----
-
-## Part 5: Create Lead Notification Workflow
+### Part 5: Create Lead Notification Workflow
 
 **Location:** PostHog → Workflows → New Workflow
-
-### Workflow: "New Lead Notification"
 
 #### Step 1: Configure Trigger
 - **Trigger type:** Event
@@ -188,8 +56,6 @@ After creating alerts, verify:
   ```
   New Lead: {{ trigger.properties.lead_name }} from {{ trigger.properties.lead_company }}
   ```
-
-**Note:** Before the workflow will work, the `formTracking.submitted()` function needs to be updated to include the full lead details. See "Part 6: Required Code Update" below.
 
 #### Step 3: Email Body Template
 
@@ -229,103 +95,36 @@ https://us.posthog.com/project/254485/person/{{ event.distinct_id }}
 - Toggle to "Active"
 - Test with a form submission
 
----
-
-## Part 6: Code Update Status ✅
-
-**Status:** COMPLETED
-
-The following code changes have been implemented:
-
-### Original Form Submission Implementation
-**File:** `src/lib/posthog.ts` (lines 436-526)
-- ✅ `formTracking.submitted()` expanded to accept full lead details
-- ✅ Event now includes all `lead_*` properties for workflow email templates
-- ✅ Lead score calculated and included in event properties
-
-**File:** `src/components/sections/BookingForm.tsx` (lines 220-236)
-- ✅ `onSubmit` handler passes all 13 form fields to analytics
-
-### User Identification Enhancement (NEW)
-**File:** `src/instrumentation-client.ts` (line 6)
-- ✅ Added `person_profiles: 'identified_only'` config for cost optimization
-- Anonymous visitors no longer create person profiles
-
-**File:** `src/lib/posthog.ts` (lines 354-407)
-- ✅ Added `identifyLead()` function for early identification after Step 1
-- ✅ Added `resetIdentity()` function to handle email changes
-- ✅ `posthog.identify()` now uses proper `$set` vs `$set_once` property handling
-- First-touch attribution data preserved in `$set_once` properties
-
-**File:** `src/components/sections/BookingForm.tsx` (lines 93, 164-174, 208-216)
-- ✅ Added `lastIdentifiedEmailRef` to track identified email
-- ✅ Calls `identifyLead()` after Step 1 completion
-- ✅ useEffect detects email changes and calls `resetIdentity()`
-
-**Implementation Plans:**
-- `thoughts/plans/2025-11-27-posthog-dashboards-funnels-alerts.md`
-- `thoughts/plans/2025-11-27-posthog-user-identification.md` (NEW)
-
----
-
-## Part 7: Subscribe to Dashboard Digests
+### Part 7: Subscribe to Dashboard Digests (Paid Plan)
 
 **Location:** Dashboard → More (⋯) → Subscribe
 
-### Daily Digest
+#### Daily Digest
 - **Dashboard:** Lead Generation Overview
 - **Recipients:** `sales@rekurve.ai`
 - **Frequency:** Daily at 8:00 AM
 
-### Weekly Summary (Optional)
+#### Weekly Summary (Optional)
 - **Dashboard:** Lead Generation Overview
 - **Recipients:** `sales@rekurve.ai`
 - **Frequency:** Weekly on Monday at 9:00 AM
 
----
-
-## Part 8: Session Recordings Configuration
+### Part 8: Session Recordings Configuration
 
 **Location:** PostHog → Session Recordings → Settings
 
-### Recommended Settings
+#### Recommended Settings
 - [ ] Enable session recording (should already be enabled)
 - [ ] Set minimum session duration: 10 seconds
 - [ ] Enable: "Start recording when high-intent event occurs"
 - [ ] High-intent events: `booking_form_started`
 
-### Verify Recording Works
+#### Verify Recording Works
 1. Start a form interaction
 2. Wait 30 seconds
 3. Go to PostHog → Session Recordings
 4. Find your session
 5. Verify the form interaction is captured
-
----
-
-## Summary: Post-Implementation Checklist
-
-### Completed ✅
-
-| Part | Description | Date |
-|------|-------------|------|
-| Part 1 | Manual Testing | 2025-12-05 |
-| Part 2 | Dashboards (3) | 2025-12-05 |
-| Part 3 | Cohorts (6) | 2025-12-05 |
-| Part 6 | Code Updates | 2025-12-05 |
-
-**Bugs to fix before pilot goes live:**
-- [ ] [#38](https://github.com/samjmarshall/www/issues/38): `booking_form_submitted` not firing (P1)
-- [ ] [#37](https://github.com/samjmarshall/www/issues/37): `form_step_completed` step 4 not firing (P2)
-
-### Remaining Manual Configuration
-
-| Part | Task | Location |
-|------|------|----------|
-| Part 4 | 3 threshold alerts | Insight → Alerts → New Alert |
-| Part 5 | Lead notification workflow | Data Pipeline → Destinations |
-| Part 7 | Daily dashboard digest | Dashboard → More → Subscribe |
-| Part 8 | Session recording settings | Session Recordings → Settings |
 
 ---
 

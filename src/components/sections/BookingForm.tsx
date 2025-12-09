@@ -5,8 +5,9 @@ import {
   ArrowLeft,
   ArrowRight,
   Building,
-  Calendar,
   CheckCircle,
+  ListChecks,
+  ShieldAlert,
   ShieldCheck,
   Target,
   User,
@@ -67,8 +68,9 @@ type FormData = z.infer<typeof formSchema>
 const steps = [
   { id: 1, title: 'Basic Info', icon: User },
   { id: 2, title: 'Company', icon: Building },
-  { id: 3, title: 'Challenges', icon: Target },
-  { id: 4, title: 'Goals', icon: Calendar },
+  { id: 3, title: 'Challenges', icon: ShieldAlert },
+  { id: 4, title: 'Goals', icon: Target },
+  { id: 5, title: 'Application Review', icon: ListChecks },
 ]
 
 const challengeOptions = [
@@ -83,7 +85,6 @@ const challengeOptions = [
 
 export function BookingForm() {
   const [currentStep, setCurrentStep] = useState(1)
-  const [isSubmitted, setIsSubmitted] = useState(false)
   const [formStarted, setFormStarted] = useState(false)
   const stepStartTimeRef = useRef<number>(Date.now())
   const lastIdentifiedEmailRef = useRef<string | null>(null)
@@ -144,7 +145,7 @@ export function BookingForm() {
   // Track form abandonment on page leave
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (formStarted && !isSubmitted) {
+      if (formStarted && currentStep !== 5) {
         analytics.form.abandoned(currentStep as 1 | 2 | 3 | 4, undefined, 'page_leave')
       }
     }
@@ -153,7 +154,7 @@ export function BookingForm() {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
-  }, [formStarted, isSubmitted, currentStep])
+  }, [formStarted, currentStep])
 
   // Handle email changes when user goes back to step 1
   useEffect(() => {
@@ -256,47 +257,10 @@ export function BookingForm() {
     })
 
     console.log('Form submitted:', data)
-    setIsSubmitted(true)
+    setCurrentStep(5)
   }
 
-  // Success state
-  if (isSubmitted) {
-    return (
-      <section
-        id="booking-form"
-        className="relative overflow-hidden bg-background py-24"
-      >
-        <div className="container relative mx-auto px-4">
-          <motion.div
-            data-testid="booking-form-success"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto max-w-2xl text-center"
-          >
-            <div className="mb-6 flex justify-center">
-              <div className="rounded-full bg-state-success/10 p-6">
-                <CheckCircle
-                  className="h-16 w-16 text-state-success"
-                  strokeWidth={1.5}
-                />
-              </div>
-            </div>
-            <h2 className="mb-4 text-3xl font-bold">
-              Application Submitted
-            </h2>
-            <p className="text-lg text-gray-600">
-              Your application has been submitted. Once we&apos;ve reviewed your
-              application, we&apos;ll reach out to book an initial discovery call
-              to confirm if we can actually help you.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-    )
-  }
-
-  return (
+return (
     <section
       id="booking-form"
       className="relative overflow-hidden bg-background py-24"
@@ -323,7 +287,7 @@ export function BookingForm() {
 
           {/* Progress Bar */}
           <div className="mb-8">
-            <div className="mb-4 grid grid-cols-4 items-center">
+            <div className="mb-4 grid grid-cols-5 items-center">
               {steps.map((step, index) => {
                 const Icon = step.icon
                 const isActive = currentStep === step.id
@@ -378,7 +342,11 @@ export function BookingForm() {
               })}
             </div>
             <div className="text-center text-sm text-gray-600" data-testid="booking-form-step-indicator">
-              Step {currentStep} of {steps.length}
+              {currentStep === 5 ? (
+                'Application Submitted'
+              ) : (
+                <>Step {currentStep} of 4</>
+              )}
             </div>
           </div>
 
@@ -755,46 +723,80 @@ export function BookingForm() {
                     </FieldGroup>
                   </motion.div>
                 )}
+
+                {/* Step 5: Application Review (Success) */}
+                {currentStep === 5 && (
+                  <motion.div
+                    key="step5"
+                    data-testid="booking-form-step-5"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6 text-center py-8"
+                  >
+                    <div className="flex justify-center">
+                      <div className="rounded-full bg-state-success/10 p-6">
+                        <CheckCircle
+                          className="h-16 w-16 text-state-success"
+                          strokeWidth={1.5}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-bold">
+                        Application Submitted
+                      </h3>
+                      <p className="text-gray-600 max-w-md mx-auto">
+                        Your application has been submitted. Once we&apos;ve reviewed your
+                        application, we&apos;ll reach out to book an initial discovery call
+                        to confirm if we can actually help you.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
               </AnimatePresence>
 
               {/* Navigation Buttons */}
-              <div className="mt-8 flex items-center justify-between gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  onClick={handlePrevStep}
-                  disabled={currentStep === 1}
-                  className="gap-2 group"
-                  data-testid="booking-form-back-btn"
-                >
-                  <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-all duration-300" />
-                  Back
-                </Button>
-
-                {currentStep === 4 ? (
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    size="lg"
-                    data-testid="booking-form-submit-btn"
-                  >
-                    Submit
-                  </Button>
-                ) : (
+              {currentStep !== 5 && (
+                <div className="mt-8 flex items-center justify-between gap-4">
                   <Button
                     type="button"
-                    variant="primary"
+                    variant="outline"
                     size="lg"
-                    onClick={handleNextStep}
+                    onClick={handlePrevStep}
+                    disabled={currentStep === 1}
                     className="gap-2 group"
-                    data-testid="booking-form-next-btn"
+                    data-testid="booking-form-back-btn"
                   >
-                    Next
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-all duration-300" />
+                    <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-all duration-300" />
+                    Back
                   </Button>
-                )}
-              </div>
+
+                  {currentStep === 4 ? (
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="lg"
+                      data-testid="booking-form-submit-btn"
+                    >
+                      Submit
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="lg"
+                      onClick={handleNextStep}
+                      className="gap-2 group"
+                      data-testid="booking-form-next-btn"
+                    >
+                      Next
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-all duration-300" />
+                    </Button>
+                  )}
+                </div>
+              )}
             </form>
           </Card>
 

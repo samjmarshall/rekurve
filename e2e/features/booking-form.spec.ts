@@ -273,4 +273,35 @@ test.describe('Booking Form Submission', () => {
       .withPropertyPresent('lead_company')
       .toBeFired();
   });
+
+  test('step 5 shows in progress bar with previous steps completed', async ({ homePage }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit step transition timing issues');
+
+    const user = createTestUser();
+
+    await homePage.goto();
+    await homePage.bookingForm.completeAllSteps(user);
+
+    // Verify we're on step 5
+    await homePage.bookingForm.expectStep(5);
+
+    // Verify step indicator shows "Application Submitted"
+    await expect(homePage.bookingForm.stepIndicator).toHaveText('Application Submitted');
+  });
+
+  test('step 5 hides navigation buttons', async ({ homePage }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit step transition timing issues');
+
+    const user = createTestUser();
+
+    await homePage.goto();
+    await homePage.bookingForm.completeAllSteps(user);
+
+    await homePage.bookingForm.expectSuccess();
+
+    // Verify navigation buttons are not visible
+    await expect(homePage.bookingForm.nextButton).not.toBeVisible();
+    await expect(homePage.bookingForm.prevButton).not.toBeVisible();
+    await expect(homePage.bookingForm.submitButton).not.toBeVisible();
+  });
 });

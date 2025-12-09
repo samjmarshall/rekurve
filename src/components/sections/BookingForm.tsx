@@ -59,10 +59,7 @@ const formSchema = z.object({
   // Step 4: Goals & Timeline
   goals: z.string().min(10, 'Please describe your goals (at least 10 characters)'),
   timeline: z.enum(['immediate', '1-3-months', '3-6-months', '6-12-months']),
-  currentMRR: z.enum(['0-50k', '50k-200k', '200k-500k', '500k+']).optional(),
-
-  // Step 5: Booking Preference
-  bookingMethod: z.enum(['calendly', 'hubspot']),
+  currentMRR: z.enum(['10k-50k', '50k-200k', '200k-500k', '500k+']).optional(),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -256,27 +253,10 @@ export function BookingForm() {
       goals: data.goals,
       timeline: data.timeline,
       current_mrr: data.currentMRR,
-      booking_method: data.bookingMethod,
     })
 
     console.log('Form submitted:', data)
     setIsSubmitted(true)
-
-    // In production, this would:
-    // 1. Send data to your backend
-    // 2. Redirect to Calendly or HubSpot booking page
-    // 3. Track conversion in analytics
-
-    // Simulated redirect based on booking method
-    setTimeout(() => {
-      if (data.bookingMethod === 'calendly') {
-        console.log('Redirect to Calendly: https://calendly.com/rekurve-ai')
-      } else {
-        console.log(
-          'Redirect to HubSpot: https://meetings.hubspot.com/rekurve-ai',
-        )
-      }
-    }, 2000)
   }
 
   // Success state
@@ -303,17 +283,13 @@ export function BookingForm() {
               </div>
             </div>
             <h2 className="mb-4 text-3xl font-bold">
-              Thank You! We&apos;ll Be In Touch Soon
+              Application Submitted
             </h2>
-            <p className="mb-8 text-lg text-gray-600">
-              Your information has been received. You&apos;ll be redirected to book a
-              time that works for you...
+            <p className="text-lg text-gray-600">
+              Your application has been submitted. Once we&apos;ve reviewed your
+              application, we&apos;ll reach out to book an initial discovery call
+              to confirm if we can actually help you.
             </p>
-            <div className="flex items-center justify-center gap-2">
-              <div className="h-2 w-2 animate-bounce rounded-full bg-primary [animation-delay:-0.3s]" />
-              <div className="h-2 w-2 animate-bounce rounded-full bg-primary [animation-delay:-0.15s]" />
-              <div className="h-2 w-2 animate-bounce rounded-full bg-primary" />
-            </div>
           </motion.div>
         </div>
       </section>
@@ -763,7 +739,7 @@ export function BookingForm() {
                                 <SelectValue placeholder="Prefer not to say" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="0-50k">$0 - $50K</SelectItem>
+                                <SelectItem value="10k-50k">$10K - $50K</SelectItem>
                                 <SelectItem value="50k-200k">
                                   $50K - $200K
                                 </SelectItem>
@@ -830,7 +806,8 @@ export function BookingForm() {
             transition={{ delay: 0.5, duration: 0.6 }}
             className="mt-8 flex items-center justify-center gap-1 text-center text-sm text-gray-600"
           >
-            <ShieldCheck className="w-4 h-4 text-accent-coral" /> Your information is secure and will never be shared. Average response time: 2 hours
+            <ShieldCheck className="w-4 h-4 text-accent-coral" />
+            Your information is secure and will never be shared.
           </motion.div>
         </motion.div>
       </div>

@@ -149,7 +149,11 @@ export class BookingFormSection {
 
   async clickSubmit(): Promise<void> {
     await this.submitButton.waitFor({ state: 'visible' });
+    await this.submitButton.scrollIntoViewIfNeeded();
+    await this.page.waitForTimeout(100);
     await this.submitButton.click();
+    // Wait for form submission and state transition
+    await this.page.waitForTimeout(500);
   }
 
   /** Complete all steps and submit */
@@ -196,5 +200,10 @@ export class BookingFormSection {
 
   async expectSuccess(): Promise<void> {
     await expect(this.successState).toBeVisible({ timeout: 10000 });
+  }
+
+  async expectSuccessContent(heading: string | RegExp): Promise<void> {
+    await expect(this.successState).toBeVisible({ timeout: 10000 });
+    await expect(this.successState.getByRole('heading', { level: 2 })).toHaveText(heading);
   }
 }

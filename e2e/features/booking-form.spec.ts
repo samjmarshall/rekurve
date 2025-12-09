@@ -222,23 +222,42 @@ test.describe('Booking Form Analytics', () => {
 });
 
 test.describe('Booking Form Submission', () => {
-  /**
-   * SKIPPED - Backend not available
-   *
-   * This test requires the form submission backend endpoint to be running.
-   * The backend handles lead storage and may trigger external integrations.
-   *
-   * To Enable:
-   * - Implement a mock API endpoint in the test server
-   * - Or use Playwright's route() to intercept and mock the submission
-   */
-  test.skip('successful submission shows success state', async ({ homePage }) => {
+  test('successful submission shows success state', async ({ homePage }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit step transition timing issues');
+
+    const user = createTestUser();
+
+    await homePage.goto();
+    await homePage.bookingForm.completeAllSteps(user);
+
+    await homePage.bookingForm.expectSuccessContent('Application Submitted');
+  });
+
+  test('success message describes application review process', async ({ homePage }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit step transition timing issues');
+
     const user = createTestUser();
 
     await homePage.goto();
     await homePage.bookingForm.completeAllSteps(user);
 
     await homePage.bookingForm.expectSuccess();
+    // Verify the message mentions the review process
+    await expect(homePage.bookingForm.successState).toContainText('reviewed your application');
+    await expect(homePage.bookingForm.successState).toContainText('discovery call');
+  });
+
+  test('success state does not show loading indicator', async ({ homePage }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit step transition timing issues');
+
+    const user = createTestUser();
+
+    await homePage.goto();
+    await homePage.bookingForm.completeAllSteps(user);
+
+    await homePage.bookingForm.expectSuccess();
+    // Verify no bouncing dots (which would indicate redirect pending)
+    await expect(homePage.bookingForm.successState.locator('.animate-bounce')).toHaveCount(0);
   });
 
   test.fixme('successful submission fires form_submitted event', async ({ homePage, analytics }) => {

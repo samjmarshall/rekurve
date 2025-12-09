@@ -38,7 +38,7 @@ export class BookingFormSection {
     this.nextButton = page.locator('[data-testid="booking-form-next-btn"]');
     this.prevButton = page.locator('[data-testid="booking-form-back-btn"]');
     this.submitButton = page.locator('[data-testid="booking-form-submit-btn"]');
-    this.successState = page.locator('[data-testid="booking-form-success"]');
+    this.successState = page.locator('[data-testid="booking-form-step-5"]');
 
     // Step 1
     this.emailInput = page.locator('#email');
@@ -185,11 +185,17 @@ export class BookingFormSection {
   }
 
   async expectStep(stepNumber: number): Promise<void> {
-    // Wait for step indicator to update
-    await expect(this.stepIndicator).toContainText(`${stepNumber}`, {
-      ignoreCase: true,
-      timeout: 10000
-    });
+    if (stepNumber === 5) {
+      // Step 5 shows "Application Submitted" instead of "Step 5"
+      await expect(this.stepIndicator).toContainText('Application Submitted', {
+        timeout: 10000
+      });
+    } else {
+      await expect(this.stepIndicator).toContainText(`Step ${stepNumber}`, {
+        ignoreCase: true,
+        timeout: 10000
+      });
+    }
   }
 
   async expectValidationError(message: string | RegExp): Promise<void> {
@@ -204,6 +210,6 @@ export class BookingFormSection {
 
   async expectSuccessContent(heading: string | RegExp): Promise<void> {
     await expect(this.successState).toBeVisible({ timeout: 10000 });
-    await expect(this.successState.getByRole('heading', { level: 2 })).toHaveText(heading);
+    await expect(this.successState.getByRole('heading', { level: 3 })).toHaveText(heading);
   }
 }

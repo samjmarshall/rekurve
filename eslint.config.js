@@ -7,7 +7,7 @@ const compat = new FlatCompat({
 
 export default tseslint.config(
   {
-    ignores: ['.next', '.yarn', 'next-env.d.ts'],
+    ignores: ['.next', '.yarn', 'next-env.d.ts', 'playwright-report'],
   },
   ...compat.extends("next/core-web-vitals"),
   {

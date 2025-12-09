@@ -186,8 +186,8 @@ export class BookingFormSection {
 
   async expectStep(stepNumber: number): Promise<void> {
     if (stepNumber === 5) {
-      // Step 5 shows "Application Submitted" instead of "Step 5"
-      await expect(this.stepIndicator).toContainText('Application Submitted', {
+      // Step 5 shows "Pending Review" instead of "Step 5"
+      await expect(this.stepIndicator).toContainText('Pending Review', {
         timeout: 10000
       });
     } else {

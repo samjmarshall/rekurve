@@ -1,4 +1,5 @@
-import { test, expect } from '../fixtures/test';
+import { expect, test } from '../fixtures/test';
+
 import { createTestUser } from '../data/test-users';
 
 test.describe('Booking Form Navigation', () => {
@@ -285,8 +286,8 @@ test.describe('Booking Form Submission', () => {
     // Verify we're on step 5
     await homePage.bookingForm.expectStep(5);
 
-    // Verify step indicator shows "Application Submitted"
-    await expect(homePage.bookingForm.stepIndicator).toHaveText('Application Submitted');
+    // Verify step indicator shows "Pending Review"
+    await expect(homePage.bookingForm.stepIndicator).toHaveText('Pending Review');
   });
 
   test('step 5 hides navigation buttons', async ({ homePage }, testInfo) => {

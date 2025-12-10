@@ -173,8 +173,8 @@ List issues remaining active with:
 
 ### Step 5: Confirm and Document
 
-After user approves each section, write complete design to:
-`thoughts/designs/YYYY-MM-DD-roadmap-prioritization.md`
+After user approves each section, write complete roadmap prioritization to:
+`thoughts/roadmap/YYYY-MM-DD-roadmap-prioritization.md`
 
 Include:
 - Context and constraints discovered

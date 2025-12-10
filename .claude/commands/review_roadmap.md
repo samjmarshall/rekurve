@@ -44,7 +44,7 @@ Then categorize issues and propose specific changes.
 
 ## Output
 
-Write the final approved design to:
-`thoughts/designs/YYYY-MM-DD-roadmap-prioritization.md`
+Write the final approved roadmap prioritization to:
+`thoughts/roadmap/YYYY-MM-DD-roadmap-prioritization.md`
 
 STOP after writing - do not implement changes automatically.

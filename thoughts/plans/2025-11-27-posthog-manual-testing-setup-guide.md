@@ -16,6 +16,7 @@ This guide covers the **remaining manual tasks** for PostHog setup. Most configu
 | Part 2 | Dashboards (3) | 2025-12-05 | Via `yarn posthog:setup` |
 | Part 3 | Cohorts (6) | 2025-12-05 | Via `yarn posthog:setup` |
 | Part 4 | Threshold Alerts | 2025-12-08 | 2 of 3 (conversion drop deferred to paid plan) |
+| Part 5 | Lead Notification Workflow | 2025-12-09 | Uses `{{ event.properties.* }}` not `trigger` |
 | Part 6 | Code Updates | 2025-12-05 | Full lead details in events |
 
 **To update dashboards/cohorts:** Modify `scripts/posthog-setup.ts` and run `yarn posthog:setup`.
@@ -24,7 +25,6 @@ This guide covers the **remaining manual tasks** for PostHog setup. Most configu
 
 | Issue | Priority | Description |
 |-------|----------|-------------|
-| [#38](https://github.com/samjmarshall/www/issues/38) | P1 | `booking_form_submitted` not firing |
 | [#37](https://github.com/samjmarshall/www/issues/37) | P2 | `form_step_completed` step 4 not firing |
 
 ### Deferred to Post-PMF
@@ -38,93 +38,24 @@ This guide covers the **remaining manual tasks** for PostHog setup. Most configu
 
 ---
 
-## Remaining Manual Tasks
+## Remaining Manual Tasks (Paid Plan Required)
 
-### Part 5: Create Lead Notification Workflow
-
-**Location:** PostHog → Workflows → New Workflow
-
-#### Step 1: Configure Trigger
-- **Trigger type:** Event
-- **Event name:** `booking_form_submitted`
-- **Frequency:** Every time (not one-time per person)
-
-#### Step 2: Add Email Action
-- **Action type:** Send email
-- **To:** `sales@rekurve.ai`
-- **Subject:**
-  ```
-  New Lead: {{ trigger.properties.lead_name }} from {{ trigger.properties.lead_company }}
-  ```
-
-#### Step 3: Email Body Template
-
-```liquid
-New Lead Submission
-
-Contact
-━━━━━━━━━━━━━━━━━━━━━━━━
-Name: {{ trigger.properties.lead_name }}
-Email: {{ trigger.properties.lead_email }}
-Phone: {{ trigger.properties.lead_phone | default: "Not provided" }}
-
-Company
-━━━━━━━━━━━━━━━━━━━━━━━━
-Company: {{ trigger.properties.lead_company }}
-Size: {{ trigger.properties.lead_company_size }} employees
-Industry: {{ trigger.properties.lead_industry }}
-Location: {{ trigger.properties.lead_location }}
-
-Qualification
-━━━━━━━━━━━━━━━━━━━━━━━━
-Timeline: {{ trigger.properties.lead_timeline }}
-MRR: {{ trigger.properties.lead_mrr | default: "Not disclosed" }}
-Lead Score: {{ trigger.properties.lead_score }}/100
-
-Challenges: {{ trigger.properties.lead_challenges }}
-
-Goals: {{ trigger.properties.lead_goals }}
-
-━━━━━━━━━━━━━━━━━━━━━━━━
-View full activity & session recordings:
-https://us.posthog.com/project/254485/person/{{ event.distinct_id }}
-```
-
-#### Step 4: Save and Activate
-- Save the workflow
-- Toggle to "Active"
-- Test with a form submission
-
-### Part 7: Subscribe to Dashboard Digests (Paid Plan)
+### Part 7: Subscribe to Dashboard Digests → [#45](https://github.com/samjmarshall/www/issues/45)
 
 **Location:** Dashboard → More (⋯) → Subscribe
 
-#### Daily Digest
 - **Dashboard:** Lead Generation Overview
 - **Recipients:** `sales@rekurve.ai`
-- **Frequency:** Daily at 8:00 AM
+- **Daily:** 8:00 AM
+- **Weekly (Optional):** Monday at 9:00 AM
 
-#### Weekly Summary (Optional)
-- **Dashboard:** Lead Generation Overview
-- **Recipients:** `sales@rekurve.ai`
-- **Frequency:** Weekly on Monday at 9:00 AM
-
-### Part 8: Session Recordings Configuration
+### Part 8: Session Recordings Configuration → [#46](https://github.com/samjmarshall/www/issues/46) (partial)
 
 **Location:** PostHog → Session Recordings → Settings
 
-#### Recommended Settings
-- [ ] Enable session recording (should already be enabled)
-- [ ] Set minimum session duration: 10 seconds
-- [ ] Enable: "Start recording when high-intent event occurs"
-- [ ] High-intent events: `booking_form_started`
-
-#### Verify Recording Works
-1. Start a form interaction
-2. Wait 30 seconds
-3. Go to PostHog → Session Recordings
-4. Find your session
-5. Verify the form interaction is captured
+- [x] Enable session recording
+- [x] Set minimum session duration: 10 seconds
+- [ ] Enable "Start recording when high-intent event occurs" with `booking_form_started` → Deferred to post-PMF (#46)
 
 ---
 

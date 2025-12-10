@@ -753,7 +753,7 @@ return (
                       <p className="text-muted-foreground max-w-md mx-auto">
                         Your application has been submitted. Once we&apos;ve reviewed your
                         application, we&apos;ll reach out to book an initial discovery call
-                        to confirm if we can actually help you.
+                        to confirm if you qualify for the release pilot.
                       </p>
                     </div>
                   </motion.div>

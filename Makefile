@@ -18,4 +18,6 @@ audit:
 	yarn npm audit --environment production
 
 clean:
-	rm -rf .next node_modules .yarn/cache .yarn/install-state.gz next-env.d.ts
+	rm -rf .next next-env.d.ts tsconfig.tsbuildinfo \
+		node_modules .yarn/cache .yarn/install-state.gz \
+		test-results playwright-report .playwright-mcp

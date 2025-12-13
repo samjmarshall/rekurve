@@ -1,0 +1,169 @@
+name: Quality Control
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  check:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Yarn cache
+        uses: actions/cache@v4
+        with:
+          path: .yarn/cache
+          key: yarn-${{ hashFiles('yarn.lock') }}
+
+      - run: make install
+
+      - name: Lint & Type Check
+        run: make check
+
+  audit:
+    name: NPM Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Yarn cache
+        uses: actions/cache@v4
+        with:
+          path: .yarn/cache
+          key: yarn-${{ hashFiles('yarn.lock') }}
+
+      - run: make install
+
+      - name: Audit
+        run: make audit
+
+      # TODO: Path to Production - Sign up for PaderDuty. Create API integration key to allow medium urgency (P2) alerts on `main` NPM Audit Critical/High CVEs
+      # - name: Send PagerDuty alert on failure
+      #   if: failure() && github.ref_name == 'main'
+      #   uses: Entle/action-pagerduty-alert@1.0.5
+      #   with:
+      #     pagerduty-integration-key: ${{ secrets.PAGERDUTY_INTEGRATION_KEY }}
+      #     pagerduty-dedup-key: npm_audit
+      #     runbook-url: https://github.com/samjmarshall/www/docs/run-books/...
+      #
+      # - name: Resolve PagerDuty alert on success
+      #   if: ${{ !failure() && !cancelled() }}
+      #   uses: Entle/action-pagerduty-alert@1.0.5
+      #   with:
+      #     pagerduty-integration-key: '${{ secrets.PAGERDUTY_INTEGRATION_KEY }}'
+      #     pagerduty-dedup-key: npm_audit
+      #     resolve: true
+
+  # test:
+  #   name: Next.js Unit Tests
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   permissions:
+  #     contents: read
+  #     pull-requests: write
+  #   steps:
+  #     - uses: actions/checkout@v5
+
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version-file: .nvmrc
+
+  #     - name: Yarn cache
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: .yarn/cache
+  #         key: yarn-${{ hashFiles('yarn.lock') }}
+
+  #     - run: make install
+
+  #     - name: Unit Tests
+  #       run: make test-coverage
+
+  #     - name: Unit Test Coverage PR Comment
+  #       if: ${{ github.event_name == 'pull_request' }}
+  #       uses: MishaKav/jest-coverage-comment@main
+  #       with:
+  #         title: Next.js Unit Test Coverage
+  #         coverage-path: ./coverage.txt
+  #         junitxml-path: ./coverage/junit.xml
+
+  # checkov:
+  #   name: Checkov
+  #   permissions:
+  #     contents: read # for actions/checkout to fetch code
+  #     security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+  #     actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v5
+
+  #     - name: Checkov
+  #       uses: bridgecrewio/checkov-action@v12
+  #       with:
+  #         config_file: infrastructure/checkov-config.yml
+  #         directory: infrastructure/
+  #         output_format: cli,sarif
+  #         output_file_path: console,results.sarif
+
+  #     # TODO: Path to Production - Enable GitHub repository Code Security
+  #     # Code Security must be enabled for this repository to use code scanning
+  #     # - name: Upload SARIF file
+  #     #   uses: github/codeql-action/upload-sarif@v3
+  #     #   if: success() || failure()
+  #     #   with:
+  #     #     sarif_file: results.sarif
+  #     #     category: security
+
+  # terraform-validate:
+  #   name: Terraform Validate
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+  #     TF_VAR_github_ref: main
+  #     TF_VAR_github_sha: ${{ github.sha }}
+  #   permissions:
+  #     contents: read
+  #     id-token: write
+  #   steps:
+  #     - uses: actions/checkout@v5
+
+  #     - uses: hashicorp/setup-terraform@v3
+
+  #     - uses: aws-actions/configure-aws-credentials@v5
+  #       with:
+  #         role-to-assume: ${{ secrets.DEPLOYER_ROLE_ARN }}
+  #         aws-region: ${{ vars.AWS_REGION }}
+
+  #     - name: Terraform Cache
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           infrastructure/.terraform/modules
+  #           infrastructure/.terraform/providers
+  #         key: terraform-${{ hashFiles('infrastructure/.terraform.lock.hcl') }}
+
+  #     - name: Terraform Validate
+  #       run: make validate
+
+  # terraform-fmt:
+  #   name: Terraform Format
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v5
+
+  #     - uses: hashicorp/setup-terraform@v3
+
+  #     - name: Terraform Format
+  #       run: make fmt-check

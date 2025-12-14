@@ -7,11 +7,6 @@ import { env } from "~/env";
 import { withPostHogConfig } from "@posthog/nextjs-config";
 
 const config: NextConfig = {
-  eslint: {
-    // Allow production builds to complete even with ESLint errors
-    // (Errors are in third-party @aceternity components, not our code)
-    ignoreDuringBuilds: true,
-  },
   headers: async () => [
     {
       // Apply these headers to all routes in your application.

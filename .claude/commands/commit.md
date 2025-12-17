@@ -36,7 +36,7 @@ See "Conventional Commits 1.0.0" message specification here: https://raw.githubu
 - Do not include any "Generated with Claude" messages
 - Do not add "Co-Authored-By" lines
 - Write commit messages as if the user wrote them
-- Add "Refs #" for applicable JIRA, Linear, GitHub tickets/issues
+- Add "Refs: #" for applicable JIRA, Linear, GitHub tickets/issues
 
 ## Remember:
 - You have the full context of what was done in this session

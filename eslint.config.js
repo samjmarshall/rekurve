@@ -1,21 +1,35 @@
-import { FlatCompat } from "@eslint/eslintrc";
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 import tseslint from 'typescript-eslint';
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-});
+// Filter out base configs to avoid re-registering @typescript-eslint plugin
+// (eslint-config-next already registers it in next/typescript)
+/** @param {import('typescript-eslint').ConfigArray} configs */
+const filterBaseConfigs = (configs) =>
+  configs.filter((/** @type {{ name?: string }} */ c) =>
+    !c.name?.includes('/base') && !c.name?.includes('/eslint-recommended')
+  );
 
 export default tseslint.config(
   {
     ignores: ['.next', '.yarn', 'next-env.d.ts', 'playwright-report'],
   },
-  ...compat.extends("next/core-web-vitals"),
+  ...nextCoreWebVitals,
+  {
+    // Disable React 19 compiler lint rules that weren't enforced before
+    // These are new strict rules in eslint-config-next 16.x that would
+    // require significant refactoring to satisfy
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/purity": "off",
+      "react-hooks/static-components": "off",
+    },
+  },
   {
     files: ['**/*.ts', '**/*.tsx'],
     extends: [
-      ...tseslint.configs.recommended,
-      ...tseslint.configs.recommendedTypeChecked,
-      ...tseslint.configs.stylisticTypeChecked
+      ...filterBaseConfigs(tseslint.configs.recommended),
+      ...filterBaseConfigs(tseslint.configs.recommendedTypeChecked),
+      ...filterBaseConfigs(tseslint.configs.stylisticTypeChecked)
     ],
     rules: {
       "@typescript-eslint/array-type": "off",

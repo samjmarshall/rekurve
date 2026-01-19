@@ -13,12 +13,16 @@ import { StatsMarquee } from "~/components/stats";
 import { analytics } from "~/lib/posthog";
 import { cn } from "~/lib/utils";
 import { useInView } from "motion/react";
+import { useMediaQuery } from "~/hooks";
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const parentRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const isHeadlineInView = useInView(headlineRef, { once: true });
+  const prefersReducedMotion = useMediaQuery(
+    "(prefers-reduced-motion: reduce)"
+  );
   return (
     <section
       id="hero"
@@ -73,7 +77,7 @@ export function Hero() {
           ref={headlineRef}
           className="text-3xl font-semibold tracking-tight md:text-7xl"
         >
-          <RoughNotationGroup show={isHeadlineInView}>
+          <RoughNotationGroup show={prefersReducedMotion || isHeadlineInView}>
             Save 10+ Hours Weekly and{" "}
             <RoughNotation
               type="highlight"

@@ -7482,6 +7482,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-rough-notation@npm:^1.0.8":
+  version: 1.0.8
+  resolution: "react-rough-notation@npm:1.0.8"
+  dependencies:
+    rough-notation: ^0.5.1
+  peerDependencies:
+    react: ^18.2.0 || ^19.0.0
+    react-dom: ^18.2.0 || ^19.0.0
+  checksum: 04a32ceff33f2fd048926a217888801b25abe6d680d5e50f31a0aa3fcf417589a6ef6badf942e951ccf4182da272386248b1929e214b16f754738c500a9bd4db
+  languageName: node
+  linkType: hard
+
 "react-style-singleton@npm:^2.2.2, react-style-singleton@npm:^2.2.3":
   version: 2.2.3
   resolution: "react-style-singleton@npm:2.2.3"
@@ -7661,6 +7673,13 @@ __metadata:
   bin:
     rimraf: dist/esm/bin.mjs
   checksum: 9b3e6f715b29a0245dcbc81783a7c8bd5a0804d52e0b36099856707df030dd3d31243f6fec2cc24be71bc2cc878139514fc8389d46cb0eb71255219585cd4cfd
+  languageName: node
+  linkType: hard
+
+"rough-notation@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "rough-notation@npm:0.5.1"
+  checksum: e7aacbd0b9751b4c5a377198dfd81eab8ad4c339bccc547e7439ce86c379113cea857fa56ef0f4beac41e316efc1888d127a8e7248b1431f41cd45092893166e
   languageName: node
   linkType: hard
 
@@ -9038,6 +9057,7 @@ __metadata:
     react-dom: 19.2.3
     react-fast-marquee: ^1.6.5
     react-hook-form: ^7.66.0
+    react-rough-notation: ^1.0.8
     shadcn: latest
     tailwind-merge: ^3.3.1
     tailwindcss: ^4.0.15

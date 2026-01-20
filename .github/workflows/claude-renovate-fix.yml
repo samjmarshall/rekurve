@@ -1,0 +1,96 @@
+name: Claude Auto-Fix Renovate
+
+on:
+  workflow_run:
+    workflows: ["Quality Control"]
+    types: [completed]
+
+jobs:
+  auto-fix:
+    # Only run on failed Renovate PRs, never on main
+    if: |
+      github.event.workflow_run.conclusion == 'failure' &&
+      startsWith(github.event.workflow_run.head_branch, 'renovate/') &&
+      github.event.workflow_run.head_branch != 'main'
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      actions: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - name: Get PR number
+        id: pr
+        run: |
+          PR_NUMBER=$(gh pr list --head "${{ github.event.workflow_run.head_branch }}" --json number --jq '.[0].number')
+          echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Get failed job logs
+        id: logs
+        run: |
+          JOBS=$(gh run view ${{ github.event.workflow_run.id }} --json jobs --jq '.jobs[] | select(.conclusion == "failure") | .name')
+          gh run view ${{ github.event.workflow_run.id }} --log-failed > /tmp/failed-logs.txt
+          echo "jobs=$JOBS" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Yarn cache
+        uses: actions/cache@v4
+        with:
+          path: .yarn/cache
+          key: yarn-${{ hashFiles('yarn.lock') }}
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Run Claude Auto-Fix
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
+          prompt: |
+            ## Context
+            This is a Renovate dependency update PR that failed CI.
+
+            **Branch**: ${{ github.event.workflow_run.head_branch }}
+            **PR**: #${{ steps.pr.outputs.number }}
+            **Failed Jobs**: ${{ steps.logs.outputs.jobs }}
+
+            ## Failed CI Logs
+            ```
+            $(cat /tmp/failed-logs.txt | head -500)
+            ```
+
+            ## Your Task
+            1. Analyze the CI failure logs above
+            2. Identify what broke due to the dependency update
+            3. Fix the breaking changes (type errors, API changes, deprecations)
+            4. Run `make check` to verify your fix works
+            5. If fixed, commit with message: "fix: resolve breaking changes from dependency update"
+            6. If you cannot fix it, comment on the PR explaining what manual intervention is needed
+
+            ## Guidelines
+            - Focus on minimal changes to fix the break
+            - Don't refactor unrelated code
+            - Check the package's changelog/migration guide if needed (use WebFetch)
+            - Common fixes: type updates, API signature changes, import path changes
+
+          claude_args: |
+            --max-turns 15
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(make:*),Bash(git:*),Bash(gh pr comment:*),WebFetch"

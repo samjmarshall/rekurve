@@ -189,7 +189,6 @@ test.describe('Booking Form Analytics', () => {
 
   test.fixme('form interaction fires form_started event', async ({ homePage, analytics }) => {
     await homePage.bookingForm.focusFirstField();
-    await homePage.page.waitForTimeout(500);
 
     analytics.expectEvent('booking_form_started').toBeFired();
   });
@@ -199,7 +198,6 @@ test.describe('Booking Form Analytics', () => {
 
     await homePage.bookingForm.fillStep1(user);
     await homePage.bookingForm.clickNext();
-    await homePage.page.waitForTimeout(500);
 
     analytics
       .expectEvent('form_step_completed')
@@ -213,7 +211,6 @@ test.describe('Booking Form Analytics', () => {
 
     await homePage.bookingForm.fillStep1(user);
     await homePage.bookingForm.clickNext();
-    await homePage.page.waitForTimeout(500);
 
     analytics
       .expectEvent('lead_identified')
@@ -266,7 +263,6 @@ test.describe('Booking Form Submission', () => {
 
     await homePage.goto();
     await homePage.bookingForm.completeAllSteps(user);
-    await homePage.page.waitForTimeout(500);
 
     analytics
       .expectEvent('booking_form_submitted')

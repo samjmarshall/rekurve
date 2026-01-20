@@ -136,7 +136,8 @@ export class AnalyticsHelper {
     while (Date.now() - startTime < timeoutMs) {
       const event = this.capturedEvents.find((e) => e.event === eventName);
       if (event) return event;
-      await this.page.waitForTimeout(100);
+      // Use requestAnimationFrame-based delay instead of hard timeout
+      await this.page.evaluate(() => new Promise(r => requestAnimationFrame(r)));
     }
     return null;
   }

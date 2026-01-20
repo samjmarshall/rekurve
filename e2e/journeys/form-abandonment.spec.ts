@@ -18,7 +18,6 @@ test.describe('Form Abandonment Tracking', () => {
     // Start form
     await homePage.bookingForm.fillStep1(user);
     await homePage.bookingForm.clickNext();
-    await homePage.page.waitForTimeout(500);
 
     // Verify we're on step 2
     await homePage.bookingForm.expectStep(2);
@@ -40,7 +39,6 @@ test.describe('Form Abandonment Tracking', () => {
     // Complete step 1 - this triggers lead identification
     await homePage.bookingForm.fillStep1(user);
     await homePage.bookingForm.clickNext();
-    await homePage.page.waitForTimeout(500);
 
     // Verify lead was identified even without completing form
     analytics.expectEvent('lead_identified').toBeFired();
@@ -48,7 +46,6 @@ test.describe('Form Abandonment Tracking', () => {
     // Complete step 2
     await homePage.bookingForm.fillStep2(user);
     await homePage.bookingForm.clickNext();
-    await homePage.page.waitForTimeout(500);
 
     // Step 2 completion tracked
     analytics.expectEvent('form_step_completed').withProperty('step', 2).toBeFired();

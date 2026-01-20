@@ -1,4 +1,4 @@
-import { test } from '../fixtures/test';
+import { test, expect } from '../fixtures/test';
 
 // SVG annotations from react-rough-notation may render differently on mobile viewports
 // These tests focus on desktop/tablet where the annotations are consistently rendered
@@ -24,9 +24,10 @@ test.describe('Reduced Motion Support', () => {
     await homePage.goto();
 
     // Hero is above fold, so annotations should trigger on load
-    // Wait for the animation to complete (1500ms + 2000ms = 3500ms max)
-    await homePage.page.waitForTimeout(4000);
-
-    await homePage.hero.expectAnnotationsVisible();
+    // expectAnnotationsVisible auto-retries until SVGs are visible
+    // Animation timing: 1500ms delay + 2000ms duration = 3500ms max, using 5s timeout to be safe
+    await expect(async () => {
+      await homePage.hero.expectAnnotationsVisible();
+    }).toPass({ timeout: 5000 });
   });
 });

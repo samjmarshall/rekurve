@@ -56,21 +56,18 @@ test.describe('CTA Click Tracking', () => {
 
   test.fixme('hero primary CTA tracks click event', async ({ homePage, analytics }) => {
     await homePage.hero.clickPrimaryCta();
-    await homePage.page.waitForTimeout(500);
 
     analytics.expectEvent('cta_clicked').withProperty('location', 'hero_primary').toBeFired();
   });
 
   test.fixme('hero secondary CTA tracks click event', async ({ homePage, analytics }) => {
     await homePage.hero.clickSecondaryCta();
-    await homePage.page.waitForTimeout(500);
 
     analytics.expectEvent('cta_clicked').withProperty('location', 'hero_secondary').toBeFired();
   });
 
   test.fixme('navbar desktop CTA tracks click event', async ({ homePage, analytics }) => {
     await homePage.navbar.clickCta();
-    await homePage.page.waitForTimeout(500);
 
     analytics.expectEvent('cta_clicked').withProperty('location', 'header').toBeFired();
   });
@@ -80,7 +77,6 @@ test.describe('CTA Click Tracking', () => {
 
     // Test foundation tier
     await homePage.pricing.clickTierCta('foundation');
-    await homePage.page.waitForTimeout(500);
     analytics.expectEvent('cta_clicked').withProperty('location', 'pricing_foundation').toBeFired();
 
     analytics.clearEvents();
@@ -90,14 +86,12 @@ test.describe('CTA Click Tracking', () => {
 
     // Test growth tier
     await homePage.pricing.clickTierCta('growth');
-    await homePage.page.waitForTimeout(500);
     analytics.expectEvent('cta_clicked').withProperty('location', 'pricing_growth').toBeFired();
   });
 
   test.fixme('final CTA section tracks click event', async ({ homePage, analytics }) => {
     await homePage.finalCta.scrollIntoView();
     await homePage.finalCta.clickPrimaryCta();
-    await homePage.page.waitForTimeout(500);
 
     analytics.expectEvent('cta_clicked').withProperty('location', 'final_cta_primary').toBeFired();
   });
@@ -105,7 +99,6 @@ test.describe('CTA Click Tracking', () => {
   test.fixme('FAQ bottom CTA tracks click event', async ({ homePage, analytics }) => {
     await homePage.faq.scrollIntoView();
     await homePage.faq.clickBottomCta();
-    await homePage.page.waitForTimeout(500);
 
     analytics.expectEvent('cta_clicked').withProperty('location', 'faq_bottom').toBeFired();
   });

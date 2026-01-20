@@ -32,12 +32,13 @@ test.describe('FAQ Search', () => {
 
     await homePage.faq.search('CRM');
 
-    // Wait for debounce and filtering
-    await homePage.page.waitForTimeout(700);
-
-    const filteredCount = await homePage.faq.getVisibleCount();
-    expect(filteredCount).toBeLessThan(initialCount);
-    expect(filteredCount).toBeGreaterThan(0);
+    // Use auto-retrying assertion instead of hardcoded wait
+    // Search for CRM should filter down to fewer items
+    await expect(async () => {
+      const filteredCount = await homePage.faq.getVisibleCount();
+      expect(filteredCount).toBeLessThan(initialCount);
+      expect(filteredCount).toBeGreaterThan(0);
+    }).toPass({ timeout: 5000 });
   });
 
   /**
@@ -60,15 +61,17 @@ test.describe('FAQ Search', () => {
     const initialCount = await homePage.faq.getVisibleCount();
 
     await homePage.faq.search('CRM');
-    await homePage.page.waitForTimeout(700);
 
-    const filteredCount = await homePage.faq.getVisibleCount();
-    expect(filteredCount).toBeLessThan(initialCount);
+    // Wait for filter to apply using auto-retry
+    await expect(async () => {
+      const filteredCount = await homePage.faq.getVisibleCount();
+      expect(filteredCount).toBeLessThan(initialCount);
+    }).toPass({ timeout: 5000 });
 
     await homePage.faq.clearSearch();
 
-    const restoredCount = await homePage.faq.getVisibleCount();
-    expect(restoredCount).toBe(initialCount);
+    // Wait for count to restore using expectSearchResults
+    await homePage.faq.expectSearchResults(initialCount);
   });
 
   /**
@@ -76,7 +79,6 @@ test.describe('FAQ Search', () => {
    */
   test.fixme('search tracks analytics event after debounce', async ({ homePage, analytics }) => {
     await homePage.faq.search('pilot');
-    await homePage.page.waitForTimeout(1000);
 
     analytics.expectEvent('faq_searched').withPropertyPresent('query').toBeFired();
   });
@@ -93,7 +95,6 @@ test.describe('FAQ Accordion', () => {
    */
   test.fixme('expanding FAQ tracks analytics event', async ({ homePage, analytics }) => {
     await homePage.faq.expandQuestion(/integrate with our existing CRM/i);
-    await homePage.page.waitForTimeout(500);
 
     analytics
       .expectEvent('faq_expanded')

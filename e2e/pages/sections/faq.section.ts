@@ -23,31 +23,24 @@ export class FaqSection {
 
   async scrollIntoView(): Promise<void> {
     await this.container.scrollIntoViewIfNeeded();
-    // Wait for scroll animation to complete (WebKit needs this)
-    await this.page.waitForTimeout(300);
+    // scrollIntoViewIfNeeded completes when element is in viewport
   }
 
   /** Wait for accordion animation to complete */
   private async waitForAccordionAnimation(): Promise<void> {
-    // Accordion animations take ~300ms, add larger buffer for mobile WebKit
-    await this.page.waitForTimeout(600);
+    // No explicit wait - expectQuestionExpanded/Collapsed assertions
+    // auto-retry until the data-state attribute updates
   }
 
   /** Search FAQs */
   async search(query: string): Promise<void> {
-    await this.searchInput.waitFor({ state: 'visible' });
-    await this.searchInput.scrollIntoViewIfNeeded();
-    await this.page.waitForTimeout(200);
     await this.searchInput.fill(query);
-    // Wait for debounce (500ms in implementation) + extra buffer for mobile WebKit rendering
-    await this.page.waitForTimeout(1000);
+    // No wait needed here - caller should use expectSearchResults() which auto-retries
   }
 
   async clearSearch(): Promise<void> {
-    await this.searchInput.waitFor({ state: 'visible' });
-    // Clear by filling with empty string and waiting for debounce
     await this.searchInput.fill('');
-    await this.page.waitForTimeout(1000);
+    // No wait needed - caller should use expectSearchResults() which auto-retries
   }
 
   /** Expand an FAQ by question text */
@@ -81,8 +74,6 @@ export class FaqSection {
 
   /** Get count of visible FAQ items (after search filtering) */
   async getVisibleCount(): Promise<number> {
-    // Wait a moment for DOM to stabilize after any filtering
-    await this.page.waitForTimeout(100);
     return await this.accordionItems.count();
   }
 
@@ -97,8 +88,7 @@ export class FaqSection {
   }
 
   async expectSearchResults(count: number): Promise<void> {
-    // Wait for search filtering to complete
-    await this.page.waitForTimeout(200);
+    // Playwright auto-retries until count matches (handles debounce automatically)
     await expect(this.accordionItems).toHaveCount(count, { timeout: 5000 });
   }
 

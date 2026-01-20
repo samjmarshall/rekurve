@@ -11,7 +11,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
-  workers: isCI ? 1 : undefined,
+  // Limit workers to prevent dev server overload (CI uses 1, local uses 2)
+  workers: isCI ? 1 : 2,
   reporter: isCI
     ? [['list'], ['html', { open: 'never' }]]
     : [['html', { open: 'on-failure' }]],
@@ -23,6 +24,10 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    // Ensure clean state for each test
+    storageState: undefined,
+    permissions: [],
+    geolocation: undefined,
   },
 
   webServer: {

@@ -27,6 +27,7 @@ export class HomePage {
 
   async goto(): Promise<void> {
     await this.page.goto('/');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async gotoWithUtm(params: {

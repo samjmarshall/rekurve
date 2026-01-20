@@ -29,7 +29,6 @@ test.describe('Lead Conversion Journey', () => {
 
     // 2. Click hero CTA
     await homePage.hero.clickPrimaryCta();
-    await homePage.page.waitForTimeout(500);
 
     // Verify CTA tracking
     analytics.expectEvent('cta_clicked').withProperty('location', 'hero_primary').toBeFired();
@@ -41,7 +40,6 @@ test.describe('Lead Conversion Journey', () => {
     // Step 1: Basic Info
     await homePage.bookingForm.fillStep1(user);
     await homePage.bookingForm.clickNext();
-    await homePage.page.waitForTimeout(500);
 
     // Verify form tracking
     analytics.expectEvent('booking_form_started').toBeFired();
@@ -61,7 +59,6 @@ test.describe('Lead Conversion Journey', () => {
     await homePage.bookingForm.expectStep(4);
     await homePage.bookingForm.fillStep4(user);
     await homePage.bookingForm.clickSubmit();
-    await homePage.page.waitForTimeout(500);
 
     // 4. Verify success state
     await homePage.bookingForm.expectSuccess();
@@ -112,7 +109,6 @@ test.describe('Multi-Touch Attribution', () => {
       medium: 'cpc',
       campaign: 'ai-sales-agents',
     });
-    await homePage.page.waitForTimeout(500);
 
     // UTM params should be captured in utm_captured event
     analytics

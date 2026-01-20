@@ -63,8 +63,7 @@ export class BookingFormSection {
 
   async scrollIntoView(): Promise<void> {
     await this.page.locator('#booking-form').scrollIntoViewIfNeeded();
-    // Wait for any scroll animations to complete
-    await this.page.waitForTimeout(300);
+    // scrollIntoViewIfNeeded completes when element is in viewport
   }
 
   async focusFirstField(): Promise<void> {
@@ -74,9 +73,8 @@ export class BookingFormSection {
 
   /** Wait for step transition to complete */
   private async waitForStepTransition(): Promise<void> {
-    // Wait for React state update and any animations
-    // Mobile WebKit needs more time for animations to complete
-    await this.page.waitForTimeout(500);
+    // No explicit wait - expectStep() already has built-in retry
+    // Playwright assertions auto-retry until the step indicator updates
   }
 
   /** Fill Step 1: Basic Info */
@@ -94,9 +92,8 @@ export class BookingFormSection {
     await this.companyInput.waitFor({ state: 'visible', timeout: 10000 });
     await this.companyInput.fill(user.company);
 
-    // Handle select - click and wait for dropdown
+    // Handle select - click and select option
     await this.companySizeSelect.click();
-    await this.page.waitForTimeout(200); // Wait for dropdown animation
     await this.page.getByRole('option', { name: user.companySize }).click();
 
     await this.industryInput.fill(user.industry);
@@ -112,7 +109,7 @@ export class BookingFormSection {
       const label = this.challengesContainer.getByText(challenge, { exact: false });
       await label.waitFor({ state: 'visible' });
       await label.click();
-      await this.page.waitForTimeout(100); // Small wait between clicks
+      // Playwright auto-waits for actionability on each click
     }
   }
 
@@ -122,38 +119,26 @@ export class BookingFormSection {
     await this.goalsInput.fill(user.goals);
 
     await this.timelineSelect.click();
-    await this.page.waitForTimeout(200);
     await this.page.getByRole('option', { name: user.timeline }).click();
 
     await this.currentMrrSelect.click();
-    await this.page.waitForTimeout(200);
     await this.page.getByRole('option', { name: user.currentMrr }).click();
   }
 
   async clickNext(): Promise<void> {
-    await this.nextButton.waitFor({ state: 'visible' });
-    // Ensure button is clickable
-    await this.nextButton.scrollIntoViewIfNeeded();
-    await this.page.waitForTimeout(100);
     await this.nextButton.click();
-    await this.waitForStepTransition();
+    // Playwright auto-waits for button to be actionable
   }
 
   async clickPrev(): Promise<void> {
-    await this.prevButton.waitFor({ state: 'visible' });
-    await this.prevButton.scrollIntoViewIfNeeded();
-    await this.page.waitForTimeout(100);
     await this.prevButton.click();
-    await this.waitForStepTransition();
+    // Playwright auto-waits for button to be actionable
   }
 
   async clickSubmit(): Promise<void> {
-    await this.submitButton.waitFor({ state: 'visible' });
-    await this.submitButton.scrollIntoViewIfNeeded();
-    await this.page.waitForTimeout(100);
     await this.submitButton.click();
-    // Wait for form submission and state transition
-    await this.page.waitForTimeout(500);
+    // Playwright auto-waits for button to be actionable
+    // Caller should use expectSuccess() or expectStep(5) which auto-retry
   }
 
   /** Complete all steps and submit */

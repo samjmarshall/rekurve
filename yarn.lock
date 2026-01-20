@@ -1555,6 +1555,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@posthog/core@npm:1.11.0":
+  version: 1.11.0
+  resolution: "@posthog/core@npm:1.11.0"
+  dependencies:
+    cross-spawn: ^7.0.6
+  checksum: ab2dc4771e735b734177d74c43b5dbd9410be2538e3bb44123380a48cd5e90b4d2f65c3f0211e435647495fcb885ad1f68c4598e435f513ed596f66b894c890e
+  languageName: node
+  linkType: hard
+
 "@posthog/nextjs-config@npm:^1.6.0":
   version: 1.7.6
   resolution: "@posthog/nextjs-config@npm:1.7.6"
@@ -2991,12 +3000,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:19.2.7":
-  version: 19.2.7
-  resolution: "@types/react@npm:19.2.7"
+"@types/react@npm:19.2.8":
+  version: 19.2.8
+  resolution: "@types/react@npm:19.2.8"
   dependencies:
     csstype: ^3.2.2
-  checksum: b1f4c9a45862ea392b9ead060a5b5730b4c41b21fde097db35e639a8a0978460468d8da87f47226230bd4681d6de48ffee695595540084a8a849dde027c66a46
+  checksum: 9cff78fd1e5856eaae867a432a7de5a8d2b6a672f7a3d39a716e3fcf1432bcf17e09886102095d48ddd1b3189b2120344bc0f6ca24b5cb74d8722edf4403dbd2
   languageName: node
   linkType: hard
 
@@ -5259,11 +5268,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^12.23.24, framer-motion@npm:^12.27.0":
-  version: 12.27.0
-  resolution: "framer-motion@npm:12.27.0"
+"framer-motion@npm:^12.23.24, framer-motion@npm:^12.27.1":
+  version: 12.27.1
+  resolution: "framer-motion@npm:12.27.1"
   dependencies:
-    motion-dom: ^12.27.0
+    motion-dom: ^12.27.1
     motion-utils: ^12.24.10
     tslib: ^2.4.0
   peerDependencies:
@@ -5277,7 +5286,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 3c5ae3138b5d3667ef5609add7b62ad6810f9e3eefae7394399cda91046c91b38f0d3f74e82e181405b78ca44463e63709f6e6b87ec9c6c0083e384bf74e0c6c
+  checksum: d987c87755142acef4f34a50dc3c0ef3470dd09c9a577d1ad8771353ba25ffe522faed45d2a7debf8ab942cd68ada4eeb3dbba0cf7f9b520a235be020f9ef1a8
   languageName: node
   linkType: hard
 
@@ -6795,12 +6804,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion-dom@npm:^12.27.0":
-  version: 12.27.0
-  resolution: "motion-dom@npm:12.27.0"
+"motion-dom@npm:^12.27.1":
+  version: 12.27.1
+  resolution: "motion-dom@npm:12.27.1"
   dependencies:
     motion-utils: ^12.24.10
-  checksum: 4d63b7230f0db6403bd6ebdd166947eb79750fbdd20ab12fd39f3017940f78c0fca356901dd2c27dc5cd62e86e3c752aa30c3d102eaa720bd21ddcc62be70268
+  checksum: c5995a60dd22822ad4efab04126aaec29f0ebe8e9fbe2acbf350fb09e1384a79cba044a16ccbc8f3664b7a962a076a4a648fd248a62b86e20222d70a2dca2fcd
   languageName: node
   linkType: hard
 
@@ -6812,10 +6821,10 @@ __metadata:
   linkType: hard
 
 "motion@npm:^12.23.24":
-  version: 12.27.0
-  resolution: "motion@npm:12.27.0"
+  version: 12.27.1
+  resolution: "motion@npm:12.27.1"
   dependencies:
-    framer-motion: ^12.27.0
+    framer-motion: ^12.27.1
     tslib: ^2.4.0
   peerDependencies:
     "@emotion/is-prop-valid": "*"
@@ -6828,7 +6837,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: e025299aa5bdc840fc1e82b7f73de253db4f92562fec324f99c74c17b75349601846619b339ba9a12cffe4e9d15b3c8e43b7fe18eca5a7d5aec15e9597880eff
+  checksum: 8b06627964ae3475cc0f9cd620c6f0870096e3bbae558a501044c03f60c70922fb6943ecb81edd9ab8e3a237b13dab70c54898c7c5b5125d0fa8bf9679cb6801
   languageName: node
   linkType: hard
 
@@ -7506,11 +7515,11 @@ __metadata:
   linkType: hard
 
 "posthog-node@npm:^5.14.0":
-  version: 5.21.1
-  resolution: "posthog-node@npm:5.21.1"
+  version: 5.23.0
+  resolution: "posthog-node@npm:5.23.0"
   dependencies:
-    "@posthog/core": 1.10.0
-  checksum: 215630e5b82d593d2616fd6ae16919a6fc8b5607c6cfe6d7253c2299c7bbe8c958a8782c5b6a3506d76b9f1190147e1bb1c09613675dc28b2a9dcd23d1d891b4
+    "@posthog/core": 1.11.0
+  checksum: f9dee5226f6eacc5bdd07bdad95cb0a4f2fe1ad4616a7d28caa97559d92079c1e023fb9cc5607c338226583e8d34d245c3fe430aa71197b2100dd23884110b7b
   languageName: node
   linkType: hard
 
@@ -9387,7 +9396,7 @@ shadcn@latest:
     "@tsparticles/slim": ^3.9.1
     "@types/node": ^20.14.10
     "@types/pako": ^2.0.4
-    "@types/react": 19.2.7
+    "@types/react": 19.2.8
     "@types/react-dom": 19.2.3
     "@types/three": ^0.181.0
     baseline-browser-mapping: ^2.9.15

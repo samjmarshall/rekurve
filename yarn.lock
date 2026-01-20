@@ -1555,6 +1555,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@posthog/core@npm:1.11.0":
+  version: 1.11.0
+  resolution: "@posthog/core@npm:1.11.0"
+  dependencies:
+    cross-spawn: ^7.0.6
+  checksum: ab2dc4771e735b734177d74c43b5dbd9410be2538e3bb44123380a48cd5e90b4d2f65c3f0211e435647495fcb885ad1f68c4598e435f513ed596f66b894c890e
+  languageName: node
+  linkType: hard
+
 "@posthog/nextjs-config@npm:^1.6.0":
   version: 1.7.6
   resolution: "@posthog/nextjs-config@npm:1.7.6"
@@ -5259,7 +5268,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^12.23.24, framer-motion@npm:^12.27.0":
+"framer-motion@npm:^12.23.24, framer-motion@npm:^12.27.1":
   version: 12.27.1
   resolution: "framer-motion@npm:12.27.1"
   dependencies:
@@ -6812,10 +6821,10 @@ __metadata:
   linkType: hard
 
 "motion@npm:^12.23.24":
-  version: 12.27.0
-  resolution: "motion@npm:12.27.0"
+  version: 12.27.1
+  resolution: "motion@npm:12.27.1"
   dependencies:
-    framer-motion: ^12.27.0
+    framer-motion: ^12.27.1
     tslib: ^2.4.0
   peerDependencies:
     "@emotion/is-prop-valid": "*"
@@ -6828,7 +6837,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: e025299aa5bdc840fc1e82b7f73de253db4f92562fec324f99c74c17b75349601846619b339ba9a12cffe4e9d15b3c8e43b7fe18eca5a7d5aec15e9597880eff
+  checksum: 8b06627964ae3475cc0f9cd620c6f0870096e3bbae558a501044c03f60c70922fb6943ecb81edd9ab8e3a237b13dab70c54898c7c5b5125d0fa8bf9679cb6801
   languageName: node
   linkType: hard
 
@@ -7506,11 +7515,11 @@ __metadata:
   linkType: hard
 
 "posthog-node@npm:^5.14.0":
-  version: 5.21.1
-  resolution: "posthog-node@npm:5.21.1"
+  version: 5.23.0
+  resolution: "posthog-node@npm:5.23.0"
   dependencies:
-    "@posthog/core": 1.10.0
-  checksum: 215630e5b82d593d2616fd6ae16919a6fc8b5607c6cfe6d7253c2299c7bbe8c958a8782c5b6a3506d76b9f1190147e1bb1c09613675dc28b2a9dcd23d1d891b4
+    "@posthog/core": 1.11.0
+  checksum: f9dee5226f6eacc5bdd07bdad95cb0a4f2fe1ad4616a7d28caa97559d92079c1e023fb9cc5607c338226583e8d34d245c3fe430aa71197b2100dd23884110b7b
   languageName: node
   linkType: hard
 

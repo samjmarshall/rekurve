@@ -1,9 +1,11 @@
 name: Quality Control
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
 jobs:
   check:
     name: Lint & Type Check

@@ -1,0 +1,68 @@
+name: Claude Security Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "src/lib/**"
+      - "src/env.js"
+      - "next.config.ts"
+      - "**/*.env*"
+      - "**/auth/**"
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Security Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Perform a security-focused review of PR #${{ github.event.pull_request.number }}.
+
+            ## Focus Areas (OWASP Top 10)
+            - Injection vulnerabilities (SQL, XSS, command injection)
+            - Broken authentication/authorization
+            - Sensitive data exposure (API keys, secrets, PII)
+            - Security misconfiguration
+            - Insecure dependencies
+
+            ## Review Process
+            1. Get the diff: `gh pr diff ${{ github.event.pull_request.number }}`
+            2. Analyze each changed file for security issues
+            3. Rate findings: CRITICAL, HIGH, MEDIUM, LOW
+            4. Comment on the PR with findings
+
+            ## Output Format
+            If issues found:
+            ```
+            ## 🔒 Security Review
+
+            ### Findings
+            - **[SEVERITY]** File:line - Description of issue
+
+            ### Recommendations
+            - Specific fix suggestions
+            ```
+
+            If no issues:
+            ```
+            ## 🔒 Security Review
+            ✅ No security concerns identified in this PR.
+            ```
+
+          claude_args: |
+            --max-turns 5
+            --allowedTools "Bash(gh pr:*),Read,Glob,Grep"
+        env:
+          GH_TOKEN: ${{ github.token }}

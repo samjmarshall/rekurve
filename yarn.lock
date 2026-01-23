@@ -6596,12 +6596,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react@npm:^0.553.0":
-  version: 0.553.0
-  resolution: "lucide-react@npm:0.553.0"
+"lucide-react@npm:^0.563.0":
+  version: 0.563.0
+  resolution: "lucide-react@npm:0.563.0"
   peerDependencies:
     react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 63308665fc0656642ec1508b834be6f3abd1aca479d59ec3323384cea19d86bcd340d115de981b1a544787bbbf1e1c31e8f35b3a94286a65b1ed060513de835b
+  checksum: 842fec302a57ae1e70eafe8b8b5020aef69c0f7969c3bd9af85cf3080f41c68ebedd6bf8bf041d83beb367b4e4febd5689f1e181560a602d0593c5bbfbe804bb
   languageName: node
   linkType: hard
 
@@ -9445,7 +9445,7 @@ shadcn@latest:
     eslint: ^9.23.0
     eslint-config-next: 16.0.10
     framer-motion: ^12.23.24
-    lucide-react: ^0.553.0
+    lucide-react: ^0.563.0
     motion: ^12.23.24
     next: 16.0.10
     next-themes: ^0.4.6

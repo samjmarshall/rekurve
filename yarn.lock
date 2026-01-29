@@ -1555,21 +1555,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/core@npm:1.11.0":
-  version: 1.11.0
-  resolution: "@posthog/core@npm:1.11.0"
-  dependencies:
-    cross-spawn: ^7.0.6
-  checksum: ab2dc4771e735b734177d74c43b5dbd9410be2538e3bb44123380a48cd5e90b4d2f65c3f0211e435647495fcb885ad1f68c4598e435f513ed596f66b894c890e
-  languageName: node
-  linkType: hard
-
 "@posthog/core@npm:1.13.0":
   version: 1.13.0
   resolution: "@posthog/core@npm:1.13.0"
   dependencies:
     cross-spawn: ^7.0.6
   checksum: 90fdf067095cfff9954db798daa32466480eefa27a630ccf6dc58d0dccf398968956aa19bc8c7e8f47be82ccfc478b3bc232767b5598e4353f3bc2378a4e6c3c
+  languageName: node
+  linkType: hard
+
+"@posthog/core@npm:1.17.0":
+  version: 1.17.0
+  resolution: "@posthog/core@npm:1.17.0"
+  dependencies:
+    cross-spawn: ^7.0.6
+  checksum: dc910e68869627bb45f696cf46d46aa907932e64bb35b80cb053b91d7b72619f8f9a63eeb1621761c3fead2ee3f35285a3763efc925d2bdfd81f7e96c709fdc8
   languageName: node
   linkType: hard
 
@@ -7561,11 +7561,11 @@ __metadata:
   linkType: hard
 
 "posthog-node@npm:^5.14.0":
-  version: 5.23.0
-  resolution: "posthog-node@npm:5.23.0"
+  version: 5.24.7
+  resolution: "posthog-node@npm:5.24.7"
   dependencies:
-    "@posthog/core": 1.11.0
-  checksum: f9dee5226f6eacc5bdd07bdad95cb0a4f2fe1ad4616a7d28caa97559d92079c1e023fb9cc5607c338226583e8d34d245c3fe430aa71197b2100dd23884110b7b
+    "@posthog/core": 1.17.0
+  checksum: 41e725bacad70c689f953dbc7d2ca442f768d5312ce70d619821699469e54e14f571bf16bf5cf8491c93001ebeb9ca2f542b3629b26d6992d6baa304075b2533
   languageName: node
   linkType: hard
 

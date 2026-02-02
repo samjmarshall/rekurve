@@ -14,10 +14,9 @@ on:
 
 jobs:
   claude:
-    # Trigger conditions + NEVER run on main branch
+    # Trigger conditions - runs on @claude mentions and 'claude' label
     if: |
       github.ref != 'refs/heads/main' &&
-      github.event.pull_request.base.ref != 'main' &&
       (
         (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
         (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||

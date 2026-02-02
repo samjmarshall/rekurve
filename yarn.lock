@@ -1531,9 +1531,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/cli@npm:~0.5.20":
-  version: 0.5.24
-  resolution: "@posthog/cli@npm:0.5.24"
+"@posthog/cli@npm:~0.5.26":
+  version: 0.5.26
+  resolution: "@posthog/cli@npm:0.5.26"
   dependencies:
     axios: ^1.13.2
     axios-proxy-builder: ^0.1.2
@@ -1542,7 +1542,7 @@ __metadata:
     rimraf: ^6.1.2
   bin:
     posthog-cli: run-posthog-cli.js
-  checksum: 7e0be8b3823a7f11f17cb4aaa52b0376c957842961172d4e522a6b5ae2293b3a38f882bd6a5c1c3630bea0e1d5511331a3c0f415262897a15e74b02a0821214e
+  checksum: d66f91fa1334408cb9c6d336f6e537770747b0b1a86dfd78548cd3c500ec8c7263824f544b8ca2633167d5113f6b85a7e15957ac13c43f456d2dcbc01f0229ab
   languageName: node
   linkType: hard
 
@@ -1552,15 +1552,6 @@ __metadata:
   dependencies:
     cross-spawn: ^7.0.6
   checksum: 897107529dea3ec8705452f9a71973c51d106ac2000254c80ced0930d0aef0829e694c101666313c4aea509b230032e87f8548bc38c3f108beea5d1dd4f1110a
-  languageName: node
-  linkType: hard
-
-"@posthog/core@npm:1.13.0":
-  version: 1.13.0
-  resolution: "@posthog/core@npm:1.13.0"
-  dependencies:
-    cross-spawn: ^7.0.6
-  checksum: 90fdf067095cfff9954db798daa32466480eefa27a630ccf6dc58d0dccf398968956aa19bc8c7e8f47be82ccfc478b3bc232767b5598e4353f3bc2378a4e6c3c
   languageName: node
   linkType: hard
 
@@ -1574,16 +1565,16 @@ __metadata:
   linkType: hard
 
 "@posthog/nextjs-config@npm:^1.6.0":
-  version: 1.8.3
-  resolution: "@posthog/nextjs-config@npm:1.8.3"
+  version: 1.8.8
+  resolution: "@posthog/nextjs-config@npm:1.8.8"
   dependencies:
-    "@posthog/cli": ~0.5.20
-    "@posthog/core": 1.13.0
-    "@posthog/webpack-plugin": 1.2.9
+    "@posthog/cli": ~0.5.26
+    "@posthog/core": 1.17.0
+    "@posthog/webpack-plugin": 1.2.14
     semver: ^7.7.2
   peerDependencies:
     next: ">12.1.0"
-  checksum: dc6c966372e537bd4c8679ede798ad6dcf4c526970a9de7fb95a28306123525c10cd67c578f7f5d7664e6e92b9d98f88b85345b1511333cf3f08022b51d0b8a6
+  checksum: af7d305d6a766fda065eff0000e13335ab803049817fc45faa25a0702d4b0d45844f4ae6d47f4b0265e74ca32f691f10c4352e93be84332d3b27b32addfd9796
   languageName: node
   linkType: hard
 
@@ -1594,15 +1585,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/webpack-plugin@npm:1.2.9":
-  version: 1.2.9
-  resolution: "@posthog/webpack-plugin@npm:1.2.9"
+"@posthog/webpack-plugin@npm:1.2.14":
+  version: 1.2.14
+  resolution: "@posthog/webpack-plugin@npm:1.2.14"
   dependencies:
-    "@posthog/cli": ~0.5.20
-    "@posthog/core": 1.13.0
+    "@posthog/cli": ~0.5.26
+    "@posthog/core": 1.17.0
   peerDependencies:
     webpack: ^5
-  checksum: 76d71e5f49223e537361ef5007528bfc14b86f85a82eb5f018eb24461acc71d14c4a067f229b10bed5c7a68a16f8048800dd873f3134dd5c624a649eeefcc3ae
+  checksum: 66bbdf9e48c6156726dc3dc62b1db1cd69cfc63d09d03c1b4a3404688b525efcab286d6a02043f1f032dba2417859ba483d030ebf685b8f70a78ffd2f26302e5
   languageName: node
   linkType: hard
 

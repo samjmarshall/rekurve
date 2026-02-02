@@ -16,7 +16,6 @@ jobs:
   claude:
     # Trigger conditions - runs on @claude mentions and 'claude' label
     if: |
-      github.ref != 'refs/heads/main' &&
       (
         (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
         (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||

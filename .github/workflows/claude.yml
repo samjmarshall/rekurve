@@ -16,7 +16,6 @@ jobs:
   claude:
     # Trigger conditions - runs on @claude mentions and 'claude' label
     if: |
-      github.ref != 'refs/heads/main' &&
       (
         (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
         (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
@@ -38,6 +37,25 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Checkout PR branch (for issue_comment events)
+        if: github.event_name == 'issue_comment' && github.event.issue.pull_request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER="${{ github.event.issue.number }}"
+          echo "Checking out PR #${PR_NUMBER} branch..."
+          gh pr checkout ${PR_NUMBER}
+
+          # Verify we're not on main/default branch
+          CURRENT_BRANCH=$(git branch --show-current)
+          if [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "master" ]; then
+            echo "ERROR: Cannot checkout PR branch, still on default branch: $CURRENT_BRANCH"
+            exit 1
+          fi
+
+          echo "Successfully checked out branch: $CURRENT_BRANCH"
 
       - name: Setup Node.js
         uses: actions/setup-node@v6

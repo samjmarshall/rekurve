@@ -8,10 +8,62 @@
 *   [ ] **Simplicity & Clarity:** Strive for a clean, uncluttered interface. Ensure labels, instructions, and information are unambiguous.
 *   [ ] **Focus & Efficiency:** Help users achieve their goals quickly and with minimal friction. Minimize unnecessary steps or distractions.
 *   [ ] **Consistency:** Maintain a uniform design language (colors, typography, components, patterns) across the entire dashboard.
-*   [ ] **Accessibility (WCAG AA+):** Design for inclusivity. Ensure sufficient color contrast, keyboard navigability, and screen reader compatibility.
+*   [ ] **Accessibility (WCAG 2.1 AA):** Accessibility is a civil right, not a feature. 1 in 4 US adults have a disability. Building accessible from the start is simpler than retrofitting.
 *   [ ] **Opinionated Design (Thoughtful Defaults):** Establish clear, efficient default workflows and settings, reducing decision fatigue for users.
 
-## II. Design System Foundation (Tokens & Core Components)
+## II. Accessibility (7 Pillars)
+
+### 1. Semantic HTML
+*   [ ] Use meaningful elements (`<button>`, `<nav>`, `<header>`, `<main>`, `<footer>`, `<article>`, `<aside>`)
+*   [ ] Maintain heading hierarchy without skipping levels (H1 → H2 → H3)
+*   [ ] Never use `<div>` or `<span>` for interactive content
+*   [ ] Establish document landmarks for screen reader navigation
+
+### 2. Keyboard Navigation
+*   [ ] Every interactive element operable via keyboard (Tab, Enter, Space, Escape, Arrow keys)
+*   [ ] Natural tab order following DOM structure (avoid `tabIndex > 0`)
+*   [ ] Visible focus indicators (minimum 2px outline)
+*   [ ] Focus trapping in modals (Tab cycles within modal, Escape closes)
+*   [ ] Skip links to jump past navigation (`<a href="#main-content" class="sr-only focus:not-sr-only">`)
+
+### 3. ARIA Attributes (use only when semantic HTML insufficient)
+*   [ ] `aria-label` for icon-only buttons
+*   [ ] `aria-labelledby` to link to labeling element
+*   [ ] `aria-describedby` for additional descriptions
+*   [ ] `aria-live="polite"` for dynamic content updates
+*   [ ] `aria-expanded` for collapsible sections
+*   [ ] `aria-hidden="true"` for decorative elements only (never on interactive elements)
+
+### 4. Forms & Inputs
+*   [ ] Explicit labels with `htmlFor` + `id` association (placeholders alone are insufficient)
+*   [ ] Required fields marked with `aria-required` and visual indicator
+*   [ ] Error messages associated with `aria-invalid` + `aria-describedby`
+*   [ ] Clear error identification with guidance and focus management
+
+### 5. Color & Contrast
+*   [ ] Normal text: 4.5:1 contrast ratio (WCAG AA)
+*   [ ] Large text (18pt+ or 14pt bold): 3:1 ratio
+*   [ ] UI components and graphics: 3:1 ratio
+*   [ ] Never convey information through color alone (pair with icons, text, or patterns)
+
+### 6. Images & Media
+*   [ ] Descriptive `alt` text for informative images
+*   [ ] Empty `alt=""` for decorative images
+*   [ ] `<figcaption>` for complex charts/diagrams
+*   [ ] Video captions and audio transcripts
+
+### 7. Testing
+*   [ ] **Automated:** axe-core, jest-axe, Lighthouse accessibility audit
+*   [ ] **Manual keyboard:** Tab through entire page, Enter/Space for buttons, Escape for modals
+*   [ ] **Screen readers:** VoiceOver (Mac: Cmd+F5), NVDA (Windows)
+*   [ ] **Visual:** 200% zoom, high contrast mode
+
+### Critical Issues (fix first)
+Missing form labels, missing alt text, color contrast failures, keyboard traps, missing focus indicators
+
+---
+
+## III. Design System Foundation (Tokens & Core Components)
 
 *   [ ] **Define a Color Palette:**
     *   [ ] **Primary Brand Color:** User-specified, used strategically.
@@ -44,7 +96,7 @@
     *   [ ] Icons (use a single, modern, clean icon set; SVG preferred)
     *   [ ] Avatars
 
-## III. Layout, Visual Hierarchy & Structure
+## IV. Layout, Visual Hierarchy & Structure
 
 *   [ ] **Responsive Grid System:** Design based on a responsive grid (e.g., 12-column) for consistent layout across devices.
 *   [ ] **Strategic White Space:** Use ample negative space to improve clarity, reduce cognitive load, and create visual balance.
@@ -56,7 +108,7 @@
     *   [ ] (Optional) Top Bar: For global search, user profile, notifications.
 *   [ ] **Mobile-First Considerations:** Ensure the design adapts gracefully to smaller screens.
 
-## IV. Interaction Design & Animations
+## V. Interaction Design & Animations
 
 *   [ ] **Purposeful Micro-interactions:** Use subtle animations and visual feedback for user actions (hovers, clicks, form submissions, status changes).
     *   [ ] Feedback should be immediate and clear.
@@ -66,7 +118,7 @@
 *   [ ] **Avoid Distraction:** Animations should enhance usability, not overwhelm or slow down the user.
 *   [ ] **Keyboard Navigation:** Ensure all interactive elements are keyboard accessible and focus states are clear.
 
-## V. Specific Module Design Tactics
+## VI. Specific Module Design Tactics
 
 ### A. Multimedia Moderation Module
 
@@ -111,7 +163,7 @@
 *   [ ] **Reset Option:** Easy way to "Reset to Defaults" for sections or entire configuration.
 *   [ ] **Microsite Preview (If Applicable):** Show a live or near-live preview of microsite changes.
 
-## VI. CSS & Styling Architecture
+## VII. CSS & Styling Architecture
 
 *   [ ] **Choose a Scalable CSS Methodology:**
     *   [ ] **Utility-First (Recommended for LLM):** e.g., Tailwind CSS. Define design tokens in config, apply via utility classes.
@@ -121,7 +173,7 @@
 *   [ ] **Maintainability & Readability:** Code should be well-organized and easy to understand.
 *   [ ] **Performance:** Optimize CSS delivery; avoid unnecessary bloat.
 
-## VII. General Best Practices
+## VIII. General Best Practices
 
 *   [ ] **Iterative Design & Testing:** Continuously test with users and iterate on designs.
 *   [ ] **Clear Information Architecture:** Organize content and navigation logically.

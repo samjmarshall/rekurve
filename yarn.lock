@@ -1556,17 +1556,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@posthog/core@npm:1.21.0":
+  version: 1.21.0
+  resolution: "@posthog/core@npm:1.21.0"
+  dependencies:
+    cross-spawn: ^7.0.6
+  checksum: 8aae5ddc3f3f0aa8b62b5c3f43adc32ed55b51ef5fe500b6e4b5b5384a9d4c5d9f05cc83f6e5960984f1a17e979a498d7121cc2c17882e49452acc341b5d84ee
+  languageName: node
+  linkType: hard
+
 "@posthog/nextjs-config@npm:^1.6.0":
-  version: 1.8.12
-  resolution: "@posthog/nextjs-config@npm:1.8.12"
+  version: 1.8.14
+  resolution: "@posthog/nextjs-config@npm:1.8.14"
   dependencies:
     "@posthog/cli": ~0.5.26
-    "@posthog/core": 1.20.1
-    "@posthog/webpack-plugin": 1.2.18
+    "@posthog/core": 1.21.0
+    "@posthog/webpack-plugin": 1.2.20
     semver: ^7.7.2
   peerDependencies:
     next: ">12.1.0"
-  checksum: 5a01a7fce339c8d1a84241f95090fb227523f52aff49d1b82e96e9445accebd711409bb6582d676b4cd8afb6f77e456fd989073c612e1c51bcfa0f83b77e68ea
+  checksum: f00ae75316906ee92454d4fbe15027a8600292cfb7a593581a632f27af11908c0cfd9f79d8f809c360ae18b2831aaebc7f42ae786a664476019ceb233a0f094e
   languageName: node
   linkType: hard
 
@@ -1577,15 +1586,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/webpack-plugin@npm:1.2.18":
-  version: 1.2.18
-  resolution: "@posthog/webpack-plugin@npm:1.2.18"
+"@posthog/webpack-plugin@npm:1.2.20":
+  version: 1.2.20
+  resolution: "@posthog/webpack-plugin@npm:1.2.20"
   dependencies:
     "@posthog/cli": ~0.5.26
-    "@posthog/core": 1.20.1
+    "@posthog/core": 1.21.0
   peerDependencies:
     webpack: ^5
-  checksum: 5e14764ba5a0003d011dce10db29d141eb38a2b47c154c9ff7781bb46643ad150462796ca036dfc94897946854a6873fac88883a1774b5aa81f29c8dea0d95db
+  checksum: 17a7f36f4a51cce4d43c0e1fb8fa771974c136382fa572a7dd1b7aec17805ab09f27cc34f1a175911f724bec5e01b308e91ad974f3d6ff1d29a8f9ecb39c8def
   languageName: node
   linkType: hard
 

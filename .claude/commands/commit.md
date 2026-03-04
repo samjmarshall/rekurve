@@ -1,15 +1,14 @@
 # Commit Changes
 
-You are tasked with creating git commits for the changes made during this session.
+Review the current working tree and create well-structured git commits.
 
 ## Message format
 
 See "Conventional Commits 1.0.0" message specification here: https://raw.githubusercontent.com/conventional-commits/conventionalcommits.org/refs/heads/master/content/v1.0.0/index.md
 
-## Process:
+## Process
 
-1. **Think about what changed:**
-   - Review the conversation history and understand what was accomplished
+1. **Understand what changed:**
    - Run `git status` to see current changes
    - Run `git diff` to understand the modifications
    - Consider whether changes should be one commit or multiple logical commits
@@ -20,17 +19,19 @@ See "Conventional Commits 1.0.0" message specification here: https://raw.githubu
    - Use imperative mood in commit messages
    - Focus on why the changes were made, not just what
 
-3. **Present your plan to the user:**
+3. **Present your plan:**
    - List the files you plan to add for each commit
    - Show the commit message(s) you'll use
    - Ask: "I plan to create [N] commit(s) with these changes. Shall I proceed?"
 
 4. **Execute upon confirmation:**
    - Use `git add` with specific files (never use `-A` or `.`)
+   - **NEVER stage git-ignored files** — run `git check-ignore -v <file>` if unsure whether a file is ignored; skip any file that is ignored
    - Create commits with your planned messages
    - Show the result with `git log --oneline -n [number]`
 
-## Important:
+## Important
+
 - **NEVER add co-author information or Claude attribution**
 - Commits should be authored solely by the user
 - Do not include any "Generated with Claude" messages
@@ -38,8 +39,7 @@ See "Conventional Commits 1.0.0" message specification here: https://raw.githubu
 - Write commit messages as if the user wrote them
 - Add "Refs: #" for applicable JIRA, Linear, GitHub tickets/issues
 
-## Remember:
-- You have the full context of what was done in this session
+## Remember
+
 - Group related changes together
 - Keep commits focused and atomic when possible
-- The user trusts your judgment - they asked you to commit

@@ -11,7 +11,7 @@ const filterBaseConfigs = (configs) =>
 
 export default tseslint.config(
   {
-    ignores: ['.next', '.yarn', 'next-env.d.ts', 'playwright-report'],
+    ignores: ['.next', '.yarn', '.agents', 'next-env.d.ts', 'playwright-report'],
   },
   ...nextCoreWebVitals,
   {

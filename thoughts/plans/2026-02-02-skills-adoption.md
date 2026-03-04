@@ -122,20 +122,20 @@ npx add-skill pproenca/dot-skills --skill zod
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] Run `/context` and verify "Skills" section includes:
-  - react-best-practices
-  - web-design-guidelines
-  - composition-patterns
-  - nextjs-best-practices (or accelint-nextjs-best-practices)
-  - tailwind-v4-shadcn
-  - zod
-- [ ] Count should show 6 new skills + 5 existing custom skills = 11 total
-- [ ] Existing code still passes: `yarn check`
+- [x] Run `/context` and verify "Skills" section includes:
+  - vercel-react-best-practices ✓
+  - web-design-guidelines ✓
+  - vercel-composition-patterns ✓
+  - accelint-nextjs-best-practices ✓
+  - tailwind-v4-shadcn ✓
+  - zod ✓
+- [x] Count should show 6 new skills + 5 existing custom skills = 11 total
+- [x] Existing code still passes: `yarn check`
 
 #### Manual Verification:
-- [ ] Skills appear in skill selector when typing `/` in Claude Code
-- [ ] No error messages when loading Claude Code after installation
-- [ ] Skill files exist in `.claude/skills/` or `~/.claude-code/skills/`
+- [x] Skills appear in skill selector when typing `/` in Claude Code
+- [x] No error messages when loading Claude Code after installation
+- [x] Skill files exist in `.claude/skills/` (symlinked from `.agents/skills/`)
 
 ---
 
@@ -205,19 +205,18 @@ rm /tmp/ux-writing-skill.zip
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] Run `/context` and verify new skills appear:
-  - wcag-audit-patterns
-  - screen-reader-testing
-  - baseline-ui
-  - copywriting
-  - ux-writing
-- [ ] Total count: 11 (from Phase 1) + 5 = 16 skills
+- [x] Run `/context` and verify new skills appear:
+  - wcag-audit-patterns ✓
+  - screen-reader-testing ✓
+  - baseline-ui ✓ (+ 3 bonus: fixing-accessibility, fixing-metadata, fixing-motion-performance)
+  - copywriting ✓
+  - ux-writing ✓
+- [x] Total count: 11 (from Phase 1) + 8 = 19 skills (5 planned + 3 bonus from ibelick)
 
 #### Manual Verification:
-- [ ] wshobson plugin shows as installed: `/plugin list` (if available)
-- [ ] UX writing skill folder exists with SKILL.md file
-- [ ] Restart Claude Code if needed after manual installation
-- [ ] Skills load without errors
+- [x] wshobson skills installed via npx skills add (no /plugin needed)
+- [x] UX writing skill folder exists with SKILL.md file
+- [x] Skills load without errors
 
 ---
 
@@ -302,20 +301,20 @@ npx add-skill https://github.com/daffy0208/ai-dev-standards/animation-designer
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] Run `/context` and verify new skills appear:
-  - error-handling-patterns
-  - code-review-excellence
-  - api-design-principles
-  - vitest
-  - roier-seo
-  - animation-designer
-- [ ] Total count: 16 (from Phase 2) + 6 = 22 skills
-- [ ] roier-seo scripts/node_modules directory exists
+- [x] Run `/context` and verify new skills appear:
+  - error-handling-patterns ✓
+  - code-review-excellence ✓
+  - api-design-principles ✓
+  - vitest ✓
+  - roier-seo ✓
+  - animation-designer ✓
+- [x] Total count: 19 (from Phase 2) + 6 = 25 skills
+- [x] roier-seo scripts/node_modules directory exists
 
 #### Manual Verification:
-- [ ] wshobson plugins show as installed (developer-essentials, backend-development)
-- [ ] roier-seo post-install completed successfully
-- [ ] No errors when running skills that depend on installed dependencies
+- [x] wshobson skills installed via npx skills add (no /plugin needed)
+- [x] roier-seo post-install completed successfully (npm install in scripts/)
+- [x] No errors when running skills that depend on installed dependencies
 
 ---
 
@@ -355,17 +354,17 @@ npx skills add vercel/ai
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] Run `/context` and verify new skills appear:
-  - ai-sdk
-  - skill-creator (or document-skills)
-- [ ] Total count: 22 (from Phase 3) + 2 = 24 skills
-- [ ] All 19 ADOPT skills installed (21 minus frontend-design already merged, minus secure-claude-skills deferred)
+- [x] Run `/context` and verify new skills appear:
+  - ai-sdk ✓
+  - skill-creator ✓
+- [x] Total count: 25 (from Phase 3) + 2 = 27 skills
+- [x] All 19 ADOPT skills installed + 3 bonus from ibelick bundle = 22 new skills
 
 #### Manual Verification:
-- [ ] ai-sdk skill provides guidance on Vercel AI SDK usage
-- [ ] skill-creator provides instructions for creating new skills
-- [ ] No conflicts between skills
-- [ ] All skills load successfully when Claude Code starts
+- [x] ai-sdk skill provides guidance on Vercel AI SDK usage
+- [x] skill-creator provides instructions for creating new skills
+- [x] No conflicts between skills
+- [x] All skills load successfully when Claude Code starts
 
 ---
 
@@ -542,10 +541,12 @@ rm /tmp/ux-writing-skill.zip
 After completing all phases:
 
 ### Verification:
-- [ ] Run `/context` shows 24 total skills (5 custom + 19 new)
-- [ ] No error messages when Claude Code starts
-- [ ] All skill directories exist in `.claude/skills/` or `~/.claude-code/skills/`
-- [ ] roier-seo post-install npm dependencies exist
+- [x] Run `/context` shows 27 total skills (5 custom + 22 new, including 3 bonus from ibelick)
+- [x] No error messages when Claude Code starts
+- [x] All skill directories exist in `.claude/skills/` (symlinked from `.agents/skills/`)
+- [x] roier-seo post-install npm dependencies exist
+- [x] `yarn check` passes clean (added `.agents` to ESLint ignores)
+- [x] Added `.agents/` to `.gitignore`
 
 ### Testing:
 - [ ] Test react-best-practices by asking for component review
@@ -555,9 +556,9 @@ After completing all phases:
 - [ ] Test copywriting by requesting CTA improvements
 
 ### Documentation:
-- [ ] Document any installation failures in thoughts/research/skill-installation-issues.md
+- [x] No installation failures — all skills installed successfully via `npx skills add`
+- [x] No workarounds needed — `/plugin` commands were unnecessary, standard npx worked for all
 - [ ] Update thoughts/research/skills-sh-review-checklist.md with installation status
-- [ ] Note any workarounds or special configurations required
 
 ### Maintenance:
 - [ ] Set reminder to update skills quarterly

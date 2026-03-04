@@ -53,3 +53,6 @@ yarn-error.log*
 
 # idea files
 .idea
+
+# skills (installed per-machine via npx skills)
+/.agents/

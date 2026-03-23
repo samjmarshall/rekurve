@@ -129,9 +129,9 @@ npx secure-claude-skills init
 
 ## Comparisons to Existing `.claude/` Config
 
-### `ui-aesthetics` vs Found Skills
+### `frontend-design` vs Found Skills
 
-| Feature | Our `ui-aesthetics` | `baseline-ui` | `frontend-design` | `web-design-guidelines` |
+| Feature | Our `frontend-design` | `baseline-ui` | `frontend-design` | `web-design-guidelines` |
 |---------|---------------------|---------------|-------------------|------------------------|
 | Anti-AI-slop | Custom rules | Explicit constraints | Strong emphasis | - |
 | Font restrictions | Brand fonts only | No Inter/Roboto | No Arial/Inter/Roboto | Typography rules |
@@ -141,7 +141,7 @@ npx secure-claude-skills init
 | Gradient restrictions | - | No gradients unless asked | - | - |
 | `text-balance/pretty` | - | Required for headings/body | - | Required |
 
-**Gaps to fill in `ui-aesthetics`:**
+**Gaps to fill in `frontend-design`:**
 1. Add fixed z-index scale (10, 20, 30, 40, 50)
 2. Add "no gradients unless explicit" rule
 3. Add `text-balance` for headings, `text-pretty` for body
@@ -265,7 +265,7 @@ npx secure-claude-skills init
 
 1. **Immediate:** Install Tier 1 skills and test compatibility
 2. **This week:** Deep-dive on `secure-claude-skills`
-3. **This sprint:** Update `ui-aesthetics` with identified gaps
+3. **This sprint:** Update `frontend-design` with identified gaps
 4. **Backlog:** Create custom skill combining best patterns
 
 ---

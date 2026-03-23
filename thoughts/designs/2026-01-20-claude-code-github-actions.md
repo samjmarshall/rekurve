@@ -31,7 +31,7 @@ Implement Claude Code GitHub Actions to automate development workflows, with par
 - `web-search-researcher` - Web research
 
 **Skills (5):**
-- `ui-aesthetics` - Design principles
+- `frontend-design` - Design principles
 - `brand-guidelines` - Rekurve colors/typography
 - `ticket-writer` - Ticket templates
 - `writing-clearly-and-concisely` - Strunk's rules

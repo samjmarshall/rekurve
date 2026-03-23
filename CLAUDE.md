@@ -1,179 +1,16 @@
-# Rekurve AI Sales Agents
+# CLAUDE.md
 
-Autonomous AI sales agents that handle lead research, qualification, follow-up, meeting booking and quote generation.
+The role of this file is to describe common mistakes and confusion points that agents might encounter when they work in this project. If you encounter something in this project that surprises you, please alert the developer working with you and indicate that this is the case in the CLAUDE.md file to help prevent future agents from having the same issue.
 
 ---
 
 ## Quick Start: Current Project State
-
-**Active Project**: Next.js 15 landing page
-
-**Tech Stack**:
-- Next.js 15.2.3 (App Router) + React 19 + TypeScript
-- Tailwind CSS 4.0.15
-- Yarn 3.8.7 (PnP mode)
-- Environment validation: @t3-oss/env-nextjs
-
-**Key Commands**:
-```bash
-yarn dev              # Development server (Turbo mode)
-yarn check            # Lint + TypeCheck
-yarn build            # Production build
-yarn test:e2e         # Run E2E tests
-yarn check:e2e        # Run E2E tests (CI mode)
-yarn posthog:setup    # Create PostHog dashboards/cohorts (requires API key)
-```
 
 **Status**: Pre-PMF validation phase. Running free Release Pilot to validate use cases.
 
 **Project Tracking**: [GitHub Project](https://github.com/users/samjmarshall/projects/2) - all tasks, roadmap, and progress tracked via GitHub Issues.
 
 **GitHub Repository**: `samjmarshall/www` - use this repo for all issue creation and management.
-
----
-
-## Repository Structure
-
-```
-www/                                    # Next.js 15 landing page application
-├── src/
-│   ├── app/                            # App Router (Next.js 15)
-│   │   ├── layout.tsx                  # Root layout with fonts & providers
-│   │   ├── page.tsx                    # Landing page
-│   │   ├── privacy/                    # Privacy policy page
-│   │   ├── robots.ts                   # robots.txt generation
-│   │   └── sitemap.ts                  # sitemap.xml generation
-│   ├── components/
-│   │   ├── sections/                   # Page sections
-│   │   │   ├── Hero.tsx               # Hero section with CTA
-│   │   │   ├── Problem.tsx            # Pain points section
-│   │   │   ├── Solution.tsx           # Solution overview
-│   │   │   ├── Results.tsx            # Results/metrics section
-│   │   │   ├── HowItWorks.tsx         # Process steps
-│   │   │   ├── CaseStudies.tsx        # Client case studies
-│   │   │   ├── Pricing.tsx            # Three-tier pricing
-│   │   │   ├── Guarantee.tsx          # Risk reversal section
-│   │   │   ├── AboutFounder.tsx       # Founder credibility
-│   │   │   ├── FAQ.tsx                # Frequently asked questions
-│   │   │   ├── FinalCTA.tsx           # Bottom CTA section
-│   │   │   └── BookingForm.tsx        # Multi-step booking form
-│   │   ├── ui/                         # Reusable UI components
-│   │   │   ├── Button.tsx, Card.tsx, Badge.tsx
-│   │   │   ├── Accordion.tsx, input.tsx, select.tsx
-│   │   │   └── sparkles.tsx, glowing-effect.tsx, compare.tsx
-│   │   ├── navbar.tsx                  # Main navigation
-│   │   ├── footer.tsx                  # Site footer
-│   │   └── logo.tsx                    # Brand logo component
-│   ├── lib/
-│   │   ├── posthog.ts                  # PostHog analytics client
-│   │   ├── posthog-server.ts           # Server-side PostHog
-│   │   ├── analytics.ts                # Analytics utilities
-│   │   ├── utils.ts                    # General utilities
-│   │   └── canonical-url.ts, open-graph.ts
-│   ├── providers/                      # React context providers
-│   ├── hooks/                          # Custom React hooks
-│   ├── icons/                          # Custom icon components
-│   ├── styles/globals.css              # Global styles
-│   ├── env.js                          # Environment variable schema
-│   ├── instrumentation.ts              # Server instrumentation
-│   └── instrumentation-client.ts       # Client instrumentation
-├── public/
-│   ├── llms.txt                        # AI search optimization
-│   ├── case-studies/                   # Case study assets
-│   └── illustrations/                  # Marketing illustrations
-├── docs/                               # Strategic documentation
-│   ├── business/                       # Business strategy & validation
-│   │   ├── AI Sales Lead Automation Impact Analysis.md  # Devoli case study
-│   │   └── Rekurve MVP Business Case Validation.md      # GTM strategy
-│   ├── sales/                          # Sales assets & templates
-│   │   ├── grand-slam-offer-deck.md    # Pitch deck outline
-│   │   └── value-based-pricing-proposals.md  # Pricing templates
-│   ├── marketing/                      # Marketing & positioning
-│   │   ├── messaging-guide.md          # AI Agent positioning & language
-│   │   └── technical-case-study-guide.md     # Case study creation
-│   └── pr_template.md                  # PR description template
-├── .claude/                            # Claude Code configuration
-│   ├── agents/                         # Custom agent definitions
-│   │   ├── design-reviewer.md          # UI/UX design review
-│   │   ├── ui-navigator.md             # Playwright browser automation
-│   │   ├── codebase-*.md               # Code exploration agents
-│   │   ├── thoughts-*.md               # Thoughts directory agents
-│   │   └── web-search-researcher.md    # Web research agent
-│   ├── commands/                       # Slash commands
-│   └── skills/                         # Reusable skills
-│       ├── ui-aesthetics/              # Distinctive UI design principles
-│       ├── brand-guidelines/           # Rekurve brand colors/typography
-│       ├── ticket-writer/              # Jira/Linear ticket templates
-│       ├── brainstorming/              # Idea refinement process
-│       └── writing-clearly-and-concisely/
-├── e2e/                                # Playwright E2E tests
-│   ├── fixtures/                       # Test fixtures
-│   ├── pages/                          # Page object models
-│   │   └── sections/                   # Section page objects
-│   ├── data/                           # Test data factories
-│   ├── utils/                          # Test utilities (analytics helper)
-│   ├── features/                       # Feature-specific tests
-│   └── journeys/                       # End-to-end journey tests
-├── scripts/                            # Utility scripts
-│   └── posthog-setup.ts                # PostHog dashboard/cohort automation
-├── thoughts/                           # Implementation notes
-│   ├── plans/                          # Detailed implementation plans
-│   └── designs/                        # Design explorations
-├── CLAUDE.md                           # This file (project instructions)
-├── .mcp.json                           # MCP server configuration
-├── next.config.ts                      # Next.js configuration
-├── package.json                        # Dependencies (Yarn 3.8.7)
-└── tsconfig.json                       # TypeScript config
-```
-
----
-
-## Performance Requirements
-
-**Lighthouse Targets**:
-- Performance: 90+
-- Accessibility: 90+ (WCAG 2.1 AA)
-- Best Practices: 90+
-- SEO: 90+
-
-**Core Web Vitals**:
-- First Contentful Paint: < 1s
-- Largest Contentful Paint: < 2s
-- Cumulative Layout Shift: < 0.1
-- Total Page Weight: < 3MB
-
----
-
-## AI Search Optimization (llms.txt)
-
-**File**: `public/llms.txt`
-
-Provides structured information for AI assistants (ChatGPT, Claude, Perplexity). Update when:
-- Pricing changes
-- Service offerings change
-- New features added
-- Founder credentials update
-- Guarantee terms change
-
----
-
-## Strategic Document Reference
-
-**Business Strategy** (`docs/business/`):
-- `AI Sales Lead Automation Impact Analysis.md` - Core case study validating speed-to-lead economics, 12x capacity gain
-- `Rekurve MVP Business Case Validation.md` - GTM strategy, target personas, technical architecture recommendations (treat as hypothesis until validated)
-
-**Sales - Active** (`docs/sales/`):
-- `pilot-program.md` - Release Pilot program overview, qualification criteria, expectations, agreement template
-- `discovery-conversation-guide.md` - Structured questions for validation conversations with prospects
-
-**Marketing - Active** (`docs/marketing/`):
-- `messaging-guide.md` - AI Agent positioning and language guidelines (simplified for pre-PMF stage)
-
-**Archived** (`docs/sales/archive/`, `docs/marketing/archive/`):
-- `grand-slam-offer-deck.md` - Pitch deck (for post-PMF paid sales)
-- `value-based-pricing-proposals.md` - Pricing negotiation framework (for post-PMF)
-- `technical-case-study-guide.md` - Case study creation guide (for when we have completed pilots)
 
 ---
 
@@ -187,7 +24,7 @@ Provides structured information for AI assistants (ChatGPT, Claude, Perplexity).
 3. Check if similar patterns exist in the codebase using the **@agent-codebase-analyzer**
 
 **During Development**:
-1. Follow the ui-aesthetics skill exactly (no generic Tailwind defaults)
+1. Follow the frontend-design skill exactly (no generic Tailwind defaults)
 2. Use agent positioning language consistently
 3. Include specific metrics and results
 4. Test accessibility (keyboard nav, screen readers, color contrast)
@@ -292,12 +129,3 @@ Navigate to http://localhost:3000
 - Even for "simple" navigation tasks, use the agent
 - Even for single click operations, use the agent
 - The overhead is minimal and consistency matters
-
----
-
-## Questions? Start Here
-
-- **Business strategy**: `docs/business/Rekurve MVP Business Case Validation.md`
-- **Market positioning & messaging**: `docs/marketing/messaging-guide.md`
-- **Pilot program details**: `docs/sales/pilot-program.md`
-- **Discovery conversations**: `docs/sales/discovery-conversation-guide.md`

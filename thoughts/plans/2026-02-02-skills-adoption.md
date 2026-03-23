@@ -7,7 +7,7 @@ Install and test 21 high-priority skills from skills.sh to enhance Claude Code's
 ## Current State Analysis
 
 **Existing Skills** (`.claude/skills/`):
-- Custom project skills: ui-aesthetics, ticket-writer, roadmap-review, writing-clearly-and-concisely, brand-guidelines
+- Custom project skills: frontend-design, ticket-writer, roadmap-review, writing-clearly-and-concisely, brand-guidelines
 - Total: 5 custom skills
 
 **Skills Infrastructure**:
@@ -37,8 +37,8 @@ Run `/context` command to see all loaded skills in the "Skills" section.
 - NOT installing CONSIDER skills (18 skills deferred for evaluation)
 - NOT installing FUTURE skills (23 skills for later use cases)
 - NOT installing secure-claude-skills yet (requires separate deep-dive review)
-- NOT modifying existing custom skills (ui-aesthetics, ticket-writer, etc.)
-- NOT removing frontend-design from the list (already merged into ui-aesthetics)
+- NOT modifying existing custom skills (frontend-design, ticket-writer, etc.)
+- NOT removing frontend-design from the list (already merged into frontend-design)
 
 ## Implementation Approach
 

@@ -61,7 +61,7 @@
 - [x] **caching-strategies** (wshobson/agents) — SKIP: Rails 8 focused, not applicable
 - [x] **web-design-guidelines** (vercel-labs/agent-skills) — ADOPT: 56K installs, 100+ UI compliance rules
 - [x] **baseline-ui** (ibelick/ui-skills) — ADOPT: Prevents AI slop, animation/z-index constraints
-- [x] **frontend-design** (anthropics/skills) — ADOPT: Distinctive fonts, anti-generic aesthetics (patterns merged into ui-aesthetics)
+- [x] **frontend-design** (anthropics/skills) — ADOPT: Distinctive fonts, anti-generic aesthetics (patterns merged into frontend-design)
 - [x] **composition-patterns** (vercel-labs/agent-skills) — ADOPT: Compound components, avoid boolean props
 - [x] **web-perf** (cloudflare/cloudflare-skills) — CONSIDER: Core Web Vitals audit via DevTools MCP
 - [x] **image-optimization** (wshobson/agents) — CONSIDER: Hero <200KB, WebP with fallbacks
@@ -96,7 +96,7 @@
 - [x] **yarn** / **npm** / **pnpm** — SKIP: No good Yarn 3 PnP skill exists, CLAUDE.md is sufficient
 - [x] **vite** / **webpack** (antfu/skills) — SKIP: 1.7K installs, Next.js uses Turbopack, patterns don't apply
 - [x] **unit-testing** → **javascript-testing-patterns** (wshobson/agents) — CONSIDER: Already noted above
-- [x] **ui-design** / **ux-design** → **ui-ux-pro-max** (nextlevelbuilder) — PATTERNS EXTRACTED: 7.9K installs, 67 styles, 96 palettes - key patterns merged into ui-aesthetics skill
+- [x] **ui-design** / **ux-design** → **ui-ux-pro-max** (nextlevelbuilder) — PATTERNS EXTRACTED: 7.9K installs, 67 styles, 96 palettes - key patterns merged into frontend-design skill
 - [x] **progressive-web-apps** — FUTURE: No strong skill, use Serwist when needed
 - [x] **oauth** / **jwt** → **better-auth** (Microck) — FUTURE: 101 downloads, comprehensive auth when needed
 - [x] **rest-api** → **api-design-principles** (wshobson/agents) — ADOPT: 25.7K downloads, REST + GraphQL patterns
@@ -129,7 +129,7 @@
 - [x] **google-tag-manager** → **claude-skill-gtm-javascript** (ekusiadadus) — FUTURE: ES5-only code generation for GTM Custom HTML tags, Consent Mode v2. Flag for marketing integrations.
 - [x] **hotjar** — SKIP: No skill exists, use PostHog for behavior analytics
 - [x] **mixpanel** / **amplitude** — SKIP: No skills on skills.sh, MCP integrations exist from Composio if needed
-- [x] **web-quality** → **web-quality-skills** (addyosmani) — PATTERNS EXTRACTED: 96 stars, 150+ Lighthouse audits. Performance patterns merged into ui-aesthetics SKILL.md.
+- [x] **web-quality** → **web-quality-skills** (addyosmani) — PATTERNS EXTRACTED: 96 stars, 150+ Lighthouse audits. Performance patterns merged into frontend-design SKILL.md.
 
 ---
 
@@ -194,7 +194,7 @@
 4. wcag-audit-patterns (wshobson)
 5. screen-reader-testing (wshobson)
 6. baseline-ui (ibelick)
-7. frontend-design (anthropics) — Merged into ui-aesthetics
+7. frontend-design (anthropics) — Merged into frontend-design
 8. composition-patterns (vercel-labs)
 9. animation-designer (daffy0208)
 10. zod (pproenca)
@@ -295,16 +295,16 @@
 37. **twilio** (MCP only) — Official Twilio MCP (84 stars), no skill wrapper
 
 ### PATTERNS EXTRACTED - 4 skills
-1. frontend-design (anthropics) — Spatial composition, scroll-triggering, complexity matching merged into ui-aesthetics
-2. ui-ux-pro-max (nextlevelbuilder) — Light/dark mode contrast rules, professional UI mistakes table merged into ui-aesthetics
+1. frontend-design (anthropics) — Spatial composition, scroll-triggering, complexity matching merged into frontend-design
+2. ui-ux-pro-max (nextlevelbuilder) — Light/dark mode contrast rules, professional UI mistakes table merged into frontend-design
 3. accessibility-engineer (daffy0208) — 7 pillars, mindset framing, WCAG patterns merged into design-checklist.md
-4. web-quality-skills (addyosmani) — Animation performance patterns merged into ui-aesthetics SKILL.md
+4. web-quality-skills (addyosmani) — Animation performance patterns merged into frontend-design SKILL.md
 
 ---
 
 ## Improvements Made to Existing Skills
 
-### ui-aesthetics SKILL.md enhanced with:
+### frontend-design SKILL.md enhanced with:
 - **From frontend-design**: Spatial Composition section (asymmetry, overlap, diagonal flow, grid-breaking)
 - **From frontend-design**: Scroll-triggering guidance in Motion section
 - **From frontend-design**: "Match complexity to vision" principle
@@ -313,7 +313,7 @@
 - **From ui-ux-pro-max**: No emoji icons anti-pattern
 - **From web-quality-skills (addyosmani)**: Animation performance patterns (transform/opacity only, debounce, requestAnimationFrame, prefers-reduced-motion)
 
-### ui-aesthetics design-checklist.md enhanced with:
+### frontend-design design-checklist.md enhanced with:
 - **From accessibility-engineer (daffy0208)**: Mindset framing ("Accessibility is a civil right, not a feature", 1 in 4 stats)
 - **From accessibility-engineer**: New Section II with 7 Pillars of Accessibility:
   1. Semantic HTML (landmarks, heading hierarchy)
@@ -376,10 +376,10 @@ Keep these in mind for specific use cases:
 
 ### Patterns Extracted (PATTERNS - 4 skills)
 These skills had valuable patterns merged into existing custom skills:
-- **frontend-design** → ui-aesthetics (spatial composition, scroll-triggering)
-- **ui-ux-pro-max** → ui-aesthetics (light/dark mode contrast, common mistakes)
+- **frontend-design** → frontend-design (spatial composition, scroll-triggering)
+- **ui-ux-pro-max** → frontend-design (light/dark mode contrast, common mistakes)
 - **accessibility-engineer** → design-checklist.md (7 pillars framework)
-- **web-quality-skills** → ui-aesthetics (animation performance patterns)
+- **web-quality-skills** → frontend-design (animation performance patterns)
 
 ### Notable Skill Authors
 - **wshobson** — 15+ high-quality skills with 20K-50K installs (error-handling, code-review, API design, accessibility, ML patterns)

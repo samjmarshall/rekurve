@@ -1,3 +1,7 @@
+---
+name: commit
+description: git commit code changes with clear messages
+---
 # Commit Changes
 
 Review the current working tree and create well-structured git commits.
@@ -43,3 +47,4 @@ See "Conventional Commits 1.0.0" message specification here: https://raw.githubu
 
 - Group related changes together
 - Keep commits focused and atomic when possible
+- Use skill writing-clearly-and-concisely is available to help draft messages

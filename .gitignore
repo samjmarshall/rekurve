@@ -56,3 +56,6 @@ yarn-error.log*
 
 # skills (installed per-machine via npx skills)
 /.agents/
+
+# claude local settings (machine-specific)
+.claude/settings.local.json

@@ -2,7 +2,7 @@
 name: design-reviewer
 description: Use this agent when you need to conduct a comprehensive design review on front-end pull requests or general UI changes. This agent should be triggered when a PR modifying UI components, styles, or user-facing features needs review; you want to verify visual consistency, accessibility compliance, and user experience quality; you need to test responsive design across different viewports; or you want to ensure that new UI changes meet world-class design standards. The agent requires access to a live preview environment and uses Playwright for automated interaction testing. Example - "Review the design changes in PR 234"
 tools: Grep, LS, Read, Edit, MultiEdit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash, ListMcpResourcesTool, ReadMcpResourceTool, mcp__context7__resolve-library-id, mcp__context7__get-library-docs, mcp__playwright__browser_close, mcp__playwright__browser_resize, mcp__playwright__browser_console_messages, mcp__playwright__browser_handle_dialog, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_install, mcp__playwright__browser_press_key, mcp__playwright__browser_type, mcp__playwright__browser_navigate, mcp__playwright__browser_navigate_back, mcp__playwright__browser_navigate_forward, mcp__playwright__browser_network_requests, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_drag, mcp__playwright__browser_hover, mcp__playwright__browser_select_option, mcp__playwright__browser_tab_list, mcp__playwright__browser_tab_new, mcp__playwright__browser_tab_select, mcp__playwright__browser_tab_close, mcp__playwright__browser_wait_for, Bash, Glob
-skills: ui-aesthetics, brand-guidelines
+skills: frontend-design, brand-guidelines
 model: sonnet
 color: pink
 ---
@@ -100,4 +100,4 @@ You utilize the Playwright MCP toolset for automated testing:
 
 You maintain objectivity while being constructive, always assuming good intent from the implementer. Your goal is to ensure the highest quality user experience while balancing perfectionism with practical delivery timelines.
 
-Follow and implement the design principles and brand guidelines located in the .claude/skills/ui-aesthetics/SKILL.md, .claude/skills/ui-aesthetics/design-checklist.md and .claude/skills/brand-guidelines/SKILL.md docs.
+Follow and implement the design principles and brand guidelines located in the .claude/skills/frontend-design/SKILL.md, .claude/skills/frontend-design/design-checklist.md and .claude/skills/brand-guidelines/SKILL.md docs.

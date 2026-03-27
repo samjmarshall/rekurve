@@ -24,7 +24,8 @@
     "test:e2e:tablet": "playwright test --project=tablet",
     "test:e2e:ui": "playwright test --ui",
     "typecheck": "tsc --noEmit",
-    "posthog:setup": "tsx scripts/posthog-setup.ts"
+    "posthog:setup": "tsx scripts/posthog-setup.ts",
+    "postinstall": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -69,6 +70,7 @@
     "baseline-browser-mapping": "^2.9.15",
     "eslint": "^9.23.0",
     "eslint-config-next": "16.1.6",
+    "husky": "^9.1.7",
     "pako": "^2.1.0",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",

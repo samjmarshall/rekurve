@@ -5685,6 +5685,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"husky@npm:^9.1.7":
+  version: 9.1.7
+  resolution: "husky@npm:9.1.7"
+  bin:
+    husky: bin.js
+  checksum: c2412753f15695db369634ba70f50f5c0b7e5cb13b673d0826c411ec1bd9ddef08c1dad89ea154f57da2521d2605bd64308af748749b27d08c5f563bcd89975f
+  languageName: node
+  linkType: hard
+
 "iconv-lite@npm:^0.7.0, iconv-lite@npm:^0.7.2, iconv-lite@npm:~0.7.0":
   version: 0.7.2
   resolution: "iconv-lite@npm:0.7.2"
@@ -9369,6 +9378,7 @@ shadcn@latest:
     eslint: ^9.23.0
     eslint-config-next: 16.1.6
     framer-motion: ^12.23.24
+    husky: ^9.1.7
     lucide-react: ^0.563.0
     motion: ^12.23.24
     next: 16.1.6

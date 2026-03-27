@@ -12,7 +12,7 @@ export default defineConfig({
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
   // Limit workers to prevent dev server overload (CI uses 1, local uses 2)
-  workers: isCI ? 1 : 2,
+  workers: isCI ? 1 : 4,
   reporter: isCI
     ? [['list'], ['html', { open: 'never' }]]
     : [['html', { open: 'on-failure' }]],
@@ -31,7 +31,8 @@ export default defineConfig({
   },
 
   webServer: {
-    command: 'yarn dev',
+    // Test against the build output to ensure production parity and test execution speed.
+    command: `rm -rf .next/ && yarn build && yarn start`,
     url: baseURL,
     timeout: 120_000,
     reuseExistingServer: !isCI,

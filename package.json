@@ -6,7 +6,6 @@
   "scripts": {
     "build": "next build",
     "check": "eslint . && tsc --noEmit",
-    "check:e2e": "playwright test --reporter=list",
     "dev": "next dev --turbo",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
@@ -14,7 +13,7 @@
     "lint:fix": "eslint --fix .",
     "preview": "next build && next start",
     "start": "next start",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --reporter=list",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:desktop": "playwright test --project=desktop",
     "test:e2e:features": "playwright test e2e/features/",

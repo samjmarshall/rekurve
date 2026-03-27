@@ -9,7 +9,9 @@ import { canonicalUrl } from "~/lib/canonical-url";
 import { Footer } from "~/components/footer";
 import openGraph from "~/lib/open-graph";
 
-const canonical = canonicalUrl("/")
+export const runtime = "edge";
+
+const canonical = canonicalUrl("/");
 
 export const metadata: Metadata = {
   title: "AI Quote Generation & Speed to Lead for Service Businesses | Rekurve",
@@ -77,7 +79,7 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export default function RootLayout({
+export default function WebsiteLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const structuredData = {
@@ -118,11 +120,11 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased bg-background">
         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <AnalyticsProvider>
             <Navbar />
             {children}

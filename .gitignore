@@ -56,6 +56,11 @@ yarn-error.log*
 # idea files
 .idea
 
+# Claude
+!.claude/
+!thoughts/
+!CLAUDE.md
+
 # skills (installed per-machine via npx skills)
 /.agents/
 

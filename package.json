@@ -29,7 +29,8 @@
     "db:studio": "drizzle-kit studio",
     "db:migrate": "drizzle-kit migrate",
     "posthog:setup": "tsx scripts/posthog-setup.ts",
-    "postinstall": "husky"
+    "postinstall": "husky",
+    "release": "auto shipit"
   },
   "dependencies": {
     "@hookform/resolvers": "5.2.2",
@@ -66,6 +67,9 @@
     "zod": "4.0.0"
   },
   "devDependencies": {
+    "@auto-it/conventional-commits": "^11.3.6",
+    "@auto-it/git-tag": "^11.3.6",
+    "@auto-it/released": "^11.3.6",
     "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4.0.15",
     "@types/node": "^20.14.10",
@@ -73,6 +77,7 @@
     "@types/react": "19.2.13",
     "@types/react-dom": "19.2.3",
     "@types/three": "^0.182.0",
+    "auto": "^11.3.6",
     "baseline-browser-mapping": "^2.9.15",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.23.0",

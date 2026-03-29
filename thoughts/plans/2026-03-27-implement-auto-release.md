@@ -102,13 +102,13 @@ release:
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `yarn install` succeeds with new dependencies
-- [ ] `make check` still passes (no type/lint regressions)
-- [ ] `npx auto --version` prints a version number
+- [x] `yarn install` succeeds with new dependencies
+- [x] `make check` still passes (no type/lint regressions)
+- [x] `npx auto --version` prints a version number
 
 #### Manual Verification:
-- [ ] `.autorc` exists with correct plugin configuration
-- [ ] `package.json` has `"release"` script
+- [x] `.autorc` exists with correct plugin configuration
+- [x] `package.json` has `"release"` script
 
 ---
 
@@ -171,10 +171,10 @@ jobs:
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] Workflow YAML is valid: `gh workflow list` shows the new workflow after push
+- [x] Workflow YAML is valid: `gh workflow list` shows the new workflow after push
 
 #### Manual Verification:
-- [ ] Workflow appears in GitHub Actions tab after merging to `main`
+- [ ] Workflow appears in GitHub Actions tab after merging to `main` (verify after merge)
 
 ---
 
@@ -207,11 +207,11 @@ This gives auto a starting point. The next release will be calculated relative t
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `gh label list` shows the auto labels
-- [ ] `git tag --list` includes `v0.1.0`
+- [x] `gh label list` shows the auto labels
+- [x] `git tag --list` includes `v0.1.0`
 
 #### Manual Verification:
-- [ ] Labels visible in the GitHub UI under Issues > Labels
+- [x] Labels visible in the GitHub UI under Issues > Labels
 
 ---
 

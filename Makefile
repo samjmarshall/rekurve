@@ -26,6 +26,9 @@ db_push: install
 db_studio: install
 	yarn db:studio
 
+release:
+	yarn release
+
 clean:
 	rm -rf .next next-env.d.ts tsconfig.tsbuildinfo \
 		node_modules .yarn/cache .yarn/install-state.gz \

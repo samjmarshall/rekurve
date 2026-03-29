@@ -56,8 +56,5 @@ Please follow [Conventional Commits](https://www.conventionalcommits.org/) stand
 <!-- Clearly state any breaking changes and their implications -->
 <!-- Use format: BREAKING CHANGE: description of what breaks and how to migrate -->
 
-- [ ] No breaking changes
-- [ ] Breaking changes documented below
-
 **Breaking changes:**
 - 

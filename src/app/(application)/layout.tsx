@@ -1,9 +1,11 @@
 import "~/styles/globals.css";
 
 import { type Metadata } from "next";
+import { redirect } from "next/navigation";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { AnalyticsProvider } from "~/providers/AnalyticsProvider";
 import { ThemeProvider } from "~/providers/ThemeProvider";
+import { getSession } from "~/lib/session";
 
 export const metadata: Metadata = {
   title: "Dashboard | Rekurve",
@@ -27,12 +29,11 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export default function ApplicationLayout({
+export default async function ApplicationLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // TODO: Auth gate — redirect to /login if no session
-  // const session = await auth()
-  // if (!session?.user) redirect("/login")
+  const session = await getSession();
+  if (!session) redirect("/login");
 
   // TODO: Wrap with TRPCReactProvider when tRPC is set up
 

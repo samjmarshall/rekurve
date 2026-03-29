@@ -1,58 +1,58 @@
-name: Claude PR Description
+# name: Claude PR Description
 
-on:
-  pull_request:
-    types: [opened]
+# on:
+#   pull_request:
+#     types: [opened]
 
-jobs:
-  describe:
-    # Skip Renovate PRs and PRs with skip-description label
-    if: |
-      !startsWith(github.event.pull_request.head.ref, 'renovate/') &&
-      !contains(github.event.pull_request.labels.*.name, 'skip-description')
+# jobs:
+#   describe:
+#     # Skip Renovate PRs and PRs with skip-description label
+#     if: |
+#       !startsWith(github.event.pull_request.head.ref, 'renovate/') &&
+#       !contains(github.event.pull_request.labels.*.name, 'skip-description')
 
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      id-token: write
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       pull-requests: write
+#       id-token: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v6
+#         with:
+#           fetch-depth: 0
 
-      - name: Run Claude PR Description
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: |
-            Generate a PR description for PR #${{ github.event.pull_request.number }}.
+#       - name: Run Claude PR Description
+#         uses: anthropics/claude-code-action@v1
+#         with:
+#           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+#           prompt: |
+#             Generate a PR description for PR #${{ github.event.pull_request.number }}.
 
-            ## Instructions
-            1. Read the PR template at `docs/pr_template.md` if it exists
-            2. Get the diff: `gh pr diff ${{ github.event.pull_request.number }}`
-            3. Get commits: `gh pr view ${{ github.event.pull_request.number }} --json commits`
-            4. Analyze changes and write a clear description
-            5. Write the description to /tmp/description.md
-            6. Update the PR: `gh pr edit ${{ github.event.pull_request.number }} --body-file /tmp/description.md`
+#             ## Instructions
+#             1. Read the PR template at `docs/pr_template.md` if it exists
+#             2. Get the diff: `gh pr diff ${{ github.event.pull_request.number }}`
+#             3. Get commits: `gh pr view ${{ github.event.pull_request.number }} --json commits`
+#             4. Analyze changes and write a clear description
+#             5. Write the description to /tmp/description.md
+#             6. Update the PR: `gh pr edit ${{ github.event.pull_request.number }} --body-file /tmp/description.md`
 
-            ## Description Format
-            If no template exists, use:
-            ```markdown
-            ## Summary
-            [1-3 bullet points of what changed]
+#             ## Description Format
+#             If no template exists, use:
+#             ```markdown
+#             ## Summary
+#             [1-3 bullet points of what changed]
 
-            ## Changes
-            [Detailed breakdown by area]
+#             ## Changes
+#             [Detailed breakdown by area]
 
-            ## Testing
-            [How to verify the changes]
-            ```
+#             ## Testing
+#             [How to verify the changes]
+#             ```
 
-          claude_args: |
-            --max-turns 10
-            --allowedTools "Read,Glob,Bash(gh pr:*),Write(/tmp/*)"
-        env:
-          GH_TOKEN: ${{ github.token }}
+#           claude_args: |
+#             --max-turns 10
+#             --allowedTools "Read,Glob,Bash(gh pr:*),Write(/tmp/*)"
+#         env:
+#           GH_TOKEN: ${{ github.token }}

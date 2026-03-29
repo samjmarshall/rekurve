@@ -8,6 +8,8 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
+    DATABASE_URL: z.string().url(),
+    DATABASE_URL_UNPOOLED: z.string().url(),
     POSTHOG_ERROR_TRACKING_API_KEY: z.string(),
     POSTHOG_PROJECT_ID: z.string().regex(/^\d+$/, "Must be a numeric string"),
   },
@@ -28,6 +30,8 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    DATABASE_URL: process.env.DATABASE_URL,
+    DATABASE_URL_UNPOOLED: process.env.DATABASE_URL_UNPOOLED,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     POSTHOG_ERROR_TRACKING_API_KEY: process.env.POSTHOG_ERROR_TRACKING_API_KEY,

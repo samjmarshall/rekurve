@@ -17,6 +17,18 @@ test_e2e:
 audit:
 	yarn npm audit --environment production
 
+db_generate: install
+	yarn db:generate
+
+db_push: install
+	yarn db:push
+
+db_studio: install
+	yarn db:studio
+
+release:
+	yarn release
+
 clean:
 	rm -rf .next next-env.d.ts tsconfig.tsbuildinfo \
 		node_modules .yarn/cache .yarn/install-state.gz \

@@ -1,0 +1,10 @@
+{
+  "baseBranch": "main",
+  "plugins": [
+    "git-tag",
+    "conventional-commits",
+    ["released", {
+      "message": ":rocket: This %TYPE is included in version %VERSION"
+    }]
+  ]
+}

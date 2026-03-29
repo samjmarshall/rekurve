@@ -198,7 +198,7 @@ After adding issues and creating iterations, set fields using the GraphQL API.
 |---|-------|--------|----------|------|-----------|-------|-----|
 | 89 | Route Group Scaffold | Ready | P1 | S | Week 1: Foundation | 2026-03-31 | 2026-03-31 |
 | 90 | Drizzle ORM + Neon Setup | Ready | P1 | M | Week 1: Foundation | 2026-03-31 | 2026-04-01 |
-| 91 | NextAuth v5 — Magic Link | Backlog | P1 | M | Week 1: Foundation | 2026-04-01 | 2026-04-02 |
+| 91 | better-auth — Email OTP | Backlog | P1 | M | Week 1: Foundation | 2026-04-01 | 2026-04-02 |
 | 95 | HubSpot API Client Setup | Backlog | P1 | M | Week 1: Foundation | 2026-04-01 | 2026-04-02 |
 | 92 | Login Page & Auth Redirect | Backlog | P2 | S | Week 1: Foundation | 2026-04-02 | 2026-04-03 |
 | 93 | tRPC Dual-Client Setup | Backlog | P1 | M | Week 1: Foundation | 2026-04-02 | 2026-04-03 |
@@ -238,7 +238,7 @@ Prep tasks to unblock development (not GitHub issues — just do them):
 | HubSpot API | Week 1 (Mar 31) | Get `HUBSPOT_ACCESS_TOKEN` from consultant's account |
 | Claude API | Week 2 (Apr 7) | Provision key for AI scoring, set `ANTHROPIC_API_KEY` |
 | Twilio | Week 3 (Apr 14) | Create account, buy AU phone number, get SID + auth token |
-| `AUTH_SECRET` | Week 1 (Mar 31) | Generate with `openssl rand -base64 32` |
+| `BETTER_AUTH_SECRET` | Week 1 (Mar 31) | Generate with `openssl rand -base64 32` |
 
 ---
 

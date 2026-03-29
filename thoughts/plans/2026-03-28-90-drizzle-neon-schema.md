@@ -2,7 +2,7 @@
 
 ## Overview
 
-Install and configure Drizzle ORM with Neon Postgres (serverless). Define all database tables — 6 domain tables plus 4 NextAuth adapter tables. Run initial migration. The Neon project is already provisioned via Vercel integration with `DATABASE_URL` available in `.env.local`.
+Install and configure Drizzle ORM with Neon Postgres (serverless). Define all database tables — 6 domain tables plus 4 better-auth tables. Run initial migration. The Neon project is already provisioned via Vercel integration with `DATABASE_URL` available in `.env.local`.
 
 **Issue**: #90
 **Epic**: #85 (MVP Foundation)
@@ -11,20 +11,20 @@ Install and configure Drizzle ORM with Neon Postgres (serverless). Define all da
 
 - `src/server/` directory does not exist — completely greenfield
 - `DATABASE_URL` and `DATABASE_URL_UNPOOLED` already provisioned in `.env.local` (Neon ap-southeast-2, pooled via PgBouncer)
-- No Drizzle, Neon driver, or NextAuth packages installed
+- No Drizzle, Neon driver, or better-auth packages installed
 - `.env.example` and `src/env.js` only validate PostHog variables
 - Project uses Yarn 3.8.7, `~/` path alias → `src/*`, strict TypeScript, `verbatimModuleSyntax: true`
 - Zod v4 installed
 
 ### Key Discoveries:
 - Design doc specifies `conversations.delivery_method` (enum: `imessage | sms | email`) per ADR-001 — included in schema
-- Auth.js Drizzle adapter expects specific column names/types — tables defined to match exactly
+- better-auth Drizzle adapter expects specific column names/types — tables defined to match exactly (can be generated via `npx @better-auth/cli generate`)
 - Neon serverless driver uses pooled URL for queries, unpooled URL for migrations
 
 ## Desired End State
 
 - Drizzle ORM configured with Neon serverless driver
-- 10 tables created in Neon Postgres (4 auth + 6 domain)
+- 10 tables created in Neon Postgres (4 better-auth + 6 domain)
 - All enums, indexes, and foreign keys in place
 - `make check` passes (lint + typecheck)
 - `yarn db:generate` produces migration files
@@ -35,8 +35,8 @@ Install and configure Drizzle ORM with Neon Postgres (serverless). Define all da
 - Seed data
 - tRPC procedures (separate issue)
 - HubSpot sync logic (separate issue)
-- NextAuth configuration/providers (separate issue — we only define the adapter-compatible tables)
-- Installing `next-auth` or `@auth/drizzle-adapter` (done when auth is set up)
+- better-auth configuration/plugins (separate issue — we only define the adapter-compatible tables)
+- Installing `better-auth` (done when auth is set up)
 
 ## Implementation Approach
 
@@ -157,10 +157,10 @@ db_studio: install
 
 ---
 
-## Phase 2: NextAuth Adapter Schema
+## Phase 2: better-auth Schema
 
 ### Overview
-Define the 4 NextAuth adapter tables matching the Auth.js Drizzle adapter's expected schema. These tables will be ready for the adapter when NextAuth is configured in a later issue.
+Define the 4 better-auth tables matching the Drizzle adapter's expected schema. These tables will be ready for the adapter when better-auth is configured in a later issue. Can also be generated via `npx @better-auth/cli generate --output ./src/server/db/schema/auth.ts`.
 
 ### Changes Required:
 
@@ -172,79 +172,68 @@ import {
   pgTable,
   text,
   timestamp,
-  primaryKey,
-  integer,
+  boolean,
 } from "drizzle-orm/pg-core";
 
-import type { AdapterAccountType } from "next-auth/adapters";
-
-export const users = pgTable("users", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: text("name"),
-  email: text("email").unique(),
-  emailVerified: timestamp("email_verified", { mode: "date" }),
+export const user = pgTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull(),
   image: text("image"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const accounts = pgTable(
-  "accounts",
-  {
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    type: text("type").$type<AdapterAccountType>().notNull(),
-    provider: text("provider").notNull(),
-    providerAccountId: text("provider_account_id").notNull(),
-    refreshToken: text("refresh_token"),
-    accessToken: text("access_token"),
-    expiresAt: integer("expires_at"),
-    tokenType: text("token_type"),
-    scope: text("scope"),
-    idToken: text("id_token"),
-    sessionState: text("session_state"),
-  },
-  (account) => [
-    primaryKey({
-      columns: [account.provider, account.providerAccountId],
-    }),
-  ],
-);
-
-export const sessions = pgTable("sessions", {
-  sessionToken: text("session_token").primaryKey(),
+export const session = pgTable("session", {
+  id: text("id").primaryKey(),
+  expiresAt: timestamp("expires_at").notNull(),
+  token: text("token").notNull().unique(),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
   userId: text("user_id")
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", { mode: "date" }).notNull(),
+    .references(() => user.id, { onDelete: "cascade" }),
 });
 
-export const verificationTokens = pgTable(
-  "verification_tokens",
-  {
-    identifier: text("identifier").notNull(),
-    token: text("token").notNull(),
-    expires: timestamp("expires", { mode: "date" }).notNull(),
-  },
-  (verificationToken) => [
-    primaryKey({
-      columns: [verificationToken.identifier, verificationToken.token],
-    }),
-  ],
-);
+export const account = pgTable("account", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  scope: text("scope"),
+  password: text("password"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+});
+
+export const verification = pgTable("verification", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
+});
 ```
 
-**Important**: This uses the `AdapterAccountType` import from `next-auth/adapters`. Since `next-auth` is not installed yet, we have two options:
-1. Install `next-auth` now as a dependency (it's needed anyway for the auth issue)
-2. Use a plain `text` type without the `$type<AdapterAccountType>()` cast
+**Key differences from NextAuth adapter tables:**
+- `user.emailVerified` is `boolean` (not `timestamp`)
+- `session` uses `token` field (not `sessionToken`), has `ipAddress`/`userAgent` tracking
+- `account` has `id` primary key, `providerId`/`accountId` (not composite PK), includes `password` field
+- `verification` replaces `verificationTokens` — more general purpose (handles OTPs, email verification)
+- All tables have `createdAt`/`updatedAt` timestamps
 
-**Recommendation**: Use plain `text("type").notNull()` for now and add the type cast when `next-auth` is installed. This avoids pulling in the entire `next-auth` package prematurely.
-
-So the actual `type` column becomes:
-```typescript
-type: text("type").notNull(),
-```
+**No external imports needed** — unlike NextAuth's `AdapterAccountType`, better-auth schema is pure Drizzle with no auth package dependency.
 
 ### Success Criteria:
 
@@ -252,7 +241,7 @@ type: text("type").notNull(),
 - [x] `make check` passes
 
 #### Manual Verification:
-- [x] Schema file exports `users`, `accounts`, `sessions`, `verificationTokens`
+- [x] Schema file exports `user`, `account`, `session`, `verification`
 
 ---
 
@@ -677,7 +666,7 @@ export * from "./nurture-sequences";
 
 #### Manual Verification:
 - [x] All 6 domain tables exported from barrel
-- [x] All 4 auth tables exported from barrel
+- [x] All 4 better-auth tables exported from barrel
 - [x] All enums defined with correct values
 - [x] Foreign key relationships correct (leads → lots, message_queue, conversations, etc.)
 
@@ -719,7 +708,7 @@ The `drizzle/` directory contains migration files and should be committed (it's 
 - [x] `make check` passes
 
 #### Manual Verification:
-- [ ] All 10 tables visible in Neon console (6 domain + 4 NextAuth)
+- [ ] All 10 tables visible in Neon console (6 domain + 4 better-auth)
 - [ ] Enum types created correctly in Postgres
 - [ ] Indexes exist on specified columns
 - [x] `DATABASE_URL` configured in `.env.local` (already done) and Vercel
@@ -752,5 +741,5 @@ The `drizzle/` directory contains migration files and should be committed (it's 
 - Design doc: `thoughts/designs/2026-03-27-ai-sales-assistant-new-home-builders.md`
 - Enquiry form: `docs/sales/Display-Client-Enquiry-Form-v1.2.md`
 - ADR-001 (iMessage/delivery_method): `docs/architecture-decisions/adr001-imessage-integration-for-sales-automation.md`
-- Auth.js Drizzle adapter schema: https://authjs.dev/getting-started/adapters/drizzle
+- better-auth Drizzle adapter schema: https://www.better-auth.com/docs/adapters/drizzle
 - Drizzle + Neon setup: https://orm.drizzle.team/docs/get-started/neon-new

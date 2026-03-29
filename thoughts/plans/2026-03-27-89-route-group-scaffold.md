@@ -414,7 +414,7 @@ export default function ApplicationLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   // TODO: Auth gate — redirect to /login if no session
-  // const session = await auth()
+  // const session = await getSession()
   // if (!session?.user) redirect("/login")
 
   // TODO: Wrap with TRPCReactProvider when tRPC is set up

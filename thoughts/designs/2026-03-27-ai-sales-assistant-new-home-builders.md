@@ -311,9 +311,9 @@ Following the aidlc-demo dual-client pattern:
 
 Serverless Postgres on Neon, integrates natively with Vercel. Drizzle ORM for type-safe queries. Relational model fits naturally: leads have messages, lots have matches, sequences have steps. DynamoDB was assessed but rejected — the only reason for AWS would be DynamoDB itself, adding unnecessary AWS account/IAM/Terraform overhead for a single service with cross-cloud latency.
 
-### Auth — NextAuth v5
+### Auth — better-auth
 
-auth() wrapped in cache(). Email magic link for the pilot (single consultant). Google OAuth addable later for multi-user.
+`auth.api.getSession()` wrapped in `cache()`. Email OTP via better-auth plugin for the pilot (single consultant). Chose OTP over magic link: eliminates corporate email scanner token consumption, better mobile UX (iOS/Android auto-detect OTP codes), simpler client implementation (no callback route needed), and more resilient retry flow (3 attempts vs 1). Google OAuth addable later for multi-user. Auth.js maintainers joined better-auth in Sep 2025 — better-auth is the recommended path for new projects.
 
 ### External Integrations
 
@@ -406,7 +406,7 @@ No separate users table for the pilot. NextAuth user record covers auth identity
 
 ### Week 1: Foundation
 
-- Project scaffold: route groups, tRPC, Drizzle, Neon, NextAuth v5 with magic link
+- Project scaffold: route groups, tRPC, Drizzle, Neon, better-auth with email OTP
 - Database schema: all tables, migrations run
 - HubSpot integration: API connection, contact sync
 - Auth flow: login -> dashboard redirect
@@ -477,5 +477,5 @@ The consultant has a populated pipeline of scored, staged leads. When a lot beco
 ### Architectural References
 
 - `rekurve/rekurve/` — Route group pattern (website/login/onboarding/application), tRPC setup, Drizzle + Neon
-- `v2/aidlc-demo/` — tRPC v11 dual-client pattern (RSC + client), NextAuth v5 with cache(), HydrateClient, shared QueryClient
+- `v2/aidlc-demo/` — tRPC v11 dual-client pattern (RSC + client), auth with cache(), HydrateClient, shared QueryClient
 - `v2/devoli-aws-prototype/` — DynamoDB pattern (assessed, rejected for this project due to AWS overhead)

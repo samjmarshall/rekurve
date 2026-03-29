@@ -73,7 +73,12 @@
 - [x] **typography** → Various skills found — CONSIDER: Font loading, typography scale patterns
 - [x] **remotion-best-practices** (remotion/remotion-skills) — FUTURE: 51K installs, if adding video
 - [x] **analytics-tracking** (coreyhaines31/marketingskills) — FUTURE: GA4, Mixpanel patterns
-- [x] **better-auth** (better-auth/better-auth-skills) — FUTURE: When adding auth
+- [x] **better-auth** → **better-auth-best-practices** (better-auth/skills) — ADOPT: 29.5K installs. Auth.js maintainers joined better-auth Sep 2025; recommended for new projects. Magic link, email OTP, Drizzle adapter built-in. **Installed.**
+- [ ] **better-auth** → **better-auth-security-best-practices** (better-auth/skills) — CONSIDER: 5.9K installs. Security hardening patterns for better-auth.
+- [ ] **better-auth** → **email-and-password-best-practices** (better-auth/skills) — SKIP: 6.9K installs. Using email OTP, not email/password.
+- [ ] **better-auth** → **organization-best-practices** (better-auth/skills) — FUTURE: 6.4K installs. Multi-tenant/orgs — out of scope for pilot.
+- [ ] **better-auth** → **two-factor-authentication-best-practices** (better-auth/skills) — FUTURE: 5.9K installs. 2FA not needed for pilot.
+- [ ] **better-auth** → **create-auth-skill** (better-auth/skills) — SKIP: 11.5K installs. Meta-skill for creating auth skills, not applicable.
 - [x] **notion** (notion/notion-skills) — SKIP: Not using Notion
 
 ### Batch 5: Data Fetching, Testing, Infrastructure (10 skills)
@@ -98,7 +103,7 @@
 - [x] **unit-testing** → **javascript-testing-patterns** (wshobson/agents) — CONSIDER: Already noted above
 - [x] **ui-design** / **ux-design** → **ui-ux-pro-max** (nextlevelbuilder) — PATTERNS EXTRACTED: 7.9K installs, 67 styles, 96 palettes - key patterns merged into frontend-design skill
 - [x] **progressive-web-apps** — FUTURE: No strong skill, use Serwist when needed
-- [x] **oauth** / **jwt** → **better-auth** (Microck) — FUTURE: 101 downloads, comprehensive auth when needed
+- [x] **oauth** / **jwt** → **better-auth** (Microck) — ADOPT: Auth.js team joined better-auth; first-class magic link, OTP, passkeys, Drizzle adapter
 - [x] **rest-api** → **api-design-principles** (wshobson/agents) — ADOPT: 25.7K downloads, REST + GraphQL patterns
 - [x] **graphql** — FUTURE: No prominent skill, use Apollo Client + Next.js docs when needed
 
@@ -171,9 +176,9 @@
 | Status | Count |
 |--------|-------|
 | **Reviewed** | **102** |
-| ADOPT | 21 |
+| ADOPT | 22 |
 | CONSIDER | 18 |
-| FUTURE | 23 |
+| FUTURE | 22 |
 | SKIP | 37 |
 | PATTERNS EXTRACTED | 4 |
 | High Priority Remaining | 0 |
@@ -209,6 +214,7 @@
 19. nextjs-best-practices (gohypergiant) — Moved from CONSIDER
 20. api-design-principles (wshobson) — 25.7K downloads
 21. **ai-sdk** (vercel/ai) — 2,300 installs, TypeScript-native AI SDK for Next.js
+22. **better-auth** (better-auth/better-auth-skills) — Auth.js team joined better-auth Sep 2025; magic link, OTP, Drizzle adapter built-in
 
 ### CONSIDER (Evaluate Further) - 18 skills
 1. playwright-skill (lackeyjb)
@@ -240,7 +246,7 @@
 7. mcp-builder — MCP servers
 8. remotion-best-practices — Video
 9. analytics-tracking — GA4/Mixpanel
-10. better-auth — Authentication
+10. ~~better-auth~~ — Moved to ADOPT
 11. tanstack-query — Data fetching
 12. langchain-architecture (wshobson) — AI agent orchestration (945 installs)
 13. figma implement-design — Design handoff (362 installs)

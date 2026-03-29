@@ -13,7 +13,7 @@
 
 ## Goal
 
-Stand up the full application skeleton for the Creation Homes AI Sales Assistant — route groups, tRPC server layer, database schema, authentication, and HubSpot integration. By the end of this epic, the consultant can log in via magic link and land on an empty dashboard, with all database tables migrated and HubSpot API connected.
+Stand up the full application skeleton for the Creation Homes AI Sales Assistant — route groups, tRPC server layer, database schema, authentication, and HubSpot integration. By the end of this epic, the consultant can log in via email OTP and land on an empty dashboard, with all database tables migrated and HubSpot API connected.
 
 ## Business Context
 
@@ -27,8 +27,8 @@ Stand up the full application skeleton for the Creation Homes AI Sales Assistant
 **In Scope:**
 - Next.js route group structure: `(website)`, `(login)`, `(onboarding)`, `(application)`
 - tRPC dual-client setup (RSC direct caller + client httpBatchStreamLink)
-- Drizzle ORM + Neon Postgres: all 6 tables with migrations
-- NextAuth v5 with email magic link
+- Drizzle ORM + Neon Postgres: all 6 domain tables + 4 better-auth tables with migrations
+- better-auth with email OTP
 - HubSpot API connection and bidirectional contact sync
 - Auth flow: login -> dashboard redirect, session checks at layout level
 - Empty dashboard shell (mobile-responsive app shell)
@@ -46,7 +46,7 @@ Stand up the full application skeleton for the Creation Homes AI Sales Assistant
 1. **Route group scaffold** — 4 independent route groups with separate layouts, no shared root layout
 2. **tRPC server layer** — Dual-client pattern, protectedProcedure, SuperJSON + Zod error formatting, router stubs for leads/lots/messages/ai/nurture
 3. **Database schema** — All 6 tables: `leads`, `lots`, `lot_matches`, `message_queue`, `conversations`, `nurture_sequences` with enums and indexes
-4. **Auth flow** — NextAuth v5, `auth()` wrapped in `cache()`, magic link provider, login/dashboard redirect
+4. **Auth flow** — better-auth, `auth.api.getSession()` wrapped in `cache()`, email OTP plugin, login/dashboard redirect
 5. **HubSpot integration** — API client, contact sync (create/update), webhook or polling for inbound changes
 
 ## Breakdown into Stories/Tasks
@@ -57,7 +57,7 @@ Stand up the full application skeleton for the Creation Homes AI Sales Assistant
 - [ ] Set up tRPC dual-client (RSC + client) with router stubs
 - [ ] Configure Drizzle ORM + Neon connection
 - [ ] Create database schema and run migrations (all 6 tables)
-- [ ] Implement NextAuth v5 with magic link provider
+- [ ] Implement better-auth with email OTP plugin
 - [ ] Build login page and auth redirect flow
 - [ ] Build empty dashboard app shell (mobile-responsive)
 - [ ] Set up HubSpot API client and contact sync
@@ -68,19 +68,19 @@ Stand up the full application skeleton for the Creation Homes AI Sales Assistant
 - Neon Postgres project provisioned (Vercel integration)
 - HubSpot account set up by pilot consultant (confirmed — willing to set up independent HubSpot)
 - Vercel project configured for deployment
-- Environment variables: `DATABASE_URL`, `NEXTAUTH_SECRET`, `HUBSPOT_API_KEY`
+- Environment variables: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `HUBSPOT_API_KEY`
 
 ## Risks and Mitigations
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
 | HubSpot API rate limits during sync | Medium | Implement batching and respect rate limit headers |
-| Magic link email deliverability | Medium | Use Resend or Vercel Email; test with real email before pilot |
+| OTP email deliverability | Low | Email OTP immune to corporate scanner token consumption; use Resend or Vercel Email |
 | Neon cold start latency | Low | Neon serverless driver handles this; monitor in practice |
 
 ## Success Criteria
 
-- [ ] Consultant can receive magic link email and log in
+- [ ] Consultant can receive OTP email and log in
 - [ ] Dashboard loads with empty state after auth
 - [ ] All 6 database tables exist with correct schema
 - [ ] tRPC health check returns OK from both RSC and client contexts

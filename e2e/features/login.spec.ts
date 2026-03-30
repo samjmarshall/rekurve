@@ -21,6 +21,30 @@ test.describe("Login Page — UI", () => {
     await expect(loginPage.emailInput).toHaveAttribute("required", "");
     await expect(loginPage.emailInput).toHaveAttribute("autocomplete", "email");
   });
+
+  test("page has noindex meta tag", async ({ loginPage }) => {
+    await loginPage.goto();
+
+    const robots = loginPage.page.locator('meta[name="robots"]');
+    await expect(robots).toHaveAttribute("content", /noindex/);
+  });
+
+  test("is mobile-responsive — renders correctly at small viewport", async ({
+    loginPage,
+  }) => {
+    await loginPage.page.setViewportSize({ width: 375, height: 667 });
+    await loginPage.goto();
+
+    await expect(loginPage.container).toBeVisible();
+    await expect(loginPage.logo).toBeVisible();
+    await expect(loginPage.emailInput).toBeVisible();
+    await expect(loginPage.continueButton).toBeVisible();
+
+    // Card should not overflow the viewport
+    const containerBox = await loginPage.container.boundingBox();
+    expect(containerBox).toBeTruthy();
+    expect(containerBox!.width).toBeLessThanOrEqual(375);
+  });
 });
 
 /**
@@ -65,6 +89,38 @@ test.describe("Login Page — Email Step", () => {
     await loginPage.expectError();
   });
 
+  test("stays on email step when submitting invalid email", async ({
+    loginPage,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name === "mobile",
+      "Mobile WebKit form submission issues",
+    );
+    await loginPage.goto();
+
+    // Fill an invalid email (no domain)
+    await loginPage.fillEmail("not-an-email");
+    await loginPage.submitEmail();
+
+    // HTML5 validation should prevent submission — still on email step
+    await loginPage.expectEmailStep();
+  });
+
+  test("stays on email step when submitting empty email", async ({
+    loginPage,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name === "mobile",
+      "Mobile WebKit form submission issues",
+    );
+    await loginPage.goto();
+
+    await loginPage.submitEmail();
+
+    // Required attribute should prevent submission — still on email step
+    await loginPage.expectEmailStep();
+  });
+
   test("shows loading state while sending", async ({ loginPage }, testInfo) => {
     test.skip(
       testInfo.project.name === "mobile",
@@ -105,7 +161,27 @@ test.describe("Login Page — OTP Step", () => {
     await loginPage.expectOtpStep();
   });
 
-  test("shows error for invalid OTP", async ({ loginPage }) => {
+  test("redirects to /dashboard on successful OTP verification", async ({
+    loginPage,
+  }) => {
+    await mockVerifyOtp(loginPage.page, { ok: true });
+
+    // Intercept the dashboard navigation to prevent the server-side
+    // auth guard from redirecting back (no real session exists in e2e)
+    const dashboardNavigation = loginPage.page.waitForRequest((req) =>
+      req.url().includes("/dashboard"),
+    );
+
+    await loginPage.page.keyboard.type("123456");
+    await loginPage.submitOtp();
+
+    const request = await dashboardNavigation;
+    expect(request.url()).toContain("/dashboard");
+  });
+
+  test("shows error for invalid OTP with resend option visible", async ({
+    loginPage,
+  }) => {
     await mockVerifyOtp(loginPage.page, {
       ok: false,
       error: "Invalid or expired code",
@@ -114,7 +190,9 @@ test.describe("Login Page — OTP Step", () => {
     await loginPage.page.keyboard.type("123456");
     await loginPage.submitOtp();
 
-    await loginPage.expectError();
+    await loginPage.expectError("Invalid or expired code");
+    await expect(loginPage.resendButton).toBeVisible();
+    await expect(loginPage.resendButton).toHaveText("Resend code");
   });
 
   test("verify button is disabled until 6 digits entered", async ({

@@ -1,9 +1,9 @@
 import {
   pgTable,
   text,
-  uuid,
   timestamp,
   uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 import { matchStrengthEnum, outreachStatusEnum } from "./enums";

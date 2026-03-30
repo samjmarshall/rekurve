@@ -1,43 +1,43 @@
-import type { NextConfig } from "next";
-import { env } from "~/env";
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
  */
 import { withPostHogConfig } from "@posthog/nextjs-config";
+import type { NextConfig } from "next";
+import { env } from "~/env";
 
 const config: NextConfig = {
   headers: async () => [
     {
       // Apply these headers to all routes in your application.
-      source: '/:path*',
+      source: "/:path*",
       headers: [
         {
-          key: 'Document-Policy',
-          value: 'js-profiling',
+          key: "Document-Policy",
+          value: "js-profiling",
         },
         {
-          key: 'X-DNS-Prefetch-Control',
-          value: 'on',
+          key: "X-DNS-Prefetch-Control",
+          value: "on",
         },
         {
-          key: 'X-Frame-Options',
-          value: 'DENY',
+          key: "X-Frame-Options",
+          value: "DENY",
         },
         {
-          key: 'Permissions-Policy',
-          value: 'geolocation=()',
+          key: "Permissions-Policy",
+          value: "geolocation=()",
         },
         {
-          key: 'X-Content-Type-Options',
-          value: 'nosniff',
+          key: "X-Content-Type-Options",
+          value: "nosniff",
         },
         {
-          key: 'Referrer-Policy',
-          value: 'origin-when-cross-origin',
+          key: "Referrer-Policy",
+          value: "origin-when-cross-origin",
         },
         {
-          key: 'Content-Security-Policy',
+          key: "Content-Security-Policy",
           value: [
             "default-src 'none';",
             "base-uri 'none';",
@@ -51,7 +51,7 @@ const config: NextConfig = {
             "script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js https://us-assets.i.posthog.com;",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
             "upgrade-insecure-requests;",
-          ].join(' '),
+          ].join(" "),
         },
       ],
     },
@@ -64,7 +64,8 @@ export default withPostHogConfig(config, {
   personalApiKey: env.POSTHOG_ERROR_TRACKING_API_KEY,
   envId: env.POSTHOG_PROJECT_ID,
   host: env.NEXT_PUBLIC_POSTHOG_HOST, // (optional)
-  sourcemaps: { // (optional)
+  sourcemaps: {
+    // (optional)
     enabled: process.env.CI === "true", // (optional) Enable sourcemaps generation and upload, default to true on production builds
     project: "Rekurve", // (optional) Project name, defaults to repository name
     deleteAfterUpload: true, // (optional) Delete sourcemaps after upload, defaults to true

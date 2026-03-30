@@ -1,14 +1,13 @@
 "use client";
 
-import { firstRowStats, secondRowStats } from "./stats-data";
-
 import Marquee from "react-fast-marquee";
-import { StatCard } from "./StatCard";
 import { useMediaQuery } from "~/hooks";
+import { StatCard } from "./StatCard";
+import { firstRowStats, secondRowStats } from "./stats-data";
 
 export function StatsMarquee() {
   const prefersReducedMotion = useMediaQuery(
-    "(prefers-reduced-motion: reduce)"
+    "(prefers-reduced-motion: reduce)",
   );
 
   return (

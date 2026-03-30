@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-import { test as base } from '@playwright/test';
-import { AnalyticsHelper } from '../utils/analytics-helper';
-import { HomePage } from '../pages/home.page';
+import { test as base } from "@playwright/test";
+import { HomePage } from "../pages/home.page";
+import { AnalyticsHelper } from "../utils/analytics-helper";
 
 type TestFixtures = {
   analytics: AnalyticsHelper;
@@ -22,4 +21,4 @@ export const test = base.extend<TestFixtures>({
   },
 });
 
-export { expect } from '@playwright/test';
+export { expect } from "@playwright/test";

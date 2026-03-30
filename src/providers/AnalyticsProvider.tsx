@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { analytics } from '~/lib/posthog'
+import { useEffect } from "react";
+import { analytics } from "~/lib/posthog";
 
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    analytics.session.initialize()
-  }, [])
+    analytics.session.initialize();
+  }, []);
 
-  return <>{children}</>
+  return <>{children}</>;
 }

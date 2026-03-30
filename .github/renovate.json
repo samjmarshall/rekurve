@@ -1,11 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "github>V2-Digital/renovate-config"
-  ],
-  "schedule": [
-    "* 9-16 * * 1-5"
-  ],
+  "extends": ["github>V2-Digital/renovate-config"],
+  "schedule": ["* 9-16 * * 1-5"],
   "timezone": "Australia/Sydney",
   "prConcurrentLimit": 10,
   "packageRules": []

@@ -1,11 +1,11 @@
 import "~/styles/globals.css";
 
-import { type Metadata } from "next";
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
+import { redirect } from "next/navigation";
+import { getSession } from "~/lib/session";
 import { AnalyticsProvider } from "~/providers/AnalyticsProvider";
 import { ThemeProvider } from "~/providers/ThemeProvider";
-import { getSession } from "~/lib/session";
 
 export const metadata: Metadata = {
   title: "Login | Rekurve",
@@ -40,16 +40,14 @@ export default async function LoginLayout({
       className={`${ibmPlexSans.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
-      <body className="font-sans antialiased bg-background">
+      <body className="bg-background font-sans antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <AnalyticsProvider>
-            {children}
-          </AnalyticsProvider>
+          <AnalyticsProvider>{children}</AnalyticsProvider>
         </ThemeProvider>
       </body>
     </html>

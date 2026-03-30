@@ -1,6 +1,6 @@
-import type { Page, Locator } from '@playwright/test';
-import { expect } from '@playwright/test';
-import type { TestUser } from '../../data/test-users';
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import type { TestUser } from "../../data/test-users";
 
 export class BookingFormSection {
   readonly page: Page;
@@ -34,52 +34,52 @@ export class BookingFormSection {
   constructor(page: Page) {
     this.page = page;
     this.container = page.locator('[data-testid="booking-form-container"]');
-    this.stepIndicator = page.locator('[data-testid="booking-form-step-indicator"]');
+    this.stepIndicator = page.locator(
+      '[data-testid="booking-form-step-indicator"]',
+    );
     this.nextButton = page.locator('[data-testid="booking-form-next-btn"]');
     this.prevButton = page.locator('[data-testid="booking-form-back-btn"]');
     this.submitButton = page.locator('[data-testid="booking-form-submit-btn"]');
     this.successState = page.locator('[data-testid="booking-form-step-5"]');
 
     // Step 1
-    this.emailInput = page.locator('#email');
-    this.firstNameInput = page.locator('#firstName');
-    this.lastNameInput = page.locator('#lastName');
-    this.phoneInput = page.locator('#phone');
+    this.emailInput = page.locator("#email");
+    this.firstNameInput = page.locator("#firstName");
+    this.lastNameInput = page.locator("#lastName");
+    this.phoneInput = page.locator("#phone");
 
     // Step 2
-    this.companyInput = page.locator('#company');
-    this.companySizeSelect = page.locator('[data-testid="select-company-size"]');
-    this.industryInput = page.locator('#industry');
-    this.locationInput = page.locator('#location');
+    this.companyInput = page.locator("#company");
+    this.companySizeSelect = page.locator(
+      '[data-testid="select-company-size"]',
+    );
+    this.industryInput = page.locator("#industry");
+    this.locationInput = page.locator("#location");
 
     // Step 3
-    this.challengesContainer = page.locator('[data-testid="booking-form-challenges"]');
+    this.challengesContainer = page.locator(
+      '[data-testid="booking-form-challenges"]',
+    );
 
     // Step 4
-    this.goalsInput = page.locator('#goals');
+    this.goalsInput = page.locator("#goals");
     this.timelineSelect = page.locator('[data-testid="select-timeline"]');
     this.currentMrrSelect = page.locator('[data-testid="select-current-mrr"]');
   }
 
   async scrollIntoView(): Promise<void> {
-    await this.page.locator('#booking-form').scrollIntoViewIfNeeded();
+    await this.page.locator("#booking-form").scrollIntoViewIfNeeded();
     // scrollIntoViewIfNeeded completes when element is in viewport
   }
 
   async focusFirstField(): Promise<void> {
-    await this.firstNameInput.waitFor({ state: 'visible' });
+    await this.firstNameInput.waitFor({ state: "visible" });
     await this.firstNameInput.focus();
-  }
-
-  /** Wait for step transition to complete */
-  private async waitForStepTransition(): Promise<void> {
-    // No explicit wait - expectStep() already has built-in retry
-    // Playwright assertions auto-retry until the step indicator updates
   }
 
   /** Fill Step 1: Basic Info */
   async fillStep1(user: TestUser): Promise<void> {
-    await this.firstNameInput.waitFor({ state: 'visible' });
+    await this.firstNameInput.waitFor({ state: "visible" });
     await this.firstNameInput.fill(user.firstName);
     await this.lastNameInput.fill(user.lastName);
     await this.emailInput.fill(user.email);
@@ -89,12 +89,12 @@ export class BookingFormSection {
   /** Fill Step 2: Company Details */
   async fillStep2(user: TestUser): Promise<void> {
     // Wait for step 2 fields to be visible
-    await this.companyInput.waitFor({ state: 'visible', timeout: 10000 });
+    await this.companyInput.waitFor({ state: "visible", timeout: 10000 });
     await this.companyInput.fill(user.company);
 
     // Handle select - click and select option
     await this.companySizeSelect.click();
-    await this.page.getByRole('option', { name: user.companySize }).click();
+    await this.page.getByRole("option", { name: user.companySize }).click();
 
     await this.industryInput.fill(user.industry);
     await this.locationInput.fill(user.location);
@@ -102,12 +102,17 @@ export class BookingFormSection {
 
   /** Fill Step 3: Challenges */
   async fillStep3(user: TestUser): Promise<void> {
-    await this.challengesContainer.waitFor({ state: 'visible', timeout: 10000 });
+    await this.challengesContainer.waitFor({
+      state: "visible",
+      timeout: 10000,
+    });
 
     for (const challenge of user.challenges) {
       // Find the label containing the challenge text and click it
-      const label = this.challengesContainer.getByText(challenge, { exact: false });
-      await label.waitFor({ state: 'visible' });
+      const label = this.challengesContainer.getByText(challenge, {
+        exact: false,
+      });
+      await label.waitFor({ state: "visible" });
       await label.click();
       // Playwright auto-waits for actionability on each click
     }
@@ -115,14 +120,14 @@ export class BookingFormSection {
 
   /** Fill Step 4: Goals */
   async fillStep4(user: TestUser): Promise<void> {
-    await this.goalsInput.waitFor({ state: 'visible', timeout: 10000 });
+    await this.goalsInput.waitFor({ state: "visible", timeout: 10000 });
     await this.goalsInput.fill(user.goals);
 
     await this.timelineSelect.click();
-    await this.page.getByRole('option', { name: user.timeline }).click();
+    await this.page.getByRole("option", { name: user.timeline }).click();
 
     await this.currentMrrSelect.click();
-    await this.page.getByRole('option', { name: user.currentMrr }).click();
+    await this.page.getByRole("option", { name: user.currentMrr }).click();
   }
 
   async clickNext(): Promise<void> {
@@ -172,20 +177,24 @@ export class BookingFormSection {
   async expectStep(stepNumber: number): Promise<void> {
     if (stepNumber === 5) {
       // Step 5 shows "Pending Review" instead of "Step 5"
-      await expect(this.stepIndicator).toContainText('Pending Review', {
-        timeout: 10000
+      await expect(this.stepIndicator).toContainText("Pending Review", {
+        timeout: 10000,
       });
     } else {
       await expect(this.stepIndicator).toContainText(`Step ${stepNumber}`, {
         ignoreCase: true,
-        timeout: 10000
+        timeout: 10000,
       });
     }
   }
 
   async expectValidationError(message: string | RegExp): Promise<void> {
     // Try multiple selectors for validation errors (framework may render differently)
-    const errorLocator = this.page.locator('[data-slot="field-error"], [role="alert"], .field-error, [aria-invalid="true"] + *').filter({ hasText: message });
+    const errorLocator = this.page
+      .locator(
+        '[data-slot="field-error"], [role="alert"], .field-error, [aria-invalid="true"] + *',
+      )
+      .filter({ hasText: message });
     await expect(errorLocator.first()).toBeVisible({ timeout: 5000 });
   }
 
@@ -195,6 +204,8 @@ export class BookingFormSection {
 
   async expectSuccessContent(heading: string | RegExp): Promise<void> {
     await expect(this.successState).toBeVisible({ timeout: 10000 });
-    await expect(this.successState.getByRole('heading', { level: 3 })).toHaveText(heading);
+    await expect(
+      this.successState.getByRole("heading", { level: 3 }),
+    ).toHaveText(heading);
   }
 }

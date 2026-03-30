@@ -1,10 +1,10 @@
-import type { Page } from '@playwright/test';
-import { NavbarSection } from './sections/navbar.section';
-import { HeroSection } from './sections/hero.section';
-import { BookingFormSection } from './sections/booking-form.section';
-import { FaqSection } from './sections/faq.section';
-import { PricingSection } from './sections/pricing.section';
-import { FinalCtaSection } from './sections/final-cta.section';
+import type { Page } from "@playwright/test";
+import { BookingFormSection } from "./sections/booking-form.section";
+import { FaqSection } from "./sections/faq.section";
+import { FinalCtaSection } from "./sections/final-cta.section";
+import { HeroSection } from "./sections/hero.section";
+import { NavbarSection } from "./sections/navbar.section";
+import { PricingSection } from "./sections/pricing.section";
 
 export class HomePage {
   readonly page: Page;
@@ -26,8 +26,8 @@ export class HomePage {
   }
 
   async goto(): Promise<void> {
-    await this.page.goto('/');
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.goto("/");
+    await this.page.waitForLoadState("domcontentloaded");
   }
 
   async gotoWithUtm(params: {
@@ -38,11 +38,11 @@ export class HomePage {
     content?: string;
   }): Promise<void> {
     const searchParams = new URLSearchParams();
-    if (params.source) searchParams.set('utm_source', params.source);
-    if (params.medium) searchParams.set('utm_medium', params.medium);
-    if (params.campaign) searchParams.set('utm_campaign', params.campaign);
-    if (params.term) searchParams.set('utm_term', params.term);
-    if (params.content) searchParams.set('utm_content', params.content);
+    if (params.source) searchParams.set("utm_source", params.source);
+    if (params.medium) searchParams.set("utm_medium", params.medium);
+    if (params.campaign) searchParams.set("utm_campaign", params.campaign);
+    if (params.term) searchParams.set("utm_term", params.term);
+    if (params.content) searchParams.set("utm_content", params.content);
 
     await this.page.goto(`/?${searchParams.toString()}`);
   }

@@ -1,19 +1,18 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Card, CardDescription, CardTitle } from "../agentic-intelligence/card";
+import { useInView } from "motion/react";
+import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import { RoughNotation, RoughNotationGroup } from "react-rough-notation";
-
-import { Button } from "../ui/Button";
-import Link from "next/link";
-import { NativeIcon } from "~/icons/bento-icons";
-import { NativeIntegrationSkeleton } from "../agentic-intelligence/skeletons";
 import { StatsMarquee } from "~/components/stats";
+import { useMediaQuery } from "~/hooks";
+import { NativeIcon } from "~/icons/bento-icons";
 import { analytics } from "~/lib/posthog";
 import { cn } from "~/lib/utils";
-import { useInView } from "motion/react";
-import { useMediaQuery } from "~/hooks";
+import { Card, CardDescription, CardTitle } from "../agentic-intelligence/card";
+import { NativeIntegrationSkeleton } from "../agentic-intelligence/skeletons";
+import { Button } from "../ui/Button";
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -21,14 +20,14 @@ export function Hero() {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const isHeadlineInView = useInView(headlineRef, { once: true });
   const prefersReducedMotion = useMediaQuery(
-    "(prefers-reduced-motion: reduce)"
+    "(prefers-reduced-motion: reduce)",
   );
   return (
     <section
       id="hero"
       data-testid="hero-section"
       ref={parentRef}
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 md:px-8 md:py-40 bg-background"
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-4 py-20 md:px-8 md:py-40"
     >
       <BackgroundGrids />
       <CollisionMechanism
@@ -72,10 +71,10 @@ export function Hero() {
         }}
       />
 
-      <div className="text-balance relative z-20 mx-auto mb-4 mt-4 max-w-4xl text-center">
+      <div className="relative z-20 mx-auto mt-4 mb-4 max-w-4xl text-balance text-center">
         <h1
           ref={headlineRef}
-          className="text-3xl font-semibold tracking-tight md:text-7xl"
+          className="font-semibold text-3xl tracking-tight md:text-7xl"
         >
           <RoughNotationGroup show={prefersReducedMotion || isHeadlineInView}>
             Save 10+ Hours Weekly and{" "}
@@ -87,8 +86,8 @@ export function Hero() {
               multiline
             >
               Close 40% More Deals
-            </RoughNotation>
-            {" "}in{" "}
+            </RoughNotation>{" "}
+            in{" "}
             <RoughNotation
               type="underline"
               color="#d97857"
@@ -101,25 +100,41 @@ export function Hero() {
           </RoughNotationGroup>
         </h1>
       </div>
-      <p className="relative z-20 mx-auto mt-4 px-4 text-center font-mono font-medium text-base/6">
-        Customer Enquiry <span className="text-primary">&rarr;</span> AI Generated Quote <span className="text-primary">&rarr;</span> Reviewed & Approved by Staff <span className="text-primary">&rarr;</span> Job Booked.
+      <p className="relative z-20 mx-auto mt-4 px-4 text-center font-medium font-mono text-base/6">
+        Customer Enquiry <span className="text-primary">&rarr;</span> AI
+        Generated Quote <span className="text-primary">&rarr;</span> Reviewed &
+        Approved by Staff <span className="text-primary">&rarr;</span> Job
+        Booked.
       </p>
-      <div className="mb-8 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-14">
-        <Link href="#how-it-works" className="w-full sm:w-40" onClick={() => analytics.cta.click('hero_secondary')} data-testid="hero-cta-secondary">
+      <div className="mt-8 mb-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-14">
+        <Link
+          href="#how-it-works"
+          className="w-full sm:w-40"
+          onClick={() => analytics.cta.click("hero_secondary")}
+          data-testid="hero-cta-secondary"
+        >
           <Button asChild variant="secondary" className="w-full text-center">
             How it Works
           </Button>
         </Link>
-        <Link href="#booking-form" className="w-full sm:w-40" onClick={() => analytics.cta.click('hero_primary')} data-testid="hero-cta-primary">
+        <Link
+          href="#booking-form"
+          className="w-full sm:w-40"
+          onClick={() => analytics.cta.click("hero_primary")}
+          data-testid="hero-cta-primary"
+        >
           <Button asChild variant="primary" className="w-full text-center">
             Book a call
           </Button>
         </Link>
       </div>
 
-      <div className="relative mx-auto h-full w-full max-w-7xl overflow-hidden px-4 md:px-8 mb-20 md:mb-30">
-        <p className="relative z-20 mx-auto max-w-2xl p-4 mb-2 md:mb-4 text-center text-base/6">
-          AI service business quoting solution to help respond to customer quote requests faster (i.e. Speed to Lead). For service businesses spending 20+ hours a week quoting or simply taking too long to respond to leads, possibly missing leads entirely.
+      <div className="relative mx-auto mb-20 h-full w-full max-w-7xl overflow-hidden px-4 md:mb-30 md:px-8">
+        <p className="relative z-20 mx-auto mb-2 max-w-2xl p-4 text-center text-base/6 md:mb-4">
+          AI service business quoting solution to help respond to customer quote
+          requests faster (i.e. Speed to Lead). For service businesses spending
+          20+ hours a week quoting or simply taking too long to respond to
+          leads, possibly missing leads entirely.
         </p>
 
         <div
@@ -131,7 +146,7 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="relative mx-auto max-w-7xl rounded-4xl border border-border bg-neutral-100 p-2 backdrop-blur-lg dark:border-charcoal-700 dark:bg-charcoal-800/50 md:p-4">
+      <div className="relative mx-auto max-w-7xl rounded-4xl border border-border bg-neutral-100 p-2 backdrop-blur-lg md:p-4 dark:border-charcoal-700 dark:bg-charcoal-800/50">
         <div className="rounded-3xl border border-border bg-card p-2 dark:border-charcoal-700">
           <div className="w-full">
             <Card className="relative w-full max-w-none overflow-hidden">
@@ -140,8 +155,8 @@ export function Hero() {
                 <CardTitle>Native Integration</CardTitle>
               </div>
               <CardDescription>
-                24/7 real-time sales activity with detailed records of
-                actions, integrations used and outcomes.
+                24/7 real-time sales activity with detailed records of actions,
+                integrations used and outcomes.
               </CardDescription>
               <NativeIntegrationSkeleton />
             </Card>
@@ -157,19 +172,19 @@ const BackgroundGrids = () => {
     <div className="pointer-events-none absolute inset-0 z-0 grid h-full w-full -rotate-45 transform select-none grid-cols-2 gap-10 md:grid-cols-4">
       <div className="relative h-full w-full">
         <GridLineVertical className="left-0" />
-        <GridLineVertical className="left-auto right-0" />
+        <GridLineVertical className="right-0 left-auto" />
       </div>
       <div className="relative h-full w-full">
         <GridLineVertical className="left-0" />
-        <GridLineVertical className="left-auto right-0" />
+        <GridLineVertical className="right-0 left-auto" />
       </div>
       <div className="relative h-full w-full bg-linear-to-b from-transparent via-neutral-100 to-transparent dark:via-neutral-800">
         <GridLineVertical className="left-0" />
-        <GridLineVertical className="left-auto right-0" />
+        <GridLineVertical className="right-0 left-auto" />
       </div>
       <div className="relative h-full w-full">
         <GridLineVertical className="left-0" />
-        <GridLineVertical className="left-auto right-0" />
+        <GridLineVertical className="right-0 left-auto" />
       </div>
     </div>
   );
@@ -286,8 +301,8 @@ const CollisionMechanism = React.forwardRef<
           repeatDelay: beamOptions.repeatDelay ?? 0,
         }}
         className={cn(
-          "absolute left-96 top-20 m-auto h-14 w-px rounded-full bg-linear-to-t from-orange-500 via-yellow-500 to-transparent",
-          beamOptions.className
+          "absolute top-20 left-96 m-auto h-14 w-px rounded-full bg-linear-to-t from-orange-500 via-yellow-500 to-transparent",
+          beamOptions.className,
         )}
       />
       <AnimatePresence>
@@ -373,7 +388,7 @@ const GridLineVertical = ({
         "[mask-composite:exclude]",
         "z-30",
         "dark:bg-[linear-gradient(to_bottom,var(--color-dark),var(--color-dark)_50%,transparent_0,transparent)]",
-        className
+        className,
       )}
     ></div>
   );

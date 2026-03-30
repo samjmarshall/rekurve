@@ -1,11 +1,11 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { emailOTP } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
+import { emailOTP } from "better-auth/plugins";
 import { Resend } from "resend";
+import { env } from "~/env";
 import { db } from "~/server/db";
 import * as authSchema from "~/server/db/schema/auth";
-import { env } from "~/env";
 
 const resend = new Resend(env.RESEND_API_KEY);
 

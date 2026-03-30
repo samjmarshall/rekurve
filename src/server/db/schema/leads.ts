@@ -1,22 +1,22 @@
 import { isNotNull } from "drizzle-orm";
 import {
+  boolean,
+  index,
+  integer,
+  numeric,
   pgTable,
   text,
-  uuid,
-  boolean,
-  numeric,
-  integer,
   timestamp,
-  index,
   uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 import {
+  constructionTimelineEnum,
+  leadSourceEnum,
+  leadStageEnum,
   preferredContactTimeEnum,
   propertyTypeEnum,
-  constructionTimelineEnum,
-  leadStageEnum,
-  leadSourceEnum,
 } from "./enums";
 
 export const leads = pgTable(

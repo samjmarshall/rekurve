@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "~/lib/utils"
+import { cva, type VariantProps } from "class-variance-authority";
+import * as React from "react";
+import { cn } from "~/lib/utils";
 
 const buttonVariants = cva(
-  "rounded-md text-sm font-bold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "relative inline-flex cursor-pointer items-center justify-center rounded-md font-bold text-sm transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         primary:
-          "bg-white text-black border-b-3 border-accent-blue focus-visible:ring-primary/50 shadow",
+          "border-accent-blue border-b-3 bg-white text-black shadow focus-visible:ring-primary/50",
         secondary:
-          "bg-neutral-800 dark:bg-neutral-950 text-white border-neutral-500 dark:border-neutral-800 border-b-3 focus-visible:ring-secondary/50 shadow",
+          "border-neutral-500 border-b-3 bg-neutral-800 text-white shadow focus-visible:ring-secondary/50 dark:border-neutral-800 dark:bg-neutral-950",
         outline:
-          "border-1 border-b-3 border-primary/30 text-primary hover:bg-primary/5 hover:border-primary/50 focus-visible:ring-primary/30",
+          "border-1 border-primary/30 border-b-3 text-primary hover:border-primary/50 hover:bg-primary/5 focus-visible:ring-primary/30",
         ghost:
           "text-primary hover:bg-primary/10 hover:text-primary/90 focus-visible:ring-primary/30",
       },
@@ -29,13 +29,13 @@ const buttonVariants = cva(
       variant: "primary",
       size: "md",
     },
-  }
-)
+  },
+);
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean
+  asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -46,9 +46,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
       />
-    )
-  }
-)
-Button.displayName = "Button"
+    );
+  },
+);
+Button.displayName = "Button";
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };

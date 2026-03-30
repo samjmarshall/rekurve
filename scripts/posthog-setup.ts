@@ -109,7 +109,7 @@ class PostHogAPI {
   private async request<T>(
     endpoint: string,
     method: "GET" | "POST" | "PATCH" = "GET",
-    body?: unknown
+    body?: unknown,
   ): Promise<T> {
     const url = `${POSTHOG_API_BASE}/api/projects/${this.projectId}${endpoint}`;
 
@@ -125,7 +125,7 @@ class PostHogAPI {
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(
-        `PostHog API error (${response.status}): ${errorText.slice(0, 500)}`
+        `PostHog API error (${response.status}): ${errorText.slice(0, 500)}`,
       );
     }
 
@@ -139,7 +139,7 @@ class PostHogAPI {
 
   async createDashboard(
     name: string,
-    description: string
+    description: string,
   ): Promise<PostHogResponse> {
     return this.request<PostHogResponse>("/dashboards/", "POST", {
       name,
@@ -150,7 +150,7 @@ class PostHogAPI {
 
   async updateDashboard(
     id: number,
-    data: { name?: string; description?: string }
+    data: { name?: string; description?: string },
   ): Promise<PostHogResponse> {
     return this.request<PostHogResponse>(`/dashboards/${id}/`, "PATCH", data);
   }
@@ -158,14 +158,14 @@ class PostHogAPI {
   // Insight operations
   async listInsights(limit = 100): Promise<{ results: PostHogResponse[] }> {
     return this.request<{ results: PostHogResponse[] }>(
-      `/insights/?limit=${limit}`
+      `/insights/?limit=${limit}`,
     );
   }
 
   async createInsight(
     name: string,
     filters: InsightFilters,
-    description?: string
+    description?: string,
   ): Promise<PostHogResponse> {
     return this.request<PostHogResponse>("/insights/", "POST", {
       name,
@@ -181,7 +181,7 @@ class PostHogAPI {
       description?: string;
       filters?: InsightFilters;
       dashboards?: number[];
-    }
+    },
   ): Promise<PostHogResponse> {
     return this.request<PostHogResponse>(`/insights/${id}/`, "PATCH", data);
   }
@@ -197,7 +197,7 @@ class PostHogAPI {
 
   async updateCohort(
     id: number,
-    cohort: CohortDefinition
+    cohort: CohortDefinition,
   ): Promise<PostHogResponse> {
     return this.request<PostHogResponse>(`/cohorts/${id}/`, "PATCH", cohort);
   }
@@ -560,7 +560,7 @@ interface SyncResult {
 }
 
 async function syncDashboardsAndInsights(
-  api: PostHogAPI
+  api: PostHogAPI,
 ): Promise<{ dashboards: SyncResult; insights: SyncResult }> {
   const dashboardResult: SyncResult = {
     created: [],
@@ -608,7 +608,7 @@ async function syncDashboardsAndInsights(
       console.log(`  Creating dashboard: ${dashboardDef.name}`);
       const newDashboard = await api.createDashboard(
         dashboardDef.name,
-        dashboardDef.description
+        dashboardDef.description,
       );
       dashboardId = newDashboard.id;
       dashboardResult.created.push(dashboardDef.name);
@@ -624,9 +624,7 @@ async function syncDashboardsAndInsights(
         const needsDashboardLink = !currentDashboards.includes(dashboardId);
 
         if (needsDashboardLink) {
-          console.log(
-            `    Linking insight to dashboard: ${insightDef.name}`
-          );
+          console.log(`    Linking insight to dashboard: ${insightDef.name}`);
           const updatedDashboards = [...currentDashboards, dashboardId];
           await api.updateInsight(existingInsight.id, {
             description: insightDef.description,
@@ -649,7 +647,7 @@ async function syncDashboardsAndInsights(
         const newInsight = await api.createInsight(
           insightDef.name,
           insightDef.filters,
-          insightDef.description
+          insightDef.description,
         );
 
         // Link to dashboard via PATCH (more reliable than dashboard_tiles in POST)
@@ -659,7 +657,10 @@ async function syncDashboardsAndInsights(
         insightResult.created.push(insightDef.name);
 
         // Add to lookup map for potential reuse
-        insightByName.set(insightDef.name, { ...newInsight, dashboards: [dashboardId] });
+        insightByName.set(insightDef.name, {
+          ...newInsight,
+          dashboards: [dashboardId],
+        });
       }
     }
   }
@@ -713,7 +714,7 @@ async function main() {
 
   if (!apiKey) {
     console.error(
-      "Error: POSTHOG_PERSONAL_API_KEY environment variable is required"
+      "Error: POSTHOG_PERSONAL_API_KEY environment variable is required",
     );
     console.error("");
     console.error("To create a Personal API Key:");
@@ -751,13 +752,13 @@ async function main() {
   console.log("Summary");
   console.log("-------");
   console.log(
-    `Dashboards: ${dashboards.created.length} created, ${dashboards.updated.length} updated`
+    `Dashboards: ${dashboards.created.length} created, ${dashboards.updated.length} updated`,
   );
   console.log(
-    `Insights: ${insights.created.length} created, ${insights.updated.length} updated`
+    `Insights: ${insights.created.length} created, ${insights.updated.length} updated`,
   );
   console.log(
-    `Cohorts: ${cohorts.created.length} created, ${cohorts.updated.length} updated, ${cohorts.errors.length} errors`
+    `Cohorts: ${cohorts.created.length} created, ${cohorts.updated.length} updated, ${cohorts.errors.length} errors`,
   );
   console.log("");
 
@@ -769,7 +770,7 @@ async function main() {
     const dash = allDashboards.results.find((d) => d.name === dashDef.name);
     if (dash) {
       console.log(
-        `  ${dashDef.name}: https://us.posthog.com/project/${PROJECT_ID}/dashboard/${dash.id}`
+        `  ${dashDef.name}: https://us.posthog.com/project/${PROJECT_ID}/dashboard/${dash.id}`,
       );
     }
   }
@@ -779,7 +780,7 @@ async function main() {
   console.log("Manual Steps Required");
   console.log("---------------------");
   console.log(
-    "The following must be configured in the PostHog UI (not available via API):"
+    "The following must be configured in the PostHog UI (not available via API):",
   );
   console.log("");
   console.log("1. Threshold Alerts (Part 4):");
@@ -787,7 +788,7 @@ async function main() {
   console.log('   - Lead Volume Spike: "Leads Today" > Greater than 5/day');
   console.log('   - Lead Drought: "Leads Today" > Less than 1 for 48 hours');
   console.log(
-    "   - Conversion Drop: Form Funnel > Rate drops >20% vs prior week"
+    "   - Conversion Drop: Form Funnel > Rate drops >20% vs prior week",
   );
   console.log("");
   console.log("2. Lead Notification Workflow (Part 5):");

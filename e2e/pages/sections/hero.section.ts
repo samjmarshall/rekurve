@@ -1,5 +1,5 @@
-import type { Page, Locator } from '@playwright/test';
-import { expect } from '@playwright/test';
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export class HeroSection {
   readonly page: Page;
@@ -13,12 +13,12 @@ export class HeroSection {
   constructor(page: Page) {
     this.page = page;
     this.container = page.locator('[data-testid="hero-section"]');
-    this.heading = this.container.getByRole('heading', { level: 1 });
+    this.heading = this.container.getByRole("heading", { level: 1 });
     this.primaryCta = page.locator('[data-testid="hero-cta-primary"]');
     this.secondaryCta = page.locator('[data-testid="hero-cta-secondary"]');
     // RoughNotation renders SVG elements for annotations
-    this.highlightAnnotation = this.heading.locator('svg').first();
-    this.underlineAnnotation = this.heading.locator('svg').last();
+    this.highlightAnnotation = this.heading.locator("svg").first();
+    this.underlineAnnotation = this.heading.locator("svg").last();
   }
 
   async clickPrimaryCta(): Promise<void> {

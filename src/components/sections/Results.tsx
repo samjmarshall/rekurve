@@ -1,11 +1,9 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "~/components/ui/Card"
-import { Clock, DollarSign, TrendingUp, Zap } from "lucide-react"
-
+import { motion } from "framer-motion";
+import { Clock, DollarSign, TrendingUp, Zap } from "lucide-react";
+import { Card, CardContent } from "~/components/ui/Card";
 import { CardDescription } from "../agentic-intelligence/card";
-import React from "react";
-import { motion } from "framer-motion"
 
 const metrics = [
   {
@@ -31,7 +29,7 @@ const metrics = [
     suffix: " hrs/week saved",
     description: "Team productivity",
   },
-]
+];
 
 export function Results() {
   return (
@@ -45,19 +43,19 @@ export function Results() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="mb-4 font-bold text-3xl tracking-tight sm:text-4xl">
             Real Results from Real Clients
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-gray-600">
-            These aren&apos;t projections! They&apos;re actual outcomes from our autonomous
-            AI sales agents.
+          <p className="mx-auto max-w-2xl text-gray-600 text-lg">
+            These aren&apos;t projections! They&apos;re actual outcomes from our
+            autonomous AI sales agents.
           </p>
         </motion.div>
 
         {/* Metrics grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {metrics.map((metric, index) => {
-            const Icon = metric.icon
+            const Icon = metric.icon;
             return (
               <motion.div
                 key={index}
@@ -66,34 +64,34 @@ export function Results() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.15 }}
               >
-                <Card className="group relative h-full overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:-translate-y-0.5">
+                <Card className="group relative h-full overflow-hidden backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl">
                   <CardContent className="flex flex-col p-8">
-                    <Icon className="size-8 mb-4 text-primary" />
+                    <Icon className="mb-4 size-8 text-primary" />
 
                     {/* Metric value */}
                     <div className="mb-2 font-mono">
-                      <span className="text-2xl font-bold tabular-nums sm:text-3xl">
+                      <span className="font-bold text-2xl tabular-nums sm:text-3xl">
                         {metric.value}
                       </span>
                       {metric.suffix && (
-                        <span className="text-xl font-semibold">
+                        <span className="font-semibold text-xl">
                           {metric.suffix}
                         </span>
                       )}
                     </div>
 
                     {/* Description */}
-                    <CardDescription className="text-sm">{metric.description}</CardDescription>
+                    <CardDescription className="text-sm">
+                      {metric.description}
+                    </CardDescription>
 
                     {/* Accent line at bottom */}
-                    <div
-                      className="absolute bottom-0 left-0 h-1 w-full bg-linear-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                    />
+                    <div className="absolute bottom-0 left-0 h-1 w-full bg-linear-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   </CardContent>
                   <Bars />
                 </Card>
               </motion.div>
-            )
+            );
           })}
         </div>
 
@@ -105,19 +103,19 @@ export function Results() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <p className="mb-6 font-mono text-sm text-gray-600">
+          <p className="mb-6 font-mono text-gray-600 text-sm">
             Implemented in 6 weeks, results visible by week 10
           </p>
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
 
 export const GradientBeam = () => {
   return (
     <div className="pointer-events-none absolute -right-20 bottom-0 h-full w-full">
-      <div className="group-hover/container-rotate-[10deg] absolute bottom-0 right-0 h-20 w-full -rotate-[5deg] rounded-full bg-linear-to-r from-primary/5 to-primary/15 blur-3xl transition duration-200 group-hover/container:-translate-y-4 group-hover/container:blur-[80px]" />
+      <div className="group-hover/container-rotate-[10deg] absolute right-0 bottom-0 h-20 w-full -rotate-[5deg] rounded-full bg-linear-to-r from-primary/5 to-primary/15 blur-3xl transition duration-200 group-hover/container:-translate-y-4 group-hover/container:blur-[80px]" />
     </div>
   );
 };
@@ -127,7 +125,7 @@ const Bars = () => {
     <svg
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="absolute left-0 top-0 mx-auto h-full w-full shrink-0"
+      className="absolute top-0 left-0 mx-auto h-full w-full shrink-0"
     >
       <g opacity="0.3">
         <mask

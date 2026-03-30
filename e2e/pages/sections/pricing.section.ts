@@ -1,7 +1,7 @@
-import type { Page, Locator } from '@playwright/test';
-import { expect } from '@playwright/test';
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
-export type PricingTier = 'foundation' | 'growth' | 'enterprise';
+export type PricingTier = "foundation" | "growth" | "enterprise";
 
 export class PricingSection {
   readonly page: Page;
@@ -15,12 +15,16 @@ export class PricingSection {
 
   constructor(page: Page) {
     this.page = page;
-    this.container = page.locator('#pricing');
+    this.container = page.locator("#pricing");
 
     // Cards by data-testid
-    this.foundationCard = page.locator('[data-testid="pricing-tier-foundation"]');
+    this.foundationCard = page.locator(
+      '[data-testid="pricing-tier-foundation"]',
+    );
     this.growthCard = page.locator('[data-testid="pricing-tier-growth"]');
-    this.enterpriseCard = page.locator('[data-testid="pricing-tier-enterprise"]');
+    this.enterpriseCard = page.locator(
+      '[data-testid="pricing-tier-enterprise"]',
+    );
 
     // CTAs within each card
     this.foundationCta = page.locator('[data-testid="pricing-cta-foundation"]');
@@ -34,13 +38,13 @@ export class PricingSection {
 
   async clickTierCta(tier: PricingTier): Promise<void> {
     switch (tier) {
-      case 'foundation':
+      case "foundation":
         await this.foundationCta.click();
         break;
-      case 'growth':
+      case "growth":
         await this.growthCta.click();
         break;
-      case 'enterprise':
+      case "enterprise":
         await this.enterpriseCta.click();
         break;
     }
@@ -49,11 +53,11 @@ export class PricingSection {
   /** Get CTA locator for a specific tier */
   getTierCta(tier: PricingTier): Locator {
     switch (tier) {
-      case 'foundation':
+      case "foundation":
         return this.foundationCta;
-      case 'growth':
+      case "growth":
         return this.growthCta;
-      case 'enterprise':
+      case "enterprise":
         return this.enterpriseCta;
     }
   }
@@ -64,11 +68,14 @@ export class PricingSection {
     await expect(this.enterpriseCard).toBeVisible();
   }
 
-  async expectTierPrice(tier: PricingTier, priceText: string | RegExp): Promise<void> {
+  async expectTierPrice(
+    tier: PricingTier,
+    priceText: string | RegExp,
+  ): Promise<void> {
     const card =
-      tier === 'foundation'
+      tier === "foundation"
         ? this.foundationCard
-        : tier === 'growth'
+        : tier === "growth"
           ? this.growthCard
           : this.enterpriseCard;
     await expect(card.getByText(priceText)).toBeVisible();

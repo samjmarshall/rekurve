@@ -1,6 +1,6 @@
 /** Identifiable test email domain for PostHog filtering */
-export const TEST_EMAIL_DOMAIN = '@test.rekurve.dev';
-export const TEST_NAME_PREFIX = 'Playwright';
+export const TEST_EMAIL_DOMAIN = "@test.rekurve.dev";
+export const TEST_NAME_PREFIX = "Playwright";
 
 export interface TestUser {
   email: string;
@@ -26,15 +26,15 @@ export function createTestUser(overrides?: Partial<TestUser>): TestUser {
     email: `${TEST_NAME_PREFIX.toLowerCase()}-${uniqueId}${TEST_EMAIL_DOMAIN}`,
     firstName: TEST_NAME_PREFIX,
     lastName: `User ${uniqueId}`,
-    phone: '+61400000000',
+    phone: "+61400000000",
     company: `Test Company ${uniqueId}`,
-    companySize: '11-20 employees',
-    industry: 'Technology',
-    location: 'Brisbane',
-    timeline: 'In 1-3 months',
-    currentMrr: '$10K - $50K',
-    challenges: ['Quote generation is too manual and time-consuming'],
-    goals: 'Automate lead research and improve conversion rates',
+    companySize: "11-20 employees",
+    industry: "Technology",
+    location: "Brisbane",
+    timeline: "In 1-3 months",
+    currentMrr: "$10K - $50K",
+    challenges: ["Quote generation is too manual and time-consuming"],
+    goals: "Automate lead research and improve conversion rates",
     ...overrides,
   };
 }
@@ -49,11 +49,11 @@ export function createAbandonmentUser(overrides?: Partial<TestUser>): TestUser {
 
 /** Create user for identity flow tests */
 export function createIdentityTestUser(
-  variant: 'first' | 'changed',
-  overrides?: Partial<TestUser>
+  variant: "first" | "changed",
+  overrides?: Partial<TestUser>,
 ): TestUser {
   const timestamp = Date.now().toString(36);
-  const prefix = variant === 'first' ? 'identity' : 'identity-changed';
+  const prefix = variant === "first" ? "identity" : "identity-changed";
 
   return createTestUser({
     email: `${prefix}-${timestamp}${TEST_EMAIL_DOMAIN}`,

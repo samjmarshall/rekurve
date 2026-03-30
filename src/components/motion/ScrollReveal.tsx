@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { motion, useInView } from "framer-motion"
-import * as React from "react"
+import { motion, useInView } from "framer-motion";
+import * as React from "react";
 
 interface ScrollRevealProps {
-  children: React.ReactNode
-  className?: string
-  delay?: number
-  duration?: number
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  duration?: number;
   /**
    * Only animate once (default: true)
    */
-  once?: boolean
+  once?: boolean;
   /**
    * Amount of element that needs to be visible to trigger (0-1)
    */
-  amount?: number
+  amount?: number;
 }
 
 /**
@@ -30,8 +30,8 @@ export function ScrollReveal({
   once = true,
   amount = 0.3,
 }: ScrollRevealProps) {
-  const ref = React.useRef(null)
-  const isInView = useInView(ref, { once, amount })
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, { once, amount });
 
   return (
     <motion.div
@@ -47,15 +47,15 @@ export function ScrollReveal({
     >
       {children}
     </motion.div>
-  )
+  );
 }
 
 interface ScrollRevealStaggerProps {
-  children: React.ReactNode
-  className?: string
-  staggerDelay?: number
-  once?: boolean
-  amount?: number
+  children: React.ReactNode;
+  className?: string;
+  staggerDelay?: number;
+  once?: boolean;
+  amount?: number;
 }
 
 /**
@@ -68,8 +68,8 @@ export function ScrollRevealStagger({
   once = true,
   amount = 0.3,
 }: ScrollRevealStaggerProps) {
-  const ref = React.useRef(null)
-  const isInView = useInView(ref, { once, amount })
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, { once, amount });
 
   return (
     <motion.div
@@ -100,5 +100,5 @@ export function ScrollRevealStagger({
         </motion.div>
       ))}
     </motion.div>
-  )
+  );
 }

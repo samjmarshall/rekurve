@@ -1,5 +1,5 @@
-import type { Page, Locator } from '@playwright/test';
-import { expect } from '@playwright/test';
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export class FaqSection {
   readonly page: Page;
@@ -12,12 +12,14 @@ export class FaqSection {
 
   constructor(page: Page) {
     this.page = page;
-    this.container = page.locator('#faq');
+    this.container = page.locator("#faq");
     this.searchInput = page.locator('[data-testid="faq-search-input"]');
     this.searchClearButton = page.locator('[data-testid="faq-search-clear"]');
     this.noResultsMessage = page.locator('[data-testid="faq-no-results"]');
     // Count accordion triggers as a proxy for visible items
-    this.accordionItems = this.container.locator('[data-slot="accordion-trigger"]');
+    this.accordionItems = this.container.locator(
+      '[data-slot="accordion-trigger"]',
+    );
     this.bottomCta = page.locator('[data-testid="faq-cta-bottom"]');
   }
 
@@ -39,36 +41,36 @@ export class FaqSection {
   }
 
   async clearSearch(): Promise<void> {
-    await this.searchInput.fill('');
+    await this.searchInput.fill("");
     // No wait needed - caller should use expectSearchResults() which auto-retries
   }
 
   /** Expand an FAQ by question text */
   async expandQuestion(questionText: string | RegExp): Promise<void> {
-    const item = this.container.getByRole('button', { name: questionText });
+    const item = this.container.getByRole("button", { name: questionText });
     await item.scrollIntoViewIfNeeded();
-    await item.waitFor({ state: 'visible' });
+    await item.waitFor({ state: "visible" });
     await item.click();
     await this.waitForAccordionAnimation();
   }
 
   /** Collapse an FAQ by question text */
   async collapseQuestion(questionText: string | RegExp): Promise<void> {
-    const item = this.container.getByRole('button', { name: questionText });
+    const item = this.container.getByRole("button", { name: questionText });
     await item.scrollIntoViewIfNeeded();
-    await item.waitFor({ state: 'visible' });
+    await item.waitFor({ state: "visible" });
     await item.click();
     await this.waitForAccordionAnimation();
   }
 
   /** Get the accordion trigger by question text */
   getQuestionTrigger(questionText: string | RegExp): Locator {
-    return this.container.getByRole('button', { name: questionText });
+    return this.container.getByRole("button", { name: questionText });
   }
 
   async clickBottomCta(): Promise<void> {
     await this.bottomCta.scrollIntoViewIfNeeded();
-    await this.bottomCta.waitFor({ state: 'visible' });
+    await this.bottomCta.waitFor({ state: "visible" });
     await this.bottomCta.click();
   }
 
@@ -79,12 +81,16 @@ export class FaqSection {
 
   async expectQuestionExpanded(questionText: string | RegExp): Promise<void> {
     const trigger = this.getQuestionTrigger(questionText);
-    await expect(trigger).toHaveAttribute('aria-expanded', 'true', { timeout: 5000 });
+    await expect(trigger).toHaveAttribute("aria-expanded", "true", {
+      timeout: 5000,
+    });
   }
 
   async expectQuestionCollapsed(questionText: string | RegExp): Promise<void> {
     const trigger = this.getQuestionTrigger(questionText);
-    await expect(trigger).toHaveAttribute('aria-expanded', 'false', { timeout: 5000 });
+    await expect(trigger).toHaveAttribute("aria-expanded", "false", {
+      timeout: 5000,
+    });
   }
 
   async expectSearchResults(count: number): Promise<void> {

@@ -125,28 +125,31 @@
     @apply border-border outline-ring/50;
   }
 
-  body {
-    @apply bg-background text-foreground;
+  /* position: relative required on html so Framer Motion's useScroll can
+     calculate scroll offsets correctly (suppresses dev-only warning) */
+  html {
+    @apply relative;
+    scroll-behavior: smooth;
   }
 
-  /* Ensure smooth scrolling */
-  html {
-    scroll-behavior: smooth;
+  body {
+    @apply bg-background text-foreground;
   }
 
   button {
     @apply cursor-pointer;
   }
 
-  /* Respect reduced motion preference */
+  /* Respect reduced motion preference — !important is intentional to override
+     inline styles from animation libraries (e.g. Framer Motion). WCAG 2.3.3 */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
     *::after {
-      animation-duration: 0.01ms;
-      animation-iteration-count: 1;
-      transition-duration: 0.01ms;
-      scroll-behavior: auto;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
 

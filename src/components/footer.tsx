@@ -73,7 +73,8 @@ export function Footer() {
           </div>
 
           <div className="mt-2 ml-2">
-            &copy; copyright Rekurve.ai 2025. All rights reserved.
+            &copy; copyright Rekurve.ai {new Date().getFullYear()}. All rights
+            reserved.
           </div>
         </div>
         <div className="mt-10 grid grid-cols-2 items-start gap-10 sm:mt-0 md:mt-0 lg:grid-cols-4">

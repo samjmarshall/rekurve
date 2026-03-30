@@ -36,10 +36,10 @@
       },
       "a11y": {
         "noSvgWithoutTitle": "off",
-        "useButtonType": "off",
-        "useSemanticElements": "off",
+        "useButtonType": "warn",
+        "useSemanticElements": "warn",
         "useAriaPropsSupportedByRole": "off",
-        "noLabelWithoutControl": "off"
+        "noLabelWithoutControl": "warn"
       },
       "suspicious": {
         "noArrayIndexKey": "off"

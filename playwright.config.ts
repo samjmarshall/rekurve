@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PORT = process.env.PORT ?? 3000;
-const baseURL = `http://localhost:${PORT}`;
+const baseURL = process.env.VERCEL_URL ?? `http://localhost:${PORT}`;
 const isCI = process.env.CI === 'true';
 
 export default defineConfig({
@@ -11,7 +11,6 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
-  // Limit workers to prevent dev server overload (CI uses 1, local uses 2)
   workers: isCI ? 1 : 4,
   reporter: isCI
     ? [['list'], ['html', { open: 'never' }]]
@@ -24,19 +23,28 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    // Ensure clean state for each test
     storageState: undefined,
     permissions: [],
     geolocation: undefined,
+
+    // Bypass Vercel Deployment Protection for automated tests
+    extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+      ? {
+          'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+          'x-vercel-set-bypass-cookie': 'true',
+        }
+      : {},
   },
 
-  webServer: {
-    // Test against the build output to ensure production parity and test execution speed.
-    command: `rm -rf .next/ && yarn build && yarn start`,
-    url: baseURL,
-    timeout: 120_000,
-    reuseExistingServer: !isCI,
-  },
+  // In CI, test against the deployed URL — no local server needed
+  webServer: isCI
+    ? undefined
+    : {
+        command: `rm -rf .next/ && yarn build && yarn start`,
+        url: `http://localhost:${PORT}`,
+        timeout: 120_000,
+        reuseExistingServer: true,
+      },
 
   projects: [
     {

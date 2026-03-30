@@ -1,5 +1,6 @@
 {
   "baseBranch": "main",
+  "noChangelog": true,
   "plugins": [
     "git-tag",
     "conventional-commits",

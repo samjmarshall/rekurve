@@ -480,7 +480,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@base-ui/react@npm:^1.3.0":
+"@base-ui/react@npm:1.3.0":
   version: 1.3.0
   resolution: "@base-ui/react@npm:1.3.0"
   dependencies:
@@ -3457,7 +3457,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-auth@npm:^1.5.6":
+"better-auth@npm:1.5.6":
   version: 1.5.6
   resolution: "better-auth@npm:1.5.6"
   dependencies:
@@ -8524,7 +8524,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resend@npm:^6.9.4":
+"resend@npm:6.9.4":
   version: 6.9.4
   resolution: "resend@npm:6.9.4"
   dependencies:
@@ -10261,7 +10261,7 @@ shadcn@latest:
     "@auto-it/conventional-commits": ^11.3.6
     "@auto-it/git-tag": ^11.3.6
     "@auto-it/released": ^11.3.6
-    "@base-ui/react": ^1.3.0
+    "@base-ui/react": 1.3.0
     "@biomejs/biome": ^2.4.9
     "@hookform/resolvers": 5.2.2
     "@neondatabase/serverless": 1.0.2
@@ -10280,7 +10280,7 @@ shadcn@latest:
     "@types/three": ^0.182.0
     auto: ^11.3.6
     baseline-browser-mapping: ^2.9.15
-    better-auth: ^1.5.6
+    better-auth: 1.5.6
     class-variance-authority: 0.7.1
     clsx: 2.1.1
     drizzle-kit: ^0.31.10
@@ -10300,7 +10300,7 @@ shadcn@latest:
     react-fast-marquee: 1.6.5
     react-hook-form: 7.66.0
     react-rough-notation: 1.0.8
-    resend: ^6.9.4
+    resend: 6.9.4
     shadcn: latest
     tailwind-merge: 3.3.1
     tailwindcss: ^4.0.15

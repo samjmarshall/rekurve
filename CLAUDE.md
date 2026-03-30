@@ -21,3 +21,11 @@ Prefer Makefile targets with `yarn` as a fallback — never use `npm` or `npx` d
 - `make test_e2e` — run Playwright E2E tests (`yarn test:e2e`)
 - `make start` — local dev server (`yarn dev`)
 - `make install` — install dependencies (`yarn`)
+
+---
+
+## Workflows
+
+### Design Review After UI/UX Changes
+
+After completing any UI/UX work in `src/` (new pages, component changes, style updates, layout modifications), run `/design_review` before committing. This catches accessibility failures, contrast issues, dark mode bugs, and brand inconsistencies early.

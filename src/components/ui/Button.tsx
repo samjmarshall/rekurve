@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "border-accent-blue border-b-3 bg-white text-black shadow focus-visible:ring-primary/50",
+          "border-accent-blue border-b-3 bg-white text-black shadow focus-visible:ring-primary/50 dark:border-accent-blue dark:bg-neutral-800 dark:text-white",
         secondary:
           "border-neutral-500 border-b-3 bg-neutral-800 text-white shadow focus-visible:ring-secondary/50 dark:border-neutral-800 dark:bg-neutral-950",
         outline:

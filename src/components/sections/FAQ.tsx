@@ -182,9 +182,9 @@ export function FAQ() {
         <ScrollReveal delay={0.2} amount={0.1}>
           {filteredFAQs.length > 0 ? (
             <Accordion
-              type="multiple"
+              multiple
               value={openItems}
-              onValueChange={(newOpenItems) => {
+              onValueChange={(newOpenItems: string[]) => {
                 // Find newly opened items
                 const newlyOpened = newOpenItems.filter(id => !prevOpenItemsRef.current.includes(id))
                 newlyOpened.forEach(id => {

@@ -132,7 +132,7 @@ export function CaseStudies() {
               </div>
 
               {/* Accordion sections */}
-              <Accordion type="single" collapsible className="w-full">
+              <Accordion className="w-full">
                 {/* Challenge */}
                 <AccordionItem value="challenge">
                   <AccordionTrigger className="text-left hover:no-underline">

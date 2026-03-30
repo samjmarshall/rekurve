@@ -16,8 +16,8 @@ export class FaqSection {
     this.searchInput = page.locator('[data-testid="faq-search-input"]');
     this.searchClearButton = page.locator('[data-testid="faq-search-clear"]');
     this.noResultsMessage = page.locator('[data-testid="faq-no-results"]');
-    // Count accordion triggers (buttons with data-state) as a proxy for visible items
-    this.accordionItems = this.container.locator('button[data-state]');
+    // Count accordion triggers as a proxy for visible items
+    this.accordionItems = this.container.locator('[data-slot="accordion-trigger"]');
     this.bottomCta = page.locator('[data-testid="faq-cta-bottom"]');
   }
 
@@ -29,7 +29,7 @@ export class FaqSection {
   /** Wait for accordion animation to complete */
   private async waitForAccordionAnimation(): Promise<void> {
     // No explicit wait - expectQuestionExpanded/Collapsed assertions
-    // auto-retry until the data-state attribute updates
+    // auto-retry until the aria-expanded attribute updates
   }
 
   /** Search FAQs */
@@ -79,12 +79,12 @@ export class FaqSection {
 
   async expectQuestionExpanded(questionText: string | RegExp): Promise<void> {
     const trigger = this.getQuestionTrigger(questionText);
-    await expect(trigger).toHaveAttribute('data-state', 'open', { timeout: 5000 });
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true', { timeout: 5000 });
   }
 
   async expectQuestionCollapsed(questionText: string | RegExp): Promise<void> {
     const trigger = this.getQuestionTrigger(questionText);
-    await expect(trigger).toHaveAttribute('data-state', 'closed', { timeout: 5000 });
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false', { timeout: 5000 });
   }
 
   async expectSearchResults(count: number): Promise<void> {

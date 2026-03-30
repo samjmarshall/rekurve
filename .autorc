@@ -1,11 +1,16 @@
 {
   "baseBranch": "main",
-  "noChangelog": true,
   "plugins": [
     "git-tag",
     "conventional-commits",
-    ["released", {
-      "message": ":rocket: This %TYPE is included in version %VERSION"
-    }]
-  ]
+    [
+      "released",
+      {
+        "message": ":rocket: This %TYPE is included in version %VERSION"
+      }
+    ]
+  ],
+  "shipit": {
+    "noChangelog": true
+  }
 }

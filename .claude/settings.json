@@ -11,19 +11,6 @@
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Skill",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/skill-logger.py\"",
-            "timeout": 30,
-            "async": true
-          }
-        ]
-      }
     ]
   }
 }

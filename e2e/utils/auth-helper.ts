@@ -3,8 +3,16 @@ import { createHmac, randomUUID } from "crypto";
 
 import "dotenv/config";
 
-const sql = neon(process.env.DATABASE_URL!);
-const secret = process.env.BETTER_AUTH_SECRET!;
+// Lazy — only initialized when createTestSession/deleteTestSession are called,
+// so the module can be safely imported even when DATABASE_URL is not set (CI).
+let _sql: ReturnType<typeof neon> | undefined;
+function sql() {
+  _sql ??= neon(process.env.DATABASE_URL!);
+  return _sql;
+}
+function secret() {
+  return process.env.BETTER_AUTH_SECRET!;
+}
 
 export interface TestSession {
   userId: string;
@@ -18,7 +26,7 @@ export interface TestSession {
  * Sign a cookie value the same way better-auth does (HMAC-SHA256, base64).
  */
 function signCookieValue(value: string): string {
-  const signature = createHmac("sha256", secret)
+  const signature = createHmac("sha256", secret())
     .update(value)
     .digest("base64");
   return `${value}.${signature}`;
@@ -36,12 +44,12 @@ export async function createTestSession(
   const token = randomUUID();
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-  await sql`
+  await sql()`
     INSERT INTO "user" (id, name, email, email_verified)
     VALUES (${userId}, 'E2E Test User', ${email}, true)
   `;
 
-  await sql`
+  await sql()`
     INSERT INTO "session" (id, token, expires_at, user_id)
     VALUES (${sessionId}, ${token}, ${expiresAt}, ${userId})
   `;
@@ -53,5 +61,5 @@ export async function createTestSession(
  * Remove a test user and its cascaded session from the DB.
  */
 export async function deleteTestSession(userId: string): Promise<void> {
-  await sql`DELETE FROM "user" WHERE id = ${userId}`;
+  await sql()`DELETE FROM "user" WHERE id = ${userId}`;
 }

@@ -7,7 +7,7 @@ Wire up Playwright E2E tests to run automatically against Vercel Preview and Pro
 ## Current State Analysis
 
 - **Playwright config** (`playwright.config.ts`) hardcodes `baseURL` to `http://localhost:${PORT}` and always runs a local build via `webServer` — incompatible with testing a remote deployment
-- **Auth tests** (`e2e/features/auth.spec.ts`) require direct DB access (`DATAVERCEL_URL`, `BETTER_AUTH_SECRET`) and set cookies with `domain: "localhost"` — cannot run against deployed URLs without additional secrets and domain logic
+- **Auth tests** (`e2e/features/auth.spec.ts`) require direct DB access (`DATABASE_URL`, `BETTER_AUTH_SECRET`) and set cookies with `domain: "localhost"` — cannot run against deployed URLs without additional secrets and domain logic
 - **Example workflow** (`.github/workflows/playwright.yml`) uses legacy `deployment_status` trigger, which doesn't support Vercel Deployment Checks
 - **Quality Control workflow** (`.github/workflows/quality-control.yml`) runs on `push`/`pull_request` only — not connected to Vercel deployments
 - **Design doc** (`thoughts/designs/2026-01-20-vercel-playwright-ci-pipeline.md`) already specifies the target architecture using `repository_dispatch`
@@ -16,7 +16,7 @@ Wire up Playwright E2E tests to run automatically against Vercel Preview and Pro
 - `playwright.config.ts:4` — `baseURL` ignores `VERCEL_URL` env var
 - `playwright.config.ts:33-39` — `webServer` block always active, will try to build in CI
 - `auth.spec.ts:47-54` — cookie `domain` hardcoded to `"localhost"`
-- `auth-helper.ts:6-7` — reads `DATAVERCEL_URL` and `BETTER_AUTH_SECRET` from env
+- `auth-helper.ts:6-7` — reads `DATABASE_URL` and `BETTER_AUTH_SECRET` from env
 - `quality-control.yml` — no `repository_dispatch` trigger, no Vercel status reporting
 
 ## Desired End State
@@ -136,28 +136,28 @@ export default defineConfig({
 
 #### Automated Verification:
 - [x] `make check` passes (no type errors in config)
-- [ ] `VERCEL_URL=https://example.com yarn playwright test --list` lists tests without starting a server
+- [x] `VERCEL_URL=https://example.com yarn playwright test --list` lists tests without starting a server
 
 #### Manual Verification:
-- [ ] `make test_e2e` still works locally (starts build + runs tests)
+- [x] `make test_e2e` still works locally (starts build + runs tests)
 
 ---
 
 ## Phase 2: Skip Auth Tests That Need DB Access in CI
 
 ### Overview
-Tag the "Authenticated Redirects" test block to skip in CI, since it requires `DATAVERCEL_URL` and `BETTER_AUTH_SECRET`. The "Auth Health Check" and "Unauthenticated Redirects" tests work purely over HTTP and can run against deployed URLs.
+Tag the "Authenticated Redirects" test block to skip in CI, since it requires `DATABASE_URL` and `BETTER_AUTH_SECRET`. The "Auth Health Check" and "Unauthenticated Redirects" tests work purely over HTTP and can run against deployed URLs.
 
 ### Changes Required:
 
 #### 1. `e2e/features/auth.spec.ts`
 **File**: `e2e/features/auth.spec.ts`
-**Changes**: Add `test.skip` for the "Authenticated Redirects" describe block when `DATAVERCEL_URL` is not available
+**Changes**: Add `test.skip` for the "Authenticated Redirects" describe block when `DATABASE_URL` is not available
 
 ```typescript
 test.describe("Authenticated Redirects", () => {
   test.skip(
-    !process.env.DATAVERCEL_URL,
+    !process.env.DATABASE_URL,
     "Requires direct DB access — skipped in CI",
   );
 
@@ -171,10 +171,10 @@ This approach is better than checking `CI` because it's explicit about the actua
 
 #### Automated Verification:
 - [x] `make check` passes
-- [ ] `DATAVERCEL_URL= yarn playwright test e2e/features/auth.spec.ts --list` shows the authenticated tests as skipped
+- [x] `DATABASE_URL= yarn playwright test e2e/features/auth.spec.ts --list` lists tests without crashing (lazy DB init)
 
 #### Manual Verification:
-- [ ] Local `make test_e2e` still runs all auth tests (since `.env` has `DATAVERCEL_URL`)
+- [x] Local `make test_e2e` still runs all auth tests (since `.env` has `DATABASE_URL`)
 
 ---
 

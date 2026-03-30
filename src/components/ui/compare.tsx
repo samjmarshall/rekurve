@@ -1,10 +1,9 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-
 import { GripVertical } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { SparklesCore } from "~/components/ui/sparkles";
 import { cn } from "~/lib/utils";
 
@@ -88,7 +87,7 @@ export const Compare = ({
         setIsDragging(true);
       }
     },
-    [slideMode]
+    [slideMode],
   );
 
   const handleEnd = useCallback(() => {
@@ -109,17 +108,17 @@ export const Compare = ({
         });
       }
     },
-    [slideMode, isDragging]
+    [slideMode, isDragging],
   );
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => handleStart(e.clientX),
-    [handleStart]
+    [handleStart],
   );
   const handleMouseUp = useCallback(() => handleEnd(), [handleEnd]);
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => handleMove(e.clientX),
-    [handleMove]
+    [handleMove],
   );
 
   const handleTouchStart = useCallback(
@@ -128,7 +127,7 @@ export const Compare = ({
         handleStart(e.touches[0].clientX);
       }
     },
-    [handleStart, autoplay]
+    [handleStart, autoplay],
   );
 
   const handleTouchEnd = useCallback(() => {
@@ -143,13 +142,13 @@ export const Compare = ({
         handleMove(e.touches[0].clientX);
       }
     },
-    [handleMove, autoplay]
+    [handleMove, autoplay],
   );
 
   return (
     <div
       ref={sliderRef}
-      className={cn("w-[400px] h-[400px] overflow-hidden", className)}
+      className={cn("h-[400px] w-[400px] overflow-hidden", className)}
       style={{
         position: "relative",
         cursor: slideMode === "drag" ? "grab" : "col-resize",
@@ -171,7 +170,7 @@ export const Compare = ({
     >
       <AnimatePresence initial={false}>
         <motion.div
-          className="h-full w-px absolute top-0 m-auto z-30 bg-linear-to-b from-transparent from-[5%] to-[95%] via-accent-blue to-transparent"
+          className="absolute top-0 z-30 m-auto h-full w-px bg-linear-to-b from-[5%] from-transparent via-accent-blue to-[95%] to-transparent"
           style={{
             left: `${sliderXPercent}%`,
             top: "0",
@@ -179,32 +178,32 @@ export const Compare = ({
           }}
           transition={{ duration: 0 }}
         >
-          <div className="w-36 h-full [mask-image:radial-gradient(100px_at_left,white,transparent)] absolute top-1/2 -translate-y-1/2 left-0 bg-linear-to-r from-accent-blue via-transparent to-transparent z-20 opacity-50" />
-          <div className="w-10 h-1/2 [mask-image:radial-gradient(50px_at_left,white,transparent)] absolute top-1/2 -translate-y-1/2 left-0 bg-linear-to-r from-state-success via-transparent to-transparent z-10 opacity-100" />
-          <div className="w-10 h-3/4 top-1/2 -translate-y-1/2 absolute -right-10 [mask-image:radial-gradient(100px_at_left,white,transparent)]">
+          <div className="absolute top-1/2 left-0 z-20 h-full w-36 -translate-y-1/2 bg-linear-to-r from-accent-blue via-transparent to-transparent opacity-50 [mask-image:radial-gradient(100px_at_left,white,transparent)]" />
+          <div className="absolute top-1/2 left-0 z-10 h-1/2 w-10 -translate-y-1/2 bg-linear-to-r from-state-success via-transparent to-transparent opacity-100 [mask-image:radial-gradient(50px_at_left,white,transparent)]" />
+          <div className="absolute top-1/2 -right-10 h-3/4 w-10 -translate-y-1/2 [mask-image:radial-gradient(100px_at_left,white,transparent)]">
             <MemoizedSparklesCore
               background="transparent"
               minSize={0.4}
               maxSize={1}
               particleDensity={1200}
-              className="w-full h-full"
+              className="h-full w-full"
               particleColor="#FFFFFF"
             />
           </div>
           {showHandlebar && (
-            <div className="h-5 w-5 rounded-md top-1/2 -translate-y-1/2 bg-white z-30 -right-2.5 absolute   flex items-center justify-center shadow-[0px_-1px_0px_0px_#FFFFFF40]">
+            <div className="absolute top-1/2 -right-2.5 z-30 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-md bg-white shadow-[0px_-1px_0px_0px_#FFFFFF40]">
               <GripVertical className="h-4 w-4 text-black" />
             </div>
           )}
         </motion.div>
       </AnimatePresence>
-      <div className="overflow-hidden w-full h-full relative z-20 pointer-events-none">
+      <div className="pointer-events-none relative z-20 h-full w-full overflow-hidden">
         <AnimatePresence initial={false}>
           {firstImage ? (
             <motion.div
               className={cn(
-                "absolute inset-0 z-20 rounded-2xl shrink-0 w-full h-full select-none overflow-hidden",
-                firstImageClassName
+                "absolute inset-0 z-20 h-full w-full shrink-0 select-none overflow-hidden rounded-2xl",
+                firstImageClassName,
               )}
               style={{
                 clipPath: `inset(0 ${100 - sliderXPercent}% 0 0)`,
@@ -215,8 +214,8 @@ export const Compare = ({
                 alt="first image"
                 src={firstImage}
                 className={cn(
-                  "absolute inset-0  z-20 rounded-2xl shrink-0 w-full h-full select-none",
-                  firstImageClassName
+                  "absolute inset-0 z-20 h-full w-full shrink-0 select-none rounded-2xl",
+                  firstImageClassName,
                 )}
                 draggable={false}
               />
@@ -227,12 +226,13 @@ export const Compare = ({
 
       <AnimatePresence initial={false}>
         {secondImage ? (
+          // biome-ignore lint/performance/noImgElement: motion.img is required for Framer Motion animation
           <motion.img
             className={cn(
-              "absolute top-0 left-0 z-[19]  rounded-2xl w-full h-full select-none",
-              secondImageClassname
+              "absolute top-0 left-0 z-[19] h-full w-full select-none rounded-2xl",
+              secondImageClassname,
             )}
-            alt="second image"
+            alt="comparison view"
             src={secondImage}
             draggable={false}
           />

@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
   createTestSession,
   deleteTestSession,
@@ -25,7 +25,8 @@ test.describe("Unauthenticated Redirects", () => {
     page,
   }) => {
     await page.goto("/login");
-    await expect(page.locator("h1")).toHaveText("Login");
+    await expect(page.locator('[data-testid="login-page"]')).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
   });
 });
 

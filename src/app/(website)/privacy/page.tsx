@@ -1,9 +1,9 @@
-import Link from "next/link"
-import openGraph from "~/lib/open-graph"
-import { type Metadata } from "next"
-import { canonicalUrl } from "~/lib/canonical-url"
+import type { Metadata } from "next";
+import Link from "next/link";
+import { canonicalUrl } from "~/lib/canonical-url";
+import openGraph from "~/lib/open-graph";
 
-const canonical = canonicalUrl("/privacy")
+const canonical = canonicalUrl("/privacy");
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -19,12 +19,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical,
   },
-}
+};
 
 export default function Privacy() {
   return (
     <main className="w-screen flex-1 justify-center">
-      <article className="prose prose-zinc dark:prose-invert mx-auto max-w-6xl py-20 px-6">
+      <article className="prose prose-zinc dark:prose-invert mx-auto max-w-6xl px-6 py-20">
         <h1>REKURVE PRIVACY POLICY</h1>
         <p>
           We are bound by the <i>Privacy Act 1988 </i>(Cth) (<b>Privacy Act</b>)
@@ -40,10 +40,7 @@ export default function Privacy() {
           holding, using, and disclosing your Personal Information in accordance
           with this Policy. If you have any questions about our Policy or your
           Personal Information, please contact us at{" "}
-          <Link
-            href="mailto:contact@rekurve.ai"
-            title="Customer Contact Email"
-          >
+          <Link href="mailto:contact@rekurve.ai" title="Customer Contact Email">
             contact@rekurve.ai
           </Link>
           .
@@ -383,10 +380,7 @@ export default function Privacy() {
           contact us at:
         </p>
         <p>
-          <Link
-            href="mailto:contact@rekurve.ai"
-            title="Customer Contact Email"
-          >
+          <Link href="mailto:contact@rekurve.ai" title="Customer Contact Email">
             contact@rekurve.ai
           </Link>
         </p>
@@ -402,5 +396,5 @@ export default function Privacy() {
         </p>
       </article>
     </main>
-  )
+  );
 }

@@ -111,12 +111,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -204,12 +200,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -219,9 +211,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -285,9 +275,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -584,9 +572,7 @@
         "leads_hubspot_contact_id_unique": {
           "name": "leads_hubspot_contact_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "hubspot_contact_id"
-          ]
+          "columns": ["hubspot_contact_id"]
         }
       },
       "policies": {},
@@ -792,12 +778,8 @@
           "name": "lot_matches_lot_id_lots_id_fk",
           "tableFrom": "lot_matches",
           "tableTo": "lots",
-          "columnsFrom": [
-            "lot_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lot_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -805,12 +787,8 @@
           "name": "lot_matches_lead_id_leads_id_fk",
           "tableFrom": "lot_matches",
           "tableTo": "leads",
-          "columnsFrom": [
-            "lead_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lead_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -938,12 +916,8 @@
           "name": "message_queue_lead_id_leads_id_fk",
           "tableFrom": "message_queue",
           "tableTo": "leads",
-          "columnsFrom": [
-            "lead_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lead_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1046,12 +1020,8 @@
           "name": "conversations_lead_id_leads_id_fk",
           "tableFrom": "conversations",
           "tableTo": "leads",
-          "columnsFrom": [
-            "lead_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lead_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1059,12 +1029,8 @@
           "name": "conversations_message_queue_id_message_queue_id_fk",
           "tableFrom": "conversations",
           "tableTo": "message_queue",
-          "columnsFrom": [
-            "message_queue_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["message_queue_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1156,12 +1122,8 @@
           "name": "nurture_sequences_lead_id_leads_id_fk",
           "tableFrom": "nurture_sequences",
           "tableTo": "leads",
-          "columnsFrom": [
-            "lead_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lead_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1177,85 +1139,47 @@
     "public.availability_type": {
       "name": "availability_type",
       "schema": "public",
-      "values": [
-        "first_come",
-        "exclusive_territory",
-        "developer_direct"
-      ]
+      "values": ["first_come", "exclusive_territory", "developer_direct"]
     },
     "public.channel": {
       "name": "channel",
       "schema": "public",
-      "values": [
-        "sms",
-        "email"
-      ]
+      "values": ["sms", "email"]
     },
     "public.construction_timeline": {
       "name": "construction_timeline",
       "schema": "public",
-      "values": [
-        "ready_now",
-        "3_6_months",
-        "12_months_plus"
-      ]
+      "values": ["ready_now", "3_6_months", "12_months_plus"]
     },
     "public.delivery_method": {
       "name": "delivery_method",
       "schema": "public",
-      "values": [
-        "imessage",
-        "sms",
-        "email"
-      ]
+      "values": ["imessage", "sms", "email"]
     },
     "public.direction": {
       "name": "direction",
       "schema": "public",
-      "values": [
-        "inbound",
-        "outbound"
-      ]
+      "values": ["inbound", "outbound"]
     },
     "public.lead_source": {
       "name": "lead_source",
       "schema": "public",
-      "values": [
-        "walk_in",
-        "referral",
-        "social",
-        "web",
-        "other"
-      ]
+      "values": ["walk_in", "referral", "social", "web", "other"]
     },
     "public.lead_stage": {
       "name": "lead_stage",
       "schema": "public",
-      "values": [
-        "unqualified",
-        "nurture",
-        "warm",
-        "hot"
-      ]
+      "values": ["unqualified", "nurture", "warm", "hot"]
     },
     "public.lot_status": {
       "name": "lot_status",
       "schema": "public",
-      "values": [
-        "available",
-        "matched",
-        "sold",
-        "expired"
-      ]
+      "values": ["available", "matched", "sold", "expired"]
     },
     "public.match_strength": {
       "name": "match_strength",
       "schema": "public",
-      "values": [
-        "strong",
-        "partial",
-        "stretch"
-      ]
+      "values": ["strong", "partial", "stretch"]
     },
     "public.message_status": {
       "name": "message_status",
@@ -1271,21 +1195,12 @@
     "public.outreach_status": {
       "name": "outreach_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "queued",
-        "sent",
-        "responded"
-      ]
+      "values": ["pending", "queued", "sent", "responded"]
     },
     "public.preferred_contact_time": {
       "name": "preferred_contact_time",
       "schema": "public",
-      "values": [
-        "weekdays",
-        "weekends",
-        "anytime"
-      ]
+      "values": ["weekdays", "weekends", "anytime"]
     },
     "public.property_type": {
       "name": "property_type",
@@ -1302,21 +1217,12 @@
     "public.sequence_status": {
       "name": "sequence_status",
       "schema": "public",
-      "values": [
-        "active",
-        "paused",
-        "completed"
-      ]
+      "values": ["active", "paused", "completed"]
     },
     "public.sequence_type": {
       "name": "sequence_type",
       "schema": "public",
-      "values": [
-        "discovery",
-        "nurture",
-        "warm_progression",
-        "lot_alert"
-      ]
+      "values": ["discovery", "nurture", "warm_progression", "lot_alert"]
     }
   },
   "schemas": {},

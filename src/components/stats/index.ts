@@ -1,3 +1,3 @@
-export { StatsMarquee } from "./StatsMarquee";
 export { StatCard } from "./StatCard";
-export { stats, firstRowStats, secondRowStats, type Stat } from "./stats-data";
+export { StatsMarquee } from "./StatsMarquee";
+export { firstRowStats, type Stat, secondRowStats, stats } from "./stats-data";

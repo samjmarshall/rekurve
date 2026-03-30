@@ -1,5 +1,5 @@
+import { createHmac, randomUUID } from "node:crypto";
 import { neon } from "@neondatabase/serverless";
-import { createHmac, randomUUID } from "crypto";
 
 import "dotenv/config";
 
@@ -54,7 +54,13 @@ export async function createTestSession(
     VALUES (${sessionId}, ${token}, ${expiresAt}, ${userId})
   `;
 
-  return { userId, sessionId, token, signedToken: signCookieValue(token), email };
+  return {
+    userId,
+    sessionId,
+    token,
+    signedToken: signCookieValue(token),
+    email,
+  };
 }
 
 /**

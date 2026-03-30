@@ -1,9 +1,8 @@
-"use client"
+"use client";
 
-import { ArrowRight, Code2, Lightbulb, RefreshCw, Search } from "lucide-react"
-
-import { Card } from "../ui/Card"
-import { Timeline } from "~/components/ui/timeline"
+import { ArrowRight, Code2, Lightbulb, RefreshCw, Search } from "lucide-react";
+import { Timeline } from "~/components/ui/timeline";
+import { Card } from "../ui/Card";
 
 const phases = [
   {
@@ -26,7 +25,11 @@ const phases = [
     icon: Lightbulb,
     description:
       "Design your autonomous AI agents tailored to your ICP, scoring criteria, and workflows",
-    deliverables: ["System architecture", "Workflow designs", "Integration plan"],
+    deliverables: [
+      "System architecture",
+      "Workflow designs",
+      "Integration plan",
+    ],
   },
   {
     number: 3,
@@ -55,11 +58,11 @@ const phases = [
       "Priority support",
     ],
   },
-]
+];
 
 // Transform phases data to Timeline format
 const timelineData = phases.map((phase) => {
-  const Icon = phase.icon
+  const Icon = phase.icon;
   return {
     title: phase.title,
     content: (
@@ -68,8 +71,12 @@ const timelineData = phases.map((phase) => {
         <div className="flex items-center gap-4">
           <Icon className="size-8 text-primary" />
           <div className="flex flex-col">
-            <span className="font-mono text-xs text-gray-600">Phase {phase.number}</span>
-            <span className="font-mono text-sm font-medium text-gray-600">{phase.duration}</span>
+            <span className="font-mono text-gray-600 text-xs">
+              Phase {phase.number}
+            </span>
+            <span className="font-medium font-mono text-gray-600 text-sm">
+              {phase.duration}
+            </span>
           </div>
         </div>
 
@@ -79,16 +86,17 @@ const timelineData = phases.map((phase) => {
         {/* Deliverables */}
         <Card className="space-y-1.5 p-4">
           {phase.deliverables.map((deliverable, idx) => (
-            <div key={idx} className="font-mono text-sm text-gray-600">
-              <ArrowRight className="inline-block mr-2 h-4 w-4 text-gray-600" /> {deliverable}
+            <div key={idx} className="font-mono text-gray-600 text-sm">
+              <ArrowRight className="mr-2 inline-block h-4 w-4 text-gray-600" />{" "}
+              {deliverable}
             </div>
           ))}
         </Card>
       </div>
     ),
-  }
-})
+  };
+});
 
 export function HowItWorks() {
-  return <Timeline data={timelineData} />
+  return <Timeline data={timelineData} />;
 }

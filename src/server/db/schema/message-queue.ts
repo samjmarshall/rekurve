@@ -1,10 +1,10 @@
 import {
+  index,
+  integer,
   pgTable,
   text,
-  uuid,
-  integer,
   timestamp,
-  index,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 import { channelEnum, messageStatusEnum } from "./enums";

@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
+import { motion } from "framer-motion";
+import { AlertTriangle, Lightbulb, TrendingUp } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "~/components/ui/Accordion"
-import { AlertTriangle, Lightbulb, TrendingUp } from "lucide-react"
-import { Card, CardContent } from "~/components/ui/Card"
+} from "~/components/ui/Accordion";
 
-import { Badge } from "~/components/ui/Badge"
-import { Compare } from "~/components/ui/compare"
-import { motion } from "framer-motion"
+import { Badge } from "~/components/ui/Badge";
+import { Card, CardContent } from "~/components/ui/Card";
+import { Compare } from "~/components/ui/compare";
 
 const caseStudy = {
   title: "How ABC Accounting Saved 25 Hours Weekly and Added $380K to Pipeline",
@@ -57,12 +57,12 @@ const caseStudy = {
       "ROI of 8.6x in the first year",
     ],
   },
-}
+};
 
 export function CaseStudies() {
-  const ChallengeIcon = caseStudy.challenge.icon
-  const SolutionIcon = caseStudy.solution.icon
-  const ResultsIcon = caseStudy.results.icon
+  const ChallengeIcon = caseStudy.challenge.icon;
+  const SolutionIcon = caseStudy.solution.icon;
+  const ResultsIcon = caseStudy.results.icon;
 
   return (
     <section className="relative overflow-hidden bg-gray-50 py-20">
@@ -80,10 +80,10 @@ export function CaseStudies() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="mb-4 text-3xl font-bold tracking-tight text-primary sm:text-4xl">
+          <h2 className="mb-4 font-bold text-3xl text-primary tracking-tight sm:text-4xl">
             Client Success Stories
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-gray-600">
+          <p className="mx-auto max-w-2xl text-gray-600 text-lg">
             Real implementations, real results. See how our AI agents transform
             sales operations.
           </p>
@@ -101,7 +101,7 @@ export function CaseStudies() {
             <CardContent className="p-8 sm:p-12">
               {/* Case study header */}
               <div className="mb-8">
-                <h3 className="mb-4 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+                <h3 className="mb-4 font-bold text-2xl text-primary tracking-tight sm:text-3xl">
                   {caseStudy.title}
                 </h3>
 
@@ -125,14 +125,16 @@ export function CaseStudies() {
                   autoplay={true}
                   autoplayDuration={5000}
                 />
-                <div className="mt-4 flex justify-between px-4 text-sm text-gray-600">
-                  <span className="font-mono">← Manual Process (40% time wasted)</span>
+                <div className="mt-4 flex justify-between px-4 text-gray-600 text-sm">
+                  <span className="font-mono">
+                    ← Manual Process (40% time wasted)
+                  </span>
                   <span className="font-mono">AI Agent (20+ hrs saved) →</span>
                 </div>
               </div>
 
               {/* Accordion sections */}
-              <Accordion type="single" collapsible className="w-full">
+              <Accordion className="w-full">
                 {/* Challenge */}
                 <AccordionItem value="challenge">
                   <AccordionTrigger className="text-left hover:no-underline">
@@ -140,13 +142,13 @@ export function CaseStudies() {
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-coral/10">
                         <ChallengeIcon className="h-5 w-5 text-accent-coral" />
                       </div>
-                      <span className="text-lg font-semibold text-primary">
+                      <span className="font-semibold text-lg text-primary">
                         {caseStudy.challenge.title}
                       </span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <ul className="ml-13 space-y-3 border-l-4 border-accent-coral/20 pl-6">
+                    <ul className="ml-13 space-y-3 border-accent-coral/20 border-l-4 pl-6">
                       {caseStudy.challenge.points.map((point, index) => (
                         <li
                           key={index}
@@ -167,13 +169,13 @@ export function CaseStudies() {
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-amber/10">
                         <SolutionIcon className="h-5 w-5 text-accent-amber" />
                       </div>
-                      <span className="text-lg font-semibold text-primary">
+                      <span className="font-semibold text-lg text-primary">
                         {caseStudy.solution.title}
                       </span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <ul className="ml-13 space-y-3 border-l-4 border-accent-amber/20 pl-6">
+                    <ul className="ml-13 space-y-3 border-accent-amber/20 border-l-4 pl-6">
                       {caseStudy.solution.points.map((point, index) => (
                         <li
                           key={index}
@@ -194,15 +196,15 @@ export function CaseStudies() {
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-state-success/10">
                         <ResultsIcon className="h-5 w-5 text-state-success" />
                       </div>
-                      <span className="text-lg font-semibold text-primary">
+                      <span className="font-semibold text-lg text-primary">
                         {caseStudy.results.title}
                       </span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className="ml-13 space-y-6 border-l-4 border-state-success/20 pl-6">
+                    <div className="ml-13 space-y-6 border-state-success/20 border-l-4 pl-6">
                       {/* Timeline */}
-                      <p className="font-mono text-sm text-gray-600">
+                      <p className="font-mono text-gray-600 text-sm">
                         {caseStudy.results.timeline}
                       </p>
 
@@ -213,10 +215,10 @@ export function CaseStudies() {
                             key={index}
                             className="rounded-lg bg-state-success/5 p-4 text-center"
                           >
-                            <div className="mb-1 font-mono text-2xl font-bold text-state-success">
+                            <div className="mb-1 font-bold font-mono text-2xl text-state-success">
                               {metric.value}
                             </div>
-                            <div className="text-xs text-gray-600">
+                            <div className="text-gray-600 text-xs">
                               {metric.label}
                             </div>
                           </div>
@@ -251,15 +253,16 @@ export function CaseStudies() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <h3 className="mb-4 text-2xl font-bold text-primary">
+          <h3 className="mb-4 font-bold text-2xl text-primary">
             More Success Stories Coming Soon
           </h3>
           <p className="text-gray-600">
-            We&apos;re collecting additional case studies from our clients. Check back soon for more transformative results.
+            We&apos;re collecting additional case studies from our clients.
+            Check back soon for more transformative results.
           </p>
           {/* Future: AnimatedTestimonials carousel will be implemented here with multiple case studies */}
         </motion.div>
       </div>
     </section>
-  )
+  );
 }

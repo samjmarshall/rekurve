@@ -297,7 +297,7 @@ Add session check to redirect authenticated users away from login. The layout fu
 - [x] `make build` succeeds
 
 #### Manual Verification:
-- [ ] Unauthenticated visit to `/dashboard` redirects to `/login`
+- [x] Unauthenticated visit to `/dashboard` redirects to `/login`
 - [ ] Authenticated visit to `/login` redirects to `/dashboard`
 
 ---
@@ -327,7 +327,7 @@ RESEND_API_KEY=
 
 #### Automated Verification:
 - [x] `make build` succeeds
-- [ ] better-auth API route responds at `/api/auth/ok` (in dev with valid env vars)
+- [x] better-auth API route responds at `/api/auth/ok` (in dev with valid env vars)
 
 #### Manual Verification:
 - [ ] OTP email received when triggering sign-in (requires #92 login UI or manual API call)

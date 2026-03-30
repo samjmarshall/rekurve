@@ -8,4 +8,6 @@ export default defineConfig({
   dbCredentials: {
     url: env.DATABASE_URL_UNPOOLED,
   },
+  verbose: true,
+  strict: true,
 });

@@ -1,3 +1,17 @@
+# v0.1.1 (Mon Mar 30 2026)
+
+#### 🐛 Bug Fix
+
+- fix(ci): add contents read permission to playwright workflow ([@samjmarshall](https://github.com/samjmarshall))
+- fix(ci): add contents read permission for repository-dispatch checkout ([@samjmarshall](https://github.com/samjmarshall))
+- fix(ci): add permissions for vercel repository-dispatch status reporting ([@samjmarshall](https://github.com/samjmarshall))
+
+#### Authors: 1
+
+- Sam Marshall ([@samjmarshall](https://github.com/samjmarshall))
+
+---
+
 # v0.1.0 (Mon Mar 30 2026)
 
 #### 🚀 Enhancement

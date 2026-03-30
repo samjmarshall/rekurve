@@ -86,7 +86,7 @@ export function Hero() {
               iterations={2}
               multiline
             >
-              Book 40% More Customers
+              Close 40% More Deals
             </RoughNotation>
             {" "}in{" "}
             <RoughNotation

@@ -11,7 +11,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
-  workers: isCI ? 1 : 4,
+  workers: isCI ? 4 : 6,
   reporter: isCI
     ? [['list'], ['html', { open: 'never' }]]
     : [['html', { open: 'on-failure' }]],
@@ -30,9 +30,9 @@ export default defineConfig({
     // Bypass Vercel Deployment Protection for automated tests
     extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
       ? {
-          'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
-          'x-vercel-set-bypass-cookie': 'true',
-        }
+        'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+        'x-vercel-set-bypass-cookie': 'true',
+      }
       : {},
   },
 
@@ -40,11 +40,11 @@ export default defineConfig({
   webServer: isCI
     ? undefined
     : {
-        command: `rm -rf .next/ && yarn build && yarn start`,
-        url: `http://localhost:${PORT}`,
-        timeout: 120_000,
-        reuseExistingServer: true,
-      },
+      command: `rm -rf .next/ && yarn build && yarn start`,
+      url: `http://localhost:${PORT}`,
+      timeout: 120_000,
+      reuseExistingServer: true,
+    },
 
   projects: [
     {

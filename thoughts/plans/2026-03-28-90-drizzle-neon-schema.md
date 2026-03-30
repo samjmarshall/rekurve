@@ -708,9 +708,9 @@ The `drizzle/` directory contains migration files and should be committed (it's 
 - [x] `make check` passes
 
 #### Manual Verification:
-- [ ] All 10 tables visible in Neon console (6 domain + 4 better-auth)
-- [ ] Enum types created correctly in Postgres
-- [ ] Indexes exist on specified columns
+- [x] All 10 tables visible in Neon console (6 domain + 4 better-auth)
+- [x] Enum types created correctly in Postgres
+- [x] Indexes exist on specified columns
 - [x] `DATABASE_URL` configured in `.env.local` (already done) and Vercel
 
 ---

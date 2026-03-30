@@ -7,6 +7,7 @@ import type { NextConfig } from "next";
 import { env } from "~/env";
 
 const config: NextConfig = {
+  skipTrailingSlashRedirect: true,
   headers: async () => [
     {
       // Apply these headers to all routes in your application.
@@ -41,19 +42,33 @@ const config: NextConfig = {
           value: [
             "default-src 'none';",
             "base-uri 'none';",
-            "connect-src 'self' https://*.posthog.com;",
+            "connect-src 'self';",
             "font-src 'self' https://fonts.gstatic.com;",
             "frame-ancestors 'none';",
             "frame-src 'self';",
             "img-src 'self' https://fonts.gstatic.com;",
             "manifest-src 'self';",
             "script-src 'self' 'unsafe-eval';",
-            "script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js https://us-assets.i.posthog.com;",
+            "script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js;",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
             "upgrade-insecure-requests;",
           ].join(" "),
         },
       ],
+    },
+  ],
+  rewrites: async () => [
+    {
+      source: "/rk/static/:path*",
+      destination: "https://us-assets.i.posthog.com/static/:path*",
+    },
+    {
+      source: "/rk/:path*",
+      destination: "https://us.i.posthog.com/:path*",
+    },
+    {
+      source: "/rk/decide",
+      destination: "https://us.i.posthog.com/decide",
     },
   ],
   poweredByHeader: false,

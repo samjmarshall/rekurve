@@ -93,8 +93,8 @@ export class AnalyticsHelper {
     this.page.on("request", (request) => {
       const url = request.url();
 
-      // Only process PostHog requests
-      if (!url.includes("posthog")) return;
+      // Only process PostHog requests (direct or proxied via /rk/)
+      if (!url.includes("posthog") && !url.includes("/rk/")) return;
 
       const method = request.method();
 

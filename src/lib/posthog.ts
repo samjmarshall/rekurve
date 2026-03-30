@@ -868,10 +868,52 @@ export const recordingControl = {
 };
 
 // ============================================================================
+// Auth Tracking
+// ============================================================================
+
+export const authTracking = {
+  /**
+   * Identify user when they submit their email for OTP.
+   * Links the anonymous PostHog session to the user's email address.
+   * Call this after a successful OTP send (Step 1 of login).
+   */
+  identify: (email: string) => {
+    if (!isPostHogReady()) return;
+
+    posthog.identify(email, {
+      $set: {
+        email,
+      },
+      $set_once: {
+        first_login_attempt: new Date().toISOString(),
+      },
+    });
+
+    safeCapture("login_otp_requested", {
+      method: "email_otp",
+    });
+  },
+
+  /**
+   * Track successful login after OTP verification.
+   */
+  loginSuccess: () => {
+    safeCapture("login_success", {
+      method: "email_otp",
+    });
+
+    posthog.setPersonProperties({
+      last_login: new Date().toISOString(),
+    });
+  },
+};
+
+// ============================================================================
 // Export consolidated analytics object
 // ============================================================================
 
 export const analytics = {
+  auth: authTracking,
   cta: ctaTracking,
   form: formTracking,
   faq: faqTracking,

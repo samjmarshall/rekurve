@@ -1,12 +1,6 @@
-import {
-  pgTable,
-  text,
-  uuid,
-  timestamp,
-  index,
-} from "drizzle-orm/pg-core";
+import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-import { channelEnum, directionEnum, deliveryMethodEnum } from "./enums";
+import { channelEnum, deliveryMethodEnum, directionEnum } from "./enums";
 import { leads } from "./leads";
 import { messageQueue } from "./message-queue";
 

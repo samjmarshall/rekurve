@@ -1,26 +1,26 @@
-'use client'
+"use client";
 
-import { Mail, MessageSquare, Search } from 'lucide-react'
-
+import { Mail, MessageSquare, Search } from "lucide-react";
+import type React from "react";
+import { ScrollReveal } from "~/components/motion/ScrollReveal";
 import { GlowingEffect } from "~/components/ui/glowing-effect";
-import type React from 'react';
-import { ScrollReveal } from '~/components/motion/ScrollReveal'
 
 export default function Solution() {
   return (
-    <section id="features" className="relative py-24 bg-background">
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
+    <section id="features" className="relative bg-background py-24">
+      <div className="relative z-10 mx-auto max-w-7xl px-6">
         {/* Heading */}
         <ScrollReveal>
-          <div className="text-center mb-16">
+          <div className="mb-16 text-center">
             <h2
-              className="text-4xl md:text-5xl font-bold tracking-tight mb-4"
-              style={{ letterSpacing: '-0.02em' }}
+              className="mb-4 font-bold text-4xl tracking-tight md:text-5xl"
+              style={{ letterSpacing: "-0.02em" }}
             >
               Meet Your <span className="text-primary">24/7 Sales Rep</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Not n8n automation. Not chatbots. Intelligent agents that research, qualify, and engage autonomously.
+            <p className="mx-auto max-w-3xl text-gray-600 text-xl">
+              Not n8n automation. Not chatbots. Intelligent agents that
+              research, qualify, and engage autonomously.
             </p>
           </div>
         </ScrollReveal>
@@ -31,7 +31,7 @@ export default function Solution() {
         </ScrollReveal>
       </div>
     </section>
-  )
+  );
 }
 
 export function GlowingBento() {
@@ -64,63 +64,69 @@ export function GlowingBento() {
       {/* <GridItem area="md:[grid-area:1/7/2/13] xl:[grid-area:2/1/2/13]"> */}
       <GridItem area="md:[grid-area:1/1/2/7] xl:[grid-area:1/1/1/13]">
         {/* Enhanced workflow visualization */}
-        <ScrollReveal delay={0.2} className="flex h-full w-full px-10 items-center justify-center">
-          <div className="flex w-full items-center gap-3 text-sm font-mono">
+        <ScrollReveal
+          delay={0.2}
+          className="flex h-full w-full items-center justify-center px-10"
+        >
+          <div className="flex w-full items-center gap-3 font-mono text-sm">
             {/* Step 1: Lead Research */}
             <div className="flex items-center gap-2 opacity-100">
-              <div className="w-2.5 h-2.5 rounded-full bg-accent-blue animate-pulse" />
+              <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-accent-blue" />
               <span className="text-stone-300">Lead Research</span>
             </div>
 
             {/* Connector 1 */}
-            <div className="flex-1 h-px bg-linear-to-r from-accent-blue/60 to-accent-blue/30 min-w-5" />
+            <div className="h-px min-w-5 flex-1 bg-linear-to-r from-accent-blue/60 to-accent-blue/30" />
 
             {/* Step 2: Qualification */}
             <div className="flex items-center gap-2 opacity-70">
               <div
-                className="w-2.5 h-2.5 rounded-full bg-accent-blue animate-pulse"
-                style={{ animationDelay: '0.3s' }}
+                className="h-2.5 w-2.5 animate-pulse rounded-full bg-accent-blue"
+                style={{ animationDelay: "0.3s" }}
               />
               <span className="text-stone-400">Qualification</span>
             </div>
 
             {/* Connector 2 */}
-            <div className="flex-1 h-px bg-linear-to-r from-accent-blue/30 to-accent-blue/20 min-w-5" />
+            <div className="h-px min-w-5 flex-1 bg-linear-to-r from-accent-blue/30 to-accent-blue/20" />
 
             {/* Step 3: Follow-up */}
             <div className="flex items-center gap-2 opacity-50">
               <div
-                className="w-2.5 h-2.5 rounded-full bg-accent-blue animate-pulse"
-                style={{ animationDelay: '0.6s' }}
+                className="h-2.5 w-2.5 animate-pulse rounded-full bg-accent-blue"
+                style={{ animationDelay: "0.6s" }}
               />
               <span className="text-stone-500">Follow-up</span>
             </div>
 
             {/* Connector 3 */}
             <div className="flex-1">
-              <div className="relative left-24 w-20 h-px bg-linear-to-r from-accent-blue/20 to-accent-green/60 min-w-5" />
+              <div className="relative left-24 h-px w-20 min-w-5 bg-linear-to-r from-accent-blue/20 to-accent-green/60" />
               <div className="relative left-24 h-5 w-px bg-accent-green/30" />
-              <div className="h-px w-24.25 bg-linear-to-r from-accent-blue/20 to-accent-green/30 min-w-5" />
+              <div className="h-px w-24.25 min-w-5 bg-linear-to-r from-accent-blue/20 to-accent-green/30" />
               <div className="relative left-24 h-5 w-px bg-accent-green/30" />
-              <div className="relative left-24 w-20 h-px bg-linear-to-r bg-accent-green/30 to-accent-green/60 min-w-5" />
+              <div className="relative left-24 h-px w-20 min-w-5 bg-accent-green/30 bg-linear-to-r to-accent-green/60" />
             </div>
-            
 
             {/* Step 4: (Success) */}
             <div className="flex flex-col gap-5.5">
               <div className="flex items-center space-x-2 opacity-100">
                 <div
-                  className="w-3 h-3 rounded-full bg-accent-green animate-pulse shadow-lg shadow-accent-green/50"
-                  style={{ animationDelay: '0.9s' }}
+                  className="h-3 w-3 animate-pulse rounded-full bg-accent-green shadow-accent-green/50 shadow-lg"
+                  style={{ animationDelay: "0.9s" }}
                 />
-                <span className="text-accent-green font-semibold">Job Booked</span>
+                <span className="font-semibold text-accent-green">
+                  Job Booked
+                </span>
               </div>
               <div className="flex items-center space-x-2 opacity-100">
                 <div
-                  className="w-3 h-3 rounded-full bg-accent-green animate-pulse shadow-lg shadow-accent-green/50"
-                  style={{ animationDelay: '0.9s' }}
+                  className="h-3 w-3 animate-pulse rounded-full bg-accent-green shadow-accent-green/50 shadow-lg"
+                  style={{ animationDelay: "0.9s" }}
                 />
-                <span className="text-accent-green font-semibold">Quote Sent</span>
+                <span className="font-semibold text-accent-green">
+                  Quote Sent
+                </span>
               </div>
             </div>
           </div>
@@ -162,10 +168,16 @@ interface GridItemProps {
   description?: React.ReactNode;
 }
 
-const GridItem = ({ area, icon, title, description, children }: React.PropsWithChildren<GridItemProps>) => {
+const GridItem = ({
+  area,
+  icon,
+  title,
+  description,
+  children,
+}: React.PropsWithChildren<GridItemProps>) => {
   return (
     <li className={`min-h-56 list-none ${area}`}>
-      <div className="relative h-full rounded-2xl shadow-md border bg-card border-border p-2 md:rounded-3xl md:p-3">
+      <div className="relative h-full rounded-2xl border border-border bg-card p-2 shadow-md md:rounded-3xl md:p-3">
         <GlowingEffect
           spread={40}
           glow={true}
@@ -173,21 +185,21 @@ const GridItem = ({ area, icon, title, description, children }: React.PropsWithC
           proximity={64}
           inactiveZone={0.01}
         />
-        <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl p-6 md:p-6 dark:shadow-[0px_0px_27px_0px_#2D2D2D]">
+        <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-0.75 p-6 md:p-6 dark:shadow-[0px_0px_27px_0px_#2D2D2D]">
           <div className="relative flex flex-1 flex-col justify-between gap-3">
             {icon && (
               <div className="w-fit rounded-lg border border-border p-2">
                 {icon}
               </div>
             )}
-            <div className="space-y-3 mb-auto h-full">
+            <div className="mb-auto h-full space-y-3">
               {title && (
-                <h3 className="-tracking-4 pt-0.5 font-sans text-xl/[1.375rem] font-semibold text-balance md:text-2xl/[1.875rem]">
+                <h3 className="text-balance pt-0.5 font-sans font-semibold text-xl/[1.375rem] -tracking-4 md:text-2xl/[1.875rem]">
                   {title}
                 </h3>
               )}
               {description && (
-                <p className="font-sans text-sm/[1.125rem] md:text-base/[1.375rem] text-gray-600 dark:text-neutral-400 [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+                <p className="font-sans text-gray-600 text-sm/[1.125rem] md:text-base/[1.375rem] dark:text-neutral-400 [&_b]:md:font-semibold [&_strong]:md:font-semibold">
                   {description}
                 </p>
               )}

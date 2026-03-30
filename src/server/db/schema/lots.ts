@@ -1,10 +1,10 @@
 import {
+  index,
+  numeric,
   pgTable,
   text,
-  uuid,
-  numeric,
   timestamp,
-  index,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 import { availabilityTypeEnum, lotStatusEnum } from "./enums";

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Logo } from "./logo";
-import React from "react";
 
 export function Footer() {
   const pages = [
@@ -66,27 +65,28 @@ export function Footer() {
     },
   ];
   return (
-    <section className="border-t border-neutral-100 dark:border-white/10 px-8 py-20 bg-background w-full relative overflow-hidden">
-      <div className="max-w-7xl mx-auto text-sm text-neutral-500 flex sm:flex-row flex-col justify-between items-start  md:px-8">
+    <section className="relative w-full overflow-hidden border-neutral-100 border-t bg-background px-8 py-20 dark:border-white/10">
+      <div className="mx-auto flex max-w-7xl flex-col items-start justify-between text-neutral-500 text-sm sm:flex-row md:px-8">
         <div>
-          <div className="mr-0 md:mr-4  md:flex mb-4">
+          <div className="mr-0 mb-4 md:mr-4 md:flex">
             <Logo />
           </div>
 
           <div className="mt-2 ml-2">
-            &copy; copyright Rekurve.ai 2025. All rights reserved.
+            &copy; copyright Rekurve.ai {new Date().getFullYear()}. All rights
+            reserved.
           </div>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 items-start mt-10 sm:mt-0 md:mt-0">
-          <div className="flex justify-center space-y-4 flex-col w-full">
-            <p className="transition-colors hover:text-text-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold">
+        <div className="mt-10 grid grid-cols-2 items-start gap-10 sm:mt-0 md:mt-0 lg:grid-cols-4">
+          <div className="flex w-full flex-col justify-center space-y-4">
+            <p className="font-bold text-neutral-600 transition-colors hover:text-text-neutral-800 dark:text-neutral-300">
               Pages
             </p>
-            <ul className="transition-colors hover:text-text-neutral-800 text-neutral-600 dark:text-neutral-300 list-none space-y-4">
+            <ul className="list-none space-y-4 text-neutral-600 transition-colors hover:text-text-neutral-800 dark:text-neutral-300">
               {pages.map((page, idx) => (
-                <li key={"pages" + idx} className="list-none">
+                <li key={`pages${idx}`} className="list-none">
                   <Link
-                    className="transition-colors hover:text-text-neutral-800 "
+                    className="transition-colors hover:text-text-neutral-800"
                     href={page.href}
                   >
                     {page.title}
@@ -96,15 +96,15 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="flex justify-center space-y-4 flex-col">
-            <p className="transition-colors hover:text-text-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold">
+          <div className="flex flex-col justify-center space-y-4">
+            <p className="font-bold text-neutral-600 transition-colors hover:text-text-neutral-800 dark:text-neutral-300">
               Socials
             </p>
-            <ul className="transition-colors hover:text-text-neutral-800 text-neutral-600 dark:text-neutral-300 list-none space-y-4">
+            <ul className="list-none space-y-4 text-neutral-600 transition-colors hover:text-text-neutral-800 dark:text-neutral-300">
               {socials.map((social, idx) => (
-                <li key={"social" + idx} className="list-none">
+                <li key={`social${idx}`} className="list-none">
                   <Link
-                    className="transition-colors hover:text-text-neutral-800 "
+                    className="transition-colors hover:text-text-neutral-800"
                     href={social.href}
                   >
                     {social.title}
@@ -114,15 +114,15 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="flex justify-center space-y-4 flex-col">
-            <p className="transition-colors hover:text-text-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold">
+          <div className="flex flex-col justify-center space-y-4">
+            <p className="font-bold text-neutral-600 transition-colors hover:text-text-neutral-800 dark:text-neutral-300">
               Legal
             </p>
-            <ul className="transition-colors hover:text-text-neutral-800 text-neutral-600 dark:text-neutral-300 list-none space-y-4">
+            <ul className="list-none space-y-4 text-neutral-600 transition-colors hover:text-text-neutral-800 dark:text-neutral-300">
               {legals.map((legal, idx) => (
-                <li key={"legal" + idx} className="list-none">
+                <li key={`legal${idx}`} className="list-none">
                   <Link
-                    className="transition-colors hover:text-text-neutral-800 "
+                    className="transition-colors hover:text-text-neutral-800"
                     href={legal.href}
                   >
                     {legal.title}
@@ -131,15 +131,15 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          <div className="flex justify-center space-y-4 flex-col">
-            <p className="transition-colors hover:text-text-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold">
+          <div className="flex flex-col justify-center space-y-4">
+            <p className="font-bold text-neutral-600 transition-colors hover:text-text-neutral-800 dark:text-neutral-300">
               Register
             </p>
-            <ul className="transition-colors hover:text-text-neutral-800 text-neutral-600 dark:text-neutral-300 list-none space-y-4">
+            <ul className="list-none space-y-4 text-neutral-600 transition-colors hover:text-text-neutral-800 dark:text-neutral-300">
               {signups.map((auth, idx) => (
-                <li key={"auth" + idx} className="list-none">
+                <li key={`auth${idx}`} className="list-none">
                   <Link
-                    className="transition-colors hover:text-text-neutral-800 "
+                    className="transition-colors hover:text-text-neutral-800"
                     href={auth.href}
                   >
                     {auth.title}
@@ -150,7 +150,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <p className="text-center uppercase mt-20 text-4xl md:text-9xl lg:text-[10rem] xl:text-[12rem] font-bold bg-clip-text text-transparent bg-linear-to-b from-background to-neutral-200/50 dark:to-neutral-800/50 inset-x-0">
+      <p className="inset-x-0 mt-20 bg-linear-to-b from-background to-neutral-200/50 bg-clip-text text-center font-bold text-4xl text-transparent uppercase md:text-9xl lg:text-[10rem] xl:text-[12rem] dark:to-neutral-800/50">
         Make it rain
       </p>
     </section>

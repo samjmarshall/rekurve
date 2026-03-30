@@ -1,5 +1,5 @@
-import type { Page, Locator } from '@playwright/test';
-import { expect } from '@playwright/test';
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export class NavbarSection {
   readonly page: Page;
@@ -11,9 +11,11 @@ export class NavbarSection {
 
   constructor(page: Page) {
     this.page = page;
-    this.container = page.locator('header');
+    this.container = page.locator("header");
     this.ctaButton = page.locator('[data-testid="navbar-cta-desktop"]');
-    this.mobileMenuButton = page.locator('[data-testid="navbar-mobile-menu-btn"]');
+    this.mobileMenuButton = page.locator(
+      '[data-testid="navbar-mobile-menu-btn"]',
+    );
     this.mobileMenu = page.locator('[data-testid="navbar-mobile-menu"]');
     this.mobileCtaButton = page.locator('[data-testid="navbar-cta-mobile"]');
   }

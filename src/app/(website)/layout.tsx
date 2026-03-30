@@ -1,13 +1,13 @@
 import "~/styles/globals.css";
 
-import { type Metadata } from "next";
+import type { Metadata } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
-import { AnalyticsProvider } from "~/providers/AnalyticsProvider";
-import { ThemeProvider } from "~/providers/ThemeProvider";
+import { Footer } from "~/components/footer";
 import { Navbar } from "~/components/navbar";
 import { canonicalUrl } from "~/lib/canonical-url";
-import { Footer } from "~/components/footer";
 import openGraph from "~/lib/open-graph";
+import { AnalyticsProvider } from "~/providers/AnalyticsProvider";
+import { ThemeProvider } from "~/providers/ThemeProvider";
 
 export const runtime = "edge";
 
@@ -118,7 +118,7 @@ export default function WebsiteLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body className="font-sans antialiased bg-background">
+      <body className="bg-background font-sans antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

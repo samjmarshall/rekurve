@@ -1,16 +1,16 @@
 import {
-  Zap,
-  Trophy,
-  Clock,
-  TrendingDown,
-  Calendar,
-  MessageCircle,
-  Medal,
-  Target,
   Bot,
-  Rocket,
+  Calendar,
+  Clock,
   DollarSign,
   type LucideIcon,
+  Medal,
+  MessageCircle,
+  Rocket,
+  Target,
+  TrendingDown,
+  Trophy,
+  Zap,
 } from "lucide-react";
 
 export interface Stat {
@@ -29,7 +29,8 @@ export const stats: Stat[] = [
   {
     id: "immediate-response",
     headline: "391% higher conversion",
-    subtext: "Responding within one minute increases conversion rates dramatically",
+    subtext:
+      "Responding within one minute increases conversion rates dramatically",
     citation: {
       name: "Velocify",
       year: "2016",
@@ -84,7 +85,8 @@ export const stats: Stat[] = [
   {
     id: "consumer-expectations",
     headline: "82% expect 10-min response",
-    subtext: "Immediate response is important or very important to 82% of buyers",
+    subtext:
+      "Immediate response is important or very important to 82% of buyers",
     citation: {
       name: "HubSpot",
       year: "2018",
@@ -139,7 +141,8 @@ export const stats: Stat[] = [
   {
     id: "cost-reduction",
     headline: "50% lower acquisition costs",
-    subtext: "AI speed-to-lead optimization can halve customer acquisition costs",
+    subtext:
+      "AI speed-to-lead optimization can halve customer acquisition costs",
     citation: {
       name: "Forrester/McKinsey",
       year: "",

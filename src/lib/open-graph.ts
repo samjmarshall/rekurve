@@ -1,5 +1,5 @@
-import { type OpenGraph } from "next/dist/lib/metadata/types/opengraph-types"
-import { getBaseUrl } from "./canonical-url"
+import type { OpenGraph } from "next/dist/lib/metadata/types/opengraph-types";
+import { getBaseUrl } from "./canonical-url";
 
 const openGraph: OpenGraph = {
   type: "website",
@@ -17,6 +17,6 @@ const openGraph: OpenGraph = {
       alt: "Rekurve AI - Quote Generation & Speed to Lead for Service Businesses",
     },
   ],
-}
+};
 
-export default openGraph
+export default openGraph;

@@ -1,6 +1,6 @@
-import { test, expect } from '../fixtures/test';
+import { expect, test } from "../fixtures/test";
 
-test.describe('FAQ Search', () => {
+test.describe("FAQ Search", () => {
   test.beforeEach(async ({ homePage }) => {
     await homePage.goto();
     await homePage.faq.scrollIntoView();
@@ -24,13 +24,16 @@ test.describe('FAQ Search', () => {
    * - Consider using MutationObserver to wait for DOM changes instead of timeout
    * - Test with longer debounce waits (2000ms+) to isolate timing vs logic issues
    */
-  test('search filters FAQ items', async ({ homePage }, testInfo) => {
-    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit search debounce timing - see code comments');
+  test("search filters FAQ items", async ({ homePage }, testInfo) => {
+    test.skip(
+      testInfo.project.name === "mobile",
+      "Mobile WebKit search debounce timing - see code comments",
+    );
 
     const initialCount = await homePage.faq.getVisibleCount();
     expect(initialCount).toBeGreaterThan(0);
 
-    await homePage.faq.search('CRM');
+    await homePage.faq.search("CRM");
 
     // Use auto-retrying assertion instead of hardcoded wait
     // Search for CRM should filter down to fewer items
@@ -44,10 +47,15 @@ test.describe('FAQ Search', () => {
   /**
    * SKIPPED ON MOBILE WEBKIT - Same search timing issue as above
    */
-  test('search with no results shows message', async ({ homePage }, testInfo) => {
-    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit search timing - see code comments');
+  test("search with no results shows message", async ({
+    homePage,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name === "mobile",
+      "Mobile WebKit search timing - see code comments",
+    );
 
-    await homePage.faq.search('xyznonexistent123');
+    await homePage.faq.search("xyznonexistent123");
 
     await homePage.faq.expectNoResults();
   });
@@ -55,12 +63,15 @@ test.describe('FAQ Search', () => {
   /**
    * SKIPPED ON MOBILE WEBKIT - Same search timing issue as above
    */
-  test('clearing search restores all FAQs', async ({ homePage }, testInfo) => {
-    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit search timing - see code comments');
+  test("clearing search restores all FAQs", async ({ homePage }, testInfo) => {
+    test.skip(
+      testInfo.project.name === "mobile",
+      "Mobile WebKit search timing - see code comments",
+    );
 
     const initialCount = await homePage.faq.getVisibleCount();
 
-    await homePage.faq.search('CRM');
+    await homePage.faq.search("CRM");
 
     // Wait for filter to apply using auto-retry
     await expect(async () => {
@@ -77,14 +88,20 @@ test.describe('FAQ Search', () => {
   /**
    * ANALYTICS TEST - See booking-form.spec.ts for PostHog batching explanation
    */
-  test.fixme('search tracks analytics event after debounce', async ({ homePage, analytics }) => {
-    await homePage.faq.search('pilot');
+  test.fixme("search tracks analytics event after debounce", async ({
+    homePage,
+    analytics,
+  }) => {
+    await homePage.faq.search("pilot");
 
-    analytics.expectEvent('faq_searched').withPropertyPresent('query').toBeFired();
+    analytics
+      .expectEvent("faq_searched")
+      .withPropertyPresent("query")
+      .toBeFired();
   });
 });
 
-test.describe('FAQ Accordion', () => {
+test.describe("FAQ Accordion", () => {
   test.beforeEach(async ({ homePage }) => {
     await homePage.goto();
     await homePage.faq.scrollIntoView();
@@ -93,13 +110,16 @@ test.describe('FAQ Accordion', () => {
   /**
    * ANALYTICS TEST - See booking-form.spec.ts for PostHog batching explanation
    */
-  test.fixme('expanding FAQ tracks analytics event', async ({ homePage, analytics }) => {
+  test.fixme("expanding FAQ tracks analytics event", async ({
+    homePage,
+    analytics,
+  }) => {
     await homePage.faq.expandQuestion(/integrate with our existing CRM/i);
 
     analytics
-      .expectEvent('faq_expanded')
-      .withPropertyPresent('question_id')
-      .withPropertyPresent('question')
+      .expectEvent("faq_expanded")
+      .withPropertyPresent("question_id")
+      .withPropertyPresent("question")
       .toBeFired();
   });
 
@@ -121,8 +141,13 @@ test.describe('FAQ Accordion', () => {
    * - Consider waiting for the content panel to be visible instead of data-state
    * - Debug with Safari's Web Inspector on iOS Simulator
    */
-  test('accordion expands to show answer content', async ({ homePage }, testInfo) => {
-    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit accordion animation timing - see code comments');
+  test("accordion expands to show answer content", async ({
+    homePage,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name === "mobile",
+      "Mobile WebKit accordion animation timing - see code comments",
+    );
 
     // Use partial question text to match
     const questionText = /integrate with our existing CRM/i;
@@ -135,14 +160,23 @@ test.describe('FAQ Accordion', () => {
   /**
    * SKIPPED ON MOBILE WEBKIT - Same accordion animation issue as above
    */
-  test('multiple accordions can be open simultaneously', async ({ homePage }, testInfo) => {
-    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit accordion animation timing - see code comments');
+  test("multiple accordions can be open simultaneously", async ({
+    homePage,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name === "mobile",
+      "Mobile WebKit accordion animation timing - see code comments",
+    );
 
     // Use partial question text to match
     await homePage.faq.expandQuestion(/What is the Release Pilot program/i);
     await homePage.faq.expandQuestion(/integrate with our existing CRM/i);
 
-    await homePage.faq.expectQuestionExpanded(/What is the Release Pilot program/i);
-    await homePage.faq.expectQuestionExpanded(/integrate with our existing CRM/i);
+    await homePage.faq.expectQuestionExpanded(
+      /What is the Release Pilot program/i,
+    );
+    await homePage.faq.expectQuestionExpanded(
+      /integrate with our existing CRM/i,
+    );
   });
 });

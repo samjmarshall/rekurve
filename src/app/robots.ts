@@ -1,10 +1,10 @@
-import type { MetadataRoute } from 'next'
-import { env } from "~/env"
-import { getBaseUrl } from '~/lib/canonical-url'
+import type { MetadataRoute } from "next";
+import { env } from "~/env";
+import { getBaseUrl } from "~/lib/canonical-url";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = getBaseUrl()
-  const allowRobots = env.ROBOTS_TXT === "Allow"
+  const baseUrl = getBaseUrl();
+  const allowRobots = env.ROBOTS_TXT === "Allow";
 
   return {
     rules: {
@@ -13,5 +13,5 @@ export default function robots(): MetadataRoute.Robots {
       disallow: allowRobots ? undefined : "/",
     },
     sitemap: `${baseUrl}/sitemap.xml`,
-  }
+  };
 }

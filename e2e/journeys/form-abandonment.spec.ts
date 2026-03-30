@@ -1,5 +1,5 @@
-import { test } from '../fixtures/test';
-import { createAbandonmentUser } from '../data/test-users';
+import { createAbandonmentUser } from "../data/test-users";
+import { test } from "../fixtures/test";
 
 /**
  * ANALYTICS TESTS - ALL MARKED AS FIXME
@@ -8,8 +8,12 @@ import { createAbandonmentUser } from '../data/test-users';
  * They're disabled because PostHog batches events - see booking-form.spec.ts
  * for detailed explanation and solutions.
  */
-test.describe('Form Abandonment Tracking', () => {
-  test.fixme('abandonment tracked when leaving after step 1', async ({ homePage, analytics, page: _page }) => {
+test.describe("Form Abandonment Tracking", () => {
+  test.fixme("abandonment tracked when leaving after step 1", async ({
+    homePage,
+    analytics,
+    page: _page,
+  }) => {
     const user = createAbandonmentUser();
 
     await homePage.goto();
@@ -27,10 +31,16 @@ test.describe('Form Abandonment Tracking', () => {
     // We can verify the form state was captured
 
     // Clear analytics and check the form state was tracked
-    analytics.expectEvent('form_step_completed').withProperty('step', 1).toBeFired();
+    analytics
+      .expectEvent("form_step_completed")
+      .withProperty("step", 1)
+      .toBeFired();
   });
 
-  test.fixme('partial lead data is captured at each step', async ({ homePage, analytics }) => {
+  test.fixme("partial lead data is captured at each step", async ({
+    homePage,
+    analytics,
+  }) => {
     const user = createAbandonmentUser();
 
     await homePage.goto();
@@ -41,14 +51,17 @@ test.describe('Form Abandonment Tracking', () => {
     await homePage.bookingForm.clickNext();
 
     // Verify lead was identified even without completing form
-    analytics.expectEvent('lead_identified').toBeFired();
+    analytics.expectEvent("lead_identified").toBeFired();
 
     // Complete step 2
     await homePage.bookingForm.fillStep2(user);
     await homePage.bookingForm.clickNext();
 
     // Step 2 completion tracked
-    analytics.expectEvent('form_step_completed').withProperty('step', 2).toBeFired();
+    analytics
+      .expectEvent("form_step_completed")
+      .withProperty("step", 2)
+      .toBeFired();
 
     // At this point, even if user abandons, we have:
     // - Contact info from step 1
@@ -57,7 +70,7 @@ test.describe('Form Abandonment Tracking', () => {
   });
 });
 
-test.describe('Form Recovery', () => {
+test.describe("Form Recovery", () => {
   /**
    * SKIPPED ON MOBILE WEBKIT
    *
@@ -73,8 +86,13 @@ test.describe('Form Recovery', () => {
    * - This test should automatically start passing once that's resolved
    * - Alternatively, break this into smaller tests that verify one transition each
    */
-  test('can navigate back to correct errors', async ({ homePage }, testInfo) => {
-    test.skip(testInfo.project.name === 'mobile', 'Mobile WebKit step transition timing - see code comments');
+  test("can navigate back to correct errors", async ({
+    homePage,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name === "mobile",
+      "Mobile WebKit step transition timing - see code comments",
+    );
 
     const user = createAbandonmentUser();
 

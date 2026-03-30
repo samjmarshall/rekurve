@@ -1,4 +1,4 @@
-import { test } from '../fixtures/test';
+import { test } from "../fixtures/test";
 
 /**
  * CTA CLICK TRACKING TESTS - ALL ANALYTICS TESTS MARKED AS FIXME
@@ -49,35 +49,59 @@ import { test } from '../fixtures/test';
  * Some analytics platforms offer a test/debug endpoint that returns
  * captured events. Check PostHog docs for similar functionality.
  */
-test.describe('CTA Click Tracking', () => {
+test.describe("CTA Click Tracking", () => {
   test.beforeEach(async ({ homePage }) => {
     await homePage.goto();
   });
 
-  test.fixme('hero primary CTA tracks click event', async ({ homePage, analytics }) => {
+  test.fixme("hero primary CTA tracks click event", async ({
+    homePage,
+    analytics,
+  }) => {
     await homePage.hero.clickPrimaryCta();
 
-    analytics.expectEvent('cta_clicked').withProperty('location', 'hero_primary').toBeFired();
+    analytics
+      .expectEvent("cta_clicked")
+      .withProperty("location", "hero_primary")
+      .toBeFired();
   });
 
-  test.fixme('hero secondary CTA tracks click event', async ({ homePage, analytics }) => {
+  test.fixme("hero secondary CTA tracks click event", async ({
+    homePage,
+    analytics,
+  }) => {
     await homePage.hero.clickSecondaryCta();
 
-    analytics.expectEvent('cta_clicked').withProperty('location', 'hero_secondary').toBeFired();
+    analytics
+      .expectEvent("cta_clicked")
+      .withProperty("location", "hero_secondary")
+      .toBeFired();
   });
 
-  test.fixme('navbar desktop CTA tracks click event', async ({ homePage, analytics }) => {
+  test.fixme("navbar desktop CTA tracks click event", async ({
+    homePage,
+    analytics,
+  }) => {
     await homePage.navbar.clickCta();
 
-    analytics.expectEvent('cta_clicked').withProperty('location', 'header').toBeFired();
+    analytics
+      .expectEvent("cta_clicked")
+      .withProperty("location", "header")
+      .toBeFired();
   });
 
-  test.fixme('pricing tier CTAs track click events', async ({ homePage, analytics }) => {
+  test.fixme("pricing tier CTAs track click events", async ({
+    homePage,
+    analytics,
+  }) => {
     await homePage.pricing.scrollIntoView();
 
     // Test foundation tier
-    await homePage.pricing.clickTierCta('foundation');
-    analytics.expectEvent('cta_clicked').withProperty('location', 'pricing_foundation').toBeFired();
+    await homePage.pricing.clickTierCta("foundation");
+    analytics
+      .expectEvent("cta_clicked")
+      .withProperty("location", "pricing_foundation")
+      .toBeFired();
 
     analytics.clearEvents();
 
@@ -85,27 +109,42 @@ test.describe('CTA Click Tracking', () => {
     await homePage.pricing.scrollIntoView();
 
     // Test growth tier
-    await homePage.pricing.clickTierCta('growth');
-    analytics.expectEvent('cta_clicked').withProperty('location', 'pricing_growth').toBeFired();
+    await homePage.pricing.clickTierCta("growth");
+    analytics
+      .expectEvent("cta_clicked")
+      .withProperty("location", "pricing_growth")
+      .toBeFired();
   });
 
-  test.fixme('final CTA section tracks click event', async ({ homePage, analytics }) => {
+  test.fixme("final CTA section tracks click event", async ({
+    homePage,
+    analytics,
+  }) => {
     await homePage.finalCta.scrollIntoView();
     await homePage.finalCta.clickPrimaryCta();
 
-    analytics.expectEvent('cta_clicked').withProperty('location', 'final_cta_primary').toBeFired();
+    analytics
+      .expectEvent("cta_clicked")
+      .withProperty("location", "final_cta_primary")
+      .toBeFired();
   });
 
-  test.fixme('FAQ bottom CTA tracks click event', async ({ homePage, analytics }) => {
+  test.fixme("FAQ bottom CTA tracks click event", async ({
+    homePage,
+    analytics,
+  }) => {
     await homePage.faq.scrollIntoView();
     await homePage.faq.clickBottomCta();
 
-    analytics.expectEvent('cta_clicked').withProperty('location', 'faq_bottom').toBeFired();
+    analytics
+      .expectEvent("cta_clicked")
+      .withProperty("location", "faq_bottom")
+      .toBeFired();
   });
 });
 
-test.describe('CTA Navigation', () => {
-  test('hero CTA navigates to booking form', async ({ homePage }) => {
+test.describe("CTA Navigation", () => {
+  test("hero CTA navigates to booking form", async ({ homePage }) => {
     await homePage.goto();
 
     // Click hero primary CTA

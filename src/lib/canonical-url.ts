@@ -1,8 +1,8 @@
 export const canonicalUrl = (pagePath = "") =>
-  `${getBaseUrl()}${addForwardSlashIfNeeded(pagePath)}${pagePath}`
+  `${getBaseUrl()}${addForwardSlashIfNeeded(pagePath)}${pagePath}`;
 
 const addForwardSlashIfNeeded = (path: string) =>
-  path && path.length > 0 && !path.startsWith("/") ? "/" : ""
+  path && path.length > 0 && !path.startsWith("/") ? "/" : "";
 
 export function getBaseUrl() {
   if (typeof window !== "undefined") return window.location.origin;

@@ -1,6 +1,6 @@
-import type { Page } from '@playwright/test';
-import { expect } from '@playwright/test';
-import pako from 'pako';
+import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import pako from "pako";
 
 interface CapturedEvent {
   event: string;
@@ -25,15 +25,15 @@ export class AnalyticsHelper {
     } catch {
       // Try base64 + gzip decompression
       try {
-        const binaryData = Buffer.from(data, 'base64');
-        const decompressed = pako.ungzip(binaryData, { to: 'string' });
+        const binaryData = Buffer.from(data, "base64");
+        const decompressed = pako.ungzip(binaryData, { to: "string" });
         return JSON.parse(decompressed);
       } catch {
         // Try URL-encoded base64
         try {
           const decoded = decodeURIComponent(data);
-          const binaryData = Buffer.from(decoded, 'base64');
-          const decompressed = pako.ungzip(binaryData, { to: 'string' });
+          const binaryData = Buffer.from(decoded, "base64");
+          const decompressed = pako.ungzip(binaryData, { to: "string" });
           return JSON.parse(decompressed);
         } catch {
           return null;
@@ -51,7 +51,7 @@ export class AnalyticsHelper {
 
       // Handle form-encoded data (data=...)
       let payload: string = postData;
-      if (postData.startsWith('data=')) {
+      if (postData.startsWith("data=")) {
         payload = postData.slice(5); // Remove 'data=' prefix
       }
 
@@ -90,16 +90,21 @@ export class AnalyticsHelper {
     this.isListening = true;
 
     // Use 'request' event listener to catch all requests including sendBeacon
-    this.page.on('request', (request) => {
+    this.page.on("request", (request) => {
       const url = request.url();
 
-      // Only process PostHog requests
-      if (!url.includes('posthog')) return;
+      // Only process PostHog requests (direct or proxied via /rk/)
+      if (!url.includes("posthog") && !url.includes("/rk/")) return;
 
       const method = request.method();
 
       // Match event capture endpoints
-      if (method === 'POST' && (url.includes('/e') || url.includes('/capture') || url.includes('/batch'))) {
+      if (
+        method === "POST" &&
+        (url.includes("/e") ||
+          url.includes("/capture") ||
+          url.includes("/batch"))
+      ) {
         const postData = request.postData();
         const events = this.extractEventsFromBody(postData);
         if (events.length > 0) {
@@ -131,13 +136,18 @@ export class AnalyticsHelper {
   }
 
   /** Wait for an event to be captured (with timeout) */
-  async waitForEvent(eventName: string, timeoutMs = 5000): Promise<CapturedEvent | null> {
+  async waitForEvent(
+    eventName: string,
+    timeoutMs = 5000,
+  ): Promise<CapturedEvent | null> {
     const startTime = Date.now();
     while (Date.now() - startTime < timeoutMs) {
       const event = this.capturedEvents.find((e) => e.event === eventName);
       if (event) return event;
       // Use requestAnimationFrame-based delay instead of hard timeout
-      await this.page.evaluate(() => new Promise(r => requestAnimationFrame(r)));
+      await this.page.evaluate(
+        () => new Promise((r) => requestAnimationFrame(r)),
+      );
     }
     return null;
   }
@@ -152,13 +162,16 @@ export class AnalyticsHelper {
     const found = this.capturedEvents.filter((e) => e.event === eventName);
     expect(
       found,
-      `Expected no '${eventName}' events, but found ${found.length}`
+      `Expected no '${eventName}' events, but found ${found.length}`,
     ).toHaveLength(0);
   }
 
   /** Debug: print all captured events */
   debugPrintEvents(): void {
-    console.log('Captured events:', JSON.stringify(this.capturedEvents, null, 2));
+    console.log(
+      "Captured events:",
+      JSON.stringify(this.capturedEvents, null, 2),
+    );
   }
 }
 
@@ -190,7 +203,7 @@ class EventAssertion {
   withPropertyMatching(key: string, pattern: RegExp): this {
     this.propertyMatchers.push({
       key,
-      matcher: (v) => typeof v === 'string' && pattern.test(v),
+      matcher: (v) => typeof v === "string" && pattern.test(v),
       description: `${key} matches ${pattern}`,
     });
     return this;
@@ -211,19 +224,21 @@ class EventAssertion {
     this.propertyMatchers.push({
       key,
       matcher: (v) => allowedValues.includes(v),
-      description: `${key} is one of [${allowedValues.join(', ')}]`,
+      description: `${key} is one of [${allowedValues.join(", ")}]`,
     });
     return this;
   }
 
   /** Execute the assertion */
   toBeFired(): void {
-    const matchingEvents = this.events.filter((e) => e.event === this.eventName);
+    const matchingEvents = this.events.filter(
+      (e) => e.event === this.eventName,
+    );
 
     expect(
       matchingEvents.length,
       `Expected '${this.eventName}' event to be fired, but it wasn't. ` +
-        `Captured events: [${this.events.map((e) => e.event).join(', ')}]`
+        `Captured events: [${this.events.map((e) => e.event).join(", ")}]`,
     ).toBeGreaterThan(0);
 
     if (this.propertyMatchers.length === 0) return;
@@ -231,19 +246,21 @@ class EventAssertion {
     // Find an event that matches ALL property conditions
     const fullyMatchingEvent = matchingEvents.find((event) =>
       this.propertyMatchers.every(({ key, matcher }) =>
-        matcher(event.properties[key])
-      )
+        matcher(event.properties[key]),
+      ),
     );
 
     if (!fullyMatchingEvent) {
-      const conditions = this.propertyMatchers.map((m) => m.description).join(', ');
+      const conditions = this.propertyMatchers
+        .map((m) => m.description)
+        .join(", ");
       const actualProps = matchingEvents
         .map((e) => JSON.stringify(e.properties))
-        .join('\n');
+        .join("\n");
 
       throw new Error(
         `Expected '${this.eventName}' with [${conditions}], but no matching event found.\n` +
-          `Actual '${this.eventName}' events:\n${actualProps}`
+          `Actual '${this.eventName}' events:\n${actualProps}`,
       );
     }
   }
@@ -254,7 +271,7 @@ class EventAssertion {
       if (e.event !== this.eventName) return false;
       if (this.propertyMatchers.length === 0) return true;
       return this.propertyMatchers.every(({ key, matcher }) =>
-        matcher(e.properties[key])
+        matcher(e.properties[key]),
       );
     });
 

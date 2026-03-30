@@ -1,85 +1,84 @@
-'use client'
+"use client";
 
-import { cn, formatCurrency } from '~/lib/utils'
-
-import { Badge } from '~/components/ui/Badge'
-import { BrandShimmer } from '../brand-shimmer'
-import { Button } from '~/components/ui/Button'
-import { Check } from 'lucide-react'
-import Link from 'next/link'
-import type { PricingTier } from '~/types'
-import { analytics } from '~/lib/posthog'
-import { motion } from 'framer-motion'
+import { motion } from "framer-motion";
+import { Check } from "lucide-react";
+import Link from "next/link";
+import { Badge } from "~/components/ui/Badge";
+import { Button } from "~/components/ui/Button";
+import { analytics } from "~/lib/posthog";
+import { cn, formatCurrency } from "~/lib/utils";
+import type { PricingTier } from "~/types";
+import { BrandShimmer } from "../brand-shimmer";
 
 const pricingTiers: PricingTier[] = [
   {
-    id: 'foundation',
-    name: 'AI-Assisted Sales System',
-    tagline: 'For small teams testing AI sales',
+    id: "foundation",
+    name: "AI-Assisted Sales System",
+    tagline: "For small teams testing AI sales",
     setupFee: 0, // Will be $9,500 once GA
     monthlyFee: 0, // Will be $1,500 once GA
-    priceDisplay: 'Free - Release Pilot',
+    priceDisplay: "Free - Release Pilot",
     priceSubtext:
-      'Available to qualified applicants only. This will become a paid offering once Generally Available.',
+      "Available to qualified applicants only. This will become a paid offering once Generally Available.",
     features: [
-      'Single Channel Quote Generation (e.g. Email)',
-      'CRM setup & integration',
-      'Basic lead research automation',
-      'Email sequence automation (3-5 sequences)',
-      'Basic lead scoring',
-      'Performance dashboard',
-      '30-day optimization support',
-      'Email support',
+      "Single Channel Quote Generation (e.g. Email)",
+      "CRM setup & integration",
+      "Basic lead research automation",
+      "Email sequence automation (3-5 sequences)",
+      "Basic lead scoring",
+      "Performance dashboard",
+      "30-day optimization support",
+      "Email support",
     ],
-    cta: 'Apply for Pilot',
-    badge: 'Now Open',
+    cta: "Apply for Pilot",
+    badge: "Now Open",
   },
   {
-    id: 'growth',
-    name: 'Intelligent Sales Agent',
-    tagline: 'Autonomous agent for scaling outbound',
+    id: "growth",
+    name: "Intelligent Sales Agent",
+    tagline: "Autonomous agent for scaling outbound",
     setupFee: 0, // Will be $20,000 once GA
     monthlyFee: 0, // Will be $4,500 once GA
-    priceDisplay: 'Free - Beta',
+    priceDisplay: "Free - Beta",
     priceSubtext:
-      'Restricted to qualified Release Pilot participants. You must first complete the Release Pilot to be considered.',
+      "Restricted to qualified Release Pilot participants. You must first complete the Release Pilot to be considered.",
     features: [
-      'Everything in Foundation',
-      'Multi-channel integration (Email + Social Media + SMS)',
-      'AI-powered lead qualification',
-      'Adaptive messaging based on engagement',
-      'Real-time lead enrichment (Clay, Clearbit)',
-      'Custom workflow automation',
-      'Advanced analytics dashboard',
-      '90-day optimization support',
-      'Priority email + Slack support',
+      "Everything in Foundation",
+      "Multi-channel integration (Email + Social Media + SMS)",
+      "AI-powered lead qualification",
+      "Adaptive messaging based on engagement",
+      "Real-time lead enrichment (Clay, Clearbit)",
+      "Custom workflow automation",
+      "Advanced analytics dashboard",
+      "90-day optimization support",
+      "Priority email + Slack support",
     ],
     highlighted: true,
-    cta: 'Join Waitlist',
-    badge: 'Coming Soon',
+    cta: "Join Waitlist",
+    badge: "Coming Soon",
   },
   {
-    id: 'enterprise',
-    name: 'Autonomous AI Sales Agent',
-    tagline: 'Enterprise-grade autonomous sales system',
+    id: "enterprise",
+    name: "Autonomous AI Sales Agent",
+    tagline: "Enterprise-grade autonomous sales system",
     setupFee: 0,
     monthlyFee: 0,
-    priceDisplay: 'Paid - Custom',
-    priceSubtext: 'Tailored to your needs',
+    priceDisplay: "Paid - Custom",
+    priceSubtext: "Tailored to your needs",
     features: [
-      'Everything in Growth',
-      'Custom AI decision logic',
-      'Advanced CRM integrations (Salesforce, HubSpot, Pipedrive)',
-      'Dedicated account manager',
-      'Custom training & onboarding',
-      '6-months active service management',
-      '99.9% uptime SLA',
-      'White-glove support (phone + video)',
+      "Everything in Growth",
+      "Custom AI decision logic",
+      "Advanced CRM integrations (Salesforce, HubSpot, Pipedrive)",
+      "Dedicated account manager",
+      "Custom training & onboarding",
+      "6-months active service management",
+      "99.9% uptime SLA",
+      "White-glove support (phone + video)",
     ],
-    cta: 'Contact Us',
-    badge: 'Custom Build',
+    cta: "Contact Us",
+    badge: "Custom Build",
   },
-]
+];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -90,7 +89,7 @@ const containerVariants = {
       delayChildren: 0.2,
     },
   },
-}
+};
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -102,66 +101,68 @@ const cardVariants = {
       ease: [0.22, 1, 0.36, 1] as const,
     },
   },
-}
+};
 
 export function Pricing() {
   // Generate Service schema for SEO
   const servicesSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "itemListElement": pricingTiers.map((tier, index) => ({
+    itemListElement: pricingTiers.map((tier, index) => ({
       "@type": "ListItem",
-      "position": index + 1,
-      "item": {
+      position: index + 1,
+      item: {
         "@type": "Service",
-        "name": tier.name,
-        "description": tier.tagline,
-        "provider": {
+        name: tier.name,
+        description: tier.tagline,
+        provider: {
           "@type": "Organization",
-          "name": "Rekurve AI",
-          "url": "https://rekurve.ai"
+          name: "Rekurve AI",
+          url: "https://rekurve.ai",
         },
-        "areaServed": ["Brisbane", "Melbourne"],
-        "serviceType": "AI Sales Agents",
-        ...(tier.setupFee > 0 && tier.monthlyFee > 0 ? {
-          "offers": {
-            "@type": "AggregateOffer",
-            "priceCurrency": "AUD",
-            "lowPrice": tier.monthlyFee,
-            "highPrice": tier.setupFee + tier.monthlyFee,
-            "offerCount": 2,
-            "offers": [
-              {
-                "@type": "Offer",
-                "name": "Setup Fee",
-                "price": tier.setupFee,
-                "priceCurrency": "AUD"
+        areaServed: ["Brisbane", "Melbourne"],
+        serviceType: "AI Sales Agents",
+        ...(tier.setupFee > 0 && tier.monthlyFee > 0
+          ? {
+              offers: {
+                "@type": "AggregateOffer",
+                priceCurrency: "AUD",
+                lowPrice: tier.monthlyFee,
+                highPrice: tier.setupFee + tier.monthlyFee,
+                offerCount: 2,
+                offers: [
+                  {
+                    "@type": "Offer",
+                    name: "Setup Fee",
+                    price: tier.setupFee,
+                    priceCurrency: "AUD",
+                  },
+                  {
+                    "@type": "Offer",
+                    name: "Monthly Fee",
+                    price: tier.monthlyFee,
+                    priceCurrency: "AUD",
+                    priceSpecification: {
+                      "@type": "UnitPriceSpecification",
+                      price: tier.monthlyFee,
+                      priceCurrency: "AUD",
+                      unitCode: "MON",
+                      billingIncrement: 1,
+                    },
+                  },
+                ],
               },
-              {
+            }
+          : {
+              offers: {
                 "@type": "Offer",
-                "name": "Monthly Fee",
-                "price": tier.monthlyFee,
-                "priceCurrency": "AUD",
-                "priceSpecification": {
-                  "@type": "UnitPriceSpecification",
-                  "price": tier.monthlyFee,
-                  "priceCurrency": "AUD",
-                  "unitCode": "MON",
-                  "billingIncrement": 1
-                }
-              }
-            ]
-          }
-        } : {
-          "offers": {
-            "@type": "Offer",
-            "price": "Contact for pricing",
-            "priceCurrency": "AUD"
-          }
-        })
-      }
-    }))
-  }
+                price: "Contact for pricing",
+                priceCurrency: "AUD",
+              },
+            }),
+      },
+    })),
+  };
 
   return (
     <section
@@ -178,15 +179,15 @@ export function Pricing() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="mb-16 text-center"
         >
-          <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+          <h2 className="mb-4 font-bold text-3xl tracking-tight md:text-4xl lg:text-5xl">
             {/* Go-live: "Simple, Transparent Pricing" */}
             Early Access Programs
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-gray-600">
+          <p className="mx-auto max-w-2xl text-gray-600 text-lg">
             {/* Go-live: "All plans include our 5x ROI guarantee. If you don&apos;t see results, you don&apos;t pay."" */}
             We&apos;re launching with a limited Release Pilot. Qualified
             applicants get free access in exchange for feedback and case study
@@ -199,28 +200,25 @@ export function Pricing() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, margin: "-100px" }}
           className="grid gap-8 pt-10 lg:grid-cols-3 lg:pt-0"
         >
           {pricingTiers.map((tier) => {
-            const isCustomPricing = tier.setupFee === 0 && tier.monthlyFee === 0
+            const isCustomPricing =
+              tier.setupFee === 0 && tier.monthlyFee === 0;
             const borderColor = tier.highlighted
-              ? 'border-primary'
-              : tier.id === 'enterprise'
-                ? 'border-primary/80'
-                : 'border-primary/60'
+              ? "border-primary"
+              : tier.id === "enterprise"
+                ? "border-primary/80"
+                : "border-primary/60";
 
             return (
               <motion.div
                 key={tier.id}
                 variants={cardVariants}
                 data-testid={`pricing-tier-${tier.id}`}
-                className={`
-                  group relative flex flex-col rounded-xl border-2 p-8 backdrop-blur-sm
-                  transition-all duration-300
-                  hover:-translate-y-2 hover:shadow-2xl
-                  ${borderColor}
-                  ${tier.highlighted ? 'lg:scale-105 lg:shadow-lg shadow-primary/15 relative bg-card shadow-xl' : 'bg-card/50'}
+                className={`group relative flex flex-col rounded-xl border-2 p-8 backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${borderColor}
+                  ${tier.highlighted ? "relative bg-card shadow-primary/15 shadow-xl lg:scale-105 lg:shadow-lg" : "bg-card/50"}
                 `}
               >
                 {/* Badge (Most Popular) */}
@@ -234,7 +232,7 @@ export function Pricing() {
                         transition={{
                           duration: 2,
                           repeat: Infinity,
-                          ease: 'easeInOut',
+                          ease: "easeInOut",
                         }}
                         className="font-semibold"
                       >
@@ -246,38 +244,39 @@ export function Pricing() {
 
                 {/* Header */}
                 <div className="mb-6">
-                  <h3 className="mb-2 text-2xl font-bold">
-                    {tier.name}
-                  </h3>
-                  <p className="text-sm text-gray-600"><span className="text-primary font-bold">{tier.id.charAt(0).toUpperCase() + tier.id.slice(1)}</span> - {tier.tagline}</p>
+                  <h3 className="mb-2 font-bold text-2xl">{tier.name}</h3>
+                  <p className="text-gray-600 text-sm">
+                    <span className="font-bold text-primary">
+                      {tier.id.charAt(0).toUpperCase() + tier.id.slice(1)}
+                    </span>{" "}
+                    - {tier.tagline}
+                  </p>
                 </div>
 
                 {/* Pricing */}
                 <div className="mb-8">
                   {tier.priceDisplay ? (
                     <div>
-                      <div className="mb-1 text-4xl font-bold leading-tight">
+                      <div className="mb-1 font-bold text-4xl leading-tight">
                         {tier.priceDisplay}
                       </div>
                       {tier.priceSubtext && (
-                        <p className="text-sm text-gray-600">
+                        <p className="text-gray-600 text-sm">
                           {tier.priceSubtext}
                         </p>
                       )}
                     </div>
                   ) : isCustomPricing ? (
                     <div>
-                      <div className="mb-1 text-4xl font-bold">
-                        Custom
-                      </div>
-                      <p className="text-sm text-gray-600">
+                      <div className="mb-1 font-bold text-4xl">Custom</div>
+                      <p className="text-gray-600 text-sm">
                         Tailored to your needs
                       </p>
                     </div>
                   ) : (
                     <div>
                       <div className="mb-1 flex items-baseline gap-2">
-                        <span className="text-4xl font-bold">
+                        <span className="font-bold text-4xl">
                           {formatCurrency(tier.setupFee)}
                         </span>
                         <span className="text-gray-600">setup</span>
@@ -308,11 +307,11 @@ export function Pricing() {
                     >
                       <Check
                         className={`mt-0.5 h-5 w-5 shrink-0 ${
-                          !tier.highlighted &&'text-gray-600'
+                          !tier.highlighted && "text-gray-600"
                         }`}
                         strokeWidth={2.5}
                       />
-                      <span className="text-sm text-gray-600">{feature}</span>
+                      <span className="text-gray-600 text-sm">{feature}</span>
                     </motion.li>
                   ))}
                 </ul>
@@ -320,21 +319,31 @@ export function Pricing() {
                 {/* CTA Button */}
                 <Link
                   href="#booking-form"
-                  className='w-full'
-                  onClick={() => analytics.cta.click(`pricing_${tier.id}` as 'pricing_foundation' | 'pricing_growth' | 'pricing_enterprise')}
+                  className="w-full"
+                  onClick={() =>
+                    analytics.cta.click(
+                      `pricing_${tier.id}` as
+                        | "pricing_foundation"
+                        | "pricing_growth"
+                        | "pricing_enterprise",
+                    )
+                  }
                   data-testid={`pricing-cta-${tier.id}`}
                 >
                   <Button
                     asChild
-                    variant={tier.highlighted ? 'primary' : 'outline'}
+                    variant={tier.highlighted ? "primary" : "outline"}
                     size="lg"
-                    className={cn('w-full', tier.highlighted && 'border-accent-green')}
+                    className={cn(
+                      "w-full",
+                      tier.highlighted && "border-accent-green",
+                    )}
                   >
                     {tier.cta}
                   </Button>
                 </Link>
               </motion.div>
-            )
+            );
           })}
         </motion.div>
 
@@ -343,13 +352,13 @@ export function Pricing() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="mt-16 text-center"
         >
           <p className="text-gray-600">
             {/* Go-live: "All plans backed by our{' '}"" */}
-            Limited spots available.{' '}
+            Limited spots available.{" "}
             <a
               // href="#guarantee" Update link when go-live
               href="#booking-form"
@@ -357,9 +366,9 @@ export function Pricing() {
             >
               {/* Go-live: "5x ROI Guarantee" */}
               Apply now
-            </a>{' '}
+            </a>{" "}
             {/* Go-live: ". Questions?{' '}" */}
-            to be considered for the Release Pilot. Questions?{' '}
+            to be considered for the Release Pilot. Questions?{" "}
             <a
               href="#faq"
               className="font-semibold underline decoration-stone-400/30 transition-colors hover:text-stone-300 hover:decoration-stone-400"
@@ -370,5 +379,5 @@ export function Pricing() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }

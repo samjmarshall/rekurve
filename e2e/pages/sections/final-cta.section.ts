@@ -1,5 +1,5 @@
-import type { Page, Locator } from '@playwright/test';
-import { expect } from '@playwright/test';
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export class FinalCtaSection {
   readonly page: Page;
@@ -11,7 +11,7 @@ export class FinalCtaSection {
   constructor(page: Page) {
     this.page = page;
     this.container = page.locator('[data-testid="final-cta-section"]');
-    this.heading = this.container.getByRole('heading');
+    this.heading = this.container.getByRole("heading");
     this.primaryCta = page.locator('[data-testid="final-cta-primary"]');
     this.emailCta = page.locator('[data-testid="final-cta-email"]');
   }

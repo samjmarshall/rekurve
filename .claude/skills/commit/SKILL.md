@@ -10,6 +10,18 @@ Review the current working tree and create well-structured git commits.
 
 See "Conventional Commits 1.0.0" message specification here: https://raw.githubusercontent.com/conventional-commits/conventionalcommits.org/refs/heads/master/content/v1.0.0/index.md
 
+### Choosing the correct type
+
+The type describes the **category** of change, not what the change does. The scope (in parentheses) narrows within a type — it does not replace it.
+
+- `ci` — CI/CD configuration and workflows (`.github/workflows/`, Vercel config)
+- `fix` — bug fixes to application code
+- `feat` — new features or user-facing functionality
+- `test` — adding or updating tests
+- `chore` — maintenance tasks, dependency updates, tooling
+- `refactor` — code restructuring with no behavior change
+- `docs` — documentation only
+
 ## Process
 
 1. **Understand what changed:**

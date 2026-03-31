@@ -9,11 +9,11 @@ import {
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { Button } from "~/components/ui/Button";
 import { analytics } from "~/lib/posthog";
 import { cn } from "~/lib/utils";
 import { Logo } from "./logo";
 import { ModeToggle } from "./mode-toggle";
-import { Button } from "./ui/Button";
 
 interface NavbarProps {
   navItems: {

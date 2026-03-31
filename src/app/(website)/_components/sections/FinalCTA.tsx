@@ -3,11 +3,11 @@
 import { ArrowRight, Mail } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
-import { ScrollReveal } from "~/components/motion/ScrollReveal";
+import { Button } from "~/components/ui/Button";
 import { analytics } from "~/lib/posthog";
 import { cn } from "~/lib/utils";
 import { BrandShimmer } from "../brand-shimmer";
-import { Button } from "../ui/Button";
+import { ScrollReveal } from "../motion/ScrollReveal";
 
 export function FinalCTA() {
   return (

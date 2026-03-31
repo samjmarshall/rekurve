@@ -1,8 +1,8 @@
 "use client";
 
 import { ArrowRight, Code2, Lightbulb, RefreshCw, Search } from "lucide-react";
+import { Card } from "~/components/ui/Card";
 import { Timeline } from "~/components/ui/timeline";
-import { Card } from "../ui/Card";
 
 const phases = [
   {

@@ -2,12 +2,12 @@ import "~/styles/globals.css";
 
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
-import { Footer } from "~/components/footer";
-import { Navbar } from "~/components/navbar";
 import { canonicalUrl } from "~/lib/canonical-url";
 import openGraph from "~/lib/open-graph";
 import { AnalyticsProvider } from "~/providers/AnalyticsProvider";
 import { ThemeProvider } from "~/providers/ThemeProvider";
+import { Footer } from "./_components/footer";
+import { Navbar } from "./_components/navbar";
 
 export const runtime = "edge";
 

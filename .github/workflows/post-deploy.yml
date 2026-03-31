@@ -74,6 +74,13 @@ jobs:
         id: pre_migrate
         run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
 
+      - name: Run database check
+        if: steps.neon.outputs.db_url
+        run: yarn db:check
+        env:
+          SKIP_ENV_VALIDATION: 1
+          DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url }}
+
       - name: Run database migrations
         if: steps.neon.outputs.db_url
         run: yarn db:migrate

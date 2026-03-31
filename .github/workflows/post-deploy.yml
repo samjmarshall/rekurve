@@ -63,7 +63,7 @@ jobs:
           fi
 
           CONNECTION=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
-            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/connection_uri?branch_id=$BRANCH_ID&role_name=neondb_owner&database_name=neondb&pooled=false")
+            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/connection_uri?branch_id=$BRANCH_ID&role_name=neondb_owner&database_name=neondb")
 
           DB_URL=$(echo "$CONNECTION" | jq -r '.uri')
           echo "db_url=$DB_URL" >> "$GITHUB_OUTPUT"
@@ -73,6 +73,13 @@ jobs:
         if: steps.neon.outputs.db_url
         id: pre_migrate
         run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Run database check
+        if: steps.neon.outputs.db_url
+        run: yarn db:check
+        env:
+          SKIP_ENV_VALIDATION: 1
+          DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url }}
 
       - name: Run database migrations
         if: steps.neon.outputs.db_url

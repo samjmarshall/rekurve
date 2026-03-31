@@ -49,6 +49,7 @@ Then wait for the user's input.
 
    - Use the **@agent-codebase-locator** agent to find all files related to the ticket/task
    - Use the **@agent-codebase-analyzer** agent to understand how the current implementation works
+   - Use the **@agent-codebase-pattern-finder** agent to find existing test patterns and conventions in the codebase (test file locations, frameworks used, helper utilities)
    - If relevant, use the **@agent-thoughts-locator** agent to find any existing thoughts documents about this feature
    - If a JIRA ticket is mentioned, use the `mcp__atlassian__` tools to get full details
    - If a Linear ticket is mentioned, use the `mcp__linear__` tools to get full details
@@ -219,10 +220,19 @@ After structure approval:
 // Specific code to add/modify
 ```
 
+#### 2. Tests
+**File**: `path/to/test-file.test.ts` (or `.spec.ts`, `.e2e.ts`)
+**Tests**: [What behavior these tests verify]
+
+```[language]
+// Key test cases to write
+```
+
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] Unit tests pass: `make test`
+- [ ] New tests written for this phase's changes
+- [ ] All tests pass: `make test` / `make test_e2e`
 
 #### Manual Verification:
 - [ ] Feature works as expected when tested
@@ -236,20 +246,6 @@ After structure approval:
 [Similar structure with both automated and manual success criteria...]
 
 ---
-
-## Testing Strategy
-
-### Unit Tests:
-- [What to test]
-- [Key edge cases]
-
-### Integration Tests:
-- [End-to-end scenarios]
-
-### Manual Testing Steps:
-1. [Specific step to verify feature]
-2. [Another verification step]
-3. [Edge case to test manually]
 
 ## Performance Considerations
 
@@ -316,12 +312,20 @@ After structure approval:
    - Think about edge cases
    - Include "what we're NOT doing"
 
-5. **Track Progress**:
+5. **Tests Are Implementation Work**:
+   - Every phase that adds or changes behavior MUST include test files in its "Changes Required" section
+   - Use red/green TDD where feasible: plan the test first, then the implementation
+   - For API/backend changes: plan integration or e2e tests that verify the behavior
+   - For UI changes: plan e2e tests for key user flows where manual testing would otherwise be needed
+   - Do NOT relegate testing to a separate "Testing Strategy" appendix — tests belong in each phase alongside the code they verify
+   - Research existing test patterns in the codebase so new tests follow the same conventions
+
+6. **Track Progress**:
    - Use TodoWrite to track planning tasks
    - Update todos as you complete research
    - Mark planning tasks complete when done
 
-6. **No Open Questions in Final Plan**:
+7. **No Open Questions in Final Plan**:
    - If you encounter open questions during planning, STOP
    - Research or ask for clarification immediately
    - Do NOT write the plan with unresolved questions
@@ -370,12 +374,13 @@ After structure approval:
 ### For New Features:
 - Research existing patterns first
 - Start with data model
-- Build backend logic
-- Add API endpoints
+- Build backend logic with tests (red/green where feasible)
+- Add API endpoints with integration/e2e tests
 - Implement email response/user interface last
 
 ### For Refactoring:
 - Document current behavior
+- Write tests that capture current behavior before changing it
 - Plan incremental changes
 - Maintain backwards compatibility
 - Include migration strategy

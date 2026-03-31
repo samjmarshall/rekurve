@@ -4,6 +4,7 @@ import {
   deleteTestSession,
   type TestSession,
 } from "../utils/auth-helper";
+import { getSessionCookie } from "../utils/session-cookie";
 
 test.describe("tRPC — Unauthenticated", () => {
   test("protected procedure returns UNAUTHORIZED without session", async ({
@@ -42,14 +43,12 @@ test.describe("tRPC — Authenticated", () => {
   ];
 
   for (const { endpoint, expected } of stubs) {
-    test(`${endpoint} returns expected stub data`, async ({ context }) => {
+    test(`${endpoint} returns expected stub data`, async ({
+      context,
+      baseURL,
+    }) => {
       await context.addCookies([
-        {
-          name: "better-auth.session_token",
-          value: session.signedToken,
-          domain: "localhost",
-          path: "/",
-        },
+        getSessionCookie(session.signedToken, baseURL!),
       ]);
 
       const response = await context.request.get(`/api/trpc/${endpoint}`);

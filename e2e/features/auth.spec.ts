@@ -4,6 +4,7 @@ import {
   deleteTestSession,
   type TestSession,
 } from "../utils/auth-helper";
+import { getSessionCookie } from "../utils/session-cookie";
 
 test.describe("Auth Health Check", () => {
   test("/api/auth/ok returns a successful response", async ({ request }) => {
@@ -49,15 +50,9 @@ test.describe("Authenticated Redirects", () => {
   test("/login redirects to /dashboard when authenticated", async ({
     context,
     page,
+    baseURL,
   }) => {
-    await context.addCookies([
-      {
-        name: "better-auth.session_token",
-        value: session.signedToken,
-        domain: "localhost",
-        path: "/",
-      },
-    ]);
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     await page.goto("/login");
     await page.waitForURL("**/dashboard");

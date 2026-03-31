@@ -4,6 +4,15 @@ import {
   deleteTestSession,
   type TestSession,
 } from "../utils/auth-helper";
+import { getSessionCookie } from "../utils/session-cookie";
+
+function withAuth(
+  context: import("@playwright/test").BrowserContext,
+  session: TestSession,
+  baseURL: string,
+) {
+  return context.addCookies([getSessionCookie(session.signedToken, baseURL)]);
+}
 
 test.describe("Dashboard Shell — Navigation", () => {
   test.skip(
@@ -21,23 +30,13 @@ test.describe("Dashboard Shell — Navigation", () => {
     await deleteTestSession(session.userId);
   });
 
-  async function withAuth(context: import("@playwright/test").BrowserContext) {
-    await context.addCookies([
-      {
-        name: "better-auth.session_token",
-        value: session.signedToken,
-        domain: "localhost",
-        path: "/",
-      },
-    ]);
-  }
-
   test("sidebar visible on desktop, bottom nav hidden", async ({
     context,
     page,
+    baseURL,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "Desktop only");
-    await withAuth(context);
+    await withAuth(context, session, baseURL!);
     await page.goto("/dashboard");
     await expect(page.locator('[data-testid="app-sidebar"]')).toBeVisible();
     await expect(page.locator('[data-testid="bottom-nav"]')).not.toBeVisible();
@@ -46,9 +45,10 @@ test.describe("Dashboard Shell — Navigation", () => {
   test("bottom nav visible on mobile, sidebar hidden", async ({
     context,
     page,
+    baseURL,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "Mobile only");
-    await withAuth(context);
+    await withAuth(context, session, baseURL!);
     await page.goto("/dashboard");
     await expect(page.locator('[data-testid="bottom-nav"]')).toBeVisible();
     await expect(page.locator('[data-testid="app-sidebar"]')).not.toBeVisible();
@@ -57,9 +57,10 @@ test.describe("Dashboard Shell — Navigation", () => {
   test("navigating between pages updates active nav item", async ({
     context,
     page,
+    baseURL,
   }, testInfo) => {
     test.skip(testInfo.project.name === "mobile", "Uses sidebar links");
-    await withAuth(context);
+    await withAuth(context, session, baseURL!);
     await page.goto("/dashboard");
 
     // Dashboard is active
@@ -81,9 +82,10 @@ test.describe("Dashboard Shell — Navigation", () => {
   test("navigating via bottom nav works on mobile", async ({
     context,
     page,
+    baseURL,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "Mobile only");
-    await withAuth(context);
+    await withAuth(context, session, baseURL!);
     await page.goto("/dashboard");
 
     await expect(
@@ -97,9 +99,13 @@ test.describe("Dashboard Shell — Navigation", () => {
     ).toHaveAttribute("aria-current", "page");
   });
 
-  test("all four pages are reachable", async ({ context, page }, testInfo) => {
+  test("all four pages are reachable", async ({
+    context,
+    page,
+    baseURL,
+  }, testInfo) => {
     test.skip(testInfo.project.name === "mobile", "Uses sidebar links");
-    await withAuth(context);
+    await withAuth(context, session, baseURL!);
 
     const pages = ["dashboard", "pipeline", "lots", "settings"];
     for (const pageName of pages) {
@@ -126,22 +132,12 @@ test.describe("Dashboard Shell — Empty States", () => {
     await deleteTestSession(session.userId);
   });
 
-  async function withAuth(context: import("@playwright/test").BrowserContext) {
-    await context.addCookies([
-      {
-        name: "better-auth.session_token",
-        value: session.signedToken,
-        domain: "localhost",
-        path: "/",
-      },
-    ]);
-  }
-
   test("/dashboard shows Action Queue empty state", async ({
     context,
     page,
+    baseURL,
   }) => {
-    await withAuth(context);
+    await withAuth(context, session, baseURL!);
     await page.goto("/dashboard");
     await expect(page.getByText("No pending actions")).toBeVisible();
     await expect(
@@ -149,20 +145,24 @@ test.describe("Dashboard Shell — Empty States", () => {
     ).toBeVisible();
   });
 
-  test("/pipeline shows Pipeline empty state", async ({ context, page }) => {
-    await withAuth(context);
+  test("/pipeline shows Pipeline empty state", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await withAuth(context, session, baseURL!);
     await page.goto("/pipeline");
     await expect(page.getByText("No leads yet")).toBeVisible();
   });
 
-  test("/lots shows Lots empty state", async ({ context, page }) => {
-    await withAuth(context);
+  test("/lots shows Lots empty state", async ({ context, page, baseURL }) => {
+    await withAuth(context, session, baseURL!);
     await page.goto("/lots");
     await expect(page.getByText("No lots tracked")).toBeVisible();
   });
 
-  test("/settings shows user email", async ({ context, page }) => {
-    await withAuth(context);
+  test("/settings shows user email", async ({ context, page, baseURL }) => {
+    await withAuth(context, session, baseURL!);
     await page.goto("/settings");
     await expect(
       page.locator('[data-testid="settings-user-email"]'),
@@ -189,15 +189,9 @@ test.describe("Dashboard Shell — Sign Out", () => {
   test("sign out from settings redirects to login", async ({
     context,
     page,
+    baseURL,
   }) => {
-    await context.addCookies([
-      {
-        name: "better-auth.session_token",
-        value: session.signedToken,
-        domain: "localhost",
-        path: "/",
-      },
-    ]);
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     await page.goto("/settings");
     await page.locator('[data-testid="settings-sign-out"]').click();

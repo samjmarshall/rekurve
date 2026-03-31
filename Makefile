@@ -10,6 +10,10 @@ start: install
 check:
 	yarn check
 
+fix:
+	yarn lint:fix
+	yarn format:write
+
 test_e2e:
 	yarn test:e2e
 

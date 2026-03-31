@@ -53,11 +53,41 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: yarn playwright install-deps
 
+      - name: Resolve Neon branch database URL
+        id: neon
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+          GIT_REF: ${{ github.event.client_payload.git.ref }}
+          ENVIRONMENT: ${{ github.event.client_payload.environment }}
+        run: |
+          BRANCHES=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
+            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches")
+
+          if [ "$ENVIRONMENT" = "production" ]; then
+            BRANCH_ID=$(echo "$BRANCHES" | jq -r '.branches[] | select(.primary == true) | .id')
+          else
+            BRANCH_ID=$(echo "$BRANCHES" | jq -r --arg ref "$GIT_REF" \
+              '.branches[] | select(.name | test($ref)) | .id')
+          fi
+
+          if [ -z "$BRANCH_ID" ]; then
+            echo "::warning::Could not resolve Neon branch for ref '$GIT_REF' — auth tests will skip"
+            exit 0
+          fi
+
+          CONNECTION=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
+            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/connection_uri?branch_id=$BRANCH_ID&role_name=neondb_owner&database_name=neondb")
+
+          echo "db_url=$(echo $CONNECTION | jq -r '.uri')" >> "$GITHUB_OUTPUT"
+
       - name: Run Playwright tests
         run: make test_e2e
         env:
           VERCEL_URL: ${{ github.event.client_payload.url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          DATABASE_URL: ${{ steps.neon.outputs.db_url }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
 
       - name: Upload test report
         uses: actions/upload-artifact@v4

@@ -65,7 +65,9 @@ export default async function ApplicationLayout({
                     email: session.user.email,
                   }}
                 />
-                <main className="flex-1 pb-16 md:pb-0">{children}</main>
+                <main className="flex flex-1 flex-col pb-16 md:pb-0">
+                  {children}
+                </main>
                 <BottomNav />
               </div>
             </TRPCReactProvider>

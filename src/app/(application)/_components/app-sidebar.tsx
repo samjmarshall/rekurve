@@ -23,7 +23,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
   return (
     <aside
       data-testid="app-sidebar"
-      className="hidden w-64 shrink-0 flex-col border-border border-r bg-background md:flex"
+      className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto border-border border-r bg-background md:flex"
     >
       {/* Header — Logo */}
       <div className="flex h-14 items-center border-border border-b px-4">
@@ -49,7 +49,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
               href={item.href}
               data-testid={`sidebar-link-${item.href.slice(1)}`}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-sm transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 isActive
                   ? "bg-secondary text-foreground"
                   : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
@@ -75,7 +75,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
           type="button"
           onClick={handleSignOut}
           data-testid="sidebar-sign-out"
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:bg-secondary/50 hover:text-foreground"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:bg-secondary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           Sign out
         </button>

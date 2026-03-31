@@ -5,14 +5,14 @@ import { useInView } from "motion/react";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import { RoughNotation, RoughNotationGroup } from "react-rough-notation";
-import { StatsMarquee } from "~/components/stats";
+import { Button } from "~/components/ui/Button";
 import { useMediaQuery } from "~/hooks";
 import { NativeIcon } from "~/icons/bento-icons";
 import { analytics } from "~/lib/posthog";
 import { cn } from "~/lib/utils";
 import { Card, CardDescription, CardTitle } from "../agentic-intelligence/card";
 import { NativeIntegrationSkeleton } from "../agentic-intelligence/skeletons";
-import { Button } from "../ui/Button";
+import { StatsMarquee } from "../stats";
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);

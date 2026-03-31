@@ -8221,6 +8221,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"postgres@npm:^3.4.8":
+  version: 3.4.8
+  resolution: "postgres@npm:3.4.8"
+  checksum: 65458ca2e3f3157effe73ca173b7f86898cb0d26f2c5e74894bf0e3a13b8d9227c28923057c350de020b29bbb6f1bfc0854c6ea1989daae21500b18c885bcae5
+  languageName: node
+  linkType: hard
+
 "posthog-js@npm:1.298.0":
   version: 1.298.0
   resolution: "posthog-js@npm:1.298.0"
@@ -10397,6 +10404,7 @@ shadcn@latest:
     next-themes: 0.4.6
     pako: ^2.1.0
     postcss: ^8.5.3
+    postgres: ^3.4.8
     posthog-js: 1.298.0
     posthog-node: 5.14.0
     react: 19.2.4

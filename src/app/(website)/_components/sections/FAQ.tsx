@@ -2,7 +2,6 @@
 
 import { Search } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
-import { ScrollReveal } from "~/components/motion/ScrollReveal";
 import {
   Accordion,
   AccordionContent,
@@ -10,6 +9,7 @@ import {
   AccordionTrigger,
 } from "~/components/ui/Accordion";
 import { analytics, type FAQCategory } from "~/lib/posthog";
+import { ScrollReveal } from "../motion/ScrollReveal";
 
 interface FAQItem {
   id: string;

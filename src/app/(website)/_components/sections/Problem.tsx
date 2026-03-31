@@ -3,9 +3,9 @@
 import { Clock, DollarSign, TrendingDown } from "lucide-react";
 import type React from "react";
 import { useEffect, useId, useState } from "react";
-import { ScrollReveal } from "~/components/motion/ScrollReveal";
 import { cn, formatCurrency } from "~/lib/utils";
 import { BrandShimmer } from "../brand-shimmer";
+import { ScrollReveal } from "../motion/ScrollReveal";
 
 const painPoints = [
   {

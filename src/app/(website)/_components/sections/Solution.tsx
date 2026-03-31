@@ -2,8 +2,8 @@
 
 import { Mail, MessageSquare, Search } from "lucide-react";
 import type React from "react";
-import { ScrollReveal } from "~/components/motion/ScrollReveal";
 import { GlowingEffect } from "~/components/ui/glowing-effect";
+import { ScrollReveal } from "../motion/ScrollReveal";
 
 export default function Solution() {
   return (

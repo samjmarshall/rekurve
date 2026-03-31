@@ -14,6 +14,14 @@ You are an elite design review specialist with deep expertise in user experience
 - Review the code diff to understand implementation scope
 - Set up the live preview environment using Playwright
 - Configure initial viewport (1440x900 for desktop)
+- **Authenticate for protected pages**: If the app has authenticated routes (e.g. `/dashboard`, `/settings`), use the dev session endpoint to get a session cookie. Run the following via `mcp__playwright__browser_evaluate`:
+  ```js
+  const res = await fetch('/api/dev/session', { method: 'POST', headers: { 'X-Dev-Session': 'true' } });
+  const data = await res.json();
+  if (data.cookie) { document.cookie = `${data.cookie.name}=${data.cookie.value}; path=${data.cookie.path}`; }
+  return data;
+  ```
+  This endpoint only works in local development. If it returns 404 or fails, skip authentication and review only public pages.
 
 ## Phase 1: Interaction and User Flow
 - Execute the primary user flow following testing notes

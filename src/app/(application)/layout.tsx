@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "~/lib/session";
 import { AnalyticsProvider } from "~/providers/AnalyticsProvider";
 import { ThemeProvider } from "~/providers/ThemeProvider";
+import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
   title: "Dashboard | Rekurve",
@@ -35,8 +36,6 @@ export default async function ApplicationLayout({
   const session = await getSession();
   if (!session) redirect("/login");
 
-  // TODO: Wrap with TRPCReactProvider when tRPC is set up
-
   return (
     <html
       lang="en"
@@ -51,10 +50,12 @@ export default async function ApplicationLayout({
           disableTransitionOnChange
         >
           <AnalyticsProvider>
-            <div className="flex min-h-screen">
-              {/* TODO: App sidebar/nav */}
-              <main className="flex-1">{children}</main>
-            </div>
+            <TRPCReactProvider>
+              <div className="flex min-h-screen">
+                {/* TODO: App sidebar/nav */}
+                <main className="flex-1">{children}</main>
+              </div>
+            </TRPCReactProvider>
           </AnalyticsProvider>
         </ThemeProvider>
       </body>

@@ -1,0 +1,32 @@
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+
+export class BottomNavSection {
+  readonly page: Page;
+  readonly container: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.container = page.locator('[data-testid="bottom-nav"]');
+  }
+
+  link(name: string): Locator {
+    return this.container.locator(`[data-testid="bottom-nav-link-${name}"]`);
+  }
+
+  async expectVisible(): Promise<void> {
+    await expect(this.container).toBeVisible();
+  }
+
+  async expectHidden(): Promise<void> {
+    await expect(this.container).not.toBeVisible();
+  }
+
+  async expectActiveLink(name: string): Promise<void> {
+    await expect(this.link(name)).toHaveAttribute("aria-current", "page");
+  }
+
+  async navigateTo(name: string): Promise<void> {
+    await this.link(name).click();
+  }
+}

@@ -1,9 +1,14 @@
+import { Inbox } from "lucide-react";
+
 export default function DashboardPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex flex-1 items-center justify-center p-4">
       <div className="text-center">
-        <h1 className="font-semibold text-2xl">Dashboard</h1>
-        <p className="mt-2 text-muted-foreground">Nothing here yet</p>
+        <Inbox size={48} className="mx-auto mb-4 text-muted-foreground/50" />
+        <h1 className="font-semibold text-lg">No pending actions</h1>
+        <p className="mt-1 max-w-sm text-muted-foreground text-sm">
+          AI-drafted messages will appear here for your review
+        </p>
       </div>
     </div>
   );

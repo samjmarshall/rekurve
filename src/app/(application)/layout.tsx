@@ -1,12 +1,19 @@
 import "~/styles/globals.css";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { redirect } from "next/navigation";
 import { getSession } from "~/lib/session";
 import { AnalyticsProvider } from "~/providers/AnalyticsProvider";
 import { ThemeProvider } from "~/providers/ThemeProvider";
 import { TRPCReactProvider } from "~/trpc/react";
+import { AppSidebar } from "./_components/app-sidebar";
+import { BottomNav } from "./_components/bottom-nav";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "Dashboard | Rekurve",
@@ -52,8 +59,14 @@ export default async function ApplicationLayout({
           <AnalyticsProvider>
             <TRPCReactProvider>
               <div className="flex min-h-screen">
-                {/* TODO: App sidebar/nav */}
-                <main className="flex-1">{children}</main>
+                <AppSidebar
+                  user={{
+                    name: session.user.name ?? "",
+                    email: session.user.email,
+                  }}
+                />
+                <main className="flex-1 pb-16 md:pb-0">{children}</main>
+                <BottomNav />
               </div>
             </TRPCReactProvider>
           </AnalyticsProvider>

@@ -63,7 +63,7 @@ jobs:
           fi
 
           CONNECTION=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
-            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/connection_uri?branch_id=$BRANCH_ID&role_name=neondb_owner&database_name=neondb")
+            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/connection_uri?branch_id=$BRANCH_ID&role_name=neondb_owner&database_name=neondb&pooled=false")
 
           DB_URL=$(echo "$CONNECTION" | jq -r '.uri')
           echo "db_url=$DB_URL" >> "$GITHUB_OUTPUT"

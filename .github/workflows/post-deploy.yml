@@ -1,0 +1,140 @@
+name: Post-Deploy Verification
+
+on:
+  repository_dispatch:
+    types:
+      - "vercel.deployment.ready"
+
+jobs:
+  verify:
+    name: Verify (${{ github.event.client_payload.environment }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      statuses: write
+      pull-requests: write
+
+    steps:
+      - name: Report status to Vercel
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: "Post-Deploy Verification"
+
+      - name: Checkout
+        uses: vercel/repository-dispatch/actions/checkout@v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Yarn cache
+        uses: actions/cache@v4
+        with:
+          path: .yarn/cache
+          key: yarn-${{ hashFiles('yarn.lock') }}
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Resolve Neon branch database URL
+        id: neon
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+          GIT_REF: ${{ github.event.client_payload.git.ref }}
+          ENVIRONMENT: ${{ github.event.client_payload.environment }}
+        run: |
+          BRANCHES=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
+            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches")
+
+          if [ "$ENVIRONMENT" = "production" ]; then
+            BRANCH_ID=$(echo "$BRANCHES" | jq -r '.branches[] | select(.primary == true) | .id')
+          else
+            BRANCH_ID=$(echo "$BRANCHES" | jq -r --arg ref "$GIT_REF" \
+              '.branches[] | select(.name | test($ref)) | .id')
+          fi
+
+          if [ -z "$BRANCH_ID" ]; then
+            echo "::warning::Could not resolve Neon branch for ref '$GIT_REF' — auth tests will skip"
+            exit 0
+          fi
+
+          CONNECTION=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
+            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/connection_uri?branch_id=$BRANCH_ID&role_name=neondb_owner&database_name=neondb")
+
+          DB_URL=$(echo "$CONNECTION" | jq -r '.uri')
+          echo "db_url=$DB_URL" >> "$GITHUB_OUTPUT"
+          echo "branch_id=$BRANCH_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Record pre-migration timestamp
+        if: steps.neon.outputs.db_url
+        id: pre_migrate
+        run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Run database migrations
+        if: steps.neon.outputs.db_url
+        run: yarn db:migrate
+        env:
+          SKIP_ENV_VALIDATION: 1
+          DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url }}
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: yarn playwright install --with-deps
+
+      - name: Install Playwright system deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: yarn playwright install-deps
+
+      - name: Run Playwright tests
+        id: e2e
+        run: make test_e2e
+        env:
+          VERCEL_URL: ${{ github.event.client_payload.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          DATABASE_URL: ${{ steps.neon.outputs.db_url }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+
+      - name: Rollback migrations (preview — reset branch to parent)
+        if: failure() && steps.e2e.outcome == 'failure' && steps.neon.outputs.branch_id && github.event.client_payload.environment != 'production'
+        uses: neondatabase/reset-branch-action@v1
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: ${{ steps.neon.outputs.branch_id }}
+          parent: true
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Rollback migrations (production — point-in-time restore)
+        if: failure() && steps.e2e.outcome == 'failure' && steps.neon.outputs.branch_id && github.event.client_payload.environment == 'production'
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+          BRANCH_ID: ${{ steps.neon.outputs.branch_id }}
+          BEFORE_TS: ${{ steps.pre_migrate.outputs.timestamp }}
+        run: |
+          curl -X POST \
+            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$BRANCH_ID/restore" \
+            -H "Authorization: Bearer $NEON_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"source_branch_id\": \"$BRANCH_ID\", \"source_timestamp\": \"$BEFORE_TS\", \"preserve_under_name\": \"pre-migration-backup\"}"
+          echo "::warning::Production database restored to pre-migration state ($BEFORE_TS)"
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ github.event.client_payload.environment }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 30

@@ -1,10 +1,12 @@
 import { test as base } from "@playwright/test";
+import { DashboardPage } from "../pages/dashboard.page";
 import { HomePage } from "../pages/home.page";
 import { LoginPage } from "../pages/login.page";
 import { AnalyticsHelper } from "../utils/analytics-helper";
 
 type TestFixtures = {
   analytics: AnalyticsHelper;
+  dashboardPage: DashboardPage;
   homePage: HomePage;
   loginPage: LoginPage;
 };
@@ -15,6 +17,11 @@ export const test = base.extend<TestFixtures>({
     await analytics.startCapturing();
     await use(analytics);
     await analytics.stopCapturing();
+  },
+
+  dashboardPage: async ({ page }, use) => {
+    const dashboardPage = new DashboardPage(page);
+    await use(dashboardPage);
   },
 
   homePage: async ({ page }, use) => {

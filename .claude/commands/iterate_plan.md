@@ -117,6 +117,7 @@ Get user confirmation before proceeding.
    - If modifying scope, update "What We're NOT Doing" section
    - If changing approach, update "Implementation Approach" section
    - Maintain the distinction between automated vs manual success criteria
+   - Every phase that adds or changes behavior must include test files in its "Changes Required" — if a phase is missing tests, add them
 
 3. **Preserve quality standards**:
    - Include specific file paths and line numbers for new content
@@ -174,7 +175,12 @@ Get user confirmation before proceeding.
    - Update todos as you complete research
    - Mark tasks complete when done
 
-6. **No Open Questions**:
+6. **Tests Are Implementation Work**:
+   - When adding or modifying phases, ensure each phase includes test files in "Changes Required"
+   - If the existing plan is missing tests in its phases, flag this and offer to add them
+   - Tests belong alongside the code they verify, not in a separate appendix
+
+7. **No Open Questions**:
    - If the requested change raises questions, ASK
    - Research or get clarification immediately
    - Do NOT update the plan with unresolved questions

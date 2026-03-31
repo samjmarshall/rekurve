@@ -75,7 +75,16 @@ For each phase in the plan:
    - Are there missing validations?
    - Could the implementation break existing functionality?
 
-### Step 3: Generate Validation Report
+### Step 3: Update Associated Issue
+
+If the plan's `## References` links to an issue or ticket, sync your verification results back to it.
+
+1. **Read the issue body** for existing acceptance criteria or verification checklists.
+2. **If it has checkboxes**, update them to reflect your results. Only check items you verified — leave manual items unchecked.
+3. **If it has no checkboxes**, skip this step.
+4. GitHub: `gh issue edit <number> --body "..."`. Linear: MCP tools. File tickets: Edit tool.
+
+### Step 4: Generate Validation Report
 
 Create comprehensive validation summary:
 

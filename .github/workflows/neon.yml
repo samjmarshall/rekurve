@@ -1,4 +1,4 @@
-name: Neon DB
+name: Neon
 
 on:
   pull_request:

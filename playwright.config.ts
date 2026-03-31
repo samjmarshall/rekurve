@@ -65,8 +65,10 @@ export default defineConfig({
     {
       name: "mobile",
       use: {
-        ...devices["iPhone 14"],
+        ...devices["Desktop Chrome"],
         viewport: { width: 375, height: 667 },
+        isMobile: true,
+        hasTouch: true,
       },
     },
   ],

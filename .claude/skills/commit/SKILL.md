@@ -15,9 +15,9 @@ See "Conventional Commits 1.0.0" message specification here: https://raw.githubu
 The type describes the **category** of change, not what the change does. The scope (in parentheses) narrows within a type — it does not replace it.
 
 - `ci` — CI/CD configuration and workflows (`.github/workflows/`, Vercel config)
-- `fix` — bug fixes to application code
+- `fix` — bug fixes to application code (`src/`)
 - `feat` — new features or user-facing functionality
-- `test` — adding or updating tests
+- `test` — adding or updating tests (`e2e/`, `__tests__/`, test utilities) — even if the change fixes a bug *in* a test, the category is still `test` because the file lives in test infrastructure
 - `chore` — maintenance tasks, dependency updates, tooling
 - `refactor` — code restructuring with no behavior change
 - `docs` — documentation only

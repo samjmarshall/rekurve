@@ -62,11 +62,13 @@ jobs:
             exit 0
           fi
 
-          CONNECTION=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
+          POOLED=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
             "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/connection_uri?branch_id=$BRANCH_ID&role_name=neondb_owner&database_name=neondb")
+          DIRECT=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
+            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/connection_uri?branch_id=$BRANCH_ID&role_name=neondb_owner&database_name=neondb&pooled=false")
 
-          DB_URL=$(echo "$CONNECTION" | jq -r '.uri')
-          echo "db_url=$DB_URL" >> "$GITHUB_OUTPUT"
+          echo "db_url=$(echo "$POOLED" | jq -r '.uri')" >> "$GITHUB_OUTPUT"
+          echo "db_url_unpooled=$(echo "$DIRECT" | jq -r '.uri')" >> "$GITHUB_OUTPUT"
           echo "branch_id=$BRANCH_ID" >> "$GITHUB_OUTPUT"
 
       - name: Record pre-migration timestamp
@@ -79,14 +81,14 @@ jobs:
         run: yarn db:check
         env:
           SKIP_ENV_VALIDATION: 1
-          DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url }}
+          DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url_unpooled }}
 
       - name: Run database migrations
         if: steps.neon.outputs.db_url
         run: yarn db:migrate
         env:
           SKIP_ENV_VALIDATION: 1
-          DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url }}
+          DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url_unpooled }}
 
       - name: Cache Playwright browsers
         id: playwright-cache

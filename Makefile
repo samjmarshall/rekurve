@@ -14,6 +14,9 @@ fix:
 	yarn lint:fix
 	yarn format:write
 
+test:
+	yarn test
+
 test_e2e:
 	yarn test:e2e
 

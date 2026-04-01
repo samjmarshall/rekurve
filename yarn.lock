@@ -2217,6 +2217,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opentelemetry/api@npm:^1.9.1":
+  version: 1.9.1
+  resolution: "@opentelemetry/api@npm:1.9.1"
+  checksum: 2b16f28c422619263b126c3601e954c3b16013d13b2ea747d4e2f84199e1f7a5bf8372cb03c17fbff881fff5511fa107297afbb47f43e171170a2924d0103b4f
+  languageName: node
+  linkType: hard
+
 "@opentelemetry/semantic-conventions@npm:^1.39.0":
   version: 1.40.0
   resolution: "@opentelemetry/semantic-conventions@npm:1.40.0"
@@ -10616,6 +10623,7 @@ shadcn@latest:
     "@hookform/resolvers": 5.2.2
     "@hubspot/api-client": ^13.5.0
     "@neondatabase/serverless": 1.0.2
+    "@opentelemetry/api": ^1.9.1
     "@playwright/test": ^1.57.0
     "@posthog/nextjs-config": 1.6.0
     "@rstest/core": ^0.9.5

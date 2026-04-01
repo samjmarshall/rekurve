@@ -21,6 +21,8 @@ export const env = createEnv({
     POSTHOG_ERROR_TRACKING_API_KEY: z.string(),
     POSTHOG_PROJECT_ID: z.string().regex(/^\d+$/, "Must be a numeric string"),
     RESEND_API_KEY: z.string(),
+    HUBSPOT_ACCESS_TOKEN: z.string().min(1),
+    HUBSPOT_CLIENT_SECRET: z.string().min(1),
     ROBOTS_TXT: z.string().default("Disallow"),
   },
 
@@ -49,6 +51,8 @@ export const env = createEnv({
     POSTHOG_ERROR_TRACKING_API_KEY: process.env.POSTHOG_ERROR_TRACKING_API_KEY,
     POSTHOG_PROJECT_ID: process.env.POSTHOG_PROJECT_ID,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
+    HUBSPOT_ACCESS_TOKEN: process.env.HUBSPOT_ACCESS_TOKEN,
+    HUBSPOT_CLIENT_SECRET: process.env.HUBSPOT_CLIENT_SECRET,
     ROBOTS_TXT: process.env.ROBOTS_TXT,
   },
   /**

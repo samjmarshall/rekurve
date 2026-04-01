@@ -18,6 +18,7 @@ Prefer Makefile targets with `yarn` as a fallback — never use `npm` or `npx` d
 
 - `make build` — clean build (`rm -rf .next` + `yarn build`)
 - `make check` — lint + typecheck (`yarn check`)
+- `make test` — run Rstest unit tests (`yarn test`)
 - `make test_e2e` — run Playwright E2E tests (`yarn test:e2e`)
 - `make start` — local dev server (`yarn dev`)
 - `make install` — install dependencies (`yarn`)

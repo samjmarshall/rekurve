@@ -17,6 +17,9 @@ fix:
 test:
 	yarn test
 
+test_coverage:
+	yarn test --coverage
+
 test_e2e:
 	yarn test:e2e
 

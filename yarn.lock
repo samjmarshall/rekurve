@@ -1425,7 +1425,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hubspot/api-client@npm:^13.5.0":
+"@hubspot/api-client@npm:13.5.0":
   version: 13.5.0
   resolution: "@hubspot/api-client@npm:13.5.0"
   dependencies:
@@ -1796,7 +1796,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jridgewell/trace-mapping@npm:^0.3.24, @jridgewell/trace-mapping@npm:^0.3.28":
+"@jridgewell/trace-mapping@npm:^0.3.23, @jridgewell/trace-mapping@npm:^0.3.24, @jridgewell/trace-mapping@npm:^0.3.28":
   version: 0.3.31
   resolution: "@jridgewell/trace-mapping@npm:0.3.31"
   dependencies:
@@ -2456,6 +2456,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rstest/coverage-istanbul@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@rstest/coverage-istanbul@npm:0.3.0"
+  dependencies:
+    istanbul-lib-coverage: ^3.2.2
+    istanbul-lib-report: ^3.0.1
+    istanbul-lib-source-maps: ^5.0.6
+    istanbul-reports: ^3.2.0
+    swc-plugin-coverage-instrument: 0.0.32
+  peerDependencies:
+    "@rstest/core": ~0.9.0
+  checksum: 7a46d0599509aaacbc88b4f534c37718c5d76bfdd04569724638e9c49fb045c79641cb6bd99f716bd6900bcd66245ddf0258ff736122ab9f01a06211c590e4c4
+  languageName: node
+  linkType: hard
+
 "@sec-ant/readable-stream@npm:^0.4.1":
   version: 0.4.1
   resolution: "@sec-ant/readable-stream@npm:0.4.1"
@@ -2730,7 +2745,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.95.2":
+"@tanstack/react-query@npm:5.95.2":
   version: 5.95.2
   resolution: "@tanstack/react-query@npm:5.95.2"
   dependencies:
@@ -2741,7 +2756,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/client@npm:^11.16.0":
+"@trpc/client@npm:11.16.0":
   version: 11.16.0
   resolution: "@trpc/client@npm:11.16.0"
   peerDependencies:
@@ -2753,7 +2768,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/server@npm:^11.16.0":
+"@trpc/server@npm:11.16.0":
   version: 11.16.0
   resolution: "@trpc/server@npm:11.16.0"
   peerDependencies:
@@ -2764,7 +2779,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/tanstack-react-query@npm:^11.16.0":
+"@trpc/tanstack-react-query@npm:11.16.0":
   version: 11.16.0
   resolution: "@trpc/tanstack-react-query@npm:11.16.0"
   peerDependencies:
@@ -4084,7 +4099,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"client-only@npm:0.0.1, client-only@npm:^0.0.1":
+"client-only@npm:0.0.1":
   version: 0.0.1
   resolution: "client-only@npm:0.0.1"
   checksum: 0c16bf660dadb90610553c1d8946a7fdfb81d624adea073b8440b7d795d5b5b08beb3c950c6a2cf16279365a3265158a236876d92bce16423c485c322d7dfaf8
@@ -6219,6 +6234,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"html-escaper@npm:^2.0.0":
+  version: 2.0.2
+  resolution: "html-escaper@npm:2.0.2"
+  checksum: d2df2da3ad40ca9ee3a39c5cc6475ef67c8f83c234475f24d8e9ce0dc80a2c82df8e1d6fa78ddd1e9022a586ea1bd247a615e80a5cd9273d90111ddda7d9e974
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.1.1":
   version: 4.2.0
   resolution: "http-cache-semantics@npm:4.2.0"
@@ -6374,7 +6396,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"input-otp@npm:^1.4.2":
+"input-otp@npm:1.4.2":
   version: 1.4.2
   resolution: "input-otp@npm:1.4.2"
   peerDependencies:
@@ -6843,6 +6865,45 @@ __metadata:
   languageName: node
   linkType: hard
 
+"istanbul-lib-coverage@npm:^3.0.0, istanbul-lib-coverage@npm:^3.2.2":
+  version: 3.2.2
+  resolution: "istanbul-lib-coverage@npm:3.2.2"
+  checksum: 2367407a8d13982d8f7a859a35e7f8dd5d8f75aae4bb5484ede3a9ea1b426dc245aff28b976a2af48ee759fdd9be374ce2bd2669b644f31e76c5f46a2e29a831
+  languageName: node
+  linkType: hard
+
+"istanbul-lib-report@npm:^3.0.0, istanbul-lib-report@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "istanbul-lib-report@npm:3.0.1"
+  dependencies:
+    istanbul-lib-coverage: ^3.0.0
+    make-dir: ^4.0.0
+    supports-color: ^7.1.0
+  checksum: fd17a1b879e7faf9bb1dc8f80b2a16e9f5b7b8498fe6ed580a618c34df0bfe53d2abd35bf8a0a00e628fb7405462576427c7df20bbe4148d19c14b431c974b21
+  languageName: node
+  linkType: hard
+
+"istanbul-lib-source-maps@npm:^5.0.6":
+  version: 5.0.6
+  resolution: "istanbul-lib-source-maps@npm:5.0.6"
+  dependencies:
+    "@jridgewell/trace-mapping": ^0.3.23
+    debug: ^4.1.1
+    istanbul-lib-coverage: ^3.0.0
+  checksum: 8dd6f2c1e2ecaacabeef8dc9ab52c4ed0a6036310002cf7f46ea6f3a5fb041da8076f5350e6a6be4c60cd4f231c51c73e042044afaf44820d857d92ecfb8ab6c
+  languageName: node
+  linkType: hard
+
+"istanbul-reports@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "istanbul-reports@npm:3.2.0"
+  dependencies:
+    html-escaper: ^2.0.0
+    istanbul-lib-report: ^3.0.0
+  checksum: 72b4c8525276147908d28b0917bc675b1019836b638e50875521ca3b8ec63672681aa98dbab88a6f49ef798c08fe041d428abdcf84f4f3fcff5844eee54af65a
+  languageName: node
+  linkType: hard
+
 "jackspeak@npm:^4.2.3":
   version: 4.2.3
   resolution: "jackspeak@npm:4.2.3"
@@ -7261,6 +7322,15 @@ __metadata:
   dependencies:
     "@jridgewell/sourcemap-codec": ^1.5.5
   checksum: 4ff76a4e8d439431cf49f039658751ed351962d044e5955adc257489569bd676019c906b631f86319217689d04815d7d064ee3ff08ab82ae65b7655a7e82a414
+  languageName: node
+  linkType: hard
+
+"make-dir@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "make-dir@npm:4.0.0"
+  dependencies:
+    semver: ^7.5.3
+  checksum: bf0731a2dd3aab4db6f3de1585cea0b746bb73eb5a02e3d8d72757e376e64e6ada190b1eddcde5b2f24a81b688a9897efd5018737d05e02e2a671dda9cff8a8a
   languageName: node
   linkType: hard
 
@@ -9097,7 +9167,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.0.0, semver@npm:^7.3.4, semver@npm:^7.3.5, semver@npm:^7.7.2, semver@npm:^7.7.3":
+"semver@npm:^7.0.0, semver@npm:^7.3.4, semver@npm:^7.3.5, semver@npm:^7.5.3, semver@npm:^7.7.2, semver@npm:^7.7.3":
   version: 7.7.4
   resolution: "semver@npm:7.7.4"
   bin:
@@ -9137,7 +9207,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"server-only@npm:^0.0.1":
+"server-only@npm:0.0.1":
   version: 0.0.1
   resolution: "server-only@npm:0.0.1"
   checksum: c432348956641ea3f460af8dc3765f3a1bdbcf7a1e0205b0756d868e6e6fe8934cdee6bff68401a1dd49ba4a831c75916517a877446d54b334f7de36fa273e53
@@ -9740,7 +9810,7 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"superjson@npm:^2.2.6":
+"superjson@npm:2.2.6":
   version: 2.2.6
   resolution: "superjson@npm:2.2.6"
   dependencies:
@@ -9791,6 +9861,13 @@ shadcn@latest:
     standardwebhooks: 1.0.0
     uuid: ^10.0.0
   checksum: 06b7a8b5ea4b024473d17a7143142982ff06a294618320789d3430223ebee07edbe20cee7ed8b0fb9b2f2b6f5048d16bdfed84e909477694740867255d4d2f8d
+  languageName: node
+  linkType: hard
+
+"swc-plugin-coverage-instrument@npm:0.0.32":
+  version: 0.0.32
+  resolution: "swc-plugin-coverage-instrument@npm:0.0.32"
+  checksum: 0443bacc508d92eaed5c7e1733110c4901143e870f4f42414894034852885ed35741380adf3f1388834853cfdb65bc61bdcab413b5ac1d8813fa8e9f3f892214
   languageName: node
   linkType: hard
 
@@ -10621,19 +10698,20 @@ shadcn@latest:
     "@base-ui/react": 1.3.0
     "@biomejs/biome": ^2.4.9
     "@hookform/resolvers": 5.2.2
-    "@hubspot/api-client": ^13.5.0
+    "@hubspot/api-client": 13.5.0
     "@neondatabase/serverless": 1.0.2
     "@opentelemetry/api": ^1.9.1
     "@playwright/test": ^1.57.0
     "@posthog/nextjs-config": 1.6.0
     "@rstest/core": ^0.9.5
+    "@rstest/coverage-istanbul": ^0.3.0
     "@t3-oss/env-nextjs": 0.13.0
     "@tailwindcss/postcss": ^4.0.15
     "@tailwindcss/typography": 0.5.19
-    "@tanstack/react-query": ^5.95.2
-    "@trpc/client": ^11.16.0
-    "@trpc/server": ^11.16.0
-    "@trpc/tanstack-react-query": ^11.16.0
+    "@tanstack/react-query": 5.95.2
+    "@trpc/client": 11.16.0
+    "@trpc/server": 11.16.0
+    "@trpc/tanstack-react-query": 11.16.0
     "@tsparticles/engine": 3.9.1
     "@tsparticles/react": 3.0.0
     "@tsparticles/slim": 3.9.1
@@ -10646,13 +10724,13 @@ shadcn@latest:
     baseline-browser-mapping: ^2.9.15
     better-auth: 1.5.6
     class-variance-authority: 0.7.1
-    client-only: ^0.0.1
+    client-only: 0.0.1
     clsx: 2.1.1
     drizzle-kit: ^0.31.10
     drizzle-orm: 0.45.2
     framer-motion: 12.23.24
     husky: ^9.1.7
-    input-otp: ^1.4.2
+    input-otp: 1.4.2
     lucide-react: 0.563.0
     motion: 12.23.24
     next: 16.2.1
@@ -10668,9 +10746,9 @@ shadcn@latest:
     react-hook-form: 7.66.0
     react-rough-notation: 1.0.8
     resend: 6.9.4
-    server-only: ^0.0.1
+    server-only: 0.0.1
     shadcn: latest
-    superjson: ^2.2.6
+    superjson: 2.2.6
     tailwind-merge: 3.3.1
     tailwindcss: ^4.0.15
     tsx: ^4.21.0

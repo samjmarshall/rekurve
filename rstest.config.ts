@@ -4,4 +4,10 @@ export default defineConfig({
   include: ["src/**/*.test.ts"],
   testEnvironment: "node",
   restoreMocks: true,
+  coverage: {
+    enabled: false,
+    provider: "istanbul",
+    reporters: ["text", "json-summary", "json"],
+    reportsDirectory: "./coverage",
+  },
 });

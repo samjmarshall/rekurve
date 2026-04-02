@@ -82,6 +82,7 @@
     "@opentelemetry/api": "^1.9.1",
     "@playwright/test": "^1.57.0",
     "@rstest/core": "^0.9.5",
+    "@rstest/coverage-istanbul": "^0.3.0",
     "@tailwindcss/postcss": "^4.0.15",
     "@types/node": "^20.14.10",
     "@types/pako": "^2.0.4",

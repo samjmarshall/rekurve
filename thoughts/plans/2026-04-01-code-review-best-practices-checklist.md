@@ -72,9 +72,9 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 - [x] **Expected finding**: No real waterfalls currently — `getSession()` is `React.cache()`-wrapped. Note as ✅ compliant.
 
 #### 1.2 Parallelize Independent Operations
-- [ ] Search for multiple sequential `await` calls that could use `Promise.all()`
-- [ ] Check tRPC context creation (`src/server/api/trpc.ts`) for parallel opportunities
-- [ ] **Expected finding**: Minimal async operations currently. Note as ✅ compliant.
+- [x] Search for multiple sequential `await` calls that could use `Promise.all()`
+- [x] Check tRPC context creation (`src/server/api/trpc.ts`) for parallel opportunities
+- [x] **Expected finding**: Minimal async operations currently. Note as ✅ compliant.
 
 #### 1.3 Strategic Suspense Boundaries
 - [ ] Identify async server components that block full page render

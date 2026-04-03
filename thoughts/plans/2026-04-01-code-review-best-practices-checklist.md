@@ -60,16 +60,16 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 ### Checklist
 
 #### 1.1 Prevent Waterfall Chains
-- [ ] Review all `async` server components for sequential `await` chains
-- [ ] Check API route handlers (`src/app/api/`) for sequential operations
-- [ ] **Files to check**:
+- [x] Review all `async` server components for sequential `await` chains
+- [x] Check API route handlers (`src/app/api/`) for sequential operations
+- [x] **Files to check**:
   - `src/app/(application)/layout.tsx` — `await getSession()`
   - `src/app/(application)/settings/page.tsx` — `await getSession()`
   - `src/app/(login)/layout.tsx` — `await getSession()`
   - `src/app/api/trpc/[trpc]/route.ts`
   - `src/app/api/dev/session/route.ts`
   - `src/app/api/health/route.ts`
-- [ ] **Expected finding**: No real waterfalls currently — `getSession()` is `React.cache()`-wrapped. Note as ✅ compliant.
+- [x] **Expected finding**: No real waterfalls currently — `getSession()` is `React.cache()`-wrapped. Note as ✅ compliant.
 
 #### 1.2 Parallelize Independent Operations
 - [ ] Search for multiple sequential `await` calls that could use `Promise.all()`

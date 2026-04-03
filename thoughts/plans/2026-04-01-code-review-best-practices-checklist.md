@@ -124,9 +124,24 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 > **Conclusion**: No duplicate serialization found. Codebase follows RSC boundary best practices.
 
 #### 2.3 Minimize Serialization at RSC Boundaries
-- [ ] Check what props server components pass to client components
-- [ ] Verify only necessary fields are passed (not entire objects)
-- [ ] **Files to check**: Same as 2.2 above
+- [x] Check what props server components pass to client components
+- [x] Verify only necessary fields are passed (not entire objects)
+- [x] **Files to check**: Same as 2.2 above
+
+> **Audit findings (2026-04-04):** ✅ Compliant — Only necessary fields are passed at RSC boundaries.
+>
+> **Application Layout → AppSidebar** (Server → Client):
+> - Server component extracts only `{ name: string; email: string }` from `session.user` (line 63-66)
+> - AppSidebar client component receives minimal prop interface (line 10-11)
+> - Both fields are used (lines 70, 72)
+> - **Assessment**: ✅ Best practice — minimizes serialization at boundary
+>
+> **Website Homepage**:
+> - Server component renders 8 self-contained section components with no props passed (lines 17-28)
+> - No RSC → client data transfer
+> - **Assessment**: ✅ Compliant — no unnecessary serialization
+>
+> **Conclusion**: Section 2.3 follows best practices. No changes required.
 
 #### 2.4 Parallel Data Fetching with Component Composition
 - [ ] Check if sibling server components could fetch data in parallel

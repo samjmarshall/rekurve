@@ -36,7 +36,7 @@ describe("tRPC — Unauthenticated", () => {
     const caller = createCaller(ctx);
 
     try {
-      await caller.leads.getAll();
+      await caller.leads.getByStage();
       expect.unreachable("Should have thrown");
     } catch (e) {
       expect(e).toBeInstanceOf(TRPCError);
@@ -55,12 +55,8 @@ describe("tRPC — Authenticated", () => {
     }));
   });
 
+  // leads router has its own dedicated tests in leads-router.test.ts
   const stubs = [
-    {
-      name: "leads.getAll",
-      call: (c: Caller) => c.leads.getAll(),
-      expected: [],
-    },
     { name: "lots.getAll", call: (c: Caller) => c.lots.getAll(), expected: [] },
     {
       name: "messages.getPending",

@@ -77,11 +77,24 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 - [x] **Expected finding**: Minimal async operations currently. Note as ✅ compliant.
 
 #### 1.3 Strategic Suspense Boundaries
-- [ ] Identify async server components that block full page render
-- [ ] **Files to check**:
+- [x] Identify async server components that block full page render
+- [x] **Files to check**:
   - `src/app/(application)/layout.tsx` — blocks on `getSession()`
   - `src/app/(application)/settings/page.tsx` — blocks on `getSession()`
-- [ ] **Expected finding**: No Suspense boundaries exist. **Recommend** adding them as a future task but don't implement in this review.
+- [x] **Expected finding**: No Suspense boundaries exist. **Recommend** adding them as a future task but don't implement in this review.
+
+> **Audit findings (2026-04-03):** ⚠️ Recommendation — No `<Suspense>` boundaries exist anywhere in the codebase. Three async server components were identified:
+> 1. `src/app/(application)/layout.tsx:43` — `await getSession()` blocks the entire application shell (sidebar, nav, all child pages) from rendering until auth resolves.
+> 2. `src/app/(application)/settings/page.tsx:5` — `await getSession()` blocks the settings page render.
+> 3. `src/app/(login)/layout.tsx:35` — `await getSession()` blocks the login layout (used for redirect-if-authenticated guard).
+>
+> The layout blocking (#1) has the highest impact since it gates the entire application shell. However, since `getSession()` is `React.cache()`-wrapped, the settings page (#2) deduplicates with the layout call within the same request — no waterfall, but still no streaming.
+>
+> **Recommendation**: Add Suspense boundaries as a future task. Priority candidates:
+> - Wrap `{children}` in the application layout with `<Suspense fallback={<DashboardSkeleton />}>` to allow the sidebar/nav shell to stream immediately while page content loads.
+> - Individual page-level Suspense for data-heavy pages as they are built out.
+>
+> Not implementing in this review per plan scope.
 
 #### 2.1 Authenticate Server Actions Like API Routes
 - [ ] Search for `"use server"` directives

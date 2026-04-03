@@ -97,8 +97,10 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 > Not implementing in this review per plan scope.
 
 #### 2.1 Authenticate Server Actions Like API Routes
-- [ ] Search for `"use server"` directives
-- [ ] **Expected finding**: No Server Actions in codebase. tRPC `protectedProcedure` handles auth. ✅ compliant (N/A).
+- [x] Search for `"use server"` directives
+- [x] **Expected finding**: No Server Actions in codebase. tRPC `protectedProcedure` handles auth. ✅ compliant (N/A).
+
+> **Audit findings (2026-04-03):** ✅ Compliant (N/A) — No `"use server"` directives exist anywhere in `src/`. The codebase uses tRPC with `protectedProcedure` for authenticated mutations, so Server Action auth is not applicable.
 
 #### 2.2 Avoid Duplicate Serialization in RSC Props
 - [ ] Check server components passing data to client components for duplicated objects

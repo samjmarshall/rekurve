@@ -1,0 +1,407 @@
+# Security Review Checklist
+
+## Overview
+
+A comprehensive security review of the Rekurve codebase, broken into small, independently actionable tasks. Each task is scoped to be completable in a single pass and targets a specific security concern area.
+
+The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Drizzle ORM over Neon PostgreSQL, deployed on Vercel.
+
+## What We're NOT Doing
+
+- Penetration testing or active exploitation
+- Third-party dependency source code audits (covered by `make audit`)
+- Infrastructure-level review (Vercel, Neon platform security)
+- Compliance audits (SOC2, GDPR — separate workstreams)
+
+---
+
+## Task 1: Authentication Configuration
+
+**Scope**: `src/lib/auth.ts`, `src/lib/auth-client.ts`, `src/lib/session.ts`
+
+**Review checklist**:
+- [ ] `BETTER_AUTH_SECRET` entropy — confirm min 32 chars enforced at runtime via `src/env.js`
+- [ ] OTP length and expiry — verify `emailOTP` plugin config uses secure defaults (6+ digits, short TTL)
+- [ ] OTP brute-force protection — check if better-auth rate-limits OTP verification attempts
+- [ ] Session token generation — confirm cryptographically random tokens (delegated to better-auth)
+- [ ] Session expiry — verify `expiresAt` is set to a reasonable duration
+- [ ] Cookie cache TTL (`cookieCache.maxAge: 300`) — assess risk of stale session data during that 5-minute window (e.g., can a revoked session still be used?)
+- [ ] `nextCookies()` plugin — confirm it sets `httpOnly`, `secure`, `sameSite=lax` (or stricter)
+- [ ] Session fixation — verify token rotates on sign-in
+
+**Files**:
+- `src/lib/auth.ts`
+- `src/lib/auth-client.ts`
+- `src/lib/session.ts`
+- `src/server/db/schema/auth.ts`
+
+---
+
+## Task 2: Authorization Gates
+
+**Scope**: Layout-level auth checks, tRPC procedure middleware
+
+**Review checklist**:
+- [ ] `(application)/layout.tsx` — confirm `getSession()` + `redirect("/login")` is server-side and cannot be bypassed client-side
+- [ ] `(login)/layout.tsx` — confirm authenticated redirect to `/dashboard`
+- [ ] No Next.js `middleware.ts` exists — assess whether layout-only gates are sufficient (can a direct API call or RSC bypass the layout?)
+- [ ] All tRPC routers use `protectedProcedure` — verify no router accidentally uses `publicProcedure`
+- [ ] `protectedProcedure` middleware — confirm it throws `UNAUTHORIZED` (not a redirect) when session is missing
+- [ ] No user-role or tenant-scoping logic — flag if any routes return data across user boundaries (IDOR risk)
+
+**Files**:
+- `src/app/(application)/layout.tsx`
+- `src/app/(login)/layout.tsx`
+- `src/server/api/trpc.ts` (lines 53-64)
+- `src/server/api/routers/*.ts` (all 5 routers)
+
+---
+
+## Task 3: API Route Security
+
+**Scope**: All `src/app/api/` routes
+
+**Review checklist**:
+- [ ] `api/auth/[...all]/route.ts` — confirm only GET and POST are exported (no unexpected methods)
+- [ ] `api/trpc/[trpc]/route.ts` — confirm error responses don't leak stack traces in production
+- [ ] `api/health/route.ts` — confirm no sensitive information in health check response
+- [ ] `api/dev/session/route.ts` — confirm `NODE_ENV !== "development"` guard is effective (returns 404 in prod)
+- [ ] `api/dev/session/route.ts` — confirm the `X-Dev-Session` header check adds defense-in-depth
+- [ ] No unrestricted API routes that accept arbitrary input without validation
+
+**Files**:
+- `src/app/api/auth/[...all]/route.ts`
+- `src/app/api/trpc/[trpc]/route.ts`
+- `src/app/api/health/route.ts`
+- `src/app/api/dev/session/route.ts`
+
+---
+
+## Task 4: Content Security Policy
+
+**Scope**: `next.config.ts` CSP headers
+
+**Review checklist**:
+- [ ] `default-src 'none'` — confirm deny-by-default baseline
+- [ ] `script-src 'unsafe-eval'` — assess necessity (Next.js requirement?) and document risk
+- [ ] `script-src-elem 'unsafe-inline'` — assess necessity and document risk; can nonces replace it?
+- [ ] `connect-src 'self'` — confirm no external domains are needed (PostHog is proxied)
+- [ ] `frame-ancestors 'none'` — confirm clickjacking protection matches `X-Frame-Options: DENY`
+- [ ] `style-src 'unsafe-inline'` — assess whether this can be tightened
+- [ ] `img-src` — confirm only trusted image sources are allowed
+- [ ] `upgrade-insecure-requests` — confirm HTTPS enforcement
+- [ ] Google reCAPTCHA enterprise script — confirm it's actually used; remove if not
+- [ ] CSP reporting — consider adding `report-uri` or `report-to` for violation monitoring
+
+**Files**:
+- `next.config.ts` (lines 42-56)
+
+---
+
+## Task 5: Security Headers
+
+**Scope**: Non-CSP security headers in `next.config.ts`
+
+**Review checklist**:
+- [ ] `X-Frame-Options: DENY` — present and correct
+- [ ] `X-Content-Type-Options: nosniff` — present and correct
+- [ ] `Referrer-Policy: origin-when-cross-origin` — assess if `strict-origin-when-cross-origin` would be more appropriate
+- [ ] `Permissions-Policy: geolocation=()` — consider expanding to deny camera, microphone, etc.
+- [ ] `poweredByHeader: false` — confirm Next.js version is not leaked
+- [ ] `Strict-Transport-Security` (HSTS) — check if Vercel handles this or if it needs explicit config
+- [ ] `X-Permitted-Cross-Domain-Policies` — consider adding if Adobe/Flash cross-domain is a concern (low priority)
+
+**Files**:
+- `next.config.ts` (lines 11-40, line 74)
+
+---
+
+## Task 6: Environment Variable Security
+
+**Scope**: `src/env.js`, `.env.example`, `.gitignore`
+
+**Review checklist**:
+- [ ] All secrets are validated with Zod schemas of appropriate strictness
+- [ ] `BETTER_AUTH_SECRET` has `z.string().min(32)` — confirm 32 is sufficient entropy
+- [ ] `SKIP_ENV_VALIDATION` flag — assess risk (who can set this? Only in CI?)
+- [ ] `.env` is in `.gitignore` — confirm secrets are never committed
+- [ ] `.env.example` contains no real secrets — verify it's template-only
+- [ ] No `process.env` usage outside of `src/env.js` — grep for raw access
+- [ ] Client-side env vars (`NEXT_PUBLIC_*`) contain no secrets — verify only PostHog keys are exposed
+- [ ] Database URLs use connection pooling in app code, unpooled only in migrations
+
+**Files**:
+- `src/env.js`
+- `.env.example`
+- `.gitignore`
+
+---
+
+## Task 7: Database Security
+
+**Scope**: `src/server/db/`, schema files, Drizzle config
+
+**Review checklist**:
+- [ ] All queries use Drizzle ORM query builder (parameterized) — no raw SQL string concatenation
+- [ ] E2E auth helper uses Neon tagged template literals (auto-parameterized) — confirm no string interpolation into SQL
+- [ ] Session table has `onDelete: "cascade"` on userId FK — confirm user deletion cleans up sessions
+- [ ] No sensitive data stored in plaintext that should be encrypted (e.g., PII in leads table)
+- [ ] Database connection string uses SSL/TLS — confirm Neon enforces encrypted connections
+- [ ] `drizzle.config.ts` uses `DATABASE_URL_UNPOOLED` — confirm this is only used for migrations, not runtime queries
+- [ ] Schema enums prevent arbitrary string injection into enum columns
+
+**Files**:
+- `src/server/db/index.ts`
+- `src/server/db/schema/*.ts`
+- `drizzle.config.ts`
+- `e2e/utils/auth-helper.ts` (SQL usage)
+
+---
+
+## Task 8: Input Validation
+
+**Scope**: All user-facing input handling
+
+**Review checklist**:
+- [ ] Booking form (`BookingForm.tsx`) — verify Zod schema validates all fields server-side (not just client-side)
+- [ ] Login form — verify email input is validated beyond just `type="email"` HTML attribute
+- [ ] OTP input — verify 6-digit constraint is enforced server-side by better-auth
+- [ ] tRPC procedures — currently no `.input()` schemas; flag any future procedures that accept input without Zod validation
+- [ ] No `dangerouslySetInnerHTML` usage — confirm via grep
+- [ ] No user input rendered without React's auto-escaping
+
+**Files**:
+- `src/app/(website)/_components/sections/BookingForm.tsx`
+- `src/app/(login)/login/page.tsx`
+- `src/server/api/routers/*.ts`
+
+---
+
+## Task 9: XSS Prevention
+
+**Scope**: All client-rendered content
+
+**Review checklist**:
+- [ ] No `dangerouslySetInnerHTML` in any component
+- [ ] No `innerHTML` assignments in any script
+- [ ] User-generated content (if any) is escaped before rendering
+- [ ] CSP `script-src` prevents inline script injection (but `'unsafe-inline'` in `script-src-elem` weakens this)
+- [ ] No URL parameters rendered directly into the page without sanitization
+- [ ] `href` attributes don't accept `javascript:` protocol from user input
+
+**Files**:
+- All files in `src/app/`, `src/components/`
+
+---
+
+## Task 10: CSRF Protection
+
+**Scope**: State-mutating endpoints
+
+**Review checklist**:
+- [ ] better-auth's built-in CSRF protection — verify it's enabled and uses origin/referer checking
+- [ ] tRPC mutations — verify `x-trpc-source` header or other CSRF mechanism is enforced server-side (not just set client-side)
+- [ ] Booking form submission — verify it goes through tRPC or has CSRF protection
+- [ ] `SameSite` cookie attribute — confirm it's set to `Lax` or `Strict` on session cookies
+- [ ] No state-mutating GET requests
+
+**Files**:
+- `src/lib/auth.ts`
+- `src/trpc/react.tsx`
+- `src/server/api/trpc.ts`
+
+---
+
+## Task 11: Rate Limiting
+
+**Scope**: All public-facing endpoints
+
+**Review checklist**:
+- [ ] **No rate limiting exists** — flag this as a gap
+- [ ] OTP send endpoint — vulnerable to abuse (email bombing, cost amplification via Resend)
+- [ ] OTP verify endpoint — vulnerable to brute-force (10^6 combinations for 6-digit code)
+- [ ] tRPC endpoints — no rate limiting on authenticated requests
+- [ ] Health check endpoint — could be used for availability probing
+- [ ] Booking form — no rate limiting on submissions
+- [ ] Recommend: Vercel Edge Middleware rate limiting or better-auth rate limit plugin
+
+**Files**:
+- No rate limiting files exist (gap to flag)
+
+---
+
+## Task 12: Error Handling & Information Leakage
+
+**Scope**: Error boundaries, tRPC error formatter, server instrumentation
+
+**Review checklist**:
+- [ ] `global-error.tsx` — confirm no stack traces or internal details rendered to user
+- [ ] tRPC `onError` — confirm only logs in development, silent in production
+- [ ] tRPC error formatter — confirm `zodError` field only exposes field-level validation (not internal schema details)
+- [ ] PostHog error tracking — confirm raw exceptions sent to PostHog don't leak to client responses
+- [ ] `instrumentation.ts` — confirm `console.error` in cookie parse failure doesn't leak to response
+- [ ] API routes — confirm all catch blocks return generic error messages
+- [ ] Server component errors — confirm Next.js error boundaries catch and genericize
+
+**Files**:
+- `src/app/global-error.tsx`
+- `src/app/api/trpc/[trpc]/route.ts`
+- `src/server/api/trpc.ts` (error formatter)
+- `src/instrumentation.ts`
+
+---
+
+## Task 13: Dependency Security
+
+**Scope**: `package.json`, lock file, CI audit
+
+**Review checklist**:
+- [ ] Run `make audit` — check for known CVEs in production dependencies
+- [ ] Review `yarn.lock` for pinned versions — confirm no floating version ranges for critical packages
+- [ ] better-auth version — check for known security advisories
+- [ ] Next.js version (16.2.1) — check for known CVEs
+- [ ] Drizzle ORM version — check for known issues
+- [ ] CI pipeline runs `npm audit` — verify it fails the build on high/critical CVEs
+- [ ] No unnecessary dependencies with broad system access
+
+**Files**:
+- `package.json`
+- `yarn.lock`
+- `.github/workflows/quality-control.yml`
+
+---
+
+## Task 14: Third-Party Integration Security
+
+**Scope**: PostHog, Resend, Google reCAPTCHA
+
+**Review checklist**:
+- [ ] PostHog — confirm API key is non-secret (project key, not personal API key)
+- [ ] PostHog proxy (`/rk/` rewrite) — confirm it doesn't create an open proxy to arbitrary hosts
+- [ ] Resend — confirm API key is server-side only, never exposed to client
+- [ ] Google reCAPTCHA enterprise script in CSP — confirm it's actually used; dead CSP entries widen attack surface
+- [ ] No third-party scripts loaded outside of CSP-allowed sources
+- [ ] Analytics provider — confirm no PII is sent to PostHog (email, phone from booking form)
+
+**Files**:
+- `next.config.ts` (PostHog rewrites)
+- `src/lib/posthog.ts`
+- `src/lib/posthog-server.ts`
+- `src/providers/AnalyticsProvider.tsx`
+- `src/lib/auth.ts` (Resend integration)
+
+---
+
+## Task 15: Cookie Security
+
+**Scope**: Session cookies, analytics cookies
+
+**Review checklist**:
+- [ ] Session cookie has `HttpOnly` flag — verify via better-auth docs or runtime inspection
+- [ ] Session cookie has `Secure` flag on HTTPS deployments — confirmed by `__Secure-` prefix
+- [ ] Session cookie has `SameSite=Lax` or `Strict` — verify
+- [ ] Session cookie `Path=/` — appropriate for this app
+- [ ] Cookie token is HMAC-SHA256 signed — confirmed in auth helper
+- [ ] No sensitive data stored in cookies beyond the session token
+- [ ] PostHog cookie — confirm no sensitive data, appropriate expiry
+
+**Files**:
+- `e2e/utils/session-cookie.ts`
+- `src/lib/auth.ts`
+- `src/lib/posthog.ts`
+
+---
+
+## Task 16: Secrets Management
+
+**Scope**: All files that reference secrets
+
+**Review checklist**:
+- [ ] `BETTER_AUTH_SECRET` — not logged, not included in error messages, not sent to client
+- [ ] `DATABASE_URL` — not exposed in client bundles or error responses
+- [ ] `RESEND_API_KEY` — server-side only
+- [ ] `POSTHOG_ERROR_TRACKING_API_KEY` — server-side only
+- [ ] `VERCEL_AUTOMATION_BYPASS_SECRET` — only used in CI/test config, not in app code
+- [ ] No hardcoded secrets in source code — grep for API keys, tokens, passwords
+- [ ] Git history — confirm no secrets were previously committed and need rotation
+
+**Files**:
+- `src/env.js`
+- All files referencing `env.*` imports
+- `.gitignore`
+
+---
+
+## Task 17: Build & Deploy Security
+
+**Scope**: CI/CD pipeline, Vercel deployment
+
+**Review checklist**:
+- [ ] Source maps — confirm they're uploaded to PostHog but NOT served publicly
+- [ ] `.next/` output — confirm no server-side code is exposed as static assets
+- [ ] CI environment — confirm secrets are stored as GitHub Actions secrets, not in workflow files
+- [ ] Vercel deployment — confirm preview deployments are protected (not publicly accessible with real data)
+- [ ] `ROBOTS_TXT` env var — confirm production allows indexing of public pages only
+- [ ] Husky pre-commit hooks — confirm they run linting/formatting (not bypassable security checks)
+
+**Files**:
+- `.github/workflows/*.yml`
+- `next.config.ts`
+- `.husky/`
+- `src/app/robots.ts`
+
+---
+
+## Task 18: Data Privacy & PII Handling
+
+**Scope**: Lead data, user data, form submissions
+
+**Review checklist**:
+- [ ] Leads table — identify all PII fields (email, phone, name, company) and their access patterns
+- [ ] Conversation storage — assess if message content contains PII and how it's protected
+- [ ] Booking form submissions — trace where form data is sent (tRPC? Direct API? HubSpot?)
+- [ ] PostHog analytics — confirm no PII (email, phone) is included in tracked events
+- [ ] Privacy page (`/privacy`) — confirm it accurately describes data collection practices
+- [ ] Data retention — check if old sessions/leads are purged
+- [ ] User deletion — confirm cascade deletes remove all associated data
+
+**Files**:
+- `src/server/db/schema/leads.ts`
+- `src/server/db/schema/conversations.ts`
+- `src/server/db/schema/auth.ts`
+- `src/app/(website)/privacy/page.tsx`
+- `src/providers/AnalyticsProvider.tsx`
+
+---
+
+## Execution Order
+
+Start with the highest-impact tasks first:
+
+1. **Task 11: Rate Limiting** — Known gap, highest risk (OTP brute-force, email bombing)
+2. **Task 1: Authentication Configuration** — Foundation of security
+3. **Task 2: Authorization Gates** — IDOR and bypass risks
+4. **Task 3: API Route Security** — Dev endpoint in production
+5. **Task 10: CSRF Protection** — State-mutation safety
+6. **Task 8: Input Validation** — Injection prevention
+7. **Task 9: XSS Prevention** — Client-side safety
+8. **Task 6: Environment Variable Security** — Secret exposure
+9. **Task 16: Secrets Management** — Credential leakage
+10. **Task 7: Database Security** — Data layer safety
+11. **Task 4: Content Security Policy** — Browser-enforced controls
+12. **Task 5: Security Headers** — Defense-in-depth headers
+13. **Task 12: Error Handling** — Information leakage
+14. **Task 15: Cookie Security** — Session hijacking prevention
+15. **Task 13: Dependency Security** — Supply chain
+16. **Task 14: Third-Party Integrations** — External service risks
+17. **Task 17: Build & Deploy Security** — CI/CD hardening
+18. **Task 18: Data Privacy** — PII compliance
+
+---
+
+## References
+
+- Codebase: Next.js 16 + better-auth + tRPC + Drizzle + Neon + Vercel
+- Auth: better-auth with email OTP via Resend
+- Testing: Playwright E2E only (no unit tests)
+- CI: GitHub Actions (`quality-control.yml`)

@@ -103,11 +103,25 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 > **Audit findings (2026-04-03):** ✅ Compliant (N/A) — No `"use server"` directives exist anywhere in `src/`. The codebase uses tRPC with `protectedProcedure` for authenticated mutations, so Server Action auth is not applicable.
 
 #### 2.2 Avoid Duplicate Serialization in RSC Props
-- [ ] Check server components passing data to client components for duplicated objects
-- [ ] **Files to check**:
+- [x] Check server components passing data to client components for duplicated objects
+- [x] **Files to check**:
   - `src/app/(application)/layout.tsx` — passes `user` to `AppSidebar`
   - `src/app/(website)/page.tsx` — renders 8 section components
-- [ ] **Expected finding**: Minimal RSC → client data transfer currently. Note observations.
+- [x] **Expected finding**: Minimal RSC → client data transfer currently. Note observations.
+
+> **Audit findings (2026-04-04):** ✅ Compliant — Minimal and properly structured RSC → client data transfer.
+>
+> **Application Layout → AppSidebar** (Server → Client):
+> - Server component extracts only necessary fields from `session.user` into a minimal object: `{ name: string; email: string }`
+> - AppSidebar client component receives and uses only these two fields (lines 70, 72)
+> - **Assessment**: ✅ Best practice — avoids passing unnecessary data across RSC boundary
+>
+> **Website Homepage**:
+> - Server component renders 8 self-contained section components with no props passed
+> - All sections (Hero, Problem, Solution, Results, HowItWorks, AboutFounder, Pricing, BookingForm, FAQ, FinalCTA) manage their own data locally
+> - **Assessment**: ✅ Compliant — no RSC → client data transfer, no serialization concerns
+>
+> **Conclusion**: No duplicate serialization found. Codebase follows RSC boundary best practices.
 
 #### 2.3 Minimize Serialization at RSC Boundaries
 - [ ] Check what props server components pass to client components

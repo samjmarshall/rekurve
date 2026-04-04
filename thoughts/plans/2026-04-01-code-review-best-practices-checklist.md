@@ -107,6 +107,23 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 - [x] Check tRPC context creation (`src/server/api/trpc.ts`) for parallel opportunities
 - [x] **Expected finding**: Minimal async operations currently. Note as ✅ compliant.
 
+> **Audit findings (2026-04-04):** ✅ Compliant — No parallelization opportunities missed.
+>
+> **`src/server/api/trpc.ts` — `createTRPCContext`**:
+> - Single `await getSession()` call. `db` is a synchronous module export, not async. Nothing to parallelize.
+> - **Assessment**: ✅ Compliant.
+>
+> **`src/server/api/routers/leads.ts` — `leads.list`**:
+> - Already uses `Promise.all()` to fetch page items and total count in parallel (line 68).
+> - All other procedures issue a single DB call per handler. No sequential independent awaits.
+> - **Assessment**: ✅ Best practice already applied.
+>
+> **`src/server/hubspot/contacts.ts`**:
+> - Each exported function (`createContact`, `getContact`, `updateContact`, `searchContacts`) issues a single HubSpot API call. No sequential independent operations.
+> - **Assessment**: ✅ Compliant.
+>
+> **Conclusion**: The codebase has minimal async operations. The one location with multiple independent async calls (`leads.list`) already uses `Promise.all()`. No changes required.
+
 #### 1.3 Strategic Suspense Boundaries
 - [x] Identify async server components that block full page render
 - [x] **Files to check**:

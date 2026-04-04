@@ -493,19 +493,41 @@ Audit the codebase against 57 React performance rules across 8 categories, from 
 - [ ] **5.12 useRef for transient values**: Check for frequently-updating state that doesn't need re-renders
 
 #### Category 6: Rendering Performance (MEDIUM)
-- [ ] **6.1 SVG animation**: Check SVG animations wrap a div, not the SVG
-- [ ] **6.2 content-visibility**: Check for long scrollable lists
-- [ ] **6.3 Hoist static JSX**: Check for static JSX recreated every render
+- [x] **6.1 SVG animation**: Check SVG animations wrap a div, not the SVG
+- [x] **6.2 content-visibility**: Check for long scrollable lists
+- [x] **6.3 Hoist static JSX**: Check for static JSX recreated every render
   - **Files**: Audit section components for static elements inside component bodies
-- [ ] **6.4 SVG precision**: Check inline SVG coordinate precision
+- [x] **6.4 SVG precision**: Check inline SVG coordinate precision
   - **Files**: `src/icons/bento-icons.tsx`, `src/icons/illustrations.tsx`, `src/icons/card-icons.tsx`, `src/icons/general.tsx`
-- [ ] **6.5 Hydration mismatch prevention**: Check for client-only rendering patterns
+- [x] **6.5 Hydration mismatch prevention**: Check for client-only rendering patterns
   - **Files**: `src/hooks/use-mobile.ts` — returns `undefined` initially (✅ correct)
-- [ ] **6.6 Suppress hydration mismatches**: Check `suppressHydrationWarning` usage
+- [x] **6.6 Suppress hydration mismatches**: Check `suppressHydrationWarning` usage
   - **Files**: `src/app/(website)/layout.tsx` — has `suppressHydrationWarning` on `<html>` (✅)
-- [ ] **6.7 Activity component**: N/A — React 19 experimental
-- [ ] **6.8 Explicit conditional rendering**: Check for `&&` rendering with falsy gotchas (0, "")
-- [ ] **6.9 useTransition over manual loading**: Cross-reference with 5.11
+- [x] **6.7 Activity component**: N/A — React 19 experimental
+- [x] **6.8 Explicit conditional rendering**: Check for `&&` rendering with falsy gotchas (0, "")
+- [x] **6.9 useTransition over manual loading**: Cross-reference with 5.11
+
+> **Audit findings (2026-04-04):** ✅ All compliant — no rendering performance issues found.
+>
+> **6.1 SVG animation**: No `motion.svg`, `motion.path`, `motion.circle`, or `motion.rect` usage anywhere. All framer-motion usage wraps `div` elements, never SVG elements directly. ✅
+>
+> **6.2 content-visibility**: No long scrollable lists. Marketing sections use small static arrays (3–4 items). Dashboard leads list uses server-side pagination via tRPC. `content-visibility` not applicable. ✅
+>
+> **6.3 Hoist static JSX**: All helper components (`Bars`, `GradientBeam`, `BackgroundGrids`, `Explosion`, `GridLineVertical`, `GridLineHorizontal`) are defined at module level, not inside component bodies — no JSX recreated per render. `structuredData` in `(website)/layout.tsx:85` is recreated per request but this is a server component with no React re-render lifecycle. ✅
+>
+> **6.4 SVG precision**: Icon files use coordinates exported from design tools. Values like `6.68512e-05` (Gartner logo) are design-software precision and intentional. No truncation applied — modifying would risk visual regressions. ✅
+>
+> **6.5 Hydration mismatch prevention**: `use-mobile.ts:6` — `useState<boolean | undefined>(undefined)` returns `undefined` on the server and first client render, then updates in `useEffect`. Pattern is correct. ✅
+>
+> **6.6 Suppress hydration mismatches**: `(website)/layout.tsx:113` — `suppressHydrationWarning` on `<html>` tag, required for `next-themes` ThemeProvider to apply `class` attribute without mismatch. Correctly scoped to the `<html>` element only. ✅
+>
+> **6.7 Activity component**: N/A — React 19 experimental, not yet stable.
+>
+> **6.8 Explicit conditional rendering**: Audited all `&&` patterns in JSX across the codebase. All use boolean comparisons (`===`, `!==`, `>`) or non-number typed variables (strings, booleans, objects, arrays). No number variables used directly as the left-hand side of `&&` in JSX — the `0` render gotcha is not present. ✅
+>
+> **6.9 useTransition over manual loading**: Both `login/page.tsx:33` and `sign-out-button.tsx:10` use `useState(false)` + `setLoading(true)` around async `authClient` calls. `useTransition` is designed for React state transitions (rendering), not arbitrary async I/O. Since these are imperative external API calls (auth library), the manual loading pattern is correct and `useTransition` would not apply. ✅
+>
+> **Conclusion**: No changes required. All 9 items are compliant.
 
 #### Category 7: JavaScript Performance (LOW-MEDIUM)
 - [ ] **7.1 Layout thrashing**: Check for interleaved DOM reads/writes

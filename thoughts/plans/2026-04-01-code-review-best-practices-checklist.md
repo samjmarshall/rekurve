@@ -455,14 +455,22 @@ Audit the codebase against 57 React performance rules across 8 categories, from 
 > **3.7 after()** — Cross-reference Phase 1 §2.6: No `after()` candidates found. The two logging sites (`onError` callback in tRPC adapter, `timingMiddleware` `console.log`) are not accessible from Next.js route handler scope and are trivial-cost sync operations. ✅ N/A.
 
 #### Category 4: Client-Side Data Fetching (MEDIUM-HIGH)
-- [ ] **4.1 Event listener deduplication**: Audit global event listeners
+- [x] **4.1 Event listener deduplication**: Audit global event listeners
   - **Files**: `src/hooks/use-mobile.ts`, `src/hooks/useMediaQuery.ts`, `src/app/(website)/_components/mode-toggle.tsx`
   - Check for duplicate `matchMedia` listeners
-- [ ] **4.2 Passive event listeners**: Check scroll/touch handlers
+- [x] **4.2 Passive event listeners**: Check scroll/touch handlers
   - **Files**: `src/components/ui/compare.tsx` — touch/mouse event handlers
   - Verify scroll listeners use `{ passive: true }`
-- [ ] **4.3 SWR deduplication**: N/A — using TanStack Query via tRPC
-- [ ] **4.4 localStorage schema versioning**: Check for any localStorage usage
+- [x] **4.3 SWR deduplication**: N/A — using TanStack Query via tRPC
+- [x] **4.4 localStorage schema versioning**: Check for any localStorage usage
+
+> **4.1 Event listener deduplication** — All three `matchMedia` listeners have proper `addEventListener`/`removeEventListener` pairs inside `useEffect` cleanup. `use-mobile.ts` listens to `(max-width: 767px)`, `useMediaQuery.ts` listens to an arbitrary query prop, `mode-toggle.tsx` listens to `(prefers-color-scheme: dark)`. Each is independently scoped with cleanup. Removed a stray `console.log(theme)` debug statement from `mode-toggle.tsx`. ✅ Compliant.
+>
+> **4.2 Passive event listeners** — `glowing-effect.tsx` already uses `{ passive: true }` on `window.scroll` and `document.body.pointermove` listeners. `compare.tsx` touch handlers (`onTouchStart`, `onTouchMove`, `onTouchEnd`) are React synthetic events passed as JSX props — the `{ passive: true }` option is not available through React's event system. However, none of the handlers call `preventDefault()`, so they are functionally equivalent to passive listeners and will not block scrolling. ✅ Compliant.
+>
+> **4.3 SWR deduplication** — ✅ N/A — confirmed using TanStack Query via tRPC, no SWR in codebase.
+>
+> **4.4 localStorage schema versioning** — No `localStorage` usage found anywhere in `src/`. ✅ N/A.
 
 #### Category 5: Re-render Optimization (MEDIUM)
 - [ ] **5.1 Derived state during render**: Check for `useEffect` that derives state

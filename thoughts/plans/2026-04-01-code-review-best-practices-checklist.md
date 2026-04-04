@@ -631,13 +631,30 @@ Audit component architecture against 9 composition rules covering boolean props,
 #### Category 1: Component Architecture (HIGH)
 
 ##### 1.1 Avoid Boolean Prop Proliferation
-- [ ] Audit components for boolean props that control rendering variants
-- [ ] **Files to check**:
+- [x] Audit components for boolean props that control rendering variants
+- [x] **Files to check**:
   - `src/components/ui/compare.tsx` — `showHandlebar?: boolean`, `autoplay?: boolean` (10 props total)
   - `src/components/ui/sparkles.tsx` — check prop count
   - `src/app/(website)/_components/navbar.tsx` — `visible` prop passed to Desktop/Mobile nav
-- [ ] **Assessment**: Compare component has boolean props but they're feature flags with defaults, not variant selectors. This is acceptable per the rule — the anti-pattern is `isThread`, `isEditing` style booleans that create exponential state combinations.
-- [ ] Document which components are compliant vs need refactoring
+- [x] **Assessment**: Compare component has boolean props but they're feature flags with defaults, not variant selectors. This is acceptable per the rule — the anti-pattern is `isThread`, `isEditing` style booleans that create exponential state combinations.
+- [x] Document which components are compliant vs need refactoring
+
+> **Audit findings (2026-04-04):** ✅ All compliant — no boolean prop proliferation found.
+>
+> **`src/components/ui/compare.tsx`**:
+> - `showHandlebar?: boolean` (default `true`) — simple on/off feature flag controlling a single UI element. Not a variant selector.
+> - `autoplay?: boolean` (default `false`) — behavioral feature toggle, not a rendering variant.
+> - `slideMode?: "hover" | "drag"` — already uses a union type for mode selection. ✅
+> - **Assessment**: ✅ Compliant — boolean props are single-responsibility feature flags with sensible defaults, not accumulating variant booleans that create exponential state combinations.
+>
+> **`src/components/ui/sparkles.tsx`**:
+> - No boolean props. All 8 props are optional numeric/string configuration values (`id`, `className`, `background`, `particleSize`, `minSize`, `maxSize`, `speed`, `particleColor`, `particleDensity`).
+> - **Assessment**: ✅ Compliant.
+>
+> **`src/app/(website)/_components/navbar.tsx`**:
+> - `visible: boolean` in `NavbarProps` — internal scroll-state passed to sub-components to drive Framer Motion animations. Not a public API variant selector; there is no alternative rendering path, only animated value interpolation.
+> - `open: boolean` in `MobileNav` — local component state, not a prop.
+> - **Assessment**: ✅ Compliant — `visible` is animation state, not a variant flag.
 
 ##### 1.2 Use Compound Components
 - [ ] Review existing compound component patterns

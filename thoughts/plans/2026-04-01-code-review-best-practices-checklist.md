@@ -210,14 +210,40 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 > **Conclusion**: No changes required.
 
 #### 3.1 Avoid Barrel File Imports
-- [ ] Audit all barrel files and their consumers
-- [ ] **Barrel files found**:
+- [x] Audit all barrel files and their consumers
+- [x] **Barrel files found**:
   - `src/server/db/schema/index.ts` — re-exports 8 schema modules (server-only, acceptable)
   - `src/hooks/index.ts` — re-exports `useMediaQuery` (single export, acceptable)
   - `src/types/index.ts` — type-only exports (tree-shaken, acceptable)
   - `src/app/(website)/_components/stats/index.ts` — re-exports stats components
-- [ ] Check if any barrel files are imported in client bundles unnecessarily
-- [ ] **Expected finding**: Barrel files are minimal and mostly server-side. Low risk.
+- [x] Check if any barrel files are imported in client bundles unnecessarily
+- [x] **Expected finding**: Barrel files are minimal and mostly server-side. Low risk.
+
+> **Audit findings (2026-04-04):** ✅ Compliant — No problematic barrel file imports found.
+>
+> **`src/server/db/schema/index.ts`** (8 re-exports: auth, conversations, enums, leads, lot-matches, lots, message-queue, nurture-sequences):
+> - Single consumer: `src/server/api/routers/leads.ts:10` — `import { leads } from "~/server/db/schema"`
+> - Server-only path (`src/server/`), never bundled for the client
+> - **Assessment**: ✅ Compliant — server-side barrel, tree-shaking irrelevant
+>
+> **`src/hooks/index.ts`** (1 re-export: `useMediaQuery`):
+> - Consumers: `src/app/(website)/_components/sections/Hero.tsx:9`, `src/app/(website)/_components/stats/StatsMarquee.tsx:4`
+> - Both consumers are client components (`"use client"`) that import a single hook
+> - Single-export barrel adds indirection with no benefit — direct imports (`~/hooks/useMediaQuery`) would be marginally cleaner — but there is zero tree-shaking risk since there is only one export
+> - **Assessment**: ✅ Compliant (minor: could use direct imports, but no bundle impact)
+>
+> **`src/types/index.ts`** (type-only interfaces: PricingTier, Testimonial, CaseStudy, FormField, FormStep, FormSubmission, FAQItem, Metric, Feature, ProcessStep):
+> - Single consumer: `src/app/(website)/_components/sections/Pricing.tsx:10` — `import type { PricingTier } from "~/types"`
+> - Uses `import type` — fully erased at compile time, zero runtime impact
+> - **Assessment**: ✅ Compliant — type-only barrel, no bundle impact possible
+>
+> **`src/app/(website)/_components/stats/index.ts`** (3 re-exports: StatCard, StatsMarquee, stats-data):
+> - Single consumer: `src/app/(website)/_components/sections/Hero.tsx:15` — `import { StatsMarquee } from "../stats"`
+> - Hero imports only `StatsMarquee`, but the barrel also re-exports `StatCard` and `stats-data` exports
+> - **No actual risk**: `StatsMarquee` internally imports `StatCard` and `stats-data` directly, so those modules would be bundled regardless. The barrel creates no extra payload.
+> - **Assessment**: ✅ Compliant — co-located feature barrel, all exports are transitively needed anyway
+>
+> **Conclusion**: No barrel files are imported unnecessarily in client bundles. No changes required.
 
 #### 3.2 Server vs. Client Component Decision
 - [ ] Review all `"use client"` components — are any unnecessarily client-side?

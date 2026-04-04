@@ -530,9 +530,38 @@ Audit the codebase against 57 React performance rules across 8 categories, from 
 > **Conclusion**: No changes required. All 9 items are compliant.
 
 #### Category 7: JavaScript Performance (LOW-MEDIUM)
-- [ ] **7.1 Layout thrashing**: Check for interleaved DOM reads/writes
-- [ ] **7.2 Index maps**: Check for repeated array lookups
-- [ ] **7.3-7.12**: Quick scan for low-hanging fruit across utility functions
+- [x] **7.1 Layout thrashing**: Check for interleaved DOM reads/writes
+- [x] **7.2 Index maps**: Check for repeated array lookups
+- [x] **7.3-7.12**: Quick scan for low-hanging fruit across utility functions
+
+> **Audit findings (2026-04-04):**
+>
+> **7.1 Layout thrashing** (interleaved DOM reads/writes):
+>
+> - `src/components/ui/glowing-effect.tsx` — `getBoundingClientRect()` read and all `style.setProperty()` writes are batched inside a single `requestAnimationFrame` callback. ✅
+> - `src/components/ui/compare.tsx` — `getBoundingClientRect()` is wrapped in `requestAnimationFrame` (line 117). All DOM updates follow within the same RAF. ✅
+> - `src/components/ui/timeline.tsx` — `getBoundingClientRect()` is called in a `useEffect` with an empty dependency array (runs once). No interleaving with writes. ✅
+> - `src/app/(website)/_components/sections/Hero.tsx` — collision detection reads `getBoundingClientRect()` inside a `setInterval(50ms)` callback without writes; state update is the only side effect. ✅
+>
+> **Conclusion**: No layout thrashing found. All DOM read/write patterns are correctly batched or isolated. ✅
+>
+> **7.2 Index maps** (repeated array lookups):
+>
+> - `src/app/(website)/_components/sections/FAQ.tsx:210` — `faqData.find((f) => f.id === id)` inside `newlyOpened.forEach()`. Technically O(n) per item. However, `faqData` has 12 items and `newlyOpened` is typically 1 item (user opens one accordion at a time). No actionable fix required at this scale. ✅
+> - `src/app/(website)/_components/sections/FAQ.tsx:230` — `openItems.includes(item.id)` inside `.map()` over `filteredFAQs` (max 12 items). Technically O(n²). With a 12-item dataset this is inconsequential — a premature optimization. ✅
+>
+> **Conclusion**: No index map issues of practical concern. Dataset is too small for O(n²) patterns to matter. ✅
+>
+> **7.3–7.12 Quick scan (utility functions, hooks, components)**:
+>
+> - **console.log in production** — `src/server/api/trpc.ts:46`: `console.log(\`[TRPC] ${path} took ${end - start}ms\`)` ran unconditionally on every tRPC call. The random delay above it was gated behind `t._config.isDev`; the log was not. **Fixed**: moved log inside `if (t._config.isDev)` block. ⚠️ → ✅
+> - **setTimeout/setInterval cleanup** — `compare.tsx`, `Hero.tsx`, `FAQ.tsx`: all timers are properly cleared in effect cleanup or before reassignment. ✅
+> - **Expensive computations** — `shimmer-text.tsx`: `MotionComponent` memoized via `useMemo`. `field.tsx`: `FieldError` content memoized. ✅
+> - **Inline constants recreated on render** — `BookingForm.tsx`: `challengeOptions` defined at module level. `faqData`: module-level constant. Hero `Explosion` creates `Array.from({ length: 20 })` per collision event only — acceptable frequency. ✅
+> - **Passive event listeners** — `glowing-effect.tsx`: mousemove listener uses `{ passive: true }`. `compare.tsx` touch listeners: already audited in cat4 (passive added in p2.cat4). ✅
+> - **No other issues found**: No excessive loops, no redundant double-computation, no unguarded `while` loops. ✅
+>
+> **Conclusion**: One fix applied (`console.log` gated behind `isDev`). Codebase is otherwise clean for JS performance.
 
 #### Category 8: Advanced Patterns (LOW)
 - [ ] **8.1 Init once**: Check for initialization in effects that should be module-level

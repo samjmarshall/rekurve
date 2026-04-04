@@ -357,11 +357,40 @@ Audit the codebase against 57 React performance rules across 8 categories, from 
 ### Checklist
 
 #### Category 1: Eliminating Waterfalls (CRITICAL)
-- [ ] **1.1 Defer await**: Check async functions for early-return optimization opportunities
-- [ ] **1.2 Dependency-based parallelization**: Check for partial-dependency async chains
-- [ ] **1.3 API route waterfalls**: Audit `src/app/api/` route handlers
-- [ ] **1.4 Promise.all()**: Search for sequential independent awaits
-- [ ] **1.5 Suspense boundaries**: Already covered in Phase 1 — cross-reference
+- [x] **1.1 Defer await**: Check async functions for early-return optimization opportunities
+- [x] **1.2 Dependency-based parallelization**: Check for partial-dependency async chains
+- [x] **1.3 API route waterfalls**: Audit `src/app/api/` route handlers
+- [x] **1.4 Promise.all()**: Search for sequential independent awaits
+- [x] **1.5 Suspense boundaries**: Already covered in Phase 1 — cross-reference
+
+> **Audit findings (2026-04-04):** ❌ One fix applied. Remainder ✅ compliant.
+>
+> **1.1 Defer await — `src/app/api/hubspot/webhook/route.ts`** ❌ Fixed:
+> - Original: `await request.text()` called at line 6, before three cheap early-return checks (missing headers, expired timestamp, invalid signature). Body parsing ran unconditionally even for requests that would be rejected without needing the body.
+> - **Fix applied**: Moved `await request.text()` to after the header and timestamp checks. Invalid requests now fail fast without paying the body-parsing cost.
+> - All other async functions in the codebase use single awaits with no early-return opportunity — compliant.
+>
+> **1.2 Dependency-based parallelization:**
+> - `src/app/api/dev/session/route.ts` POST: `await db.query.user.findFirst()` → conditional `await db.insert(user)` → `await db.insert(session)`. Each step depends on the previous (session insert needs user ID from the insert/find result). Not a waterfall — true sequential dependencies.
+> - All other routes issue single awaits per handler. No partial-dependency chains exist.
+> - **Assessment**: ✅ Compliant — no parallelization opportunities missed.
+>
+> **1.3 API route waterfalls — full audit:**
+> - `src/app/api/hubspot/webhook/route.ts`: Defer-await fix applied (see 1.1). No sequential independent awaits.
+> - `src/app/api/dev/session/route.ts`: Sequential dependent awaits only — not a waterfall (covered in 1.2).
+> - `src/app/api/health/route.ts`: No async operations — synchronous JSON response.
+> - `src/app/api/trpc/[trpc]/route.ts`: No direct awaits in handler body; async context creation delegated to `fetchRequestHandler`.
+> - `src/app/api/auth/[...all]/route.ts`: Delegated to better-auth handler — internal implementation.
+> - **Assessment**: ✅ Compliant after fix.
+>
+> **1.4 Promise.all():**
+> - `src/server/api/routers/leads.ts:68` — already uses `Promise.all([items query, count query])` in `leads.list`. ✅ Best practice already applied.
+> - All other tRPC procedures issue a single DB call per handler. No sequential independent awaits anywhere in server routers or HubSpot client functions.
+> - **Assessment**: ✅ Compliant — existing `Promise.all()` usage is correct; no new opportunities found.
+>
+> **1.5 Suspense boundaries:**
+> - Cross-reference Phase 1 §1.3: Recommendation noted — no Suspense boundaries exist. Not implementing in this review per plan scope.
+> - **Assessment**: ✅ Cross-reference complete.
 
 #### Category 2: Bundle Size Optimization (CRITICAL)
 - [ ] **2.1 Barrel imports**: Already covered in Phase 1 — cross-reference

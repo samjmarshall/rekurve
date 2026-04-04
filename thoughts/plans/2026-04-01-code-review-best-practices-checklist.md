@@ -71,6 +71,37 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
   - `src/app/api/health/route.ts`
 - [x] **Expected finding**: No real waterfalls currently — `getSession()` is `React.cache()`-wrapped. Note as ✅ compliant.
 
+> **Audit findings (2026-04-04):** ✅ Compliant — No sequential await waterfall chains found.
+>
+> **`src/app/(application)/layout.tsx`**:
+> - Single `await getSession()` at line 43. No chained awaits.
+> - `getSession` is `React.cache()`-wrapped — deduplicates across all server components in the same request.
+> - **Assessment**: ✅ Compliant.
+>
+> **`src/app/(application)/settings/page.tsx`**:
+> - Single `await getSession()` at line 5. No chained awaits.
+> - Deduplicates with the layout's call via `React.cache()` — zero additional I/O cost.
+> - **Assessment**: ✅ Compliant.
+>
+> **`src/app/(login)/layout.tsx`**:
+> - Single `await getSession()` at line 35. No chained awaits.
+> - **Assessment**: ✅ Compliant.
+>
+> **`src/app/api/trpc/[trpc]/route.ts`**:
+> - No awaits in the route handler body. `createContext` factory is passed to `fetchRequestHandler` — no sequential async calls.
+> - **Assessment**: ✅ Compliant.
+>
+> **`src/app/api/dev/session/route.ts`**:
+> - POST handler awaits user lookup then session insert sequentially, but these are inherently dependent (session insert requires user ID). Not a waterfall.
+> - Dev-only route (returns 404 in production).
+> - **Assessment**: ✅ Compliant — sequential awaits are necessary dependencies, not parallelizable.
+>
+> **`src/app/api/health/route.ts`**:
+> - No async operations. Synchronous JSON response.
+> - **Assessment**: ✅ Compliant.
+>
+> **Conclusion**: No waterfall chains exist. `getSession()` is the only repeated async call and is correctly deduplicated by `React.cache()`. No changes required.
+
 #### 1.2 Parallelize Independent Operations
 - [x] Search for multiple sequential `await` calls that could use `Promise.all()`
 - [x] Check tRPC context creation (`src/server/api/trpc.ts`) for parallel opportunities
@@ -295,9 +326,9 @@ Based on audit findings, apply fixes for any issues found. Expected changes:
 - [x] `make build` succeeds
 
 #### Manual Verification:
-- [ ] Audit report written with findings per rule
-- [ ] Each finding categorized as: ✅ Compliant, ⚠️ Recommendation, ❌ Issue
-- [ ] No regressions in page functionality
+- [x] Audit report written with findings per rule
+- [x] Each finding categorized as: ✅ Compliant, ⚠️ Recommendation, ❌ Issue
+- [x] No regressions in page functionality
 
 ---
 

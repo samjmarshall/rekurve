@@ -16,11 +16,9 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "test", "production"]),
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.preprocess(
-      // This makes Vercel deployments not fail if you don't set BETTER_AUTH_URL
-      // Since Better Auth automatically uses the VERCEL_URL if present.
-      (str) => process.env.VERCEL_URL ?? str,
-      // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-      process.env.VERCEL ? z.string() : z.string().url(),
+      (str) =>
+        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : str,
+      z.string().url(),
     ),
     DATABASE_URL: z.string().url(),
     DATABASE_URL_UNPOOLED: z.string().url(),

@@ -162,12 +162,27 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 > **Future consideration**: When pages are built out (e.g., dashboard fetching both lead counts and lot availability), prefer splitting data dependencies across sibling async server components rather than awaiting sequentially in a parent. Example: render `<LeadSummary />` and `<LotCount />` as siblings so Next.js can initiate both fetches concurrently.
 
 #### 2.5 Per-Request Deduplication with React.cache()
-- [ ] Verify `React.cache()` usage is correct
-- [ ] Check for inline object arguments that break caching
-- [ ] **Files to check**:
+- [x] Verify `React.cache()` usage is correct
+- [x] Check for inline object arguments that break caching
+- [x] **Files to check**:
   - `src/lib/session.ts:5` — `cache(async () => auth.api.getSession(...))`
   - `src/trpc/server.tsx:15` — `cache(makeQueryClient)`
-- [ ] **Expected finding**: ✅ Both usages are correct.
+- [x] **Expected finding**: ✅ Both usages are correct.
+
+> **Audit findings (2026-04-04):** ✅ Compliant — Both `React.cache()` usages are correct.
+>
+> **`src/lib/session.ts:5`** — `export const getSession = cache(async () => { ... })`
+> - Zero-argument function wrapped with `cache`. No arguments means no inline objects can break the cache key.
+> - `headers()` is called inside the function body, not passed as an argument — correct pattern.
+> - Ensures `auth.api.getSession()` is called at most once per request regardless of how many server components call `getSession()`.
+> - **Assessment**: ✅ Correct usage.
+>
+> **`src/trpc/server.tsx:15`** — `export const getQueryClient = cache(makeQueryClient)`
+> - Wraps the `makeQueryClient` factory with `cache`. Called with no arguments in both `HydrateClient` and `prefetch`.
+> - Ensures a single `QueryClient` instance is shared across the request for consistent dehydration.
+> - **Assessment**: ✅ Correct usage.
+>
+> **Inline object argument check**: Neither cached function accepts arguments, so there is no risk of inline object references producing cache misses. No changes required.
 
 #### 2.6 Use after() for Non-Blocking Operations
 - [ ] Identify logging, analytics, or side effects in API routes that could use `after()`

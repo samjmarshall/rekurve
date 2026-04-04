@@ -1,5 +1,5 @@
 ---
-name: plan-to-spec
+name: plan-to-ralph-spec
 description: Convert a markdown implementation plan to a JSON spec file for ralph.sh execution
 ---
 
@@ -11,7 +11,7 @@ Convert a markdown implementation plan into a structured `.spec.json` file that 
 
 The user provides a path to a markdown plan:
 ```
-/plan-to-spec thoughts/plans/2026-04-01-code-review-best-practices-checklist.md
+/plan-to-ralph-spec thoughts/plans/2026-04-01-code-review-best-practices-checklist.md
 ```
 
 ## Steps

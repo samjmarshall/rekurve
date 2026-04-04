@@ -92,7 +92,7 @@ fi
 
 if [[ ! -f "$SPEC_PATH" ]]; then
   echo "Error: spec file not found: $SPEC_PATH" >&2
-  echo "Run: /plan-to-spec $PLAN_PATH" >&2
+  echo "Run: /plan-to-ralph-spec $PLAN_PATH" >&2
   exit 1
 fi
 

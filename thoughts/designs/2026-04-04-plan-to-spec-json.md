@@ -17,7 +17,7 @@ The root cause: markdown is a human-authoring format, not a machine contract. Ev
 
 ## Solution
 
-Replace markdown parsing with a structured JSON spec file. A Claude Skill (`/plan-to-spec`) converts markdown plans to JSON once; the user reviews; ralph.sh reads JSON for execution.
+Replace markdown parsing with a structured JSON spec file. A Claude Skill (`/plan-to-ralph-spec`) converts markdown plans to JSON once; the user reviews; ralph.sh reads JSON for execution.
 
 ```
 thoughts/plans/2026-04-01-code-review.md           <- human plan (source)
@@ -75,12 +75,12 @@ State is owned by ralph.sh, not Claude:
 - After successful validate: ralph writes `"validated"`
 - On failure: state unchanged. Ralph stops the loop and resumes from the same section on next run.
 
-## The Skill: `/plan-to-spec`
+## The Skill: `/plan-to-ralph-spec`
 
 ### Invocation
 
 ```
-/plan-to-spec thoughts/plans/2026-04-01-code-review-best-practices-checklist.md
+/plan-to-ralph-spec thoughts/plans/2026-04-01-code-review-best-practices-checklist.md
 ```
 
 ### Behavior
@@ -106,7 +106,7 @@ State is owned by ralph.sh, not Claude:
 ### File location
 
 ```
-.claude/skills/plan-to-spec/SKILL.md
+.claude/skills/plan-to-ralph-spec/SKILL.md
 ```
 
 ## Ralph.sh Changes
@@ -121,7 +121,7 @@ Ralph accepts a `.spec.json` path:
 scripts/ralph.sh thoughts/plans/2026-04-01-code-review.spec.json
 ```
 
-Auto-detection: if the path ends in `.md`, ralph checks for a sibling `.spec.json` and uses that. If no spec exists, it errors with a message to run `/plan-to-spec` first.
+Auto-detection: if the path ends in `.md`, ralph checks for a sibling `.spec.json` and uses that. If no spec exists, it errors with a message to run `/plan-to-ralph-spec` first.
 
 ### Replaced functions
 
@@ -187,7 +187,7 @@ Files to read first:
 ### New
 
 ```
-.claude/skills/plan-to-spec/SKILL.md
+.claude/skills/plan-to-ralph-spec/SKILL.md
 ```
 
 ### Modified

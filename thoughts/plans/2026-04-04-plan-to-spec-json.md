@@ -2,7 +2,7 @@
 
 ## Overview
 
-Replace ralph.sh's brittle markdown regex parsing with a two-stage workflow: a `/plan-to-spec` Claude skill converts markdown plans to `.spec.json` files once, then ralph.sh reads JSON with `jq` for section discovery, state management, and prompt construction. This eliminates the root cause of ralph silently skipping sections when heading formats vary.
+Replace ralph.sh's brittle markdown regex parsing with a two-stage workflow: a `/plan-to-ralph-spec` Claude skill converts markdown plans to `.spec.json` files once, then ralph.sh reads JSON with `jq` for section discovery, state management, and prompt construction. This eliminates the root cause of ralph silently skipping sections when heading formats vary.
 
 ## Current State Analysis
 
@@ -23,8 +23,8 @@ Replace ralph.sh's brittle markdown regex parsing with a two-stage workflow: a `
 
 After this plan is complete:
 
-1. A `/plan-to-spec` skill exists at `.claude/skills/plan-to-spec/SKILL.md`
-2. Running `/plan-to-spec thoughts/plans/some-plan.md` produces `thoughts/plans/some-plan.spec.json`
+1. A `/plan-to-ralph-spec` skill exists at `.claude/skills/plan-to-ralph-spec/SKILL.md`
+2. Running `/plan-to-ralph-spec thoughts/plans/some-plan.md` produces `thoughts/plans/some-plan.spec.json`
 3. `scripts/ralph.sh` accepts `.spec.json` or `.md` (auto-detects sibling spec)
 4. Ralph reads JSON for section discovery, state transitions, and prompt construction — zero markdown regex
 5. `ralph-implement.md` and `ralph-validate.md` are simplified — no plan-file reading, no checkbox management
@@ -35,7 +35,7 @@ After this plan is complete:
 - `make check` passes
 - `scripts/ralph.sh thoughts/plans/some-plan.spec.json --dry-run` lists sections from JSON
 - `scripts/ralph.sh thoughts/plans/some-plan.md --dry-run` auto-detects the sibling `.spec.json`
-- `/plan-to-spec` produces valid JSON matching the schema for any plan heading format
+- `/plan-to-ralph-spec` produces valid JSON matching the schema for any plan heading format
 
 ## What We're NOT Doing
 
@@ -52,7 +52,7 @@ Phase 1 (skill) is independent. Phase 2 (ralph.sh) and Phase 3 (prompts) are tig
 
 ---
 
-## Phase 1: `/plan-to-spec` Skill
+## Phase 1: `/plan-to-ralph-spec` Skill
 
 ### Overview
 Create the Claude skill that converts a markdown plan to a `.spec.json` file. The skill leverages Claude's natural language understanding to find section boundaries regardless of heading format.
@@ -60,12 +60,12 @@ Create the Claude skill that converts a markdown plan to a `.spec.json` file. Th
 ### Changes Required:
 
 #### 1.1 Create skill file
-**File**: `.claude/skills/plan-to-spec/SKILL.md` (new)
+**File**: `.claude/skills/plan-to-ralph-spec/SKILL.md` (new)
 **Changes**: New skill following existing project patterns (YAML frontmatter + markdown body)
 
 ```markdown
 ---
-name: plan-to-spec
+name: plan-to-ralph-spec
 description: Convert a markdown implementation plan to a JSON spec file for ralph.sh execution
 ---
 
@@ -77,7 +77,7 @@ Convert a markdown implementation plan into a structured `.spec.json` file that 
 
 The user provides a path to a markdown plan:
 ```
-/plan-to-spec thoughts/plans/2026-04-01-code-review-best-practices-checklist.md
+/plan-to-ralph-spec thoughts/plans/2026-04-01-code-review-best-practices-checklist.md
 ```
 
 ## Steps
@@ -132,7 +132,7 @@ The user provides a path to a markdown plan:
 - [x] `make check` passes (skill file is valid markdown)
 
 #### Manual Verification:
-- [ ] Running `/plan-to-spec thoughts/plans/2026-04-01-code-review-best-practices-checklist.md` produces a valid `.spec.json`
+- [ ] Running `/plan-to-ralph-spec thoughts/plans/2026-04-01-code-review-best-practices-checklist.md` produces a valid `.spec.json`
 - [ ] Sections with varied heading formats (####, ###, ##, numbered, named) are all captured
 - [ ] Sections with zero checkboxes are skipped with a warning
 
@@ -171,7 +171,7 @@ fi
 
 if [[ ! -f "$SPEC_PATH" ]]; then
   echo "Error: spec file not found: $SPEC_PATH" >&2
-  echo "Run: /plan-to-spec $PLAN_PATH" >&2
+  echo "Run: /plan-to-ralph-spec $PLAN_PATH" >&2
   exit 1
 fi
 
@@ -434,7 +434,7 @@ done
 #### Manual Verification:
 - [ ] Passing `.spec.json` directly works
 - [ ] Passing `.md` auto-detects sibling `.spec.json`
-- [ ] Passing `.md` without a sibling `.spec.json` errors with a message to run `/plan-to-spec`
+- [ ] Passing `.md` without a sibling `.spec.json` errors with a message to run `/plan-to-ralph-spec`
 - [ ] Dry-run shows section states from JSON (pending/implemented/validated)
 
 ---
@@ -643,7 +643,7 @@ Add `*.spec.json` to `.gitignore` and remove any remaining dead code references.
 
 ## Performance Considerations
 
-- The `/plan-to-spec` skill runs once per plan, not per loop iteration — no performance concern
+- The `/plan-to-ralph-spec` skill runs once per plan, not per loop iteration — no performance concern
 - `jq` one-liners are faster than the bash `while read` loops they replace
 - `update_section_state` writes the full spec on each transition (2× per section: implemented + validated). For typical plan sizes (5–20 sections), this is negligible
 

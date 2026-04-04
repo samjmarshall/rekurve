@@ -144,8 +144,22 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 > **Conclusion**: Section 2.3 follows best practices. No changes required.
 
 #### 2.4 Parallel Data Fetching with Component Composition
-- [ ] Check if sibling server components could fetch data in parallel
-- [ ] **Expected finding**: Most pages are stubs with no data fetching. Note as future consideration.
+- [x] Check if sibling server components could fetch data in parallel
+- [x] **Expected finding**: Most pages are stubs with no data fetching. Note as future consideration.
+
+> **Audit findings (2026-04-04):** ✅ Compliant (N/A) — No parallel data fetching opportunities exist in the current codebase.
+>
+> **Data fetching inventory:**
+> - `src/app/(application)/layout.tsx` — `await getSession()` (single call, no siblings to parallelize)
+> - `src/app/(application)/settings/page.tsx` — `await getSession()` (deduplicated with layout via `React.cache()`)
+> - `src/app/(application)/dashboard/page.tsx` — no data fetching (stub)
+> - `src/app/(application)/lots/page.tsx` — no data fetching (stub)
+> - `src/app/(application)/pipeline/page.tsx` — no data fetching (stub)
+> - `src/app/(website)/page.tsx` — not async; renders static section components with no data fetching
+>
+> **Assessment**: The component composition rule applies when a single parent component awaits multiple independent data sources sequentially instead of rendering sibling components that each fetch in parallel. No such pattern exists today — pages are stubs and the only real async work is `getSession()` which is a single call per request.
+>
+> **Future consideration**: When pages are built out (e.g., dashboard fetching both lead counts and lot availability), prefer splitting data dependencies across sibling async server components rather than awaiting sequentially in a parent. Example: render `<LeadSummary />` and `<LotCount />` as siblings so Next.js can initiate both fetches concurrently.
 
 #### 2.5 Per-Request Deduplication with React.cache()
 - [ ] Verify `React.cache()` usage is correct

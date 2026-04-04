@@ -246,13 +246,35 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 > **Conclusion**: No barrel files are imported unnecessarily in client bundles. No changes required.
 
 #### 3.2 Server vs. Client Component Decision
-- [ ] Review all `"use client"` components — are any unnecessarily client-side?
-- [ ] **Key files to audit**:
+- [x] Review all `"use client"` components — are any unnecessarily client-side?
+- [x] **Key files to audit**:
   - `src/components/ui/Badge.tsx` — pure presentational, no hooks/events → could be server component
   - `src/components/ui/Card.tsx` — pure presentational, no hooks/events → could be server component
   - `src/components/ui/separator.tsx` — pure presentational → could be server component
   - `src/components/ui/label.tsx` — check if it needs client features
-- [ ] **Expected finding**: Several UI components are marked `"use client"` but use no client features. Removing the directive would reduce client bundle.
+- [x] **Expected finding**: Several UI components are marked `"use client"` but use no client features. Removing the directive would reduce client bundle.
+
+> **Audit findings (2026-04-04):** ✅ Two unnecessary `"use client"` directives removed. Two components already compliant.
+>
+> **`src/components/ui/Badge.tsx`**:
+> - No `"use client"` directive — already a server component.
+> - Pure CVA variant component, no hooks or event handlers. Used by Pricing, CaseStudies, AboutFounder sections (all server components, no event handlers passed).
+> - **Assessment**: ✅ Already compliant. No change needed.
+>
+> **`src/components/ui/Card.tsx`**:
+> - No `"use client"` directive — already a server component.
+> - Uses `React.forwardRef` (available in server components). No hooks or event handlers. Used by 7 section/page files.
+> - **Assessment**: ✅ Already compliant. No change needed.
+>
+> **`src/components/ui/separator.tsx`** — ❌ Had unnecessary `"use client"`:
+> - `@base-ui/react/separator` already declares `'use client'` internally (`node_modules/@base-ui/react/esm/separator/Separator.js:1`). The client boundary is at the Base UI layer — our wrapper does not need to repeat it.
+> - Only consumer: `src/components/ui/field.tsx` which already has `"use client"`.
+> - **Fix applied**: Removed `"use client"` from `separator.tsx`.
+>
+> **`src/components/ui/label.tsx`** — ❌ Had unnecessary `"use client"`:
+> - Plain `<label>` HTML element with Tailwind classes. No hooks, no event handlers, no browser APIs.
+> - Only consumer: `src/components/ui/field.tsx` which already has `"use client"`.
+> - **Fix applied**: Removed `"use client"` from `label.tsx`.
 
 ### Changes Required
 
@@ -263,12 +285,14 @@ Based on audit findings, apply fixes for any issues found. Expected changes:
 **Change**: Remove `"use client"` directive if the component uses no hooks, event handlers, or browser APIs.
 
 > **Important**: Only remove if no consumer passes event handler props (onClick, etc.) that require client hydration. Verify each by checking all import sites.
+>
+> **Result (2026-04-04)**: Badge and Card already lacked `"use client"`. Removed from `separator.tsx` and `label.tsx`. `make check` passed, `make build` succeeded.
 
 ### Success Criteria
 
 #### Automated Verification:
-- [ ] `make check` passes (lint + typecheck)
-- [ ] `make build` succeeds
+- [x] `make check` passes (lint + typecheck)
+- [x] `make build` succeeds
 
 #### Manual Verification:
 - [ ] Audit report written with findings per rule

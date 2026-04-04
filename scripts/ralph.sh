@@ -298,6 +298,12 @@ setup_worktree() {
     log "Created worktree: $WORKTREE_DIR on $BRANCH_NAME"
   fi
 
+  # Copy .env from main worktree (secrets aren't committed)
+  if [[ -f "$REPO_ROOT/.env" ]]; then
+    cp "$REPO_ROOT/.env" "$WORKTREE_DIR/.env"
+    log "Copied .env to worktree"
+  fi
+
   # Ensure dependencies are installed
   if [[ ! -d "$WORKTREE_DIR/node_modules" ]]; then
     log "Installing dependencies in worktree..."

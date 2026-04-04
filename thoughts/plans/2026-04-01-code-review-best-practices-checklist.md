@@ -185,11 +185,29 @@ Audit the codebase against the 12 Next.js-specific rules covering security, wate
 > **Inline object argument check**: Neither cached function accepts arguments, so there is no risk of inline object references producing cache misses. No changes required.
 
 #### 2.6 Use after() for Non-Blocking Operations
-- [ ] Identify logging, analytics, or side effects in API routes that could use `after()`
-- [ ] **Files to check**:
+- [x] Identify logging, analytics, or side effects in API routes that could use `after()`
+- [x] **Files to check**:
   - `src/app/api/trpc/[trpc]/route.ts` — `onError` handler logs in dev
   - `src/server/api/trpc.ts` — `timingMiddleware` logs execution time
-- [ ] **Expected finding**: `console.log` in timing middleware could use `after()`. Low priority.
+- [x] **Expected finding**: `console.log` in timing middleware could use `after()`. Low priority.
+
+> **Audit findings (2026-04-04):** ✅ Compliant (N/A) — Neither logging site is a meaningful candidate for `after()`.
+>
+> **`src/app/api/trpc/[trpc]/route.ts` — `onError` handler (lines 20-27)**:
+> - Dev-only `console.error` executed synchronously as a callback within `fetchRequestHandler`.
+> - Not in the Next.js route handler scope where `after()` can be called; it runs inside the tRPC adapter's error path.
+> - Trivial cost — no network I/O, no database writes, no latency impact.
+> - **Assessment**: ✅ No benefit from `after()`.
+>
+> **`src/server/api/trpc.ts` — `timingMiddleware` `console.log` (line 46)**:
+> - Runs after `await next()` returns inside tRPC middleware. It is already non-blocking from the HTTP response perspective — tRPC streams the result, and the `console.log` is a microsecond-cost sync operation.
+> - `after()` cannot be used inside tRPC middleware; it requires a Next.js route handler or Server Action context.
+> - Even if accessible, deferring a `console.log` post-response would make the timing log meaningless (it would fire after the client already received the response).
+> - **Assessment**: ✅ No benefit from `after()`. Timing middleware log is appropriate as-is.
+>
+> **What would warrant `after()`**: Analytics HTTP calls (e.g., PostHog event tracking in a route handler), audit log DB writes, or cache invalidation webhooks triggered by a tRPC mutation response. None of these patterns exist yet.
+>
+> **Conclusion**: No changes required.
 
 #### 3.1 Avoid Barrel File Imports
 - [ ] Audit all barrel files and their consumers

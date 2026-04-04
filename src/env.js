@@ -1,6 +1,12 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+console.log(`VERCEL_URL => ${process.env.VERCEL_URL}`);
+console.log(`VERCEL_BRANCH_URL => ${process.env.VERCEL_BRANCH_URL}`);
+console.log(
+  `VERCEL_PROJECT_PRODUCTION_URL => ${process.env.VERCEL_PROJECT_PRODUCTION_URL}`,
+);
+
 export const env = createEnv({
   /**
    * Specify your server-side environment variables schema here. This way you can ensure the app

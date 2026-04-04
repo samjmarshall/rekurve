@@ -8450,6 +8450,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"portless@npm:^0.9.4":
+  version: 0.9.4
+  resolution: "portless@npm:0.9.4"
+  bin:
+    portless: dist/cli.js
+  checksum: 45af8fc757b758b7cec0419c14787de8b4216d49623c86dded161dd1d740832735b30bdc7694278466370b5d55d5c6ce2a94b573436179b78234a4d4960bcc6f
+  conditions: (os=darwin | os=linux | os=win32)
+  languageName: node
+  linkType: hard
+
 "possible-typed-array-names@npm:^1.0.0":
   version: 1.1.0
   resolution: "possible-typed-array-names@npm:1.1.0"
@@ -10736,6 +10746,7 @@ shadcn@latest:
     next: 16.2.1
     next-themes: 0.4.6
     pako: ^2.1.0
+    portless: ^0.9.4
     postcss: ^8.5.3
     postgres: ^3.4.8
     posthog-js: 1.298.0

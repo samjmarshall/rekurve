@@ -657,14 +657,26 @@ Audit component architecture against 9 composition rules covering boolean props,
 > - **Assessment**: ✅ Compliant — `visible` is animation state, not a variant flag.
 
 ##### 1.2 Use Compound Components
-- [ ] Review existing compound component patterns
-- [ ] **Already using compound pattern**:
+- [x] Review existing compound component patterns
+- [x] **Already using compound pattern**:
   - `Card` (Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter)
   - `Accordion` (Accordion, AccordionItem, AccordionTrigger, AccordionContent)
   - `Select` (Select, SelectTrigger, SelectValue, SelectContent, SelectItem, etc.)
   - `InputOTP` (InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator)
-- [ ] **Potential candidates for compound pattern**: None currently — components are appropriately simple for current scope
-- [ ] Note: Card uses structural composition (no shared context) which is appropriate for its use case
+- [x] **Potential candidates for compound pattern**: None currently — components are appropriately simple for current scope
+- [x] Note: Card uses structural composition (no shared context) which is appropriate for its use case
+
+> **Audit findings (2026-04-04):** ✅ All compliant — compound component pattern applied where appropriate.
+>
+> **`src/components/ui/Card.tsx`**: Exports Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter as separate named exports. Uses `forwardRef` wrappers with `displayName` for each sub-component. No shared context — structural composition only. ✅ Appropriate: Card sub-components are pure layout wrappers with no shared state.
+>
+> **`src/components/ui/Accordion.tsx`**: Exports Accordion, AccordionItem, AccordionTrigger, AccordionContent. Wraps Base UI's Accordion primitives which handle context internally. ✅
+>
+> **`src/components/ui/select.tsx`**: Exports Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectScrollDownButton, SelectScrollUpButton, SelectSeparator, SelectTrigger, SelectValue. Wraps Base UI's Select primitives. ✅
+>
+> **`src/components/ui/input-otp.tsx`**: Exports InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot. ✅
+>
+> **Candidates for refactoring**: None. Remaining custom components (Compare, SparklesCore, Timeline) are self-contained with no sub-component API needed — compound pattern would be over-engineering for their scope.
 
 #### Category 2: State Management (MEDIUM)
 

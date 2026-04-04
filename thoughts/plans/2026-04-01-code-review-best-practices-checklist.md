@@ -426,13 +426,33 @@ Audit the codebase against 57 React performance rules across 8 categories, from 
 > **2.5 Preload on intent** — Site is a single-page marketing layout with anchor navigation (`#booking-form`, etc.). No page navigations to preload. ✅ N/A.
 
 #### Category 3: Server-Side Performance (HIGH)
-- [ ] **3.1 Auth in server actions**: N/A — no server actions
-- [ ] **3.2 Duplicate serialization**: Cross-reference Phase 1 finding
-- [ ] **3.3 LRU caching**: Check for expensive repeated computations across requests
-- [ ] **3.4 Minimize serialization**: Cross-reference Phase 1 finding
-- [ ] **3.5 Parallel data fetching**: Cross-reference Phase 1 finding
-- [ ] **3.6 React.cache()**: Cross-reference Phase 1 finding
-- [ ] **3.7 after()**: Cross-reference Phase 1 finding
+- [x] **3.1 Auth in server actions**: N/A — no server actions
+- [x] **3.2 Duplicate serialization**: Cross-reference Phase 1 finding
+- [x] **3.3 LRU caching**: Check for expensive repeated computations across requests
+- [x] **3.4 Minimize serialization**: Cross-reference Phase 1 finding
+- [x] **3.5 Parallel data fetching**: Cross-reference Phase 1 finding
+- [x] **3.6 React.cache()**: Cross-reference Phase 1 finding
+- [x] **3.7 after()**: Cross-reference Phase 1 finding
+
+> **Audit findings (2026-04-04):** ✅ All compliant — no server-side performance issues found.
+>
+> **3.1 Auth in server actions** — Cross-reference Phase 1 §2.1: No `"use server"` directives exist. Auth is handled by `protectedProcedure` in tRPC. ✅ N/A.
+>
+> **3.2 Duplicate serialization** — Cross-reference Phase 1 §2.2: Application layout passes only `{ name, email }` extracted from `session.user` to `AppSidebar`. No object is serialized twice across RSC boundaries. Website sections receive no props. ✅ Compliant.
+>
+> **3.3 LRU caching** — Checked all server-side code for expensive repeated per-request computations:
+> - `src/server/hubspot/properties.ts`: `REVERSE_MAP` is a module-level constant, computed once at module load time. Not a per-request cost.
+> - `src/server/api/routers/leads.ts` — `getByStage`: Loads all leads from DB and runs 4 in-memory `.filter()` calls. The filters are O(n) but trivially cheap. Data is user-specific and mutable — cross-request caching would require invalidation infrastructure that doesn't exist and isn't warranted at this scale.
+> - No CPU-intensive transforms, no repeated config/schema parsing, no external API responses that would benefit from a cache layer.
+> - **Assessment**: ✅ N/A — no LRU cache candidates found.
+>
+> **3.4 Minimize serialization** — Cross-reference Phase 1 §2.3: Only necessary fields are passed at RSC → client boundaries. `{ name, email }` for `AppSidebar`, no props for website sections. ✅ Compliant.
+>
+> **3.5 Parallel data fetching** — Cross-reference Phase 1 §2.4: No opportunities missed. `leads.list` already uses `Promise.all()`. No sibling server components fetching independent data sources in sequence. ✅ Compliant.
+>
+> **3.6 React.cache()** — Cross-reference Phase 1 §2.5: Both usages are correct. `getSession` (zero-arg, wraps `auth.api.getSession`) and `getQueryClient` (zero-arg, wraps `makeQueryClient`) — no inline object arguments that could cause cache misses. ✅ Compliant.
+>
+> **3.7 after()** — Cross-reference Phase 1 §2.6: No `after()` candidates found. The two logging sites (`onError` callback in tRPC adapter, `timingMiddleware` `console.log`) are not accessible from Next.js route handler scope and are trivial-cost sync operations. ✅ N/A.
 
 #### Category 4: Client-Side Data Fetching (MEDIUM-HIGH)
 - [ ] **4.1 Event listener deduplication**: Audit global event listeners

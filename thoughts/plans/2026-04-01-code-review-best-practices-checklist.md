@@ -564,10 +564,28 @@ Audit the codebase against 57 React performance rules across 8 categories, from 
 > **Conclusion**: One fix applied (`console.log` gated behind `isDev`). Codebase is otherwise clean for JS performance.
 
 #### Category 8: Advanced Patterns (LOW)
-- [ ] **8.1 Init once**: Check for initialization in effects that should be module-level
+- [x] **8.1 Init once**: Check for initialization in effects that should be module-level
   - **Files**: `src/providers/AnalyticsProvider.tsx` — initializes in `useEffect`
-- [ ] **8.2 Event handler refs**: Check for handlers recreated causing effect re-runs
-- [ ] **8.3 useEffectEvent**: Note as future consideration (React 19 experimental)
+- [x] **8.2 Event handler refs**: Check for handlers recreated causing effect re-runs
+- [x] **8.3 useEffectEvent**: Note as future consideration (React 19 experimental)
+
+> **Audit findings (2026-04-04):** ✅ Compliant — No advanced pattern issues found.
+>
+> **8.1 Init once — `src/providers/AnalyticsProvider.tsx`**:
+> - `analytics.session.initialize()` is called inside `useEffect([], [])`. The `initialize()` function reads `window.innerWidth`, `window.location.search`, and checks `posthog.__loaded` — all runtime-only values that are unavailable during SSR.
+> - Moving this call to module level would execute it during SSR (where `window` is undefined) and before PostHog has loaded (async). The `useEffect` is the correct location.
+> - The function also has an internal `if (!isPostHogReady()) return;` guard — if called at module level, this guard would always bail out since PostHog loads asynchronously after module evaluation.
+> - **Assessment**: ✅ Compliant — `useEffect` with empty deps is the correct pattern here. Not a candidate for module-level initialization.
+>
+> **8.2 Event handler refs — `glowing-effect.tsx` and `compare.tsx`**:
+> - `glowing-effect.tsx`: `handleMove` is memoized via `useCallback([inactiveZone, proximity, movementDuration])`. The `useEffect` depends on `[handleMove, disabled]`. Inline wrappers `handleScroll` and `handlePointerMove` inside the effect do not appear in the dependency array (they're local), so no extra re-runs occur.
+> - `compare.tsx`: `startAutoplay` and `stopAutoplay` are memoized via `useCallback`. The autoplay `useEffect` correctly lists `[startAutoplay, stopAutoplay]` as deps. Plain JSX event handlers `mouseEnterHandler` and `mouseLeaveHandler` are recreated each render but are used only as JSX props, not as `useEffect` deps — recreation has no performance impact on effects.
+> - **Assessment**: ✅ Compliant — handlers that appear in effect dependency arrays are properly stabilized with `useCallback`. No stale-closure or unnecessary re-run issues.
+>
+> **8.3 useEffectEvent — Future consideration**:
+> - `useEffectEvent` (experimental, React 19) would allow reading current props/state inside effects without listing them as dependencies — effectively giving event-handler semantics (always-fresh values, not reactive) to functions used inside `useEffect`.
+> - The primary candidate would be `glowing-effect.tsx`: `handleMove` currently needs `useCallback([inactiveZone, proximity, movementDuration])` to stabilize it for the effect dep array. With `useEffectEvent`, it could read these props directly without `useCallback` or deps, simplifying the code.
+> - **Assessment**: Future consideration — revisit when `useEffectEvent` is stabilized in React. No action needed now.
 
 ### Changes Required
 

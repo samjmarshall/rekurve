@@ -64,6 +64,11 @@ yarn-error.log*
 # skills (installed per-machine via npx skills)
 /.agents/
 
+# Ralph loop runtime
+/.worktrees/
+/.ralph/
+*.spec.json
+
 # claude local settings (machine-specific)
 .claude/settings.local.json
 .claude/skills.log

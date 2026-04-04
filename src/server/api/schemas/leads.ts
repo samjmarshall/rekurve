@@ -40,8 +40,14 @@ export const preferredContactTimeSchema = z.enum([
 // Full form create schema — only firstName/lastName required
 export const leadCreateSchema = z.object({
   // Contact — required
-  firstName: z.string().min(1).max(100),
-  lastName: z.string().min(1).max(100),
+  firstName: z
+    .string({ error: "First name is required" })
+    .min(1, "First name is required")
+    .max(100),
+  lastName: z
+    .string({ error: "Last name is required" })
+    .min(1, "Last name is required")
+    .max(100),
   // Contact — optional
   email: z.string().email().max(255).nullish(),
   phone: z.string().max(20).nullish(),
@@ -71,9 +77,18 @@ export const leadCreateSchema = z.object({
 
 // Quick capture — name + phone required
 export const leadQuickCaptureSchema = z.object({
-  firstName: z.string().min(1).max(100),
-  lastName: z.string().min(1).max(100),
-  phone: z.string().min(1).max(20),
+  firstName: z
+    .string({ error: "First name is required" })
+    .min(1, "First name is required")
+    .max(100),
+  lastName: z
+    .string({ error: "Last name is required" })
+    .min(1, "Last name is required")
+    .max(100),
+  phone: z
+    .string({ error: "Phone number is required" })
+    .min(1, "Phone number is required")
+    .max(20),
   notes: z.string().max(5000).nullish(),
   leadSource: leadSourceSchema.nullish(),
 });

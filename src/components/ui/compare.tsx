@@ -2,10 +2,18 @@
 
 import { GripVertical } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { SparklesCore } from "~/components/ui/sparkles";
 import { cn } from "~/lib/utils";
+
+const SparklesCore = dynamic(
+  () =>
+    import("~/components/ui/sparkles").then((m) => ({
+      default: m.SparklesCore,
+    })),
+  { ssr: false },
+);
 
 interface CompareProps {
   firstImage?: string;

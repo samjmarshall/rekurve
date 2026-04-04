@@ -393,19 +393,37 @@ Audit the codebase against 57 React performance rules across 8 categories, from 
 > - **Assessment**: ✅ Cross-reference complete.
 
 #### Category 2: Bundle Size Optimization (CRITICAL)
-- [ ] **2.1 Barrel imports**: Already covered in Phase 1 — cross-reference
-- [ ] **2.2 Conditional module loading**: Check for feature-gated heavy imports
-- [ ] **2.3 Defer third-party libraries**: Audit PostHog, tsparticles, framer-motion loading
+- [x] **2.1 Barrel imports**: Already covered in Phase 1 — cross-reference
+- [x] **2.2 Conditional module loading**: Check for feature-gated heavy imports
+- [x] **2.3 Defer third-party libraries**: Audit PostHog, tsparticles, framer-motion loading
   - **Files**: `src/providers/AnalyticsProvider.tsx`, `src/components/ui/sparkles.tsx`
   - PostHog loads eagerly in provider — should it defer until after hydration?
   - tsparticles uses lazy init pattern (✅ already deferred)
-- [ ] **2.4 Dynamic imports**: Check for heavy components that should use `next/dynamic`
+- [x] **2.4 Dynamic imports**: Check for heavy components that should use `next/dynamic`
   - **Candidates**:
     - `src/components/ui/sparkles.tsx` — loads @tsparticles engine (~50KB+)
     - `src/components/ui/compare.tsx` — complex interactive component
     - `src/app/(website)/_components/sections/BookingForm.tsx` — loads react-hook-form + zod
-  - [ ] Implement `next/dynamic` for tsparticles/sparkles component
-- [ ] **2.5 Preload on intent**: Check navigation patterns for preload opportunities
+  - [x] Implement `next/dynamic` for tsparticles/sparkles component
+- [x] **2.5 Preload on intent**: Check navigation patterns for preload opportunities
+
+> **Audit findings (2026-04-04):** ❌ One fix applied. Remainder ✅ compliant.
+>
+> **2.1 Barrel imports** — Cross-reference Phase 1 §3.1: No problematic barrel imports. ✅
+>
+> **2.2 Conditional module loading** — No feature-gated heavy imports found. PostHog is protected by `isPostHogReady()` guards at call sites. ✅
+>
+> **2.3 Defer third-party libraries**:
+> - **PostHog** (`src/providers/AnalyticsProvider.tsx`): `analytics.session.initialize()` is called inside `useEffect` — deferred until after hydration. `posthog-js` is imported at module level, but this is by design (PostHog itself buffers events before initialization). `isPostHogReady()` guards all tracking calls. **Assessment**: ✅ Already appropriately deferred.
+> - **tsparticles** (`src/components/ui/sparkles.tsx`): `initParticlesEngine` is called inside `useEffect` — the engine itself is deferred. However, the packages (`@tsparticles/react`, `@tsparticles/slim`) are statically imported, adding to the initial bundle. Fixed via 2.4. **Assessment**: ✅ After fix.
+> - **framer-motion**: Used throughout as a core animation library. Acceptable — not a candidate for deferral.
+>
+> **2.4 Dynamic imports** ❌ Fixed:
+> - `SparklesCore` was statically imported in `compare.tsx`, pulling `@tsparticles/react` and `@tsparticles/slim` (~50KB+) into the initial bundle even before the particle engine was used.
+> - **Fix applied**: Replaced static import in `compare.tsx` with `next/dynamic` using `ssr: false`. The tsparticles packages now load as a separate chunk, deferred until the Compare component is rendered.
+> - `BookingForm.tsx` and `compare.tsx` themselves: `react-hook-form` and `zod` are reasonable client-bundle inclusions for a form. `compare.tsx` without tsparticles is lightweight. No further dynamic imports warranted.
+>
+> **2.5 Preload on intent** — Site is a single-page marketing layout with anchor navigation (`#booking-form`, etc.). No page navigations to preload. ✅ N/A.
 
 #### Category 3: Server-Side Performance (HIGH)
 - [ ] **3.1 Auth in server actions**: N/A — no server actions

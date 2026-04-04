@@ -12,10 +12,12 @@ Build `scripts/ralph.sh` and two Claude prompts (`ralph-implement.md`, `ralph-va
 - `.claude/prompts/` does not exist — needs to be created
 - `.worktrees/` and `.ralph/` are not in `.gitignore`
 - `package.json` name is `www` — Portless URLs will be `https://www.localhost` (main worktree) or `https://<branch>.www.localhost` (linked worktree)
-- Dev command is `next dev --turbo` — no Portless integration yet
+- Dev command is `next dev --turbo` — needs Portless integration via `portless run`
+- `portless` is already in devDependencies (`^0.9.4`) — no global install needed
 - Neon CLI is used for database branching (referenced in `.github/workflows/neon.yml`, `.env.example`)
 - Existing skills (`/implement_plan`, `/validate_plan`, `/commit`) provide behavioral lineage for the prompts
 - Claude CLI supports all required flags: `--max-turns`, `--append-system-prompt-file`, `--output-format json`, `--max-budget-usd`, `--model`, `--allowedTools`
+- Claude Code `claude -p` uses Max subscription billing when authenticated via `claude auth login` and no `ANTHROPIC_API_KEY` is set (auth precedence: API key > OAuth). The `--max-budget-usd` flag is only meaningful with API key billing.
 
 ### Key Discoveries:
 - `/implement_plan` (.claude/commands/implement_plan.md) reads files fully, implements phase-by-phase, marks `- [x]`, stops with structured notes on mismatch
@@ -31,6 +33,7 @@ All files below exist, `make check` passes, and `ralph.sh --help` prints usage:
 scripts/ralph.sh                          # Main loop (executable)
 .claude/prompts/ralph-implement.md        # Implement system prompt
 .claude/prompts/ralph-validate.md         # Validate system prompt
+.claude/prompts/ralph-describe-pr.md      # PR description system prompt
 .ralph/                                   # Runtime dir (gitignored, created at runtime)
   metrics/                                # JSONL logs (created at runtime)
 ```
@@ -46,7 +49,8 @@ And the script will:
 3. Run `claude -p` with the implement prompt, then validate prompt
 4. Record metrics, commit on success, stop on failure
 5. Loop until all sections are complete or a failure occurs
-6. Tear down the environment
+6. Push branch, create a GitHub PR with a generated description for human review
+7. Tear down the environment
 
 ## What We're NOT Doing
 
@@ -57,7 +61,7 @@ And the script will:
 - Automatic retry on failure
 - Dashboard or UI for metrics
 - CI integration
-- Installing Portless as a project dependency (assumed pre-installed globally)
+- Portless global install — it's a devDependency, accessed via `yarn dev`
 
 ## Implementation Approach
 
@@ -84,7 +88,18 @@ Create directory structure, update `.gitignore`, and build the CLI argument pars
 
 Add after the existing `/.agents/` block (line 66).
 
-#### 2. Create `scripts/ralph.sh`
+#### 2. Integrate Portless into `package.json` dev script
+**File**: `package.json`
+**Changes**: Wrap the dev command with `portless run` so `yarn dev` automatically uses a stable `.localhost` URL with HTTPS.
+
+```diff
+- "dev": "next dev --turbo"
++ "dev": "portless run next dev --turbo"
+```
+
+Since `portless` is already in devDependencies, `yarn dev` resolves the binary from `node_modules/.bin` — no global install needed. The `portless run` form infers the app name from the directory name (`www` → `https://www.localhost`). In a git worktree on branch `fix-ui`, it automatically produces `https://fix-ui.www.localhost`.
+
+#### 3. Create `scripts/ralph.sh`
 **File**: `scripts/ralph.sh` (new)
 **Changes**: Executable shell script with argument parsing, defaults, help text, and utility functions.
 
@@ -93,14 +108,16 @@ Add after the existing `/.agents/` block (line 66).
 set -euo pipefail
 
 # ── Defaults ──────────────────────────────────────────────
+BILLING="max"           # "max" (subscription) or "api" (API key, metered)
 MAX_TURNS=15
-MAX_BUDGET="5.00"
+MAX_BUDGET="5.00"       # Only enforced in api mode
 MODEL="opus"
 IMPLEMENT_PROMPT=".claude/prompts/ralph-implement.md"
 VALIDATE_PROMPT=".claude/prompts/ralph-validate.md"
 GRANULARITY="section"   # "section" or "checkbox"
 NO_PORTLESS=false
 NO_NEON=false
+NO_PR=false
 DRY_RUN=false
 
 # ── Usage ─────────────────────────────────────────────────
@@ -111,14 +128,16 @@ Usage: scripts/ralph.sh <plan-path> [options]
 Drive Claude Code through an implementation plan one section at a time.
 
 Options:
+  --billing MODE           "max" (subscription, default) or "api" (API key, metered)
   --max-turns N            Max Claude agent turns per session (default: 15)
-  --max-budget USD         Max USD per session (default: 5.00)
+  --max-budget USD         Max USD per session, api mode only (default: 5.00)
   --model MODEL            Claude model: opus, sonnet, haiku (default: opus)
   --implement-prompt PATH  Override implement prompt (default: .claude/prompts/ralph-implement.md)
   --validate-prompt PATH   Override validate prompt (default: .claude/prompts/ralph-validate.md)
   --granularity MODE       "section" or "checkbox" (default: section)
   --no-portless            Skip Portless dev server
   --no-neon                Skip Neon branch even if migrations detected
+  --no-pr                  Skip PR creation after loop completes
   --dry-run                Parse plan and print sections without running Claude
   -h, --help               Show this help
 
@@ -138,6 +157,7 @@ PLAN_PATH=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --billing)       BILLING="$2"; shift 2 ;;
     --max-turns)     MAX_TURNS="$2"; shift 2 ;;
     --max-budget)    MAX_BUDGET="$2"; shift 2 ;;
     --model)         MODEL="$2"; shift 2 ;;
@@ -146,6 +166,7 @@ while [[ $# -gt 0 ]]; do
     --granularity)   GRANULARITY="$2"; shift 2 ;;
     --no-portless)   NO_PORTLESS=true; shift ;;
     --no-neon)       NO_NEON=true; shift ;;
+    --no-pr)         NO_PR=true; shift ;;
     --dry-run)       DRY_RUN=true; shift ;;
     -h|--help)       usage ;;
     -*)              echo "Unknown option: $1" >&2; exit 1 ;;
@@ -190,25 +211,59 @@ log "Slug: $PLAN_SLUG"
 log "Worktree: $WORKTREE_DIR"
 log "Branch: $BRANCH_NAME"
 log "Metrics: $METRICS_FILE"
-log "Model: $MODEL | Max turns: $MAX_TURNS | Max budget: \$$MAX_BUDGET"
+log "Billing: $BILLING | Model: $MODEL | Max turns: $MAX_TURNS"
+if [[ "$BILLING" == "api" ]]; then
+  log "Max budget: \$$MAX_BUDGET per session"
+fi
+
+# ── Auth Verification ────────────────────────────────────
+verify_auth() {
+  if [[ "$BILLING" == "max" ]]; then
+    if [[ -n "${ANTHROPIC_API_KEY:-}" ]]; then
+      err "ANTHROPIC_API_KEY is set — claude -p will use API billing, not your Max plan"
+      err "Either unset it:  unset ANTHROPIC_API_KEY"
+      err "Or use API mode:  --billing api"
+      exit 1
+    fi
+    if ! claude auth status 2>&1 | grep -q "Logged in"; then
+      err "No active Max subscription session"
+      err "Run: claude auth login"
+      exit 1
+    fi
+    log "Auth: Max subscription (OAuth)"
+  else
+    if [[ -z "${ANTHROPIC_API_KEY:-}" ]]; then
+      err "API mode requires ANTHROPIC_API_KEY to be set"
+      exit 1
+    fi
+    log "Auth: API key"
+  fi
+}
+
+verify_auth
 ```
 
 Mark the file executable after creation.
 
-#### 3. Create `.claude/prompts/` directory
+#### 4. Create `.claude/prompts/` directory
 **Action**: The directory is created implicitly when writing the prompt files in Phase 2. No standalone step needed — git tracks files, not empty directories.
 
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `scripts/ralph.sh --help` prints usage and exits 0
-- [ ] `scripts/ralph.sh` (no args) exits 1 with error message
-- [ ] `scripts/ralph.sh nonexistent.md` exits 1 with "plan not found"
-- [ ] `make check` passes (no lint/type issues from new files)
-- [ ] `.gitignore` contains `/.worktrees/` and `/.ralph/`
+- [x] `scripts/ralph.sh --help` prints usage and exits 0
+- [x] `scripts/ralph.sh` (no args) exits 1 with error message
+- [x] `scripts/ralph.sh nonexistent.md` exits 1 with "plan not found"
+- [x] `make check` passes (no lint/type issues from new files)
+- [x] `.gitignore` contains `/.worktrees/` and `/.ralph/`
+- [x] `package.json` dev script is `portless run next dev --turbo`
+- [x] `ANTHROPIC_API_KEY=fake scripts/ralph.sh plan.md` exits 1 with credential mismatch error (max mode rejects API key)
+- [x] `scripts/ralph.sh plan.md --billing api` without `ANTHROPIC_API_KEY` exits 1 with missing key error
 
 #### Manual Verification:
-- [ ] Script is executable (`ls -la scripts/ralph.sh` shows `+x`)
+- [x] Script is executable (`ls -la scripts/ralph.sh` shows `+x`)
+- [x] `yarn dev` starts the dev server via Portless with a `.localhost` URL
+- [x] `--help` output documents `--billing` flag and notes `--max-budget` is api-mode only
 
 ---
 
@@ -386,14 +441,14 @@ You have access to: Read, Edit, Grep, Glob, and restricted Bash commands includi
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `.claude/prompts/ralph-implement.md` exists and is non-empty
-- [ ] `.claude/prompts/ralph-validate.md` exists and is non-empty
-- [ ] `make check` passes
+- [x] `.claude/prompts/ralph-implement.md` exists and is non-empty
+- [x] `.claude/prompts/ralph-validate.md` exists and is non-empty
+- [x] `make check` passes
 
 #### Manual Verification:
-- [ ] Implement prompt covers: read plan, read files fully, implement section, run checks, mark `[/]`, write progress notes on failure
-- [ ] Validate prompt covers: read plan, git diff, run checks, think critically, mark `[x]`, atomic commit with conventional format and `[ralph]` tag, revert markers on failure
-- [ ] Commit message example includes `[ralph]` tag and plan reference
+- [x] Implement prompt covers: read plan, read files fully, implement section, run checks, mark `[/]`, write progress notes on failure
+- [x] Validate prompt covers: read plan, git diff, run checks, think critically, mark `[x]`, atomic commit with conventional format and `[ralph]` tag, revert markers on failure
+- [x] Commit message example includes `[ralph]` tag and plan reference
 
 ---
 
@@ -564,17 +619,11 @@ setup_portless() {
     return 0
   fi
 
-  if ! command -v portless &>/dev/null; then
-    err "Portless not installed. Install with: npm install -g portless"
-    err "Or skip with --no-portless"
-    exit 1
-  fi
-
-  log "Starting Portless dev server in worktree..."
-  (cd "$WORKTREE_DIR" && portless run next dev &)
+  log "Starting dev server via yarn dev (Portless) in worktree..."
+  (cd "$WORKTREE_DIR" && yarn dev &)
   PORTLESS_PID=$!
 
-  # Wait for server to be ready (check for PORTLESS_URL or port)
+  # Wait for server to be ready
   local retries=30
   while [[ $retries -gt 0 ]]; do
     if curl -sf "https://www.localhost" &>/dev/null; then
@@ -585,11 +634,11 @@ setup_portless() {
   done
 
   if [[ $retries -eq 0 ]]; then
-    err "Portless dev server failed to start"
+    err "Dev server failed to start"
     exit 1
   fi
 
-  log "Portless ready (PID: $PORTLESS_PID)"
+  log "Dev server ready (PID: $PORTLESS_PID)"
 }
 
 needs_neon() {
@@ -684,15 +733,15 @@ fi
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `scripts/ralph.sh thoughts/plans/2026-04-01-code-review-best-practices-checklist.md --dry-run` parses sections and prints their IDs/titles
-- [ ] `scripts/ralph.sh thoughts/plans/2026-04-01-code-review-best-practices-checklist.md --dry-run` identifies the first incomplete section
-- [ ] A plan with all `- [x]` markers reports "All sections complete"
-- [ ] `make check` passes
+- [x] `scripts/ralph.sh thoughts/plans/2026-04-01-code-review-best-practices-checklist.md --dry-run` parses sections and prints their IDs/titles
+- [x] `scripts/ralph.sh thoughts/plans/2026-04-01-code-review-best-practices-checklist.md --dry-run` identifies the first incomplete section
+- [x] A plan with all `- [x]` markers reports "All sections complete"
+- [x] `make check` passes
 
 #### Manual Verification:
-- [ ] Section parser correctly handles `#### N.M Title` format
-- [ ] Parser distinguishes `- [ ]` (implement), `- [/]` (validate), and `- [x]` (complete)
-- [ ] Parser stops at phase boundaries (`##`/`###` headers) and doesn't leak across phases
+- [x] Section parser correctly handles `#### N.M Title` format
+- [x] Parser distinguishes `- [ ]` (implement), `- [/]` (validate), and `- [x]` (complete)
+- [x] Parser stops at phase boundaries (`##`/`###` headers) and doesn't leak across phases
 
 ---
 
@@ -732,13 +781,25 @@ run_claude() {
   local start_time
   start_time=$(date +%s%3N)
 
+  local budget_flags=""
+  if [[ "$BILLING" == "api" ]]; then
+    budget_flags="--max-budget-usd $MAX_BUDGET"
+  fi
+
+  # In max mode, strip ANTHROPIC_API_KEY from subprocess to prevent
+  # accidental API billing (belt-and-suspenders — verify_auth already checked)
+  local env_prefix=""
+  if [[ "$BILLING" == "max" ]]; then
+    env_prefix="env -u ANTHROPIC_API_KEY"
+  fi
+
   local output exit_code=0
-  output=$(cd "$WORKTREE_DIR" && claude -p \
+  output=$(cd "$WORKTREE_DIR" && $env_prefix claude -p \
     "$prompt_text" \
     --append-system-prompt-file "$prompt_file" \
     --output-format json \
     --max-turns "$MAX_TURNS" \
-    --max-budget-usd "$MAX_BUDGET" \
+    $budget_flags \
     --model "$MODEL" \
     --allowedTools "$tools" \
     --permission-mode "bypassPermissions" \
@@ -759,6 +820,8 @@ run_claude() {
 
 **Note on `--permission-mode bypassPermissions`**: The script runs in a disposable worktree. All changes are reviewed before merge. This avoids permission prompts that would block headless execution. The `--allowedTools` list constrains what Claude can actually do.
 
+**Note on billing modes**: In `max` mode, `--max-budget-usd` is omitted because Max subscription uses a quota-based rolling window, not per-token metering — the flag has no meaningful target. `--max-turns` is the sole runaway prevention. In `api` mode, both `--max-turns` and `--max-budget-usd` are active. The `env -u ANTHROPIC_API_KEY` in max mode is a safety net — even if the variable appears in the environment after `verify_auth` ran (e.g., sourced by a subprocess), it won't reach the Claude CLI.
+
 **Note on prompt file paths**: The prompt file paths are relative to the repository root. Since `claude -p` runs from within the worktree directory (which is a full copy of the repo), the paths `.claude/prompts/ralph-implement.md` resolve correctly within the worktree.
 
 #### 2. Success detection
@@ -772,8 +835,14 @@ check_success() {
   local output="$LAST_OUTPUT"
   local exit_code=$LAST_EXIT_CODE
 
-  # 1. Non-zero exit code = crash
+  # 1. Non-zero exit code = crash or quota exhaustion
   if [[ $exit_code -ne 0 ]]; then
+    # Check for Max plan quota exhaustion
+    if echo "$output" | grep -qiE 'rate.limit|quota|capacity|too many requests|429'; then
+      err "Max plan quota exhausted — wait for your rolling window to reset"
+      err "Re-run ralph when quota is available; it will resume from this section"
+      exit 1  # Hard exit — quota hit is environmental, not a section failure
+    fi
     err "Claude process exited with code $exit_code"
     return 1
   fi
@@ -855,6 +924,7 @@ record_metrics() {
     --arg section_title "$section_title" \
     --arg phase "$phase" \
     --arg subtype "$subtype" \
+    --arg billing "$BILLING" \
     --argjson cost "$total_cost" \
     --argjson input "$input_tokens" \
     --argjson output_tok "$output_tokens" \
@@ -872,6 +942,7 @@ record_metrics() {
       section_title: $section_title,
       phase: $phase,
       subtype: $subtype,
+      billing: $billing,
       total_cost_usd: $cost,
       input_tokens: $input,
       output_tokens: $output_tok,
@@ -884,7 +955,7 @@ record_metrics() {
       max_budget_configured: $max_budget
     }' >> "$METRICS_FILE"
 
-  log "Metrics: \$$total_cost | ${num_turns} turns | ${duration_ms}ms ($phase)"
+  log "Metrics: billing=$BILLING | ${num_turns} turns | ${duration_ms}ms ($phase)"
 }
 ```
 
@@ -949,9 +1020,11 @@ log "Ralph loop finished"
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `jq` can parse every line in a sample JSONL metrics file
-- [ ] `make check` passes
-- [ ] The script handles the case where Claude exits non-zero gracefully (logs error, doesn't crash)
+- [x] `jq` can parse every line in a sample JSONL metrics file
+- [x] JSONL records include `billing` field with value `"max"` or `"api"`
+- [x] `make check` passes
+- [x] The script handles the case where Claude exits non-zero gracefully (logs error, doesn't crash)
+- [x] Quota exhaustion (rate limit error) triggers hard exit with resume guidance, not a section failure
 
 #### Manual Verification:
 - [ ] Running ralph against a small plan (e.g., 1-2 sections) produces:
@@ -960,6 +1033,7 @@ log "Ralph loop finished"
   - Plan file with `[x]` markers for completed sections
 - [ ] Resume works: re-running ralph on a partially-complete plan skips `[x]` sections
 - [ ] Failure path works: if Claude fails, script stops with error and plan has progress notes
+- [ ] In max mode, `total_cost_usd` is `0` in metrics (subscription, not metered)
 
 ---
 
@@ -1036,30 +1110,262 @@ Add this after `setup_worktree` but before `sanity_gate`.
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `make check` passes
-- [ ] Sending SIGINT to the script triggers cleanup (Portless stop, summary print)
+- [x] `make check` passes
+- [x] Sending SIGINT to the script triggers cleanup (Portless stop, summary print)
 
 #### Manual Verification:
 - [ ] After a successful run, worktree and branch are preserved for review
 - [ ] After Ctrl+C, cleanup runs and Portless is stopped
 - [ ] Summary prints total cost and section count from metrics file
-- [ ] If plan wasn't committed, it's copied to the worktree before execution starts
+- [x] If plan wasn't committed, it's copied to the worktree before execution starts
+
+---
+
+## Phase 6: PR Creation for Human Review
+
+### Overview
+After the loop completes all sections, push the ralph branch to the remote, create a GitHub Pull Request, and invoke a Claude session to generate a rich PR description following the repository's PR template (`docs/pr_template.md`). This gives the human a review artifact with full context — motivation from the plan, a summary of every change, test results, and metrics. Skipped with `--no-pr`.
+
+### Changes Required:
+
+#### 1. Create `ralph-describe-pr.md`
+**File**: `.claude/prompts/ralph-describe-pr.md` (new)
+**Changes**: System prompt for the PR description phase. Adapted from `.claude/commands/describe_pr.md` for headless execution inside a Ralph session.
+
+```markdown
+# Ralph: Describe Pull Request
+
+You are generating a pull request description for work completed by the Ralph automated loop. The shell script that invoked you will tell you the PR number and the plan file path.
+
+## Your Task
+
+1. Read the PR template at `docs/pr_template.md`
+2. Read the plan file completely — understand the motivation, phases, and scope
+3. Run `gh pr diff {number}` to see the full diff
+4. Run `gh pr view {number} --json commits` to see all commits
+5. Analyze the changes thoroughly — understand what was built and why
+6. Run verification commands: `make check`, `make test`
+7. Generate the PR description following the template structure
+8. Save to `thoughts/prs/{number}_description.md`
+9. Update the PR: `gh pr edit {number} --body-file thoughts/prs/{number}_description.md`
+
+## Description Guidelines
+
+### Context/Motivation
+- Pull from the plan's Overview section — explain the *why*
+- Reference the plan file path for traceability
+
+### Description of Changes
+- Summarize each phase's changes concisely
+- Organize by component/area if the plan touched multiple parts
+- Call out any deviations from the plan (Ralph progress notes)
+
+### Testing Information
+- Run `make check` and `make test` and report results
+- Mark checkboxes based on actual results
+- Note any manual verification items from the plan that need human testing
+
+### Relevant Links
+- Link the plan file: `thoughts/plans/{plan-name}.md`
+- Link the metrics file if it exists
+- Add `[ralph]` tag to indicate automated generation
+
+## Rules
+
+### Do:
+- Read the full diff — don't summarize from commit messages alone
+- Be specific about what changed and why
+- Mark test checkboxes based on actual command results
+- Include a `[ralph]` tag in the description footer
+- Mention the model and section count in the description footer
+
+### Don't:
+- Fabricate test results — run the commands
+- Include the full diff in the description
+- Add co-author attribution
+- Skip reading the PR template
+```
+
+#### 2. PR creation functions
+**File**: `scripts/ralph.sh`
+**Changes**: Add functions after the `check_success` function to handle branch push, PR creation, and description generation.
+
+```bash
+# ── PR Creation ──────────────────────────────────────────
+
+DESCRIBE_PR_PROMPT=".claude/prompts/ralph-describe-pr.md"
+DESCRIBE_PR_TOOLS="Read,Grep,Glob,Bash(make\ *),Bash(gh\ *),Bash(git\ diff*),Bash(git\ log*),Bash(git\ status*),Bash(mkdir\ *),Write"
+
+push_and_create_pr() {
+  if $NO_PR; then
+    log "PR creation: skipped (--no-pr)"
+    return 0
+  fi
+
+  if ! command -v gh &>/dev/null; then
+    err "gh CLI not installed — skipping PR creation"
+    err "Install with: brew install gh"
+    log "Branch is ready for manual PR: $BRANCH_NAME"
+    return 0
+  fi
+
+  # Push branch to remote
+  log "Pushing branch to remote: $BRANCH_NAME"
+  (cd "$WORKTREE_DIR" && git push -u origin "$BRANCH_NAME")
+
+  # Create PR with placeholder body
+  log "Creating pull request..."
+  local pr_url
+  pr_url=$(cd "$WORKTREE_DIR" && gh pr create \
+    --title "$(pr_title)" \
+    --body "$(pr_placeholder_body)" \
+    --base main \
+    --head "$BRANCH_NAME" \
+    2>&1) || {
+    err "Failed to create PR: $pr_url"
+    log "Branch pushed — create PR manually"
+    return 0
+  }
+
+  log "PR created: $pr_url"
+
+  # Extract PR number from URL
+  local pr_number
+  pr_number=$(echo "$pr_url" | grep -oE '[0-9]+$')
+
+  # Run Claude to generate rich description
+  log "Generating PR description..."
+  local prompt_text="Describe PR #${pr_number} for plan $PLAN_PATH. The plan file is at $PLAN_PATH."
+
+  local budget_flags=""
+  if [[ "$BILLING" == "api" ]]; then
+    budget_flags="--max-budget-usd $MAX_BUDGET"
+  fi
+
+  local env_prefix=""
+  if [[ "$BILLING" == "max" ]]; then
+    env_prefix="env -u ANTHROPIC_API_KEY"
+  fi
+
+  (cd "$WORKTREE_DIR" && $env_prefix claude -p \
+    "$prompt_text" \
+    --append-system-prompt-file "$DESCRIBE_PR_PROMPT" \
+    --output-format json \
+    --max-turns "$MAX_TURNS" \
+    $budget_flags \
+    --model "$MODEL" \
+    --allowedTools "$DESCRIBE_PR_TOOLS" \
+    --permission-mode "bypassPermissions" \
+    2>&1) || {
+    err "PR description generation failed — PR exists with placeholder body"
+    log "Run /describe_pr manually to update the description"
+  }
+
+  log "PR ready for review: $pr_url"
+  PR_URL="$pr_url"
+}
+
+pr_title() {
+  # Generate a conventional commit-style PR title from the plan name
+  # e.g., "2026-04-01-dashboard-app-shell" → "feat: dashboard app shell [ralph]"
+  local title
+  title=$(echo "$PLAN_NAME" | sed -E 's/^[0-9]{4}-[0-9]{2}-[0-9]{2}-//' | tr '-' ' ')
+  echo "feat: $title [ralph]"
+}
+
+pr_placeholder_body() {
+  cat <<EOF
+## Context/Motivation
+Automated implementation of plan: \`$PLAN_PATH\`
+
+_Generating full description..._
+
+---
+\`[ralph]\` automated PR — description will be updated shortly.
+EOF
+}
+```
+
+#### 3. Wire into main loop
+**File**: `scripts/ralph.sh`
+**Changes**: After the "All sections complete!" log in the main loop, call `push_and_create_pr`.
+
+Update the main loop's completion path:
+
+```bash
+  result=$(find_next_section "$worktree_plan") || {
+    log "All sections complete!"
+    push_and_create_pr
+    break
+  }
+```
+
+Also initialize `PR_URL=""` in the variable declarations section (alongside `PORTLESS_PID=""` and `NEON_BRANCH=""`).
+
+#### 4. Update cleanup summary
+**File**: `scripts/ralph.sh`
+**Changes**: Update the `cleanup` function to include the PR URL if one was created.
+
+Add after the metrics summary in `cleanup()`:
+
+```bash
+  # Print PR link if created
+  if [[ -n "$PR_URL" ]]; then
+    log "PR: $PR_URL"
+  fi
+```
+
+And update the final guidance to be conditional — if a PR was created, don't print the manual merge instructions:
+
+```bash
+  if [[ -n "$PR_URL" ]]; then
+    log "Review and merge the PR: $PR_URL"
+  else
+    log "Worktree preserved at: $WORKTREE_DIR"
+    log "Branch: $BRANCH_NAME"
+    log "To merge: git merge $BRANCH_NAME"
+    log "To remove: git worktree remove $WORKTREE_DIR && git branch -d $BRANCH_NAME"
+  fi
+```
+
+### Success Criteria:
+
+#### Automated Verification:
+- [x] `.claude/prompts/ralph-describe-pr.md` exists and is non-empty
+- [x] `make check` passes
+- [x] `scripts/ralph.sh --help` documents the `--no-pr` flag
+- [x] `--no-pr` flag is parsed and prevents PR creation
+
+#### Manual Verification:
+- [ ] After a successful full run (without `--no-pr`), a PR is created on GitHub
+- [ ] PR has a placeholder body initially, then gets updated with a rich description
+- [ ] PR description follows the `docs/pr_template.md` structure
+- [ ] PR description includes plan reference, `[ralph]` tag, and test results
+- [ ] If `gh` is not installed, the script warns but doesn't fail
+- [ ] If PR creation fails (e.g., no remote), the script warns and continues to cleanup
+- [ ] The cleanup summary prints the PR URL
 
 ---
 
 ## Performance Considerations
 
 - Each Claude session is independent — no context sharing between implement and validate. This is by design (stateless, resumable) but means Claude re-reads the plan each time.
-- The `--max-turns` and `--max-budget-usd` flags prevent runaway sessions. Defaults (15 turns, $5.00) should handle most sections; tune down for simpler sections or up for complex ones.
+- **Max mode (default)**: `--max-turns` is the sole runaway prevention. No dollar-based budget cap — Max subscription uses a rolling 5-hour quota window shared across all Claude surfaces (web, interactive CLI, `claude -p`). If quota is exhausted, the script exits cleanly and resumes from the same section on re-run.
+- **API mode**: Both `--max-turns` and `--max-budget-usd` are active. Defaults (15 turns, $5.00) should handle most sections; tune down for simpler sections or up for complex ones.
 - Portless adds ~5-10 seconds of startup time. Plans that don't reference E2E tests skip it automatically.
 - JSONL metrics accumulate over time. Each line is ~500 bytes, so even 1000 sections would be <500KB.
+- PR description generation adds one extra Claude session after the loop completes. This is a one-time cost per run, not per section. Skip with `--no-pr` if not needed.
+- In max mode, `total_cost_usd` in metrics will be `0` since Max doesn't meter per-token cost. Token counts (`input_tokens`, `output_tokens`) are still recorded and useful for understanding session size.
 
 ## References
 
 - Design doc: `thoughts/designs/2026-04-01-ralph-loop.md`
 - Implement skill lineage: `.claude/commands/implement_plan.md`
 - Validate skill lineage: `.claude/commands/validate_plan.md`
+- Describe PR skill lineage: `.claude/commands/describe_pr.md`
+- PR template: `docs/pr_template.md`
 - Commit skill lineage: `.claude/skills/commit/SKILL.md`
 - Claude Code CLI reference: `code.claude.com/docs/en/cli-reference`
+- Claude Code authentication: `code.claude.com/docs/en/authentication`
 - Portless: `github.com/vercel-labs/portless`
 - Neon CLI: `neon.com/docs/guides/branching-neon-cli`

@@ -3,10 +3,10 @@ set -euo pipefail
 
 # ── Defaults ──────────────────────────────────────────────
 BILLING="max"            # "max" (subscription) or "api" (API key, metered)
-MAX_TURNS=15
+MAX_TURNS=30
 MAX_BUDGET="5.00"        # Only enforced in api mode
-IMPLEMENT_MODEL="sonnet" # End goal to run with haiku
-VALIDATE_MODEL="opus"    # End goal to use sonnet
+IMPLEMENT_MODEL="sonnet"
+VALIDATE_MODEL="opus"
 IMPLEMENT_PROMPT=".claude/prompts/ralph-implement.md"
 VALIDATE_PROMPT=".claude/prompts/ralph-validate.md"
 GRANULARITY="section"    # "section" or "checkbox"
@@ -25,7 +25,7 @@ Accepts a .md plan (auto-detects sibling .spec.json) or a .spec.json directly.
 
 Options:
   --billing MODE           "max" (subscription, default) or "api" (API key, metered)
-  --max-turns N            Max Claude agent turns per session (default: 15)
+  --max-turns N            Max Claude agent turns per session (default: 30)
   --max-budget USD         Max USD per session, api mode only (default: 5.00)
   --implement-model MODEL  Claude model for implement phase (default: haiku)
   --validate-model MODEL   Claude model for validate phase (default: sonnet)
@@ -251,10 +251,14 @@ cleanup() {
 
   # Print summary
   if [[ -f "$METRICS_FILE" ]]; then
-    local total_cost total_sections
-    total_cost=$(jq -s '[.[].total_cost_usd] | add // 0' "$METRICS_FILE")
+    local api_cost total_sections
+    api_cost=$(jq -s '[.[].api_equivalent_cost_usd] | add // 0' "$METRICS_FILE")
     total_sections=$(jq -s '[.[].section] | unique | length' "$METRICS_FILE")
-    log "Summary: $total_sections sections, \$$total_cost total cost"
+    if [[ "$BILLING" == "max" ]]; then
+      log "Summary: $total_sections sections, \$$api_cost API-equivalent cost (covered by Max subscription)"
+    else
+      log "Summary: $total_sections sections, \$$api_cost total API cost"
+    fi
     log "Metrics: $METRICS_FILE"
   fi
 
@@ -278,6 +282,9 @@ trap cleanup EXIT INT TERM
 setup_worktree() {
   if [[ -d "$WORKTREE_DIR" ]]; then
     log "Worktree exists: $WORKTREE_DIR"
+    # Sync BRANCH_NAME with the worktree's actual branch
+    BRANCH_NAME=$(cd "$WORKTREE_DIR" && git branch --show-current)
+    log "Resuming on branch: $BRANCH_NAME"
   else
     mkdir -p "$(dirname "$WORKTREE_DIR")"
 
@@ -394,6 +401,7 @@ VALIDATE_TOOLS='Read,Edit,Grep,Glob,Bash(make\ *),Bash(git\ diff*),Bash(git\ sta
 LAST_EXIT_CODE=0
 LAST_DURATION_MS=0
 LAST_OUTPUT=""
+LAST_COMMIT_SHA=""
 
 run_claude() {
   local phase="$1"    # "implement" or "validate"
@@ -523,8 +531,10 @@ record_metrics() {
   mkdir -p "$METRICS_DIR"
 
   # Extract fields from Claude's JSON output
-  local total_cost input_tokens output_tokens cache_read num_turns subtype duration_api
-  total_cost=$(echo "$output" | jq -r '.total_cost_usd // 0' 2>/dev/null) || total_cost=0
+  # Note: total_cost_usd is always the API-equivalent price, even in max (subscription) mode.
+  # In max mode this is NOT actual billing — it's useful for cost comparison across models.
+  local api_cost input_tokens output_tokens cache_read num_turns subtype duration_api
+  api_cost=$(echo "$output" | jq -r '.total_cost_usd // 0' 2>/dev/null) || api_cost=0
   input_tokens=$(echo "$output" | jq -r '.input_tokens // 0' 2>/dev/null) || input_tokens=0
   output_tokens=$(echo "$output" | jq -r '.output_tokens // 0' 2>/dev/null) || output_tokens=0
   cache_read=$(echo "$output" | jq -r '.cache_read_tokens // 0' 2>/dev/null) || cache_read=0
@@ -545,7 +555,7 @@ record_metrics() {
     --arg phase "$phase" \
     --arg subtype "$subtype" \
     --arg billing "$BILLING" \
-    --argjson cost "$total_cost" \
+    --argjson cost "$api_cost" \
     --argjson input "$input_tokens" \
     --argjson output_tok "$output_tokens" \
     --argjson cache "$cache_read" \
@@ -555,6 +565,7 @@ record_metrics() {
     --arg model "$(if [[ "$phase" == "implement" ]]; then echo "$IMPLEMENT_MODEL"; else echo "$VALIDATE_MODEL"; fi)" \
     --argjson max_turns "$MAX_TURNS" \
     --argjson max_budget "$MAX_BUDGET" \
+    --arg commit_sha "$LAST_COMMIT_SHA" \
     '{
       timestamp: $ts,
       plan: $plan,
@@ -563,7 +574,7 @@ record_metrics() {
       phase: $phase,
       subtype: $subtype,
       billing: $billing,
-      total_cost_usd: $cost,
+      api_equivalent_cost_usd: $cost,
       input_tokens: $input,
       output_tokens: $output_tok,
       cache_read_tokens: $cache,
@@ -572,10 +583,11 @@ record_metrics() {
       num_turns: $turns,
       model: $model,
       max_turns_configured: $max_turns,
-      max_budget_configured: $max_budget
+      max_budget_configured: $max_budget,
+      commit_sha: (if $commit_sha == "" then null else $commit_sha end)
     }' >> "$METRICS_FILE"
 
-  log "Metrics: billing=$BILLING | ${num_turns} turns | ${duration_ms}ms ($phase)"
+  log "Metrics: billing=$BILLING | ${num_turns} turns | ${duration_ms}ms ($phase)$(if [ -n "$LAST_COMMIT_SHA" ]; then echo " | commit: ${LAST_COMMIT_SHA:0:8}"; fi)"
 }
 
 # ── PR Creation ───────────────────────────────────────────
@@ -695,6 +707,8 @@ sanity_gate
 
 log "Starting main loop"
 
+LOOP_FAILED=false
+
 while true; do
   worktree_spec="$WORKTREE_DIR/$SPEC_PATH"
 
@@ -710,11 +724,13 @@ while true; do
   # Implement phase (skip if already implemented)
   if [[ "$SECTION_STATE" == "implement" ]]; then
     log "Phase: implement"
+    LAST_COMMIT_SHA=""
     run_claude "implement" "$SECTION_ID" "$SECTION_TITLE"
     record_metrics "implement" "$SECTION_ID" "$SECTION_TITLE"
 
     if ! check_success "implement" "$SECTION_ID"; then
       err "Implement failed for section $SECTION_ID"
+      LOOP_FAILED=true
       break
     fi
 
@@ -724,16 +740,27 @@ while true; do
 
   # Validate phase
   log "Phase: validate"
+  LAST_COMMIT_SHA=""
   run_claude "validate" "$SECTION_ID" "$SECTION_TITLE"
-  record_metrics "validate" "$SECTION_ID" "$SECTION_TITLE"
 
   if ! check_success "validate" "$SECTION_ID"; then
+    record_metrics "validate" "$SECTION_ID" "$SECTION_TITLE"
     err "Validate failed for section $SECTION_ID"
+    LOOP_FAILED=true
     break
   fi
 
+  # Capture commit SHA after successful validation (validate agent commits on success)
+  LAST_COMMIT_SHA=$(cd "$WORKTREE_DIR" && git rev-parse HEAD)
+  record_metrics "validate" "$SECTION_ID" "$SECTION_TITLE"
+
   update_section_state "$worktree_spec" "$SECTION_ID" "validated"
-  log "Section $SECTION_ID complete"
+  log "Section $SECTION_ID complete (commit: ${LAST_COMMIT_SHA:0:8})"
 done
+
+if $LOOP_FAILED; then
+  log "Ralph loop finished with errors"
+  exit 1
+fi
 
 log "Ralph loop finished"

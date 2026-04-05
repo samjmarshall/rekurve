@@ -121,14 +121,14 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: `src/env.js`, `.env.example`, `.gitignore`
 
 **Review checklist**:
-- [ ] All secrets are validated with Zod schemas of appropriate strictness
-- [ ] `BETTER_AUTH_SECRET` has `z.string().min(32)` — confirm 32 is sufficient entropy
-- [ ] `SKIP_ENV_VALIDATION` flag — assess risk (who can set this? Only in CI?)
-- [ ] `.env` is in `.gitignore` — confirm secrets are never committed
-- [ ] `.env.example` contains no real secrets — verify it's template-only
-- [ ] No `process.env` usage outside of `src/env.js` — grep for raw access
-- [ ] Client-side env vars (`NEXT_PUBLIC_*`) contain no secrets — verify only PostHog keys are exposed
-- [ ] Database URLs use connection pooling in app code, unpooled only in migrations
+- [x] All secrets are validated with Zod schemas of appropriate strictness — `POSTHOG_ERROR_TRACKING_API_KEY` and `RESEND_API_KEY` upgraded from `z.string()` to `z.string().min(1)` for explicit strictness; all other secrets have appropriate constraints. ✅
+- [x] `BETTER_AUTH_SECRET` has `z.string().min(32)` — 32 bytes of entropy (`openssl rand -base64 32` = 32 random bytes = 256 bits) exceeds the 128-bit security threshold; min(32) is sufficient. ✅
+- [x] `SKIP_ENV_VALIDATION` flag — used only in CI (`post-deploy.yml` lines 83 and 90) for DB check/migrate steps that need only `DATABASE_URL_UNPOOLED`. Not set in any production deployment path (Vercel handles those with real env vars). Risk is contained. ✅
+- [x] `.env` is in `.gitignore` (line 47: `.env` and `.env*.local`) — secrets are never committed. ✅
+- [x] `.env.example` contains no real secrets — `POSTHOG_PROJECT_ID=254485` is a non-sensitive numeric identifier (not a secret); all API keys/tokens are empty with comments. Added missing vars (`POSTHOG_ERROR_TRACKING_API_KEY`, `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`) to keep example in sync with schema. ✅
+- [x] Raw `process.env` outside `src/env.js` — 3 files access Vercel/Next.js platform variables only (`VERCEL_URL`, `PORT`, `NEXT_RUNTIME`). These are not secrets; they are optional platform-injected variables unsuitable for the Zod schema. No application secrets accessed via raw `process.env`. ✅
+- [x] Client-side env vars (`NEXT_PUBLIC_*`) — only `NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_POSTHOG_HOST` are exposed; both are PostHog analytics identifiers, public by design. No secrets in client vars. ✅
+- [x] Database URLs — `src/server/db/index.ts` uses `env.DATABASE_URL` (pooled Neon HTTP connection); `drizzle.config.ts` uses `env.DATABASE_URL_UNPOOLED` (direct connection for migrations only). Correct separation. ✅
 
 **Files**:
 - `src/env.js`

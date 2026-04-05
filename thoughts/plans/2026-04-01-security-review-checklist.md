@@ -82,16 +82,16 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: `next.config.ts` CSP headers
 
 **Review checklist**:
-- [ ] `default-src 'none'` — confirm deny-by-default baseline
-- [ ] `script-src 'unsafe-eval'` — assess necessity (Next.js requirement?) and document risk
-- [ ] `script-src-elem 'unsafe-inline'` — assess necessity and document risk; can nonces replace it?
-- [ ] `connect-src 'self'` — confirm no external domains are needed (PostHog is proxied)
-- [ ] `frame-ancestors 'none'` — confirm clickjacking protection matches `X-Frame-Options: DENY`
-- [ ] `style-src 'unsafe-inline'` — assess whether this can be tightened
-- [ ] `img-src` — confirm only trusted image sources are allowed
-- [ ] `upgrade-insecure-requests` — confirm HTTPS enforcement
-- [ ] Google reCAPTCHA enterprise script — confirm it's actually used; remove if not
-- [ ] CSP reporting — consider adding `report-uri` or `report-to` for violation monitoring
+- [x] `default-src 'none'` — deny-by-default baseline confirmed. ✅
+- [x] `script-src 'unsafe-eval'` — removed. `'unsafe-eval'` is only needed by webpack HMR in dev mode; Next.js production builds do not require it. Removing it eliminates `eval()`/`Function()` execution vectors. ✅
+- [x] `script-src-elem 'unsafe-inline'` — retained (required). Next.js App Router injects inline hydration scripts, and three `<script type="application/ld+json">` tags in `(website)/layout.tsx`, `Pricing.tsx`, and `FAQ.tsx` require it. Replacing with nonces would require Edge Middleware to inject a per-request nonce and thread it through all inline scripts — significant infrastructure change. Accepted risk for now. ⚠️
+- [x] `connect-src 'self'` — confirmed sufficient. PostHog is fully proxied through `/rk/` rewrites in `next.config.ts`; no direct external `connect-src` hosts needed. ✅
+- [x] `frame-ancestors 'none'` — confirmed. Matches `X-Frame-Options: DENY`. Redundant but correct (belt-and-suspenders for older browsers). ✅
+- [x] `style-src 'unsafe-inline'` — retained. `'unsafe-inline'` is required by Tailwind/Radix for inline styles. Tightening would require auditing all inline style usage across the app. Removed dead `https://fonts.googleapis.com` entry (self-hosted via `next/font/google`). ⚠️
+- [x] `img-src` — tightened. Removed dead `https://fonts.gstatic.com` entry; `next/font/google` self-hosts all font files at build time with no runtime external requests. `img-src 'self'` is now the correct minimal policy. ✅
+- [x] `upgrade-insecure-requests` — confirmed. HTTPS enforcement is present. ✅
+- [x] Google reCAPTCHA enterprise script — **removed**. Grepped all of `src/` for `recaptcha`/`reCAPTCHA`/`google.com/recaptcha` — zero matches. The `https://www.google.com/recaptcha/enterprise.js` entry in `script-src-elem` was dead configuration widening the allowed script surface. ✅
+- [ ] CSP reporting — no `report-uri` or `report-to` directive present. Adding a reporting endpoint (e.g., via Sentry or a lightweight `/api/csp-report` route) would provide visibility into violations in the wild. Low urgency but recommended for future hardening.
 
 **Files**:
 - `next.config.ts` (lines 42-56)

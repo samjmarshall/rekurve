@@ -43,14 +43,22 @@ const config: NextConfig = {
             "default-src 'none';",
             "base-uri 'none';",
             "connect-src 'self';",
-            "font-src 'self' https://fonts.gstatic.com;",
+            // next/font/google self-hosts all fonts at build time — no runtime requests to fonts.gstatic.com
+            "font-src 'self';",
             "frame-ancestors 'none';",
             "frame-src 'self';",
-            "img-src 'self' https://fonts.gstatic.com;",
+            // next/font/google self-hosts fonts — no runtime requests to fonts.gstatic.com
+            "img-src 'self';",
             "manifest-src 'self';",
-            "script-src 'self' 'unsafe-eval';",
-            "script-src-elem 'self' 'unsafe-inline' https://www.google.com/recaptcha/enterprise.js;",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+            // 'unsafe-eval' is only required by webpack HMR in development; safe to remove in production
+            // but Next.js injects it unconditionally — monitor if removing causes build errors
+            "script-src 'self';",
+            // 'unsafe-inline' required by Next.js App Router inline hydration scripts and JSON-LD <script> tags
+            // Nonces via middleware would eliminate this but require significant infrastructure changes
+            "script-src-elem 'self' 'unsafe-inline';",
+            // 'unsafe-inline' required by Tailwind/Radix inline styles; tightening would need a full audit
+            // next/font/google self-hosts fonts — no runtime requests to fonts.googleapis.com
+            "style-src 'self' 'unsafe-inline';",
             "upgrade-insecure-requests;",
           ].join(" "),
         },

@@ -72,7 +72,6 @@ function InputOTPSlot({
 function InputOTPSeparator({ ...props }: React.ComponentProps<"div">) {
   return (
     // biome-ignore lint/a11y/useFocusableInteractive: upstream shadcn component
-    // biome-ignore lint/a11y/useSemanticElements: upstream shadcn component
     <div
       data-slot="input-otp-separator"
       className="flex items-center [&_svg:not([class*='size-'])]:size-4"

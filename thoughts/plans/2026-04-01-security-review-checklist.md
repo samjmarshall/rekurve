@@ -142,13 +142,13 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: `src/server/db/`, schema files, Drizzle config
 
 **Review checklist**:
-- [ ] All queries use Drizzle ORM query builder (parameterized) — no raw SQL string concatenation
-- [ ] E2E auth helper uses Neon tagged template literals (auto-parameterized) — confirm no string interpolation into SQL
-- [ ] Session table has `onDelete: "cascade"` on userId FK — confirm user deletion cleans up sessions
-- [ ] No sensitive data stored in plaintext that should be encrypted (e.g., PII in leads table)
-- [ ] Database connection string uses SSL/TLS — confirm Neon enforces encrypted connections
-- [ ] `drizzle.config.ts` uses `DATABASE_URL_UNPOOLED` — confirm this is only used for migrations, not runtime queries
-- [ ] Schema enums prevent arbitrary string injection into enum columns
+- [x] All queries use Drizzle ORM query builder (parameterized) — no raw SQL string concatenation. Two `sql` tagged template usages in `leads.ts` (`sql\`${preferredEstate} = ANY(${leads.preferredEstates})\`` at line 62 and `sql<number>\`count(*)\`` at line 76) use Drizzle's `sql` helper, which auto-parameterizes interpolated values as bind parameters; no string concatenation anywhere. ✅
+- [x] E2E auth helper uses Neon tagged template literals (auto-parameterized) — all three queries in `e2e/utils/auth-helper.ts` (`INSERT user`, `INSERT session`, `DELETE user`) use the `neon` tagged template literal; interpolated values (`${userId}`, `${email}`, `${token}`, `${sessionId}`, `${expiresAt}`) are sent as bind parameters, never concatenated into the SQL string. ✅
+- [x] Session table has `onDelete: "cascade"` on userId FK — confirmed at `auth.ts:29-31`; `account` table also cascades on userId (`auth.ts:43-45`). Deleting a user atomically removes all their sessions and accounts via DB-level cascade. ✅
+- [x] No sensitive data stored in plaintext that should be encrypted — PII fields (`firstName`, `lastName`, `email`, `phone`) in the leads table are stored plaintext; Neon provides encryption at rest covering the storage risk. `account.password` is hashed by better-auth (argon2) — not plaintext. No credit card numbers, SSNs, or government IDs present in any schema. Application-level field encryption not warranted at current pre-PMF scale. ✅
+- [x] Database connection string uses SSL/TLS — `@neondatabase/serverless` neon-http driver communicates exclusively via HTTPS; TLS is inherent to the transport and cannot be disabled client-side. Neon also rejects non-SSL connections at the platform level. ✅
+- [x] `drizzle.config.ts` uses `DATABASE_URL_UNPOOLED` — confirmed. `drizzle.config.ts` is consumed only by the Drizzle Kit CLI for migrations; `DATABASE_URL_UNPOOLED` is not imported by any runtime module. Runtime queries use the pooled `DATABASE_URL` via `env.DATABASE_URL` in `src/server/db/index.ts`. Correct separation confirmed. ✅
+- [x] Schema enums prevent arbitrary string injection into enum columns — 15 `pgEnum` definitions in `schema/enums.ts` cover all enum-typed columns across all tables; PostgreSQL enforces valid enum values at the DB level, rejecting arbitrary strings with a type error before any row is written. ✅
 
 **Files**:
 - `src/server/db/index.ts`

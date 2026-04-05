@@ -1,12 +1,6 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
-console.log(`VERCEL_URL => ${process.env.VERCEL_URL}`);
-console.log(`VERCEL_BRANCH_URL => ${process.env.VERCEL_BRANCH_URL}`);
-console.log(
-  `VERCEL_PROJECT_PRODUCTION_URL => ${process.env.VERCEL_PROJECT_PRODUCTION_URL}`,
-);
-
 export const env = createEnv({
   /**
    * Specify your server-side environment variables schema here. This way you can ensure the app
@@ -17,7 +11,11 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.preprocess(
       (str) =>
-        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : str,
+        process.env.VERCEL
+          ? process.env.VERCEL_ENV === "production"
+            ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+            : `https://${process.env.VERCEL_URL}`
+          : str,
       z.string().url(),
     ),
     DATABASE_URL: z.string().url(),

@@ -199,11 +199,11 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: State-mutating endpoints
 
 **Review checklist**:
-- [ ] better-auth's built-in CSRF protection — verify it's enabled and uses origin/referer checking
-- [ ] tRPC mutations — verify `x-trpc-source` header or other CSRF mechanism is enforced server-side (not just set client-side)
-- [ ] Booking form submission — verify it goes through tRPC or has CSRF protection
-- [ ] `SameSite` cookie attribute — confirm it's set to `Lax` or `Strict` on session cookies
-- [ ] No state-mutating GET requests
+- [x] better-auth's built-in CSRF protection — enabled by default, no opt-out in `auth.ts`. `originCheckMiddleware` (at `node_modules/better-auth/dist/api/middlewares/origin-check.mjs`) fires on all non-GET/OPTIONS/HEAD requests that include a `Cookie` header. It checks the `Origin` or `Referer` header against `trustedOrigins`. `formCsrfMiddleware` additionally validates `Sec-Fetch-Site/Mode/Dest` for first-login scenarios. Neither `advanced.disableCSRFCheck` nor `advanced.disableOriginCheck` is set in `src/lib/auth.ts`. Protection is active. ✅
+- [x] tRPC mutations — `x-trpc-source: nextjs-react` set at `src/trpc/react.tsx:44` is a client-set hint for observability, **not a server-side CSRF check** (the tRPC server does not validate it). Actual CSRF protection for tRPC comes from `SameSite=Lax` on the session cookie: cross-site POST requests from foreign origins cannot include the cookie, so all `protectedProcedure` mutations will return `UNAUTHORIZED` if called cross-site. This is architecturally sound — `SameSite=Lax` is the established CSRF defence for cookie-authenticated JSON APIs. No additional tRPC-layer enforcement is needed. ✅
+- [x] Booking form submission — `onSubmit` handler at `BookingForm.tsx:256` fires PostHog analytics and `console.log()` only; there is no server-side submission endpoint. CSRF is not applicable here (no state mutation server-side). ✅ Note: this is consistent with the Task 8 finding; if a server endpoint is added, CSRF protection will be inherited via `SameSite=Lax` cookies automatically.
+- [x] `SameSite` cookie attribute — better-auth defaults `sameSite: "lax"` for all session cookies (`node_modules/better-auth/dist/cookies/index.mjs:33`). The `nextCookies()` plugin adds the `__Secure-` prefix for HTTPS deployments but does not alter `sameSite`. `Lax` correctly blocks cross-site subresource POST requests while allowing same-site navigation. ✅
+- [x] No state-mutating GET requests — all state-mutating operations across all 5 tRPC routers (`leads.ts`: `create`, `update`, `delete`; `ai.ts`, `lots.ts`, `messages.ts`, `nurture.ts`: read-only queries only) use `.mutation()`. Every `.query()` is read-only. Zero state-mutating GET paths exist. ✅
 
 **Files**:
 - `src/lib/auth.ts`

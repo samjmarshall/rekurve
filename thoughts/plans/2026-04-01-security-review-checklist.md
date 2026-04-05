@@ -217,16 +217,17 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: All public-facing endpoints
 
 **Review checklist**:
-- [ ] **No rate limiting exists** — flag this as a gap
-- [ ] OTP send endpoint — vulnerable to abuse (email bombing, cost amplification via Resend)
-- [ ] OTP verify endpoint — vulnerable to brute-force (10^6 combinations for 6-digit code)
-- [ ] tRPC endpoints — no rate limiting on authenticated requests
-- [ ] Health check endpoint — could be used for availability probing
-- [ ] Booking form — no rate limiting on submissions
-- [ ] Recommend: Vercel Edge Middleware rate limiting or better-auth rate limit plugin
+- [x] **No rate limiting exists** — confirmed. Zero matches for `rateLimit`, `rateLimiting`, `upstash`, `redis`, or any rate-limiting library across all of `src/` and `package.json`. No `middleware.ts` exists at the app level. This is a gap across all endpoints. ⚠️
+- [x] OTP send endpoint (`POST /api/auth/sign-in/email-otp`) — no rate limiting. An attacker can call this endpoint in a tight loop with any email address, triggering Resend API calls on each request. Each OTP dispatch costs money; at scale this enables cost amplification (Resend billing) and email inbox flooding for the target address. No IP-level or email-level throttle is in place. ⚠️ **High risk.**
+- [x] OTP verify endpoint (`POST /api/auth/email-otp/verify`) — partially mitigated. `auth.ts:31` sets `allowedAttempts: 3`, which invalidates a specific OTP after 3 failed guesses, preventing brute-force of any single 6-digit code. However, there is no rate limit on how many fresh OTPs can be requested: an attacker can request a new OTP, exhaust its 3 attempts, request another, and repeat indefinitely. This cycles through the search space at 3 guesses per OTP issuance round-trip rather than 10^6 sequential guesses, but it still represents an unconstrained verification attempt loop. ⚠️ **Medium risk** (mitigated by per-OTP attempt cap, not eliminated).
+- [x] tRPC endpoints (`/api/trpc/*`) — no rate limiting on authenticated requests. All 5 routers are protected by `protectedProcedure` so unauthenticated callers are rejected, but a valid session can make unlimited requests. Relevant for AI-backed procedures (`ai.ts`) where each call may trigger an LLM inference cost. ⚠️ **Low-medium risk** (requires a valid session; mainly a cost protection concern).
+- [x] Health check endpoint (`GET /api/health`) — no rate limiting. Returns only `{ status: "ok", timestamp }` with no internal detail (Task 3 confirmed this). An attacker can poll it to infer uptime/availability patterns. Low-severity; no sensitive data exposed. ⚠️ **Low risk.**
+- [x] Booking form — no server-side submission endpoint exists (`onSubmit` at `BookingForm.tsx:256` calls PostHog analytics and `console.log()` only). No rate limiting is applicable. ✅ (consistent with Task 8 and Task 10 findings).
+- [x] Recommend: Two viable mitigations — (1) **Vercel Edge Middleware** with the `@vercel/functions` `waitUntil` + IP-keyed in-memory or KV store; best for `/api/auth/*` and `/api/health`; requires no new dependencies if using Vercel KV. (2) **better-auth `rateLimit` plugin** (`import { rateLimit } from "better-auth/plugins"`) for auth-layer throttling of OTP send/verify specifically; this is the most targeted fix for the highest-risk endpoints. Either approach addresses the OTP bombing vector. At current pre-PMF scale, implementing better-auth's `rateLimit` plugin for the auth routes is the recommended first step.
 
 **Files**:
 - No rate limiting files exist (gap to flag)
+- `src/lib/auth.ts` — `allowedAttempts: 3` is the only existing throttle (per-OTP attempt cap only)
 
 ---
 

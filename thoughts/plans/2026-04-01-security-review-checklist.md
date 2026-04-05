@@ -257,13 +257,13 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: `package.json`, lock file, CI audit
 
 **Review checklist**:
-- [ ] Run `make audit` — check for known CVEs in production dependencies
-- [ ] Review `yarn.lock` for pinned versions — confirm no floating version ranges for critical packages
-- [ ] better-auth version — check for known security advisories
-- [ ] Next.js version (16.2.1) — check for known CVEs
-- [ ] Drizzle ORM version — check for known issues
-- [ ] CI pipeline runs `npm audit` — verify it fails the build on high/critical CVEs
-- [ ] No unnecessary dependencies with broad system access
+- [x] Run `make audit` — `yarn npm audit --environment production` returned "No audit suggestions" (exit 0). Zero known CVEs across all production dependencies. ✅
+- [x] Review `yarn.lock` for pinned versions — all production dependencies in `package.json` use exact versions (no `^` or `~` ranges). `yarn.lock` pins every transitive dependency to exact resolved versions: `better-auth@1.5.6`, `next@16.2.1`, `drizzle-orm@0.45.2`. `shadcn: "latest"` in devDependencies is floating but devDependency-only and resolves to `4.1.1` in the lock file; not a production concern. ✅
+- [x] better-auth version (1.5.6) — no known security advisories; confirmed clean by `yarn npm audit`. ✅
+- [x] Next.js version (16.2.1) — no known CVEs; confirmed clean by `yarn npm audit`. ✅
+- [x] Drizzle ORM version (0.45.2) — no known issues; confirmed clean by `yarn npm audit`. ✅
+- [x] CI pipeline runs `make audit` — `quality-control.yml` has a dedicated `audit` job (lines 36-81) that runs `make audit` on every push/PR to `main`. `yarn npm audit` exits non-zero on any vulnerability, failing the CI job and blocking the merge. Scoped to `--environment production` to ignore devDependency CVEs. ✅
+- [x] No unnecessary dependencies with broad system access — all 27 production dependencies are application-level packages (UI framework, DB client, auth, email, analytics, tRPC, Zod). No shell-execution libraries, no raw `child_process` wrappers, no broad filesystem utilities. DevDependencies include `tsx` (TS execution for scripts) and `husky` (git hooks), both standard tooling with no unexpected system access. ✅
 
 **Files**:
 - `package.json`

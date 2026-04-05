@@ -299,18 +299,20 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: Session cookies, analytics cookies
 
 **Review checklist**:
-- [ ] Session cookie has `HttpOnly` flag — verify via better-auth docs or runtime inspection
-- [ ] Session cookie has `Secure` flag on HTTPS deployments — confirmed by `__Secure-` prefix
-- [ ] Session cookie has `SameSite=Lax` or `Strict` — verify
-- [ ] Session cookie `Path=/` — appropriate for this app
-- [ ] Cookie token is HMAC-SHA256 signed — confirmed in auth helper
-- [ ] No sensitive data stored in cookies beyond the session token
-- [ ] PostHog cookie — confirm no sensitive data, appropriate expiry
+- [x] Session cookie has `HttpOnly` flag — `httpOnly: true` at `node_modules/better-auth/dist/cookies/index.mjs:35`. The session cookie is never accessible via `document.cookie`; JS-based XSS attacks cannot exfiltrate it. ✅
+- [x] Session cookie has `Secure` flag on HTTPS deployments — `secure: !!secureCookiePrefix` at `cookies/index.mjs:32`. When the base URL is HTTPS (or `NODE_ENV=production`), the `__Secure-` prefix is applied and `Secure=true` is set. Confirmed by `e2e/utils/session-cookie.ts:11-18` which derives `secure: isSecure` from the base URL protocol. On HTTP (localhost dev), no prefix and `Secure=false` — correct behaviour. ✅
+- [x] Session cookie has `SameSite=Lax` — `sameSite: "lax"` at `cookies/index.mjs:33`. Confirmed in Task 10 (CSRF). Blocks cross-site subresource POST requests while allowing top-level navigations. ✅
+- [x] Session cookie `Path=/` — `path: "/"` at `cookies/index.mjs:34`. Appropriate for this app; the cookie is scoped to the entire domain and sent on all requests, which is required for both the app routes and the tRPC API at `/api/trpc/*`. ✅
+- [x] Cookie token is HMAC-SHA256 signed — `createHMAC("SHA-256", "base64urlnopad").sign(ctx.context.secret, JSON.stringify({...}))` at `cookies/index.mjs:101`. The payload is signed with `BETTER_AUTH_SECRET` (min 32 chars, validated in `src/env.js`). Verification uses `createHMAC("SHA-256", "base64urlnopad").verify(...)` at line 242 — tampered tokens are rejected before any DB lookup. ✅
+- [x] No sensitive data stored in cookies beyond the session token — better-auth sets three cookies: `[__Secure-]better-auth.session_token` (7-day expiry, signed opaque token referencing a DB session row), `session_data` (5-minute cache of session/user metadata, `cookieCache.maxAge: 300` per `auth.ts`), `account_data` (5-minute cache). All three carry only IDs and expiry timestamps — no passwords, raw secrets, or PII. ✅
+- [x] PostHog cookie — PostHog sets `ph_<project_key>_posthog` as a regular (non-HttpOnly) cookie with a 365-day default expiry (`cookie_expiration: 365` in type definitions). Non-HttpOnly is expected and required for a client-side analytics SDK that reads its own persistence via JS. Contents: anonymous `distinct_id`, `$device_id`, `$user_state`, `$ses_id` (session ID), feature flag values. No auth tokens, session secrets, or user PII stored here. With `person_profiles: "identified_only"` (`instrumentation-client.ts:7`), no profile data persists in the cookie beyond PostHog's own analytics identifiers. 365-day expiry is standard for analytics SDKs and acceptable. ✅
 
 **Files**:
 - `e2e/utils/session-cookie.ts`
 - `src/lib/auth.ts`
 - `src/lib/posthog.ts`
+- `src/instrumentation-client.ts`
+- `node_modules/better-auth/dist/cookies/index.mjs` (lines 21–35, 101, 242)
 
 ---
 

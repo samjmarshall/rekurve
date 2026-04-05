@@ -703,12 +703,12 @@ Audit component architecture against 9 composition rules covering boolean props,
 #### Category 3: Implementation Patterns (MEDIUM)
 
 ##### 3.1 Create Explicit Component Variants
-- [ ] Check for components using boolean modes instead of explicit variants
-- [ ] **Files to check**:
+- [x] Check for components using boolean modes instead of explicit variants
+- [x] **Files to check**:
   - `src/components/ui/compare.tsx` — `slideMode?: "hover" | "drag"` (✅ uses enum, not boolean)
   - `src/components/ui/Button.tsx` — uses CVA variants (✅)
   - `src/components/ui/Badge.tsx` — uses CVA variants (✅)
-- [ ] **Assessment**: Components already use enum variants via CVA. ✅ compliant.
+- [x] **Assessment**: Components already use enum variants via CVA. ✅ compliant.
 
 ##### 3.2 Prefer Children Over Render Props
 - [ ] Search for `renderX` prop patterns

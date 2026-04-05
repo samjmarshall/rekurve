@@ -633,6 +633,7 @@ export function BookingForm() {
                             const isSelected =
                               field.value?.includes(challenge) || false;
                             return (
+                              // biome-ignore lint/a11y/noLabelWithoutControl: label wraps Checkbox (Radix input) as its control
                               <label
                                 key={index}
                                 className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-all duration-200 ${

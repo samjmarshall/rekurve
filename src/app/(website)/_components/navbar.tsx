@@ -155,6 +155,7 @@ const MobileNav = ({ navItems, visible }: NavbarProps) => {
       <div className="flex w-full flex-row items-center justify-between">
         <Logo />
         <button
+          type="button"
           data-testid="navbar-mobile-menu-btn"
           onClick={() => setOpen(!open)}
           aria-label={open ? "Close menu" : "Open menu"}

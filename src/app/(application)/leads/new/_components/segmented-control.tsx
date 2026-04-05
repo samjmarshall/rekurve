@@ -58,6 +58,7 @@ export function SegmentedControl<T extends string>({
       {options.map((option, index) => {
         const isSelected = value === option.value;
         return (
+          // biome-ignore lint/a11y/useSemanticElements: composite radio-group widget; <input type="radio"> can't be styled as a button group
           <button
             key={option.value}
             ref={(el) => {

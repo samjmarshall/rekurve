@@ -42,12 +42,12 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: Layout-level auth checks, tRPC procedure middleware
 
 **Review checklist**:
-- [ ] `(application)/layout.tsx` — confirm `getSession()` + `redirect("/login")` is server-side and cannot be bypassed client-side
-- [ ] `(login)/layout.tsx` — confirm authenticated redirect to `/dashboard`
-- [ ] No Next.js `middleware.ts` exists — assess whether layout-only gates are sufficient (can a direct API call or RSC bypass the layout?)
-- [ ] All tRPC routers use `protectedProcedure` — verify no router accidentally uses `publicProcedure`
-- [ ] `protectedProcedure` middleware — confirm it throws `UNAUTHORIZED` (not a redirect) when session is missing
-- [ ] No user-role or tenant-scoping logic — flag if any routes return data across user boundaries (IDOR risk)
+- [x] `(application)/layout.tsx` — `async` server component, no `"use client"`, `getSession()` reads from `next/headers`, `redirect("/login")` is server-side. Cannot be bypassed client-side. ✅
+- [x] `(login)/layout.tsx` — `async` server component, `if (session) redirect("/dashboard")` on every render. ✅
+- [x] No Next.js `middleware.ts` exists — layout gates are sufficient for the current single-tenant model. Direct `/api/trpc/*` calls bypass the layout but are independently gated by `protectedProcedure` (throws UNAUTHORIZED). No unprotected API surface identified. ✅ (acceptable; middleware would add defense-in-depth but is not required here)
+- [x] All tRPC routers use `protectedProcedure` — all 5 routers (ai, leads, lots, messages, nurture) use only `protectedProcedure`. No `publicProcedure` used for any data procedure. ✅
+- [x] `protectedProcedure` middleware — throws `new TRPCError({ code: "UNAUTHORIZED" })` at `trpc.ts:57`. No redirect; correct API behavior. ✅
+- [x] No user-role or tenant-scoping logic — leads table has no `userId`/`tenantId` column; all authenticated users share a flat lead pool. No IDOR risk at current single-tenant scale. ⚠️ Flag for future: if multi-tenancy is added, all `leads` queries must add a tenant filter or ownership check (`getById`, `update`, `delete` all operate on any UUID without ownership verification).
 
 **Files**:
 - `src/app/(application)/layout.tsx`

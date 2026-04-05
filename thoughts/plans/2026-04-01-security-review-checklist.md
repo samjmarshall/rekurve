@@ -163,12 +163,12 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: All user-facing input handling
 
 **Review checklist**:
-- [ ] Booking form (`BookingForm.tsx`) — verify Zod schema validates all fields server-side (not just client-side)
-- [ ] Login form — verify email input is validated beyond just `type="email"` HTML attribute
-- [ ] OTP input — verify 6-digit constraint is enforced server-side by better-auth
-- [ ] tRPC procedures — currently no `.input()` schemas; flag any future procedures that accept input without Zod validation
-- [ ] No `dangerouslySetInnerHTML` usage — confirm via grep
-- [ ] No user input rendered without React's auto-escaping
+- [x] Booking form (`BookingForm.tsx`) — client-side Zod validation via `zodResolver` covers all fields. The `onSubmit` handler only fires PostHog analytics and a `console.log`; **there is no server-side submission endpoint**. No server-side Zod validation is needed because there is no server to validate against. ⚠️ If a backend submission endpoint (tRPC or API route) is added in the future, server-side Zod validation must be included at that point.
+- [x] Login form — `type="email"` + `required` attributes provide UX-level gating; better-auth validates the email format server-side before dispatching an OTP via Resend. Server-side validation is delegated to the auth library. ✅
+- [x] OTP input — `auth.ts` configures `emailOTP({ otpLength: 6, expiresIn: 300, allowedAttempts: 3 })`. Better-auth enforces the 6-digit length, 5-minute TTL, and 3-attempt limit entirely server-side; the client `maxLength={6}` on `InputOTP` is UI-only. ✅
+- [x] tRPC procedures — all 5 input-accepting procedures in `leads.ts` have `.input()` schemas (`leadCreateSchema`, `z.object({ id: z.string().uuid() })`, `leadFilterSchema`, `leadUpdateSchema`). Remaining procedures across all 5 routers (`ai.healthCheck`, `lots.getAll`, `messages.getPending`, `nurture.getActive`, `leads.getByStage`) accept no input. No unvalidated input paths exist. ✅ Rule for future: any new procedure that accepts parameters must use `.input(zodSchema)` — never use bare `.query()` or `.mutation()` with `ctx.input` or manual parsing.
+- [x] `dangerouslySetInnerHTML` — 3 usages found, all for `application/ld+json` schema markup: `(website)/layout.tsx:118`, `FAQ.tsx:156`, `Pricing.tsx:175`. All three use `JSON.stringify()` of static, hardcoded data objects (no user input flows into these). Standard pattern for JSON-LD; safe. ✅
+- [x] User input rendered without React's auto-escaping — one user-supplied state value rendered in JSX: `{email}` at `login/page.tsx:206` inside a `<span>`. React auto-escapes this. Validation error messages in both forms are static Zod schema strings or better-auth library strings, not user content. No raw HTML injection paths. ✅
 
 **Files**:
 - `src/app/(website)/_components/sections/BookingForm.tsx`

@@ -277,17 +277,18 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: PostHog, Resend, Google reCAPTCHA
 
 **Review checklist**:
-- [ ] PostHog — confirm API key is non-secret (project key, not personal API key)
-- [ ] PostHog proxy (`/rk/` rewrite) — confirm it doesn't create an open proxy to arbitrary hosts
-- [ ] Resend — confirm API key is server-side only, never exposed to client
-- [ ] Google reCAPTCHA enterprise script in CSP — confirm it's actually used; dead CSP entries widen attack surface
-- [ ] No third-party scripts loaded outside of CSP-allowed sources
-- [ ] Analytics provider — confirm no PII is sent to PostHog (email, phone from booking form)
+- [x] PostHog — `NEXT_PUBLIC_POSTHOG_KEY` is declared in the `client` block of `src/env.js` (browser-side project key; public by design, used in `posthog.init()` at `instrumentation-client.ts:4`). `POSTHOG_ERROR_TRACKING_API_KEY` (personal API key for sourcemap upload) is declared in the `server` block with no `NEXT_PUBLIC_` prefix, used only in `next.config.ts` via `withPostHogConfig`. `POSTHOG_PROJECT_ID` is also server-side only. Correct key separation: public project key on client, personal key server-only. ✅
+- [x] PostHog proxy (`/rk/` rewrite) — all three rewrite rules hardcode the destination host (`https://us-assets.i.posthog.com/static/:path*` and `https://us.i.posthog.com/:path*`). The `:path*` wildcard captures only the path segment of the incoming URL; the destination host is a compile-time constant and cannot be overridden by manipulating the source path. Not an open proxy. ✅
+- [x] Resend — `RESEND_API_KEY` is declared in the `server` block of `src/env.js` with no `NEXT_PUBLIC_` prefix. Consumed only in `src/lib/auth.ts` (server-side module, not imported by any client component or `NEXT_PUBLIC_` path). Never included in client bundles. ✅
+- [x] Google reCAPTCHA enterprise script in CSP — already removed in Task 4. Zero matches for `recaptcha`/`reCAPTCHA` in `src/` or `next.config.ts`. Current `script-src-elem` is `'self' 'unsafe-inline'` with no external hosts. No dead CSP entries remain. ✅
+- [x] No third-party scripts loaded outside of CSP-allowed sources — PostHog JS initialises with `api_host: "/rk"` (`instrumentation-client.ts:5`), routing all SDK requests through the same-origin `/rk/` proxy. No `<Script src>` tags reference external domains. `withPostHogConfig` in `next.config.ts` handles sourcemap upload at build time only (not a runtime script load). `script-src-elem 'self' 'unsafe-inline'` is accurate and sufficient. ✅
+- [x] Analytics provider — **PII is intentionally sent to PostHog**. `formTracking.identifyLead()` (`posthog.ts:370`) calls `posthog.identify(email, { $set: { email, name, phone } })` after step 1. `formTracking.submitted()` (`posthog.ts:467-493`) sends a `booking_form_submitted` event containing `lead_email`, `lead_phone`, and `lead_name`, then calls `posthog.identify` with the same PII. This is a deliberate CRM-style lead tracking design, not accidental leakage. `person_profiles: "identified_only"` (`instrumentation-client.ts:7`) limits profile creation to explicitly identified users (no anonymous profiles persist). **Risk**: email, full name, and phone number are stored in PostHog and subject to PostHog's data retention. This must be accurately disclosed in the privacy policy. No code change required at this stage; flagged for Task 18 (Data Privacy) review. ⚠️
 
 **Files**:
 - `next.config.ts` (PostHog rewrites)
 - `src/lib/posthog.ts`
 - `src/lib/posthog-server.ts`
+- `src/instrumentation-client.ts`
 - `src/providers/AnalyticsProvider.tsx`
 - `src/lib/auth.ts` (Resend integration)
 

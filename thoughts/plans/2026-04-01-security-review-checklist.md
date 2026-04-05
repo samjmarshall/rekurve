@@ -321,13 +321,13 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: All files that reference secrets
 
 **Review checklist**:
-- [ ] `BETTER_AUTH_SECRET` — not logged, not included in error messages, not sent to client
-- [ ] `DATABASE_URL` — not exposed in client bundles or error responses
-- [ ] `RESEND_API_KEY` — server-side only
-- [ ] `POSTHOG_ERROR_TRACKING_API_KEY` — server-side only
-- [ ] `VERCEL_AUTOMATION_BYPASS_SECRET` — only used in CI/test config, not in app code
-- [ ] No hardcoded secrets in source code — grep for API keys, tokens, passwords
-- [ ] Git history — confirm no secrets were previously committed and need rotation
+- [x] `BETTER_AUTH_SECRET` — declared in the `server` block of `src/env.js` (no `NEXT_PUBLIC_` prefix; never bundled client-side). Only two usages: `env.js:49` (runtime env binding) and `api/dev/session/route.ts:16` (HMAC key for dev-only endpoint, guarded by `NODE_ENV !== "development"` check). The three `console.log()` calls in `src/env.js` (lines 4–8) only log `VERCEL_URL`, `VERCEL_BRANCH_URL`, and `VERCEL_PROJECT_PRODUCTION_URL` — non-secret Vercel platform variables. No logging of `BETTER_AUTH_SECRET` anywhere in `src/`. ✅
+- [x] `DATABASE_URL` — declared in the `server` block of `src/env.js`. Used exclusively by `src/server/db/index.ts:8` to initialise the Neon HTTP client. Never imported by any file in the `client` render path. Test files use `"postgres://mock"` placeholder (not a real credential). No error response handler reads or echoes `DATABASE_URL`. ✅
+- [x] `RESEND_API_KEY` — declared in the `server` block of `src/env.js` with no `NEXT_PUBLIC_` prefix. Only usage: `src/lib/auth.ts:10` (`new Resend(env.RESEND_API_KEY)`). `auth.ts` is a server-only module; it is never imported by any client component or `"use client"` file. Key never reaches the browser. ✅
+- [x] `POSTHOG_ERROR_TRACKING_API_KEY` — declared in the `server` block of `src/env.js`. Only usage: `next.config.ts:91` (`personalApiKey: env.POSTHOG_ERROR_TRACKING_API_KEY`) inside `withPostHogConfig`, consumed exclusively at build time for sourcemap upload to PostHog. Not included in any runtime bundle, not accessible in the browser. ✅
+- [x] `VERCEL_AUTOMATION_BYPASS_SECRET` — zero matches in `src/`. Appears only in `playwright.config.ts:31,34` (test runner headers) and `.github/workflows/post-deploy.yml:113` (CI env injection via `${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}`). Never imported by any app module. Correct CI/test-only usage. ✅
+- [x] No hardcoded secrets in source code — grepped `src/**/*.{ts,tsx,js}` for patterns matching API key formats (`phc_*`, `re_*`, `postgres://…`, inline `secret/token/password = "…long string"`). Zero matches. The `"postgres://mock"` strings in two test files (`leads-router.test.ts:45`, `router.test.ts:13`) are intentional fake URLs used for env schema mocking in unit tests, not real credentials. ✅
+- [x] Git history — `git log --all --diff-filter=A --name-only -- '.env*'` shows the only `.env*` file ever added to the repo is `.env.example`; the `.env` file itself was never committed. `.env.example` contains placeholder values with no real secrets (confirmed in Task 6). No secrets were previously committed; no rotation is needed. ✅
 
 **Files**:
 - `src/env.js`

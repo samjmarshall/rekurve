@@ -711,10 +711,10 @@ Audit component architecture against 9 composition rules covering boolean props,
 - [x] **Assessment**: Components already use enum variants via CVA. ✅ compliant.
 
 ##### 3.2 Prefer Children Over Render Props
-- [ ] Search for `renderX` prop patterns
-- [ ] **Files to check**:
+- [x] Search for `renderX` prop patterns
+- [x] **Files to check**:
   - `src/components/ui/select.tsx` — Base UI uses `render` prop (library API, acceptable)
-- [ ] **Assessment**: No custom render prop patterns. Base UI's `render` prop is acceptable per the rule's exception for data-passing scenarios.
+- [x] **Assessment**: No custom render prop patterns. Base UI's `render` prop is acceptable per the rule's exception for data-passing scenarios.
 
 #### Category 4: React 19 APIs (MEDIUM)
 

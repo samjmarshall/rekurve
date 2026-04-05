@@ -62,12 +62,12 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: All `src/app/api/` routes
 
 **Review checklist**:
-- [ ] `api/auth/[...all]/route.ts` — confirm only GET and POST are exported (no unexpected methods)
-- [ ] `api/trpc/[trpc]/route.ts` — confirm error responses don't leak stack traces in production
-- [ ] `api/health/route.ts` — confirm no sensitive information in health check response
-- [ ] `api/dev/session/route.ts` — confirm `NODE_ENV !== "development"` guard is effective (returns 404 in prod)
-- [ ] `api/dev/session/route.ts` — confirm the `X-Dev-Session` header check adds defense-in-depth
-- [ ] No unrestricted API routes that accept arbitrary input without validation
+- [x] `api/auth/[...all]/route.ts` — only `GET` and `POST` are exported via `toNextJsHandler(auth)`; no other methods. ✅
+- [x] `api/trpc/[trpc]/route.ts` — `onError` is `undefined` in production (no console leak); tRPC's internal error formatter omits `stack` from `shape.data` outside dev; custom `errorFormatter` only adds `zodError` field. No stack traces leaked. ✅
+- [x] `api/health/route.ts` — returns only `{ status: "ok", timestamp: Date.now() }`; no DB version, env, or internal details. ✅
+- [x] `api/dev/session/route.ts` — `NODE_ENV !== "development"` guard is on both POST and DELETE handlers; returns `{}` with 404 in production. ✅
+- [x] `api/dev/session/route.ts` — `X-Dev-Session: true` header check is applied on both POST and DELETE before any DB access; provides defense-in-depth. ✅
+- [x] No unrestricted API routes — HubSpot webhook validates HMAC-SHA256 signature + 5-minute timestamp before parsing body; tRPC input validated via Zod; auth delegated to better-auth. ✅
 
 **Files**:
 - `src/app/api/auth/[...all]/route.ts`

@@ -39,6 +39,7 @@ export function ModeToggle() {
 
   return (
     <button
+      type="button"
       onClick={SWITCH}
       className="relative flex cursor-pointer items-center justify-center rounded-xl p-2 text-neutral-500 hover:shadow-input dark:text-neutral-500"
     >

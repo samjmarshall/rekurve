@@ -259,6 +259,7 @@ export function FAQ() {
                 No questions found matching &ldquo;{searchQuery}&rdquo;
               </p>
               <button
+                type="button"
                 onClick={() => setSearchQuery("")}
                 className="mt-4 font-mono text-primary text-sm transition-colors hover:text-primary/70"
                 data-testid="faq-search-clear"

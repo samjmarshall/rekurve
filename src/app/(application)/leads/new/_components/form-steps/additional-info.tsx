@@ -47,6 +47,7 @@ export function AdditionalInfo({ form }: AdditionalInfoProps) {
           name="resolveFinanceOptedIn"
           control={control}
           render={({ field }) => (
+            // biome-ignore lint/a11y/noLabelWithoutControl: label wraps Checkbox (Radix input) as its control
             <label className="flex cursor-pointer items-start gap-3 rounded-md border p-3">
               <Checkbox
                 checked={field.value ?? false}

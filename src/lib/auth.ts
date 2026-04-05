@@ -15,13 +15,21 @@ export const auth = betterAuth({
     schema: authSchema,
   }),
   session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // extend expiry once per day on active use
     cookieCache: {
       enabled: true,
+      // 5-minute stale window: a revoked session may remain valid on cached
+      // clients for up to 5 minutes. Acceptable for this app; reduce or
+      // disable if immediate revocation becomes a requirement.
       maxAge: 5 * 60,
     },
   },
   plugins: [
     emailOTP({
+      otpLength: 6,
+      expiresIn: 300, // 5 minutes
+      allowedAttempts: 3, // invalidate OTP after 3 failed attempts
       async sendVerificationOTP({ email, otp }) {
         await resend.emails.send({
           from: "Rekurve <noreply@rekurve.ai>",

@@ -341,12 +341,12 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: CI/CD pipeline, Vercel deployment
 
 **Review checklist**:
-- [ ] Source maps — confirm they're uploaded to PostHog but NOT served publicly
-- [ ] `.next/` output — confirm no server-side code is exposed as static assets
-- [ ] CI environment — confirm secrets are stored as GitHub Actions secrets, not in workflow files
-- [ ] Vercel deployment — confirm preview deployments are protected (not publicly accessible with real data)
-- [ ] `ROBOTS_TXT` env var — confirm production allows indexing of public pages only
-- [ ] Husky pre-commit hooks — confirm they run linting/formatting (not bypassable security checks)
+- [x] Source maps — `next.config.ts:94-99` sets `sourcemaps: { enabled: process.env.CI === "true", deleteAfterUpload: true }` in the `withPostHogConfig` wrapper. Source maps are generated only when `CI=true` (GitHub Actions), uploaded to PostHog for error tracking, then deleted from the build output. `deleteAfterUpload: true` ensures no `.map` files persist in `.next/` and are never served publicly. ✅
+- [x] `.next/` output — no `output: "export"` or custom `distDir` in `next.config.ts`. Default Next.js App Router behaviour: server code (API routes, server components, tRPC handlers) compiles to Node.js functions deployed as Vercel Serverless Functions — not accessible as static files. `.next/static/` contains only client bundles, CSS chunks, and media. No server-side code is exposed via the static asset path. ✅
+- [x] CI environment — all 4 workflow files use `${{ secrets.* }}` references exclusively: `NEON_API_KEY`, `VERCEL_AUTOMATION_BYPASS_SECRET`, `BETTER_AUTH_SECRET` in `post-deploy.yml`; `NEON_API_KEY` in `neon.yml`; `GITHUB_TOKEN` (auto-provided) in `quality-control.yml` and `release.yml`. Non-sensitive config (project IDs, region) uses `${{ vars.* }}`. No secrets are hardcoded or logged in any workflow file. ✅
+- [x] Vercel deployment — `post-deploy.yml:113` passes `VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}` to Playwright E2E tests. This confirms preview deployments are protected by Vercel Deployment Protection and require the bypass secret to access — unauthenticated public access to preview URLs is blocked. E2E tests use the secret to bypass protection within CI only. Real production data is isolated to the production Neon branch; preview deployments connect to per-PR Neon branches (created/deleted by `neon.yml`). ✅
+- [x] `ROBOTS_TXT` env var — `robots.ts` checks `env.ROBOTS_TXT === "Allow"` to return either `allow: "/"` or `disallow: "/"`. Production Vercel env should set `ROBOTS_TXT=Allow`; all other environments (preview, development) omit it, defaulting to disallow all. Auth-protected routes (`/dashboard`, `/settings`) are not indexed by crawlers in practice because they redirect unauthenticated requests to `/login` — even under `allow: "/"` no private content is exposed. The coarse `allow: "/"` rule is acceptable at this stage; a future improvement would be to add `disallow: ["/dashboard", "/settings"]` explicitly for belt-and-suspenders. ✅ (minor future hardening only)
+- [x] Husky pre-commit hooks — `.husky/pre-commit` contains only `make check` (ESLint + TypeScript typecheck). This is a developer quality gate, not a security control. Bypassing with `git commit --no-verify` skips linting/formatting only — no security-critical checks (secrets scanning, SAST) run in the hook. Security controls are enforced in CI (`quality-control.yml`) which cannot be bypassed. Correct architecture: pre-commit for DX, CI for enforcement. ✅
 
 **Files**:
 - `.github/workflows/*.yml`

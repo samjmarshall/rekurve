@@ -236,13 +236,13 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: Error boundaries, tRPC error formatter, server instrumentation
 
 **Review checklist**:
-- [ ] `global-error.tsx` — confirm no stack traces or internal details rendered to user
-- [ ] tRPC `onError` — confirm only logs in development, silent in production
-- [ ] tRPC error formatter — confirm `zodError` field only exposes field-level validation (not internal schema details)
-- [ ] PostHog error tracking — confirm raw exceptions sent to PostHog don't leak to client responses
-- [ ] `instrumentation.ts` — confirm `console.error` in cookie parse failure doesn't leak to response
-- [ ] API routes — confirm all catch blocks return generic error messages
-- [ ] Server component errors — confirm Next.js error boundaries catch and genericize
+- [x] `global-error.tsx` — renders only `<NextError statusCode={0} />` (Next.js generic error page). The `error` object is forwarded exclusively to `posthog.captureException(error)` in a `useEffect` (client-side PostHog SDK). No stack trace, message, or internal detail is rendered into the DOM. ✅
+- [x] tRPC `onError` — `env.NODE_ENV === "development"` guard in `src/app/api/trpc/[trpc]/route.ts:20-27`; the handler is `undefined` in production. Nothing is logged to the console or returned to the client in production. ✅ (consistent with Task 3 finding)
+- [x] tRPC error formatter — `error.cause.flatten()` at `src/server/api/trpc.ts:26` produces only `{ formErrors: string[], fieldErrors: Record<string, string[]> }` — field paths and message strings from Zod, no schema internals or full `ZodIssue` arrays. The `shape` spread preserves tRPC's default behaviour: `stack` is stripped from `shape.data` in production by tRPC's own serializer; only `code`, `httpStatus`, `path`, and `zodError` reach the client. ✅
+- [x] PostHog error tracking — `global-error.tsx` sends errors via the client-side PostHog JS SDK (browser → PostHog servers, never into the HTTP response). `instrumentation.ts:onRequestError` calls the server-side PostHog SDK (`posthog.captureException`) which sends a fire-and-forget HTTP request to PostHog's ingest API; this call is not awaited in a way that affects the Next.js response, and its result is never included in any response body. ✅
+- [x] `instrumentation.ts` — `console.error("Error parsing PostHog cookie:", e)` at line 34 is server-side only (guarded by `NEXT_RUNTIME === "nodejs"`). `onRequestError` is a Next.js instrumentation hook; it runs after the response is already committed and has no return value that could modify the HTTP response. No leakage path to the client. ✅
+- [x] API routes — no `try/catch` blocks exist in any of the four API routes (`auth`, `trpc`, `health`, `dev/session`, `hubspot/webhook`). Uncaught exceptions in Next.js route handlers return a generic HTTP 500 with no stack trace or error detail in production (`NODE_ENV=production`). The `hubspot/webhook/route.ts` has one unguarded `JSON.parse(body)` at line 37 — this is post-signature-validation so the body is trusted, but a malformed body would produce a generic 500 (no leakage). No information-leaking catch blocks found. ✅
+- [x] Server component errors — no nested `error.tsx` files exist (`src/app/**/error.tsx` — zero results). Root-level `global-error.tsx` covers the outermost boundary. For nested route segments, Next.js production mode automatically returns a generic error page without stack traces for all unhandled server component exceptions. No stack traces or internal details are exposed. ✅
 
 **Files**:
 - `src/app/global-error.tsx`

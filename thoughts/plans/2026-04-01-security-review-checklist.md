@@ -182,12 +182,12 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: All client-rendered content
 
 **Review checklist**:
-- [ ] No `dangerouslySetInnerHTML` in any component
-- [ ] No `innerHTML` assignments in any script
-- [ ] User-generated content (if any) is escaped before rendering
-- [ ] CSP `script-src` prevents inline script injection (but `'unsafe-inline'` in `script-src-elem` weakens this)
-- [ ] No URL parameters rendered directly into the page without sanitization
-- [ ] `href` attributes don't accept `javascript:` protocol from user input
+- [x] No `dangerouslySetInnerHTML` in any component — 3 usages exist (`(website)/layout.tsx:118`, `FAQ.tsx:156`, `Pricing.tsx:175`), all for `application/ld+json` schema markup using `JSON.stringify()` of static hardcoded data objects. No user input flows into any of these. Standard JSON-LD pattern; safe. ✅
+- [x] No `innerHTML` assignments in any script — zero matches found anywhere in `src/`. ✅
+- [x] User-generated content (if any) is escaped before rendering — all user-supplied state values rendered in JSX use React's auto-escaping: `{email}` at `login/page.tsx:206`, `{session?.user.email}` at `settings/page.tsx:14`, `{leadName}` (derived from `form.getValues()`) at `success-screen.tsx:24`, `{submitError}` (tRPC error message, not user content) at `form-navigation.tsx:26`. No raw HTML injection paths. ✅
+- [x] CSP `script-src` prevents inline script injection — `'unsafe-inline'` in `script-src-elem` is a known accepted risk documented in Task 4 (required for Next.js App Router hydration scripts and JSON-LD tags; nonce replacement requires Edge Middleware). ⚠️
+- [x] No URL parameters rendered directly into the page without sanitization — no `useSearchParams()` or `router.query` usage in `src/app/` or `src/components/`. URL search params are consumed only in `posthog.ts` for analytics (not rendered to the DOM). No URL parameters are rendered to the page. ✅
+- [x] `href` attributes don't accept `javascript:` protocol from user input — all dynamic `href` values come from hardcoded static config arrays (`navbar.tsx` navItems, `footer.tsx` pages/socials/legals, `nav-config.ts` navItems). The only non-literal dynamic href is `stat.citation.url` in `StatCard.tsx`, sourced from `stats-data.ts` which contains only hardcoded `https://` URLs. No user input flows into any `href` attribute. ✅
 
 **Files**:
 - All files in `src/app/`, `src/components/`

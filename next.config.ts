@@ -27,7 +27,7 @@ const config: NextConfig = {
         },
         {
           key: "Permissions-Policy",
-          value: "geolocation=()",
+          value: "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
         },
         {
           key: "X-Content-Type-Options",
@@ -35,7 +35,11 @@ const config: NextConfig = {
         },
         {
           key: "Referrer-Policy",
-          value: "origin-when-cross-origin",
+          value: "strict-origin-when-cross-origin",
+        },
+        {
+          key: "X-Permitted-Cross-Domain-Policies",
+          value: "none",
         },
         {
           key: "Content-Security-Policy",

@@ -103,13 +103,13 @@ The codebase is a Next.js 16 application with better-auth (email OTP), tRPC, Dri
 **Scope**: Non-CSP security headers in `next.config.ts`
 
 **Review checklist**:
-- [ ] `X-Frame-Options: DENY` — present and correct
-- [ ] `X-Content-Type-Options: nosniff` — present and correct
-- [ ] `Referrer-Policy: origin-when-cross-origin` — assess if `strict-origin-when-cross-origin` would be more appropriate
-- [ ] `Permissions-Policy: geolocation=()` — consider expanding to deny camera, microphone, etc.
-- [ ] `poweredByHeader: false` — confirm Next.js version is not leaked
-- [ ] `Strict-Transport-Security` (HSTS) — check if Vercel handles this or if it needs explicit config
-- [ ] `X-Permitted-Cross-Domain-Policies` — consider adding if Adobe/Flash cross-domain is a concern (low priority)
+- [x] `X-Frame-Options: DENY` — present and correct. ✅
+- [x] `X-Content-Type-Options: nosniff` — present and correct. ✅
+- [x] `Referrer-Policy` — upgraded from `origin-when-cross-origin` to `strict-origin-when-cross-origin`. The stricter variant additionally suppresses the `Referer` header when navigating from HTTPS to HTTP, preventing accidental URL leakage on protocol downgrades. It is the browser default since Chrome 85 / Firefox 87 and the recommended value per MDN. ✅
+- [x] `Permissions-Policy` — expanded from `geolocation=()` to `camera=(), geolocation=(), microphone=(), payment=(), usb=()`. Explicitly denies APIs the app has no business using; reduces attack surface if a malicious script is injected. ✅
+- [x] `poweredByHeader: false` — confirmed. `X-Powered-By: Next.js` is suppressed; Next.js version is not leaked in response headers. ✅
+- [x] `Strict-Transport-Security` (HSTS) — Vercel automatically injects `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` at the edge for all production deployments on custom domains. Adding it explicitly in `next.config.ts` would create duplicate `Strict-Transport-Security` headers (Vercel edge + Next.js), which is harmless but redundant. No config change needed. ✅
+- [x] `X-Permitted-Cross-Domain-Policies` — added with value `none`. Adobe Flash is EOL (2020) and no browser supports it, but the header is a free hardening win that prevents any future Adobe/PDF cross-domain policy file from being honoured. ✅
 
 **Files**:
 - `next.config.ts` (lines 11-40, line 74)

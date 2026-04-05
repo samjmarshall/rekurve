@@ -280,6 +280,31 @@ trap cleanup EXIT INT TERM
 # ── Environment Setup ─────────────────────────────────────
 
 setup_worktree() {
+  # Ensure Node.js matches .nvmrc before running any yarn/node commands
+  if [[ -f "$REPO_ROOT/.nvmrc" ]] && [[ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]]; then
+    export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+    # nvm.sh references unset variables internally; relax -u while it's active
+    set +u
+    # shellcheck disable=SC1091
+    . "$NVM_DIR/nvm.sh"
+
+    local nvmrc_version expected_node current_node
+    nvmrc_version=$(tr -d '[:space:]' < "$REPO_ROOT/.nvmrc")
+    expected_node=$(nvm which "$nvmrc_version" 2>/dev/null || true)
+    current_node=$(command -v node 2>/dev/null || true)
+
+    if [[ -n "$expected_node" && "$expected_node" != "$current_node" ]]; then
+      log "Node.js version mismatch — switching via nvm use"
+      log "  .nvmrc target: $expected_node"
+      log "  current node:  ${current_node:-<none>}"
+      # nvm use must run in the current shell so PATH updates persist
+      pushd "$REPO_ROOT" >/dev/null
+      nvm use
+      popd >/dev/null
+    fi
+    set -u
+  fi
+
   if [[ -d "$WORKTREE_DIR" ]]; then
     log "Worktree exists: $WORKTREE_DIR"
     # Sync BRANCH_NAME with the worktree's actual branch
@@ -314,7 +339,11 @@ setup_worktree() {
 
 needs_devserver() {
   if $NO_DEVSERVER; then return 1; fi
-  grep -qE 'make test_e2e|test:e2e|browser|page\.' "$PLAN_PATH"
+  # If the plan runs make test_e2e, Playwright's webServer config handles its
+  # own build/serve via `rm -rf .next && yarn build && yarn start` — starting
+  # yarn dev in parallel causes a port+`.next/` collision that crashes Turbopack.
+  if grep -qE 'make test_e2e|test:e2e|playwright' "$PLAN_PATH"; then return 1; fi
+  grep -qE 'browser|webdriver' "$PLAN_PATH"
 }
 
 setup_devserver() {

@@ -40,6 +40,6 @@ release:
 	yarn release
 
 clean:
-	rm -rf .next next-env.d.ts tsconfig.tsbuildinfo \
+	rm -rf .next/ next-env.d.ts tsconfig.tsbuildinfo \
 		node_modules .yarn/cache .yarn/install-state.gz \
 		test-results playwright-report .playwright-mcp

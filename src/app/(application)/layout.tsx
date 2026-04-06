@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { redirect } from "next/navigation";
+import { ToastProvider } from "~/components/ui/toast";
 import { getSession } from "~/lib/session";
 import { AnalyticsProvider } from "~/providers/AnalyticsProvider";
 import { ThemeProvider } from "~/providers/ThemeProvider";
@@ -58,18 +59,20 @@ export default async function ApplicationLayout({
         >
           <AnalyticsProvider>
             <TRPCReactProvider>
-              <div className="flex min-h-screen">
-                <AppSidebar
-                  user={{
-                    name: session.user.name ?? "",
-                    email: session.user.email,
-                  }}
-                />
-                <main className="flex flex-1 flex-col pb-16 md:pb-0">
-                  {children}
-                </main>
-                <BottomNav />
-              </div>
+              <ToastProvider>
+                <div className="flex min-h-screen">
+                  <AppSidebar
+                    user={{
+                      name: session.user.name ?? "",
+                      email: session.user.email,
+                    }}
+                  />
+                  <main className="flex flex-1 flex-col pb-16 md:pb-0">
+                    {children}
+                  </main>
+                  <BottomNav />
+                </div>
+              </ToastProvider>
             </TRPCReactProvider>
           </AnalyticsProvider>
         </ThemeProvider>

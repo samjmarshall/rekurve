@@ -2,18 +2,18 @@
 
 import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+  const systemThemeRef = useRef<"light" | "dark">("light");
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    setSystemTheme(mediaQuery.matches ? "dark" : "light");
+    systemThemeRef.current = mediaQuery.matches ? "dark" : "light";
 
     const handleChange = (e: MediaQueryListEvent) => {
-      setSystemTheme(e.matches ? "dark" : "light");
+      systemThemeRef.current = e.matches ? "dark" : "light";
     };
 
     mediaQuery.addEventListener("change", handleChange);
@@ -21,7 +21,6 @@ export function ModeToggle() {
   }, []);
 
   const SWITCH = () => {
-    console.log(theme);
     switch (theme) {
       case "light":
         setTheme("dark");
@@ -30,7 +29,7 @@ export function ModeToggle() {
         setTheme("light");
         break;
       case "system":
-        setTheme(systemTheme === "light" ? "dark" : "light");
+        setTheme(systemThemeRef.current === "light" ? "dark" : "light");
         break;
       default:
         break;

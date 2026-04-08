@@ -46,6 +46,13 @@ After implementing a phase:
 
 Don't let verification interrupt your flow - batch it at natural stopping points.
 
+## UI/Frontend Phases
+
+When a phase modifies UI components, pages, or styles in `src/`:
+- Use the `frontend-design` skill to guide implementation
+- Follow `.claude/skills/frontend-design/design-checklist.md`
+- Run `/design_review` after completing the phase
+
 ## If You Get Stuck
 
 When something isn't working as expected:

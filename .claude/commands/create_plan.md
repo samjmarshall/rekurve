@@ -378,6 +378,11 @@ After structure approval:
 - Add API endpoints with integration/e2e tests
 - Implement email response/user interface last
 
+### For UI/Frontend Changes:
+- Apply `frontend-design` skill and `design-checklist.md` during planning
+- Include accessibility, responsiveness, and brand alignment in success criteria
+- Plan `/design_review` as a verification step after UI phases
+
 ### For Refactoring:
 - Document current behavior
 - Write tests that capture current behavior before changing it

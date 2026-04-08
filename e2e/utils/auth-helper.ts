@@ -69,3 +69,14 @@ export async function createTestSession(
 export async function deleteTestSession(userId: string): Promise<void> {
   await sql()`DELETE FROM "user" WHERE id = ${userId}`;
 }
+
+/**
+ * Delete leads created by E2E tests, identified by test email patterns.
+ */
+export async function deleteTestLeads(): Promise<void> {
+  await sql()`
+    DELETE FROM "leads"
+    WHERE email LIKE 'e2e-%@test.rekurve.dev'
+       OR (first_name = 'Quick' AND last_name LIKE 'Capture %')
+  `;
+}

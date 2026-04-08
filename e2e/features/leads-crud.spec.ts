@@ -3,6 +3,7 @@ import { LeadFormSection } from "../pages/sections/lead-form.section";
 import { QuickCaptureSection } from "../pages/sections/quick-capture.section";
 import {
   createTestSession,
+  deleteTestLeads,
   deleteTestSession,
   type TestSession,
 } from "../utils/auth-helper";
@@ -21,6 +22,7 @@ test.describe("Leads CRUD — E2E", () => {
   });
 
   test.afterAll(async () => {
+    await deleteTestLeads();
     await deleteTestSession(session.userId);
   });
 

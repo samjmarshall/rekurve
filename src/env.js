@@ -14,11 +14,11 @@ export const env = createEnv({
         process.env.VERCEL
           ? process.env.VERCEL_ENV === "production"
             ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-            : `https://${process.env.VERCEL_URL}`
+            : `https://${process.env.VERCEL_BRANCH_URL}`
           : process.env.PORTLESS_URL
             ? process.env.PORTLESS_URL
             : str,
-      z.string().url(),
+      z.url(),
     ),
     DATABASE_URL: z.string().url(),
     DATABASE_URL_UNPOOLED: z.string().url(),

@@ -11,7 +11,7 @@ const resend = new Resend(env.RESEND_API_KEY);
 
 export const auth = betterAuth({
   // trustedOrigins: [env.BETTER_AUTH_URL],
-  // baseURL: env.BETTER_AUTH_URL,
+  baseURL: env.BETTER_AUTH_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: authSchema,

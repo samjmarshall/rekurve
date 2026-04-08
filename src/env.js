@@ -70,5 +70,3 @@ export const env = createEnv({
    */
   emptyStringAsUndefined: true,
 });
-
-console.log(`BETTER_AUTH_URL = ${env.BETTER_AUTH_URL}`);

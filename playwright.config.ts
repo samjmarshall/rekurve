@@ -1,7 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = process.env.PORT ?? 3000;
-const baseURL = process.env.VERCEL_URL ?? `http://localhost:${PORT}`;
+const baseURL = process.env.VERCEL_URL ?? "http://localhost:3000";
 const isCI = process.env.CI === "true";
 
 export default defineConfig({
@@ -41,8 +40,8 @@ export default defineConfig({
   webServer: isCI
     ? undefined
     : {
-        command: `rm -rf .next/ && yarn build && yarn start`,
-        url: `http://localhost:${PORT}`,
+        command: "rm -rf .next/ && yarn preview",
+        url: baseURL,
         timeout: 120_000,
         reuseExistingServer: true,
       },

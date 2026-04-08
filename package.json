@@ -12,6 +12,7 @@
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "preview": "next build && next start",
+    "porless:get": "portless get",
     "start": "next start",
     "test:e2e": "playwright test --reporter=list",
     "test:e2e:debug": "playwright test --debug",

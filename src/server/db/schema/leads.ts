@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   numeric,
   pgTable,
   text,
@@ -11,6 +12,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+import type { ScoreMetadata } from "~/server/ai/scoring";
 import {
   constructionTimelineEnum,
   leadSourceEnum,
@@ -49,6 +51,7 @@ export const leads = pgTable(
     // Scoring
     leadScore: integer("lead_score").default(0),
     leadStage: leadStageEnum("lead_stage").default("unqualified").notNull(),
+    scoreMetadata: jsonb("score_metadata").$type<ScoreMetadata | null>(),
 
     // Preferences
     preferredEstates: text("preferred_estates").array(),

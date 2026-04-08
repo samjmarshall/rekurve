@@ -61,6 +61,21 @@ describe("fromHubSpotProperties", () => {
   });
 });
 
+describe("leadScore and leadStage mapping", () => {
+  test("maps leadScore and leadStage to HubSpot properties", () => {
+    const result = toHubSpotProperties({ leadScore: "85", leadStage: "hot" });
+    expect(result).toEqual({ lead_score: "85", lead_stage: "hot" });
+  });
+
+  test("maps HubSpot lead_score and lead_stage back to app fields", () => {
+    const result = fromHubSpotProperties({
+      lead_score: "85",
+      lead_stage: "hot",
+    });
+    expect(result).toEqual({ leadScore: "85", leadStage: "hot" });
+  });
+});
+
 describe("PROPERTY_MAP", () => {
   test("round-trips all fields", () => {
     const input: Record<string, string> = {};

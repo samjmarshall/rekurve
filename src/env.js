@@ -8,6 +8,7 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
+    ANTHROPIC_API_KEY: z.string().min(1),
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.preprocess(
       (str) =>
@@ -20,8 +21,8 @@ export const env = createEnv({
             : str,
       z.url(),
     ),
-    DATABASE_URL: z.string().url(),
-    DATABASE_URL_UNPOOLED: z.string().url(),
+    DATABASE_URL: z.url(),
+    DATABASE_URL_UNPOOLED: z.url(),
     POSTHOG_ERROR_TRACKING_API_KEY: z.string().min(1),
     POSTHOG_PROJECT_ID: z.string().regex(/^\d+$/, "Must be a numeric string"),
     RESEND_API_KEY: z.string().min(1),
@@ -37,7 +38,7 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_POSTHOG_KEY: z.string(),
-    NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
+    NEXT_PUBLIC_POSTHOG_HOST: z.url(),
   },
 
   /**
@@ -46,6 +47,7 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     DATABASE_URL: process.env.DATABASE_URL,

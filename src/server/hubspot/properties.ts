@@ -17,6 +17,8 @@ export const PROPERTY_MAP = {
   seenBroker: "seen_broker",
   constructionTimeline: "construction_timeline",
   resolveFinanceOptedIn: "resolve_finance_opted_in",
+  leadScore: "lead_score",
+  leadStage: "lead_stage",
 } as const satisfies Record<string, string>;
 
 export type AppField = keyof typeof PROPERTY_MAP;

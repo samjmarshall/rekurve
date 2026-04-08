@@ -1,0 +1,1 @@
+export { qualifyAndScore } from "./scoring";

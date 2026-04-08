@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { ScoreMetadata } from "~/server/ai/scoring";
 
 // Enum schemas — mirror values from src/server/db/schema/enums.ts
 export const propertyTypeSchema = z.enum([
@@ -98,6 +99,7 @@ export const leadUpdateSchema = leadCreateSchema.partial().extend({
   id: z.string().uuid(),
   leadScore: z.number().int().min(0).max(100).nullish(),
   leadStage: leadStageSchema.optional(),
+  scoreMetadata: z.custom<ScoreMetadata>().nullish(),
 });
 
 // Filter/pagination for leads.list

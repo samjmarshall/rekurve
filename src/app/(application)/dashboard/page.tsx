@@ -1,4 +1,5 @@
 import { Inbox } from "lucide-react";
+import { QuickCaptureButton } from "../_components/quick-capture/button";
 
 export default function DashboardPage() {
   return (
@@ -10,6 +11,7 @@ export default function DashboardPage() {
           AI-drafted messages will appear here for your review
         </p>
       </div>
+      <QuickCaptureButton />
     </div>
   );
 }

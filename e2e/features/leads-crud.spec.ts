@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { LeadFormSection } from "../pages/sections/lead-form.section";
+import { QuickCaptureSection } from "../pages/sections/quick-capture.section";
 import {
   createTestSession,
   deleteTestSession,
@@ -115,8 +116,57 @@ test.describe("Leads CRUD — E2E", () => {
     await expect(form.lastNameInput).toHaveValue("Test");
   });
 
-  test("create a lead via quick capture and verify stage defaults to unqualified", () => {
-    test.fixme();
+  test("create a lead via quick capture and verify the success toast appears", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+    await page.goto("/dashboard");
+
+    const quickCapture = new QuickCaptureSection(page);
+    const uniqueId = Date.now().toString(36);
+
+    await quickCapture.open();
+    await expect(quickCapture.firstNameInput).toBeFocused();
+
+    await quickCapture.fill({
+      firstName: "Quick",
+      lastName: `Capture ${uniqueId}`,
+      phone: "0412345678",
+      notes: "Met at BBQ",
+    });
+    await quickCapture.submit();
+
+    // Success toast appears with the lead name
+    await quickCapture.expectSuccessToast(`Quick Capture ${uniqueId}`);
+
+    // Dialog should be closed
+    await expect(quickCapture.dialog).not.toBeVisible();
+  });
+
+  test("quick capture validation surfaces phone format errors", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+    await page.goto("/dashboard");
+
+    const quickCapture = new QuickCaptureSection(page);
+    await quickCapture.open();
+    await quickCapture.fill({
+      firstName: "Bad",
+      lastName: "Phone",
+      phone: "555-1234",
+    });
+    await quickCapture.submit();
+
+    await expect(
+      page
+        .locator('[data-slot="field-error"]')
+        .filter({ hasText: /AU mobile/i }),
+    ).toBeVisible();
   });
 
   test("update a lead's details and verify changes persist on reload", () => {

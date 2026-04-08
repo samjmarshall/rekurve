@@ -1,15 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Resolver } from "react-hook-form";
+import { isValidAuMobile } from "~/lib/phone";
 import { type LeadCreate, leadCreateSchema } from "~/server/api/schemas/leads";
 
-// Australian mobile: 04xx xxx xxx or +614xx xxx xxx
-// Strips spaces/dashes before matching
-const AU_MOBILE_REGEX = /^(\+?61|0)4\d{8}$/;
-
-export function isValidAuMobile(value: string): boolean {
-  const stripped = value.replace(/[\s\-()]/g, "");
-  return AU_MOBILE_REGEX.test(stripped);
-}
+export { isValidAuMobile };
 
 export const leadFormSchema = leadCreateSchema.superRefine((data, ctx) => {
   if (data.phone) {

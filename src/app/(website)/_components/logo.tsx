@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { NativeIcon } from "~/icons/bento-icons";
 import { cn } from "~/lib/utils";

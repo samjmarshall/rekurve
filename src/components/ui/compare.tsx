@@ -2,10 +2,18 @@
 
 import { GripVertical } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { SparklesCore } from "~/components/ui/sparkles";
 import { cn } from "~/lib/utils";
+
+const SparklesCore = dynamic(
+  () =>
+    import("~/components/ui/sparkles").then((m) => ({
+      default: m.SparklesCore,
+    })),
+  { ssr: false },
+);
 
 interface CompareProps {
   firstImage?: string;
@@ -32,7 +40,7 @@ export const Compare = ({
   autoplayDuration = 5000,
 }: CompareProps) => {
   const [sliderXPercent, setSliderXPercent] = useState(initialSliderPercentage);
-  const [isDragging, setIsDragging] = useState(false);
+  const isDraggingRef = useRef(false);
 
   const sliderRef = useRef<HTMLDivElement>(null);
 
@@ -76,7 +84,7 @@ export const Compare = ({
       setSliderXPercent(initialSliderPercentage);
     }
     if (slideMode === "drag") {
-      setIsDragging(false);
+      isDraggingRef.current = false;
     }
     startAutoplay();
   }
@@ -84,7 +92,7 @@ export const Compare = ({
   const handleStart = useCallback(
     (_clientX: number) => {
       if (slideMode === "drag") {
-        setIsDragging(true);
+        isDraggingRef.current = true;
       }
     },
     [slideMode],
@@ -92,14 +100,17 @@ export const Compare = ({
 
   const handleEnd = useCallback(() => {
     if (slideMode === "drag") {
-      setIsDragging(false);
+      isDraggingRef.current = false;
     }
   }, [slideMode]);
 
   const handleMove = useCallback(
     (clientX: number) => {
       if (!sliderRef.current) return;
-      if (slideMode === "hover" || (slideMode === "drag" && isDragging)) {
+      if (
+        slideMode === "hover" ||
+        (slideMode === "drag" && isDraggingRef.current)
+      ) {
         const rect = sliderRef.current.getBoundingClientRect();
         const x = clientX - rect.left;
         const percent = (x / rect.width) * 100;
@@ -108,7 +119,7 @@ export const Compare = ({
         });
       }
     },
-    [slideMode, isDragging],
+    [slideMode],
   );
 
   const handleMouseDown = useCallback(

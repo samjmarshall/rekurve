@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { env } from "~/env";
 
 export async function POST(request: Request) {
-  const body = await request.text();
   const signature = request.headers.get("x-hubspot-signature-v3");
   const timestamp = request.headers.get("x-hubspot-request-timestamp");
 
@@ -18,6 +17,9 @@ export async function POST(request: Request) {
   if (Date.now() - Number(timestamp) > 5 * 60 * 1000) {
     return NextResponse.json({ error: "Timestamp expired" }, { status: 401 });
   }
+
+  // Defer body read until after cheap header/timestamp checks
+  const body = await request.text();
 
   const isValid = Signature.isValid({
     signatureVersion: "v3",

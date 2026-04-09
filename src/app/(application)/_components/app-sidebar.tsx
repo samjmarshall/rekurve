@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { NativeIcon } from "~/icons/bento-icons";
-import { authClient } from "~/lib/auth-client";
 import { cn } from "~/lib/utils";
+import { signOutAction } from "../settings/_components/sign-out-action";
 import { navItems } from "./nav-config";
 
 interface AppSidebarProps {
@@ -13,12 +13,6 @@ interface AppSidebarProps {
 
 export function AppSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
-
-  const handleSignOut = async () => {
-    await authClient.signOut();
-    router.push("/login");
-  };
 
   return (
     <aside
@@ -71,14 +65,15 @@ export function AppSidebar({ user }: AppSidebarProps) {
           </p>
           <p className="truncate text-muted-foreground text-xs">{user.email}</p>
         </div>
-        <button
-          type="button"
-          onClick={handleSignOut}
-          data-testid="sidebar-sign-out"
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:bg-secondary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          Sign out
-        </button>
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            data-testid="sidebar-sign-out"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:bg-secondary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            Sign out
+          </button>
+        </form>
       </div>
     </aside>
   );

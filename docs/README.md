@@ -99,6 +99,8 @@ cp .env.example .env
 | `NEXT_PUBLIC_POSTHOG_HOST` | Analytics | PostHog ingest host (reverse-proxied) |
 | `POSTHOG_ERROR_TRACKING_API_KEY` | Analytics | PostHog error tracking key |
 | `POSTHOG_PROJECT_ID` | Analytics | PostHog project ID (numeric) |
+| `NEON_API_KEY` | Database | Neon API key (optional — local DB branching) |
+| `NEON_PROJECT_ID` | Database | Neon project ID (optional — local DB branching) |
 | `ROBOTS_TXT` | SEO | `Disallow` (default) or `Allow` |
 
 Environment validation is enforced at build time via `src/env.js` (uses `@t3-oss/env-nextjs` + Zod). Set `SKIP_ENV_VALIDATION=1` to bypass during Docker builds or CI steps that don't need the full env.
@@ -121,6 +123,10 @@ All commands go through the `Makefile`. Prefer `make` targets over raw `yarn`/`n
 | `make db_generate` | Generate Drizzle migration files |
 | `make db_push` | Push schema to database |
 | `make db_studio` | Open Drizzle Studio GUI |
+| `make db_branch` | Create/switch Neon DB branch for current git branch |
+| `make db_branch_delete` | Delete current branch's Neon DB branch |
+| `make db_branch_delete_all` | Delete all `local/*` Neon branches |
+| `make db_branch_status` | List all local Neon branches |
 | `make release` | Semantic release via `auto shipit` |
 | `make clean` | Remove `.next`, `node_modules`, caches |
 
@@ -157,6 +163,27 @@ All commands go through the `Makefile`. Prefer `make` targets over raw `yarn`/`n
 - **Rollback on failure**:
   - Preview: resets Neon branch to parent
   - Production: point-in-time restore to pre-migration timestamp
+
+### Local Database Branching
+
+When you switch git branches locally, a Neon database branch named `local/{branch}` is automatically created (via the `post-checkout` hook). This gives each feature branch its own isolated copy of the production database.
+
+**Setup** (one-time):
+1. Get your API key from Neon Console → Account Settings → API Keys
+2. Get the project ID from Neon Console → Project Settings → General
+3. Add both to your `.env`:
+   ```
+   NEON_API_KEY=your-key-here
+   NEON_PROJECT_ID=your-project-id
+   ```
+
+**Manual control**:
+- `make db_branch` — create/switch to the branch DB
+- `make db_branch_delete` — delete the current branch's DB
+- `make db_branch_delete_all` — clean up all `local/*` branches
+- `make db_branch_status` — list all local branches
+
+**Opting out**: If `NEON_API_KEY` is not set, the hook silently skips. Developers who don't need isolated databases can continue using their existing connection strings.
 
 ### Deployment Flow
 

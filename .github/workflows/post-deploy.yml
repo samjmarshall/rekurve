@@ -53,8 +53,8 @@ jobs:
           if [ "$ENVIRONMENT" = "production" ]; then
             BRANCH_ID=$(echo "$BRANCHES" | jq -r '.branches[] | select(.primary == true) | .id')
           else
-            BRANCH_ID=$(echo "$BRANCHES" | jq -r --arg ref "$GIT_REF" \
-              '.branches[] | select(.name | test($ref)) | .id')
+            BRANCH_ID=$(echo "$BRANCHES" | jq -r --arg ref "preview/$GIT_REF" \
+              '.branches[] | select(.name == $ref) | .id')
           fi
 
           if [ -z "$BRANCH_ID" ]; then

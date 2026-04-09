@@ -8,6 +8,13 @@
       "when": 1774759360834,
       "tag": "0000_loud_chimera",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1775646482485,
+      "tag": "0001_boring_giant_man",
+      "breakpoints": true
     }
   ]
 }

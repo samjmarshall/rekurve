@@ -27,6 +27,6 @@ Prefer Makefile targets with `yarn` as a fallback — never use `npm` or `npx` d
 
 ## Workflows
 
-### Design Review After UI/UX Changes
+### Building & Reviewing UI
 
-After completing any UI/UX work in `src/` (new pages, component changes, style updates, layout modifications), run `/design_review` before committing. This catches accessibility failures, contrast issues, dark mode bugs, and brand inconsistencies early.
+Use the `frontend-design` skill when implementing UI components, pages, or layouts. After completing UI/UX work in `src/`, run `/design_review` before committing.

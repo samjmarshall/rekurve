@@ -113,6 +113,11 @@ jobs:
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           DATABASE_URL: ${{ steps.neon.outputs.db_url }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          # HubSpot outbound sync tests run in any environment
+          HUBSPOT_ACCESS_TOKEN: ${{ secrets.HUBSPOT_ACCESS_TOKEN }}
+          # Inbound webhook tests only run on production — the HubSpot
+          # webhook target URL is manually pinned to the production deployment
+          HUBSPOT_WEBHOOK_ACTIVE: ${{ github.event.client_payload.environment == 'production' && '1' || '' }}
 
       - name: Rollback migrations (preview — reset branch to parent)
         if: failure() && steps.e2e.outcome == 'failure' && steps.neon.outputs.branch_id && github.event.client_payload.environment != 'production'

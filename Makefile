@@ -36,6 +36,18 @@ db_push: install
 db_studio: install
 	yarn db:studio
 
+db_branch:
+	scripts/neon-branch.sh create
+
+db_branch_delete:
+	scripts/neon-branch.sh delete
+
+db_branch_delete_all:
+	scripts/neon-branch.sh delete --all
+
+db_branch_status:
+	scripts/neon-branch.sh status
+
 release:
 	yarn release
 

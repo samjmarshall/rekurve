@@ -20,8 +20,8 @@ export const env = createEnv({
             : str,
       z.url(),
     ),
-    DATABASE_URL: z.string().url(),
-    DATABASE_URL_UNPOOLED: z.string().url(),
+    DATABASE_URL: z.url(),
+    DATABASE_URL_UNPOOLED: z.url(),
     POSTHOG_ERROR_TRACKING_API_KEY: z.string().min(1),
     POSTHOG_PROJECT_ID: z.string().regex(/^\d+$/, "Must be a numeric string"),
     RESEND_API_KEY: z.string().min(1),
@@ -37,7 +37,7 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_POSTHOG_KEY: z.string(),
-    NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
+    NEXT_PUBLIC_POSTHOG_HOST: z.url(),
   },
 
   /**

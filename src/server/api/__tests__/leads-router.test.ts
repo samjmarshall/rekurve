@@ -30,6 +30,7 @@ const mockLead = {
   referrerName: null,
   notes: null,
   resolveFinanceOptedIn: false,
+  scoreMetadata: null,
   createdAt: new Date("2026-01-01"),
   updatedAt: new Date("2026-01-01"),
   lastContactedAt: null,
@@ -43,8 +44,8 @@ beforeEach(() => {
   rs.doMock("~/env", () => ({
     env: {
       DATABASE_URL: "postgres://mock",
-      HUBSPOT_ACCESS_TOKEN: "mock",
-      HUBSPOT_CLIENT_SECRET: "mock",
+      HUBSPOT_ACCESS_TOKEN: "mock-token",
+      HUBSPOT_CLIENT_SECRET: "mock-secret",
     },
   }));
 
@@ -70,6 +71,27 @@ beforeEach(() => {
   };
 
   rs.doMock("~/server/db", () => ({ db: mockDb }));
+
+  rs.doMock("~/server/scoring", () => ({
+    qualifyAndScore: rs.fn().mockReturnValue({
+      score: 45,
+      stage: "nurture",
+      breakdown: {
+        land: { score: 15, maxScore: 30, reasoning: "test" },
+        finance: { score: 15, maxScore: 25, reasoning: "test" },
+        timeline: { score: 12, maxScore: 20, reasoning: "test" },
+        budget: { score: 0, maxScore: 10, reasoning: "test" },
+        propertyType: { score: 3, maxScore: 10, reasoning: "test" },
+        engagement: { score: 0, maxScore: 5, reasoning: "test" },
+      },
+      gaps: [],
+      nextQuestion: "test question",
+    }),
+  }));
+
+  rs.doMock("~/server/hubspot/contacts", () => ({
+    updateContact: rs.fn().mockResolvedValue({}),
+  }));
 });
 
 async function getCaller(): Promise<Caller> {
@@ -321,6 +343,89 @@ describe("leads.delete", () => {
       expect(e).toBeInstanceOf(TRPCError);
       expect((e as TRPCError).code).toBe("NOT_FOUND");
     }
+  });
+});
+
+// --- leads.create — scoring integration ---
+
+describe("leads.create — scoring integration", () => {
+  test("returns lead immediately without waiting for scoring", async () => {
+    const { qualifyAndScore } = await import("~/server/scoring");
+    (qualifyAndScore as ReturnType<typeof rs.fn>).mockImplementation(() => ({
+      score: 0,
+      stage: "unqualified",
+      breakdown: {},
+      gaps: [],
+      nextQuestion: "",
+    }));
+
+    const returning = rs.fn().mockResolvedValue([mockLead]);
+    const values = rs.fn().mockReturnValue({ returning });
+    (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
+
+    const caller = await getCaller();
+    const result = await caller.leads.create({
+      firstName: "John",
+      lastName: "Smith",
+    });
+
+    // Should return immediately, not wait for scoring
+    expect(result.firstName).toBe("John");
+  });
+
+  test("create succeeds even when scoring throws", async () => {
+    const { qualifyAndScore } = await import("~/server/scoring");
+    (qualifyAndScore as ReturnType<typeof rs.fn>).mockImplementation(() => {
+      throw new Error("Scoring failed");
+    });
+
+    const returning = rs.fn().mockResolvedValue([mockLead]);
+    const values = rs.fn().mockReturnValue({ returning });
+    (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
+
+    const caller = await getCaller();
+    const result = await caller.leads.create({
+      firstName: "John",
+      lastName: "Smith",
+    });
+
+    expect(result.firstName).toBe("John");
+    expect(result.leadScore).toBe(0);
+  });
+});
+
+// --- leads.update — scoring integration ---
+
+describe("leads.update — scoring integration", () => {
+  test("triggers re-scoring when qualification fields change", async () => {
+    const { qualifyAndScore } = await import("~/server/scoring");
+    const updatedLead = { ...mockLead, budget: "$700K" };
+    const returning = rs.fn().mockResolvedValue([updatedLead]);
+    const where = rs.fn().mockReturnValue({ returning });
+    const set = rs.fn().mockReturnValue({ where });
+    (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
+
+    const caller = await getCaller();
+    await caller.leads.update({ id: mockLead.id, budget: "$700K" });
+
+    // Give the microtask queue a tick
+    await new Promise((r) => setTimeout(r, 0));
+    expect(qualifyAndScore).toHaveBeenCalled();
+  });
+
+  test("does not re-score when only non-qualification fields change", async () => {
+    const { qualifyAndScore } = await import("~/server/scoring");
+    const updatedLead = { ...mockLead, referrerName: "Bob" };
+    const returning = rs.fn().mockResolvedValue([updatedLead]);
+    const where = rs.fn().mockReturnValue({ returning });
+    const set = rs.fn().mockReturnValue({ where });
+    (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
+
+    const caller = await getCaller();
+    await caller.leads.update({ id: mockLead.id, referrerName: "Bob" });
+
+    await new Promise((r) => setTimeout(r, 0));
+    expect(qualifyAndScore).not.toHaveBeenCalled();
   });
 });
 

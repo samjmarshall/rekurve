@@ -8,6 +8,63 @@ import {
 } from "~/server/api/schemas/leads";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { leads } from "~/server/db/schema";
+import { updateContact } from "~/server/hubspot/contacts";
+import type { ScoreMetadata } from "~/server/scoring";
+import { qualifyAndScore } from "~/server/scoring";
+
+/** Fire-and-forget scoring — errors are logged, never thrown. */
+async function scoreLeadAsync(
+  db: typeof import("~/server/db").db,
+  leadId: string,
+  lead: Parameters<typeof qualifyAndScore>[0],
+  hubspotContactId: string | null,
+): Promise<void> {
+  try {
+    const result = qualifyAndScore(lead);
+
+    const metadata: ScoreMetadata = {
+      ...result,
+      scoredAt: new Date().toISOString(),
+    };
+
+    await db
+      .update(leads)
+      .set({
+        leadScore: result.score,
+        leadStage: result.stage,
+        scoreMetadata: metadata,
+        updatedAt: new Date(),
+      })
+      .where(eq(leads.id, leadId));
+
+    if (hubspotContactId) {
+      await updateContact(hubspotContactId, {
+        leadScore: String(result.score),
+        leadStage: result.stage,
+      }).catch((err) => {
+        console.error(`[scoring] HubSpot sync failed for lead ${leadId}:`, err);
+      });
+    }
+  } catch (err) {
+    console.error(`[scoring] Failed to score lead ${leadId}:`, err);
+  }
+}
+
+// Qualification fields that trigger re-scoring
+const SCORING_FIELDS = new Set([
+  "hasLand",
+  "landRegistered",
+  "landAddress",
+  "landSizeSqm",
+  "landWidth",
+  "landDepth",
+  "seenBroker",
+  "constructionTimeline",
+  "budget",
+  "propertyType",
+  "preferredEstates",
+  "preferredSuburbs",
+]);
 
 export const leadsRouter = createTRPCRouter({
   create: protectedProcedure
@@ -21,6 +78,10 @@ export const leadsRouter = createTRPCRouter({
           leadScore: 0,
         })
         .returning();
+
+      // Fire-and-forget — don't block the response
+      void scoreLeadAsync(ctx.db, lead!.id, lead!, lead!.hubspotContactId);
+
       return lead!;
     }),
 
@@ -105,6 +166,20 @@ export const leadsRouter = createTRPCRouter({
       if (!updated) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Lead not found" });
       }
+
+      // Re-score if qualification fields changed
+      const hasQualificationChange = Object.keys(data).some((k) =>
+        SCORING_FIELDS.has(k),
+      );
+      if (hasQualificationChange) {
+        void scoreLeadAsync(
+          ctx.db,
+          updated.id,
+          updated,
+          updated.hubspotContactId,
+        );
+      }
+
       return updated;
     }),
 

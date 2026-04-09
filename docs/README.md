@@ -262,9 +262,9 @@ These commands are invoked inside [Claude Code](https://claude.ai/code) via slas
 | `/brainstorm` | Socratic exploration of rough ideas into a design doc | Before writing code — refine what you're building |
 | `/write_ticket` | Collaborative ticket writing | Creating GitHub issues with clear scope |
 | `/review_roadmap` | GitHub Project prioritization review | Re-assessing milestone priorities |
-| `/create_plan` | Research-heavy plan creation → `thoughts/plans/` | Starting a new feature or significant change |
+| `/create_plan` | Research-heavy plan creation → `thoughts/plans/`. Applies `frontend-design` skill for UI work | Starting a new feature or significant change |
 | `/iterate_plan` | Update existing plan with new feedback | Plan needs revision after code review or discovery |
-| `/implement_plan <path>` | Execute a plan phase-by-phase | Working through an approved plan |
+| `/implement_plan <path>` | Execute a plan phase-by-phase. Invokes `frontend-design` skill for UI phases | Working through an approved plan |
 | `/validate_plan <path>` | Verify implementation matches plan intent | After implementing — check nothing was missed |
 | `/plan-to-ralph-spec <path>` | Convert markdown plan to `.spec.json` for Ralph | Before running `ralph.sh` — produces the JSON spec Ralph reads |
 | `/commit` | Structured conventional commit | Ready to commit (follows repo conventions) |

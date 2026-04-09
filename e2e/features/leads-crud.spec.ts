@@ -3,9 +3,9 @@ import { LeadFormSection } from "../pages/sections/lead-form.section";
 import { QuickCaptureSection } from "../pages/sections/quick-capture.section";
 import {
   createTestSession,
-  deleteTestLeads,
   deleteTestSession,
   type TestSession,
+  uniquePhone,
 } from "../utils/auth-helper";
 import { getSessionCookie } from "../utils/session-cookie";
 
@@ -22,7 +22,9 @@ test.describe("Leads CRUD — E2E", () => {
   });
 
   test.afterAll(async () => {
-    await deleteTestLeads();
+    // Leads and HubSpot contacts created here are cleaned up by
+    // e2e/utils/global-teardown.ts after every worker has finished — doing it
+    // here would race with concurrent hubspot-sync tests in other workers.
     await deleteTestSession(session.userId);
   });
 
@@ -45,7 +47,7 @@ test.describe("Leads CRUD — E2E", () => {
     await form.fillStep1({
       firstName: "E2E",
       lastName: `Test ${uniqueId}`,
-      phone: "0412345678",
+      phone: uniquePhone(),
       email: `e2e-${uniqueId}@test.rekurve.dev`,
     });
     await form.selectSegmented("Preferred contact time", "Anytime");
@@ -135,7 +137,7 @@ test.describe("Leads CRUD — E2E", () => {
     await quickCapture.fill({
       firstName: "Quick",
       lastName: `Capture ${uniqueId}`,
-      phone: "0412345678",
+      phone: uniquePhone(),
       notes: "Met at BBQ",
     });
     await quickCapture.submit();

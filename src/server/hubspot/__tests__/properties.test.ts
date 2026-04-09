@@ -1,7 +1,9 @@
 import { describe, expect, test } from "@rstest/core";
 import {
+  coerceFromHubSpot,
   fromHubSpotProperties,
   PROPERTY_MAP,
+  toAppField,
   toHubSpotProperties,
 } from "../properties";
 
@@ -77,6 +79,10 @@ describe("leadScore and leadStage mapping", () => {
 });
 
 describe("PROPERTY_MAP", () => {
+  test("has 20 entries", () => {
+    expect(Object.keys(PROPERTY_MAP)).toHaveLength(20);
+  });
+
   test("round-trips all fields", () => {
     const input: Record<string, string> = {};
     for (const key of Object.keys(PROPERTY_MAP)) {
@@ -87,5 +93,35 @@ describe("PROPERTY_MAP", () => {
     expect(Object.keys(roundTripped).sort()).toEqual(
       Object.keys(PROPERTY_MAP).sort(),
     );
+  });
+});
+
+describe("toAppField", () => {
+  test("maps known HubSpot property to app field", () => {
+    expect(toAppField("lead_score")).toBe("leadScore");
+    expect(toAppField("preferred_contact_time")).toBe("preferredContactTime");
+  });
+
+  test("returns undefined for unknown property", () => {
+    expect(toAppField("hs_analytics_source")).toBeUndefined();
+  });
+});
+
+describe("coerceFromHubSpot", () => {
+  test("coerces boolean fields from string", () => {
+    expect(coerceFromHubSpot("hasLand", "true")).toBe(true);
+    expect(coerceFromHubSpot("hasLand", "false")).toBe(false);
+    expect(coerceFromHubSpot("seenBroker", "true")).toBe(true);
+    expect(coerceFromHubSpot("resolveFinanceOptedIn", "false")).toBe(false);
+  });
+
+  test("coerces integer fields from string", () => {
+    expect(coerceFromHubSpot("leadScore", "85")).toBe(85);
+    expect(coerceFromHubSpot("leadScore", "0")).toBe(0);
+  });
+
+  test("passes string fields through unchanged", () => {
+    expect(coerceFromHubSpot("firstName", "Jane")).toBe("Jane");
+    expect(coerceFromHubSpot("leadStage", "hot")).toBe("hot");
   });
 });

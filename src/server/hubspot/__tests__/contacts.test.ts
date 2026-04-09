@@ -113,3 +113,82 @@ describe("searchContacts", () => {
     expect(results[0]!.properties.email).toBe("jane@example.com");
   });
 });
+
+describe("findExistingContact", () => {
+  test("finds contact by email first", async () => {
+    mockDoSearch.mockResolvedValue({ results: [MOCK_RESPONSE] });
+
+    const { findExistingContact } = await import("../contacts");
+    const result = await findExistingContact("jane@example.com", "0400000000");
+
+    expect(result?.id).toBe("123");
+    expect(mockDoSearch).toHaveBeenCalledTimes(1);
+    expect(mockDoSearch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filterGroups: [
+          {
+            filters: [
+              {
+                propertyName: "email",
+                operator: "EQ",
+                value: "jane@example.com",
+              },
+            ],
+          },
+        ],
+      }),
+    );
+  });
+
+  test("falls back to phone when no email match", async () => {
+    mockDoSearch
+      .mockResolvedValueOnce({ results: [] })
+      .mockResolvedValueOnce({ results: [MOCK_RESPONSE] });
+
+    const { findExistingContact } = await import("../contacts");
+    const result = await findExistingContact(
+      "nobody@example.com",
+      "0400000000",
+    );
+
+    expect(result?.id).toBe("123");
+    expect(mockDoSearch).toHaveBeenCalledTimes(2);
+  });
+
+  test("returns null when no match found", async () => {
+    mockDoSearch.mockResolvedValue({ results: [] });
+
+    const { findExistingContact } = await import("../contacts");
+    const result = await findExistingContact(
+      "nobody@example.com",
+      "0000000000",
+    );
+
+    expect(result).toBeNull();
+  });
+
+  test("skips email search when email is null", async () => {
+    mockDoSearch.mockResolvedValue({ results: [MOCK_RESPONSE] });
+
+    const { findExistingContact } = await import("../contacts");
+    const result = await findExistingContact(null, "0400000000");
+
+    expect(result?.id).toBe("123");
+    expect(mockDoSearch).toHaveBeenCalledTimes(1);
+    expect(mockDoSearch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filterGroups: [
+          {
+            filters: [
+              {
+                propertyName: "phone",
+                operator: "EQ",
+                value: "0400000000",
+              },
+            ],
+          },
+        ],
+      }),
+    );
+  });
+});

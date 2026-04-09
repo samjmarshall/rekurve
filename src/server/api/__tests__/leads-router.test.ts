@@ -89,8 +89,42 @@ beforeEach(() => {
     }),
   }));
 
-  rs.doMock("~/server/hubspot/contacts", () => ({
-    updateContact: rs.fn().mockResolvedValue({}),
+  rs.doMock("~/server/hubspot", () => ({
+    findExistingContact: rs.fn().mockResolvedValue(null),
+    createContact: rs.fn().mockResolvedValue({
+      id: "hs-123",
+      properties: {},
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    }),
+    updateContact: rs.fn().mockResolvedValue({
+      id: "hs-123",
+      properties: {},
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    }),
+    PROPERTY_MAP: {
+      firstName: "firstname",
+      lastName: "lastname",
+      email: "email",
+      phone: "phone",
+      hasLand: "has_land",
+      landRegistered: "land_registered",
+      landAddress: "land_address",
+      landSizeSqm: "land_size_sqm",
+      propertyType: "property_type",
+      budget: "budget",
+      seenBroker: "seen_broker",
+      constructionTimeline: "construction_timeline",
+      resolveFinanceOptedIn: "resolve_finance_opted_in",
+      preferredContactTime: "preferred_contact_time",
+      landWidth: "land_width",
+      landDepth: "land_depth",
+      leadScore: "lead_score",
+      leadStage: "lead_stage",
+      notes: "notes",
+      leadSource: "lead_source",
+    },
   }));
 });
 
@@ -152,6 +186,77 @@ describe("leads.create", () => {
     } catch (e) {
       expect(e).toBeInstanceOf(TRPCError);
       expect((e as TRPCError).code).toBe("BAD_REQUEST");
+    }
+  });
+});
+
+// --- leads.create — HubSpot sync ---
+
+describe("leads.create — HubSpot sync", () => {
+  test("creates HubSpot contact when no dedup match", async () => {
+    const leadWithHs = { ...mockLead, hubspotContactId: "hs-123" };
+    const returning = rs.fn().mockResolvedValue([leadWithHs]);
+    const values = rs.fn().mockReturnValue({ returning });
+    (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
+
+    const { createContact } = await import("~/server/hubspot");
+
+    const caller = await getCaller();
+    await caller.leads.create({
+      firstName: "John",
+      lastName: "Smith",
+      email: "john@example.com",
+    });
+
+    expect(createContact).toHaveBeenCalled();
+  });
+
+  test("updates existing HubSpot contact when dedup match found", async () => {
+    const { findExistingContact, updateContact } = await import(
+      "~/server/hubspot"
+    );
+    (findExistingContact as ReturnType<typeof rs.fn>).mockResolvedValue({
+      id: "hs-existing",
+      properties: {},
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    });
+
+    const leadWithHs = { ...mockLead, hubspotContactId: "hs-existing" };
+    const returning = rs.fn().mockResolvedValue([leadWithHs]);
+    const values = rs.fn().mockReturnValue({ returning });
+    (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
+
+    const caller = await getCaller();
+    await caller.leads.create({
+      firstName: "John",
+      lastName: "Smith",
+      email: "john@example.com",
+    });
+
+    expect(updateContact).toHaveBeenCalledWith(
+      "hs-existing",
+      expect.objectContaining({ firstName: "John" }),
+    );
+  });
+
+  test("throws INTERNAL_SERVER_ERROR on DB failure after HubSpot success", async () => {
+    const returning = rs.fn().mockRejectedValue(new Error("DB down"));
+    const values = rs.fn().mockReturnValue({ returning });
+    (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
+
+    const caller = await getCaller();
+
+    try {
+      await caller.leads.create({
+        firstName: "John",
+        lastName: "Smith",
+      });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect(e).toBeInstanceOf(TRPCError);
+      expect((e as TRPCError).code).toBe("INTERNAL_SERVER_ERROR");
+      expect((e as TRPCError).message).toContain("hs-123");
     }
   });
 });
@@ -265,6 +370,10 @@ describe("leads.list", () => {
 
 describe("leads.update", () => {
   test("updates a lead with partial fields", async () => {
+    (
+      mockDb.query as { leads: { findFirst: ReturnType<typeof rs.fn> } }
+    ).leads.findFirst.mockResolvedValue({ hubspotContactId: null });
+
     const updatedLead = { ...mockLead, budget: "$700K" };
     const returning = rs.fn().mockResolvedValue([updatedLead]);
     const where = rs.fn().mockReturnValue({ returning });
@@ -281,10 +390,9 @@ describe("leads.update", () => {
   });
 
   test("throws NOT_FOUND when lead does not exist", async () => {
-    const returning = rs.fn().mockResolvedValue([]);
-    const where = rs.fn().mockReturnValue({ returning });
-    const set = rs.fn().mockReturnValue({ where });
-    (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
+    (
+      mockDb.query as { leads: { findFirst: ReturnType<typeof rs.fn> } }
+    ).leads.findFirst.mockResolvedValue(undefined);
 
     const caller = await getCaller();
 
@@ -310,6 +418,51 @@ describe("leads.update", () => {
       expect(e).toBeInstanceOf(TRPCError);
       expect((e as TRPCError).code).toBe("BAD_REQUEST");
     }
+  });
+});
+
+// --- leads.update — HubSpot sync ---
+
+describe("leads.update — HubSpot sync", () => {
+  test("updates HubSpot before local DB when linked", async () => {
+    (
+      mockDb.query as { leads: { findFirst: ReturnType<typeof rs.fn> } }
+    ).leads.findFirst.mockResolvedValue({ hubspotContactId: "hs-123" });
+
+    const updatedLead = { ...mockLead, budget: "$700K" };
+    const returning = rs.fn().mockResolvedValue([updatedLead]);
+    const where = rs.fn().mockReturnValue({ returning });
+    const set = rs.fn().mockReturnValue({ where });
+    (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
+
+    const { updateContact } = await import("~/server/hubspot");
+
+    const caller = await getCaller();
+    await caller.leads.update({ id: mockLead.id, budget: "$700K" });
+
+    expect(updateContact).toHaveBeenCalledWith(
+      "hs-123",
+      expect.objectContaining({ budget: "$700K" }),
+    );
+  });
+
+  test("skips HubSpot when lead has no hubspotContactId", async () => {
+    (
+      mockDb.query as { leads: { findFirst: ReturnType<typeof rs.fn> } }
+    ).leads.findFirst.mockResolvedValue({ hubspotContactId: null });
+
+    const updatedLead = { ...mockLead, budget: "$700K" };
+    const returning = rs.fn().mockResolvedValue([updatedLead]);
+    const where = rs.fn().mockReturnValue({ returning });
+    const set = rs.fn().mockReturnValue({ where });
+    (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
+
+    const { updateContact } = await import("~/server/hubspot");
+
+    const caller = await getCaller();
+    await caller.leads.update({ id: mockLead.id, budget: "$700K" });
+
+    expect(updateContact).not.toHaveBeenCalled();
   });
 });
 
@@ -398,6 +551,10 @@ describe("leads.create — scoring integration", () => {
 
 describe("leads.update — scoring integration", () => {
   test("triggers re-scoring when qualification fields change", async () => {
+    (
+      mockDb.query as { leads: { findFirst: ReturnType<typeof rs.fn> } }
+    ).leads.findFirst.mockResolvedValue({ hubspotContactId: null });
+
     const { qualifyAndScore } = await import("~/server/scoring");
     const updatedLead = { ...mockLead, budget: "$700K" };
     const returning = rs.fn().mockResolvedValue([updatedLead]);
@@ -414,6 +571,10 @@ describe("leads.update — scoring integration", () => {
   });
 
   test("does not re-score when only non-qualification fields change", async () => {
+    (
+      mockDb.query as { leads: { findFirst: ReturnType<typeof rs.fn> } }
+    ).leads.findFirst.mockResolvedValue({ hubspotContactId: null });
+
     const { qualifyAndScore } = await import("~/server/scoring");
     const updatedLead = { ...mockLead, referrerName: "Bob" };
     const returning = rs.fn().mockResolvedValue([updatedLead]);

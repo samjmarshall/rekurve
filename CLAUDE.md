@@ -25,6 +25,17 @@ Prefer Makefile targets with `yarn` as a fallback — never use `npm` or `npx` d
 
 ---
 
+## Database Migrations
+
+**Never use `drizzle-kit push`** — it applies schema changes directly without recording them in the migrations table, breaking idempotency.
+
+Always use this two-step process:
+
+1. `yarn db:generate` — generate a migration SQL file in `drizzle/`
+2. `yarn db:migrate` — apply pending migrations and record them in `__drizzle_migrations`
+
+---
+
 ## Workflows
 
 ### Building & Reviewing UI

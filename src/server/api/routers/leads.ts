@@ -8,7 +8,12 @@ import {
 } from "~/server/api/schemas/leads";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { leads } from "~/server/db/schema";
-import { updateContact } from "~/server/hubspot/contacts";
+import {
+  createContact,
+  findExistingContact,
+  PROPERTY_MAP,
+  updateContact as updateHubSpotContact,
+} from "~/server/hubspot";
 import type { ScoreMetadata } from "~/server/scoring";
 import { qualifyAndScore } from "~/server/scoring";
 
@@ -38,7 +43,7 @@ async function scoreLeadAsync(
       .where(eq(leads.id, leadId));
 
     if (hubspotContactId) {
-      await updateContact(hubspotContactId, {
+      await updateHubSpotContact(hubspotContactId, {
         leadScore: String(result.score),
         leadStage: result.stage,
       }).catch((err) => {
@@ -70,19 +75,42 @@ export const leadsRouter = createTRPCRouter({
   create: protectedProcedure
     .input(leadCreateSchema)
     .mutation(async ({ ctx, input }) => {
-      const [lead] = await ctx.db
-        .insert(leads)
-        .values({
-          ...input,
-          leadStage: "unqualified",
-          leadScore: 0,
-        })
-        .returning();
+      // 1. Extract HubSpot-mapped fields from input
+      const hubspotData: Record<string, string | boolean | null> = {};
+      for (const key of Object.keys(input) as Array<keyof typeof input>) {
+        if (key in PROPERTY_MAP && input[key] != null) {
+          hubspotData[key] = input[key] as string | boolean | null;
+        }
+      }
 
-      // Fire-and-forget — don't block the response
-      void scoreLeadAsync(ctx.db, lead!.id, lead!, lead!.hubspotContactId);
+      // 2. Dedup: search HubSpot for existing contact by email/phone
+      const existing = await findExistingContact(input.email, input.phone);
+      const hubspotContact = existing
+        ? await updateHubSpotContact(existing.id, hubspotData)
+        : await createContact(hubspotData);
 
-      return lead!;
+      // 3. Write to local DB with hubspotContactId
+      try {
+        const [lead] = await ctx.db
+          .insert(leads)
+          .values({
+            ...input,
+            hubspotContactId: hubspotContact.id,
+            leadStage: "unqualified",
+            leadScore: 0,
+          })
+          .returning();
+
+        // Fire-and-forget — don't block the response
+        void scoreLeadAsync(ctx.db, lead!.id, lead!, lead!.hubspotContactId);
+
+        return lead!;
+      } catch {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Lead saved to HubSpot (contact ID: ${hubspotContact.id}) but local save failed. Retry or check HubSpot.`,
+        });
+      }
     }),
 
   getById: protectedProcedure
@@ -157,6 +185,29 @@ export const leadsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
 
+      // Fetch the lead to get its hubspotContactId
+      const existing = await ctx.db.query.leads.findFirst({
+        where: eq(leads.id, id),
+        columns: { hubspotContactId: true },
+      });
+      if (!existing) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Lead not found" });
+      }
+
+      // Write mapped fields to HubSpot first (if linked)
+      if (existing.hubspotContactId) {
+        const hubspotData: Record<string, string | boolean | null> = {};
+        for (const key of Object.keys(data) as Array<keyof typeof data>) {
+          if (key in PROPERTY_MAP && data[key] !== undefined) {
+            hubspotData[key] = data[key] as string | boolean | null;
+          }
+        }
+        if (Object.keys(hubspotData).length > 0) {
+          await updateHubSpotContact(existing.hubspotContactId, hubspotData);
+        }
+      }
+
+      // Update local DB
       const [updated] = await ctx.db
         .update(leads)
         .set({ ...data, updatedAt: new Date() })

@@ -17,8 +17,13 @@ export const PROPERTY_MAP = {
   seenBroker: "seen_broker",
   constructionTimeline: "construction_timeline",
   resolveFinanceOptedIn: "resolve_finance_opted_in",
+  preferredContactTime: "preferred_contact_time",
+  landWidth: "land_width",
+  landDepth: "land_depth",
   leadScore: "lead_score",
   leadStage: "lead_stage",
+  notes: "notes",
+  leadSource: "lead_source",
 } as const satisfies Record<string, string>;
 
 export type AppField = keyof typeof PROPERTY_MAP;
@@ -55,6 +60,30 @@ export function fromHubSpotProperties(
     }
   }
   return result;
+}
+
+/** Look up the app field name for a HubSpot property. Returns undefined if not mapped. */
+export function toAppField(hubspotProperty: string): AppField | undefined {
+  return REVERSE_MAP[hubspotProperty as HubSpotProperty];
+}
+
+const BOOLEAN_FIELDS: ReadonlySet<string> = new Set<AppField>([
+  "hasLand",
+  "landRegistered",
+  "seenBroker",
+  "resolveFinanceOptedIn",
+]);
+
+const INTEGER_FIELDS: ReadonlySet<string> = new Set<AppField>(["leadScore"]);
+
+/** Coerce a HubSpot string value to the app's expected type for a given field. */
+export function coerceFromHubSpot(
+  field: AppField,
+  value: string,
+): string | boolean | number {
+  if (BOOLEAN_FIELDS.has(field)) return value === "true";
+  if (INTEGER_FIELDS.has(field)) return parseInt(value, 10);
+  return value;
 }
 
 /** All HubSpot property names to request when fetching contacts. */

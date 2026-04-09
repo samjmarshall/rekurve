@@ -1,5 +1,5 @@
 import { Client } from "@hubspot/api-client";
-import { FilterOperatorEnum } from "@hubspot/api-client/lib/codegen/crm/contacts/models/Filter";
+import { FilterOperatorEnum } from "@hubspot/api-client/lib/codegen/crm/contacts/models/Filter.js";
 import { type NeonQueryFunction, neon } from "@neondatabase/serverless";
 
 import "dotenv/config";
@@ -104,7 +104,14 @@ export async function archiveTestContact(hubspotId: string): Promise<void> {
   await hubspot().crm.contacts.basicApi.archive(hubspotId);
 }
 
-/** Delete all HubSpot contacts matching the E2E test email pattern. */
+/**
+ * Delete HubSpot contacts created by E2E tests. Catches two patterns:
+ *   - Full-form / inbound-sync tests: email containing `test.rekurve.dev`
+ *   - Quick-capture tests: firstname `Quick` + lastname containing `Capture`
+ *     (quick capture has no email field, so the email filter can't find them)
+ *
+ * `filterGroups` are OR'd, filters within a group are AND'd.
+ */
 export async function deleteTestContacts(): Promise<void> {
   const response = await hubspot().crm.contacts.searchApi.doSearch({
     filterGroups: [
@@ -114,6 +121,20 @@ export async function deleteTestContacts(): Promise<void> {
             propertyName: "email",
             operator: FilterOperatorEnum.ContainsToken,
             value: "test.rekurve.dev",
+          },
+        ],
+      },
+      {
+        filters: [
+          {
+            propertyName: "firstname",
+            operator: FilterOperatorEnum.Eq,
+            value: "Quick",
+          },
+          {
+            propertyName: "lastname",
+            operator: FilterOperatorEnum.ContainsToken,
+            value: "Capture",
           },
         ],
       },

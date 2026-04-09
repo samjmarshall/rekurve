@@ -5,6 +5,7 @@ import {
   deleteTestLeads,
   deleteTestSession,
   type TestSession,
+  uniquePhone,
 } from "../utils/auth-helper";
 import {
   archiveTestContact,
@@ -17,6 +18,14 @@ import {
   waitForLeadField,
 } from "../utils/hubspot-helper";
 import { getSessionCookie } from "../utils/session-cookie";
+
+// Tests in this file mutate the shared HubSpot account and DB. Run them
+// sequentially within a single worker so beforeAll/afterAll cleanup runs
+// once per describe — preventing workers from wiping each other's data.
+//
+// Timeout is doubled because each test does 2-3 HubSpot API roundtrips and
+// the local dev server is heavily contended by parallel workers in dev.
+test.describe.configure({ mode: "serial", timeout: 60_000 });
 
 test.describe("HubSpot Outbound Sync — E2E", () => {
   test.skip(
@@ -48,6 +57,7 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
 
     const uniqueId = Date.now().toString(36);
     const testEmail = `e2e-${uniqueId}@test.rekurve.dev`;
+    const testPhone = uniquePhone();
 
     await page.goto("/leads/new");
     const form = new LeadFormSection(page);
@@ -56,7 +66,7 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
     await form.fillStep1({
       firstName: "HubSpot",
       lastName: `Sync ${uniqueId}`,
-      phone: "0412345678",
+      phone: testPhone,
       email: testEmail,
     });
     await form.selectSegmented("Preferred contact time", "Anytime");
@@ -90,7 +100,7 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
     expect(contact!.properties.firstname).toBe("HubSpot");
     expect(contact!.properties.lastname).toBe(`Sync ${uniqueId}`);
     expect(contact!.properties.email).toBe(testEmail);
-    expect(contact!.properties.phone).toBe("0412345678");
+    expect(contact!.properties.phone).toBe(testPhone);
     expect(contact!.properties.has_land).toBe("true");
     expect(contact!.properties.land_address).toBe("42 Test Ave");
     expect(contact!.properties.land_size_sqm).toBe("500");
@@ -116,13 +126,15 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
 
     const uniqueId = Date.now().toString(36);
     const testEmail = `e2e-${uniqueId}@test.rekurve.dev`;
+    const seedPhone = uniquePhone();
+    const formPhone = uniquePhone();
 
     // Seed: create a contact in HubSpot first
     const seeded = await createTestContact({
       firstname: "Existing",
       lastname: "Contact",
       email: testEmail,
-      phone: "0400000000",
+      phone: seedPhone,
     });
 
     // Create a lead in the app with the same email
@@ -132,7 +144,7 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
     await form.fillStep1({
       firstName: "Updated",
       lastName: `Dedup ${uniqueId}`,
-      phone: "0412345678",
+      phone: formPhone,
       email: testEmail,
     });
     await form.clickNext();
@@ -202,7 +214,7 @@ test.describe("HubSpot Inbound Sync — E2E", () => {
     await form.fillStep1({
       firstName: "Inbound",
       lastName: `Phone ${uniqueId}`,
-      phone: "0412345678",
+      phone: uniquePhone(),
       email: testEmail,
     });
     await form.clickNext();
@@ -242,7 +254,7 @@ test.describe("HubSpot Inbound Sync — E2E", () => {
     await form.fillStep1({
       firstName: "Inbound",
       lastName: `Delete ${uniqueId}`,
-      phone: "0412345678",
+      phone: uniquePhone(),
       email: testEmail,
     });
     await form.clickNext();

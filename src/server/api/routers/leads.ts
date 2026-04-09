@@ -105,7 +105,14 @@ export const leadsRouter = createTRPCRouter({
         void scoreLeadAsync(ctx.db, lead!.id, lead!, lead!.hubspotContactId);
 
         return lead!;
-      } catch {
+      } catch (err) {
+        const cause = err instanceof Error ? err.cause : undefined;
+        console.error(
+          `[leads.create] local insert failed for HubSpot contact ${hubspotContact.id}:`,
+          err,
+          "cause:",
+          cause,
+        );
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: `Lead saved to HubSpot (contact ID: ${hubspotContact.id}) but local save failed. Retry or check HubSpot.`,

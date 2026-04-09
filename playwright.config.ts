@@ -5,12 +5,15 @@ const isCI = process.env.CI === "true";
 
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 30_000,
+  globalTeardown: "./e2e/utils/global-teardown.ts",
+  timeout: 45_000,
   expect: { timeout: 5_000 },
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
-  workers: isCI ? 1 : 6,
+  // 6 workers × 3 viewport projects overwhelms the local dev server (page.goto
+  // timeouts under load). 4 keeps parallelism while leaving headroom.
+  workers: isCI ? 1 : 4,
   reporter: isCI
     ? [["list"], ["html", { open: "never" }]]
     : [["html", { open: "on-failure" }]],
@@ -56,6 +59,9 @@ export default defineConfig({
     },
     {
       name: "tablet",
+      // HubSpot-mutating tests run on desktop only — they aren't viewport-specific
+      // and parallel HubSpot API load across 3 projects causes timeouts and DB cleanup races.
+      testIgnore: ["**/hubspot-sync.spec.ts"],
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 768, height: 1024 },
@@ -63,6 +69,7 @@ export default defineConfig({
     },
     {
       name: "mobile",
+      testIgnore: ["**/hubspot-sync.spec.ts"],
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 375, height: 667 },

@@ -71,6 +71,21 @@ export async function deleteTestSession(userId: string): Promise<void> {
 }
 
 /**
+ * Generate a unique AU mobile-format phone for an E2E test.
+ *
+ * `leads.create` dedups by email OR phone — and the leads table enforces a
+ * UNIQUE constraint on `hubspot_contact_id`. Tests that share a phone end up
+ * pointing at the same HubSpot contact ID, causing duplicate-key violations
+ * when they run in parallel. Each test must call this to get its own phone.
+ */
+export function uniquePhone(): string {
+  const suffix = Math.floor(Math.random() * 1e8)
+    .toString()
+    .padStart(8, "0");
+  return `04${suffix}`;
+}
+
+/**
  * Delete leads created by E2E tests, identified by test email patterns.
  */
 export async function deleteTestLeads(): Promise<void> {

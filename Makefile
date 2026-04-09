@@ -48,6 +48,9 @@ db_branch_delete_all:
 db_branch_status:
 	scripts/neon-branch.sh status
 
+hubspot_setup:
+	yarn tsx scripts/hubspot/setup.ts
+
 release:
 	yarn release
 

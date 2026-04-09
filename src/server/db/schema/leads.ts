@@ -12,7 +12,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import type { ScoreMetadata } from "~/server/ai/scoring";
+import type { ScoreMetadata } from "~/server/scoring";
 import {
   constructionTimelineEnum,
   leadSourceEnum,

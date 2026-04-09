@@ -44,8 +44,8 @@ beforeEach(() => {
   rs.doMock("~/env", () => ({
     env: {
       DATABASE_URL: "postgres://mock",
-      HUBSPOT_ACCESS_TOKEN: "mock",
-      HUBSPOT_CLIENT_SECRET: "mock",
+      HUBSPOT_ACCESS_TOKEN: "mock-token",
+      HUBSPOT_CLIENT_SECRET: "mock-secret",
     },
   }));
 
@@ -72,8 +72,8 @@ beforeEach(() => {
 
   rs.doMock("~/server/db", () => ({ db: mockDb }));
 
-  rs.doMock("~/server/ai/scoring", () => ({
-    qualifyAndScore: rs.fn().mockResolvedValue({
+  rs.doMock("~/server/scoring", () => ({
+    qualifyAndScore: rs.fn().mockReturnValue({
       score: 45,
       stage: "nurture",
       breakdown: {
@@ -350,10 +350,14 @@ describe("leads.delete", () => {
 
 describe("leads.create — scoring integration", () => {
   test("returns lead immediately without waiting for scoring", async () => {
-    const { qualifyAndScore } = await import("~/server/ai/scoring");
-    (qualifyAndScore as ReturnType<typeof rs.fn>).mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 10_000)),
-    );
+    const { qualifyAndScore } = await import("~/server/scoring");
+    (qualifyAndScore as ReturnType<typeof rs.fn>).mockImplementation(() => ({
+      score: 0,
+      stage: "unqualified",
+      breakdown: {},
+      gaps: [],
+      nextQuestion: "",
+    }));
 
     const returning = rs.fn().mockResolvedValue([mockLead]);
     const values = rs.fn().mockReturnValue({ returning });
@@ -370,10 +374,10 @@ describe("leads.create — scoring integration", () => {
   });
 
   test("create succeeds even when scoring throws", async () => {
-    const { qualifyAndScore } = await import("~/server/ai/scoring");
-    (qualifyAndScore as ReturnType<typeof rs.fn>).mockRejectedValue(
-      new Error("API down"),
-    );
+    const { qualifyAndScore } = await import("~/server/scoring");
+    (qualifyAndScore as ReturnType<typeof rs.fn>).mockImplementation(() => {
+      throw new Error("Scoring failed");
+    });
 
     const returning = rs.fn().mockResolvedValue([mockLead]);
     const values = rs.fn().mockReturnValue({ returning });
@@ -394,7 +398,7 @@ describe("leads.create — scoring integration", () => {
 
 describe("leads.update — scoring integration", () => {
   test("triggers re-scoring when qualification fields change", async () => {
-    const { qualifyAndScore } = await import("~/server/ai/scoring");
+    const { qualifyAndScore } = await import("~/server/scoring");
     const updatedLead = { ...mockLead, budget: "$700K" };
     const returning = rs.fn().mockResolvedValue([updatedLead]);
     const where = rs.fn().mockReturnValue({ returning });
@@ -410,7 +414,7 @@ describe("leads.update — scoring integration", () => {
   });
 
   test("does not re-score when only non-qualification fields change", async () => {
-    const { qualifyAndScore } = await import("~/server/ai/scoring");
+    const { qualifyAndScore } = await import("~/server/scoring");
     const updatedLead = { ...mockLead, referrerName: "Bob" };
     const returning = rs.fn().mockResolvedValue([updatedLead]);
     const where = rs.fn().mockReturnValue({ returning });

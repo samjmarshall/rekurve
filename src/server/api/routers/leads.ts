@@ -1,8 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import type { ScoreMetadata } from "~/server/ai/scoring";
-import { qualifyAndScore } from "~/server/ai/scoring";
 import {
   leadCreateSchema,
   leadFilterSchema,
@@ -11,6 +9,8 @@ import {
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { leads } from "~/server/db/schema";
 import { updateContact } from "~/server/hubspot/contacts";
+import type { ScoreMetadata } from "~/server/scoring";
+import { qualifyAndScore } from "~/server/scoring";
 
 /** Fire-and-forget scoring — errors are logged, never thrown. */
 async function scoreLeadAsync(
@@ -20,7 +20,7 @@ async function scoreLeadAsync(
   hubspotContactId: string | null,
 ): Promise<void> {
   try {
-    const result = await qualifyAndScore(lead);
+    const result = qualifyAndScore(lead);
 
     const metadata: ScoreMetadata = {
       ...result,
@@ -64,7 +64,6 @@ const SCORING_FIELDS = new Set([
   "propertyType",
   "preferredEstates",
   "preferredSuburbs",
-  "notes",
 ]);
 
 export const leadsRouter = createTRPCRouter({

@@ -12,22 +12,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@anthropic-ai/sdk@npm:^0.85.0":
-  version: 0.85.0
-  resolution: "@anthropic-ai/sdk@npm:0.85.0"
-  dependencies:
-    json-schema-to-ts: ^3.1.1
-  peerDependencies:
-    zod: ^3.25.0 || ^4.0.0
-  peerDependenciesMeta:
-    zod:
-      optional: true
-  bin:
-    anthropic-ai-sdk: bin/cli
-  checksum: 8b2896b26313216496b88454224e781370d8a364ddadc63944e75376b26e3c5879c753fe6e2ba1b51ed8040bea3d4d31c5cdcd1de1de5089183c70d1151a58b4
-  languageName: node
-  linkType: hard
-
 "@auto-it/bot-list@npm:11.3.6":
   version: 11.3.6
   resolution: "@auto-it/bot-list@npm:11.3.6"
@@ -453,7 +437,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.28.6":
+"@babel/runtime@npm:^7.28.6":
   version: 7.29.2
   resolution: "@babel/runtime@npm:7.29.2"
   checksum: d5548d1165de8995f8afc93a5694b8625409be16cd1f2250ac13e331335858ddac3cb9fd278e6c43956a130101a2203f09417938a1a96f9fb70f02b4b4172e1d
@@ -6993,16 +6977,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json-schema-to-ts@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "json-schema-to-ts@npm:3.1.1"
-  dependencies:
-    "@babel/runtime": ^7.18.3
-    ts-algebra: ^2.0.0
-  checksum: b616f1c2d7492502e11eec4f8e4539ee1e897543a679d929494afdc164d9557275cead8372747b73f239b1e68056ffbf551b03ae82d0047bba0dfe2bbd6b64f4
-  languageName: node
-  linkType: hard
-
 "json-schema-traverse@npm:^1.0.0":
   version: 1.0.0
   resolution: "json-schema-traverse@npm:1.0.0"
@@ -10105,13 +10079,6 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"ts-algebra@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "ts-algebra@npm:2.0.0"
-  checksum: 970b0e7db49cf8c1a8ff2a816eb047fac8add47511f5e4995e4998c56c6f7b226399284412de88f3e137ab55c857a4262c0d8f02f0765730e7d3a021de2ea7ef
-  languageName: node
-  linkType: hard
-
 "ts-morph@npm:^26.0.0":
   version: 26.0.0
   resolution: "ts-morph@npm:26.0.0"
@@ -10735,7 +10702,6 @@ shadcn@latest:
   version: 0.0.0-use.local
   resolution: "www@workspace:."
   dependencies:
-    "@anthropic-ai/sdk": ^0.85.0
     "@auto-it/conventional-commits": ^11.3.6
     "@auto-it/git-tag": ^11.3.6
     "@auto-it/released": ^11.3.6

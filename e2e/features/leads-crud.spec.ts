@@ -8,6 +8,7 @@ import {
   type TestSession,
   uniquePhone,
 } from "../utils/auth-helper";
+import { cleanupTestLeadsByPhone } from "../utils/hubspot-helper";
 import { getSessionCookie } from "../utils/session-cookie";
 
 test.describe("Leads CRUD — E2E", () => {
@@ -17,15 +18,14 @@ test.describe("Leads CRUD — E2E", () => {
   );
 
   let session: TestSession;
+  const phones: string[] = [];
 
   test.beforeAll(async () => {
     session = await createTestSession();
   });
 
   test.afterAll(async () => {
-    // Leads and HubSpot contacts created here are cleaned up by
-    // e2e/utils/global-teardown.ts after every worker has finished — doing it
-    // here would race with concurrent hubspot-sync tests in other workers.
+    await cleanupTestLeadsByPhone(phones);
     await deleteTestSession(session.userId);
   });
 
@@ -43,12 +43,14 @@ test.describe("Leads CRUD — E2E", () => {
 
     const form = new LeadFormSection(page);
     const uniqueId = Date.now().toString(36);
+    const phone = uniquePhone();
+    phones.push(phone);
 
     // Step 1: Contact
     await form.fillStep1({
       firstName: "E2E",
       lastName: `Test ${uniqueId}`,
-      phone: uniquePhone(),
+      phone,
       email: `e2e-${uniqueId}@test.rekurve.dev`,
     });
     await form.selectSegmented("Preferred contact time", "Anytime");
@@ -131,6 +133,8 @@ test.describe("Leads CRUD — E2E", () => {
 
     const quickCapture = new QuickCaptureSection(page);
     const uniqueId = Date.now().toString(36);
+    const phone = uniquePhone();
+    phones.push(phone);
 
     await quickCapture.open();
     await expect(quickCapture.firstNameInput).toBeFocused();
@@ -138,7 +142,7 @@ test.describe("Leads CRUD — E2E", () => {
     await quickCapture.fill({
       firstName: "Quick",
       lastName: `Capture ${uniqueId}`,
-      phone: uniquePhone(),
+      phone,
       notes: "Met at BBQ",
     });
     await quickCapture.submit();

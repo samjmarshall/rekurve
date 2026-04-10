@@ -23,6 +23,13 @@ You are implementing a single section of an implementation plan. The tasks, file
 - Attempt to sequence multiple sections — the shell script handles that
 - Create git commits — the validate phase handles that
 
+## Prior Attempts
+
+If a "Prior attempts" section appears in your prompt, this task has been tried before. Read the notes carefully:
+- Do NOT repeat approaches that already failed
+- Build on any partial progress — check `git diff` and `git status` to see what's already changed
+- If a prior attempt succeeded at implementation but failed validation, the code changes may already be in place
+
 ## When Reality Diverges from the Tasks
 
 If the codebase doesn't match what the tasks expect:

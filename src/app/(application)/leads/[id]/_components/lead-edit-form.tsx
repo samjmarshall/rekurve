@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { AdditionalInfo } from "~/app/(application)/leads/new/_components/form-steps/additional-info";
 import { BuildDetails } from "~/app/(application)/leads/new/_components/form-steps/build-details";
@@ -49,6 +50,15 @@ function leadToDefaults(lead: Lead): LeadCreate {
 export function LeadEditForm({ lead, onCancel, onSuccess }: LeadEditFormProps) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      formRef.current
+        ?.querySelector<HTMLElement>("input, select, textarea")
+        ?.focus();
+    });
+  }, []);
 
   const form = useForm<LeadCreate>({
     resolver: leadFormResolver,
@@ -84,12 +94,22 @@ export function LeadEditForm({ lead, onCancel, onSuccess }: LeadEditFormProps) {
     }),
   );
 
+  const handleCancel = () => {
+    if (form.formState.isDirty) {
+      if (!window.confirm("You have unsaved changes. Discard them?")) {
+        return;
+      }
+    }
+    onCancel();
+  };
+
   const onSubmit = (data: LeadCreate) => {
     updateLead.mutate({ id: lead.id, ...data });
   };
 
   return (
     <form
+      ref={formRef}
       onSubmit={form.handleSubmit(onSubmit)}
       noValidate
       className="flex flex-col gap-6 pb-24"
@@ -146,7 +166,7 @@ export function LeadEditForm({ lead, onCancel, onSuccess }: LeadEditFormProps) {
           type="button"
           variant="outline"
           size="md"
-          onClick={onCancel}
+          onClick={handleCancel}
           disabled={updateLead.isPending}
           data-testid="lead-profile-cancel-btn"
         >

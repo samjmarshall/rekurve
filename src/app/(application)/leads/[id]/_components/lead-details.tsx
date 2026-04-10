@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
 import {
   formatContactTime,
+  formatDate,
   formatLeadSource,
   formatPropertyType,
   formatTimeline,
@@ -101,10 +102,7 @@ export function LeadDetails({ lead }: { lead: Lead }) {
             />
             <DetailRow label="Referrer name" value={lead.referrerName} />
             <DetailRow label="Notes" value={lead.notes} />
-            <DetailRow
-              label="Created"
-              value={new Date(lead.createdAt).toLocaleDateString()}
-            />
+            <DetailRow label="Created" value={formatDate(lead.createdAt)} />
           </DetailGrid>
         </CardContent>
       </Card>

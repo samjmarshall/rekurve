@@ -2,7 +2,7 @@ import type { BadgeProps } from "~/components/ui/Badge";
 
 type BadgeVariant = NonNullable<BadgeProps["variant"]>;
 type LeadStage = "unqualified" | "nurture" | "warm" | "hot";
-type FactorKey =
+export type FactorKey =
   | "land"
   | "finance"
   | "timeline"
@@ -41,6 +41,17 @@ const STAGE_BADGE_VARIANTS: Record<LeadStage, BadgeVariant> = {
 
 export function stageTone(stage: LeadStage): BadgeVariant {
   return STAGE_BADGE_VARIANTS[stage];
+}
+
+const STAGE_RING_CLASSES: Record<LeadStage, string> = {
+  unqualified: "border-muted-foreground/30 bg-muted/10",
+  nurture: "border-accent-amber/30 bg-accent-amber/5",
+  warm: "border-primary/30 bg-primary/5",
+  hot: "border-accent-coral/30 bg-accent-coral/5",
+};
+
+export function stageRingClasses(stage: LeadStage): string {
+  return STAGE_RING_CLASSES[stage];
 }
 
 const FACTOR_LABELS: Record<FactorKey, string> = {
@@ -113,6 +124,15 @@ const LEAD_SOURCE_LABELS: Record<string, string> = {
 export function formatLeadSource(value: string | null | undefined): string {
   if (!value) return "Not provided";
   return LEAD_SOURCE_LABELS[value] ?? humanise(value);
+}
+
+export function formatDate(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return new Intl.DateTimeFormat("en-AU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(d);
 }
 
 function humanise(value: string): string {

@@ -3,12 +3,14 @@ import {
   FACTOR_ORDER,
   factorLabel,
   formatContactTime,
+  formatDate,
   formatLastContacted,
   formatLeadSource,
   formatPropertyType,
   formatTimeline,
   impactTone,
   stageLabel,
+  stageRingClasses,
   stageTone,
 } from "../display";
 
@@ -99,6 +101,28 @@ describe("enum formatters", () => {
     expect(formatLeadSource("walk_in")).toBe("Walk-in");
     expect(formatLeadSource("referral")).toBe("Referral");
     expect(formatLeadSource("unknown_source")).toBe("Unknown source");
+  });
+});
+
+describe("stageRingClasses", () => {
+  test("returns distinct classes for each stage", () => {
+    const classes = new Set([
+      stageRingClasses("unqualified"),
+      stageRingClasses("nurture"),
+      stageRingClasses("warm"),
+      stageRingClasses("hot"),
+    ]);
+    expect(classes.size).toBe(4);
+  });
+});
+
+describe("formatDate", () => {
+  test("formats a Date object in en-AU short format", () => {
+    expect(formatDate(new Date("2026-04-10T00:00:00Z"))).toBe("10 Apr 2026");
+  });
+
+  test("formats a string date", () => {
+    expect(formatDate("2026-01-15T12:00:00Z")).toBe("15 Jan 2026");
   });
 });
 

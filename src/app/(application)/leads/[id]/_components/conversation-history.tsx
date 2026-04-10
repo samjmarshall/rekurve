@@ -16,8 +16,7 @@ export function ConversationHistory() {
             aria-hidden="true"
           />
           <p className="max-w-xs text-muted-foreground text-sm">
-            No messages yet — conversation history will appear here when Epic 3
-            is complete.
+            No conversations yet.
           </p>
         </div>
       </CardContent>

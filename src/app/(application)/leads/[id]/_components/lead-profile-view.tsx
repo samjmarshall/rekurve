@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { type RouterOutputs, useTRPC } from "~/trpc/react";
 import { ConversationHistory } from "./conversation-history";
 import { LeadDetails } from "./lead-details";
@@ -21,6 +21,12 @@ export function LeadProfileView({ id }: { id: string }) {
   } = useQuery(trpc.leads.getById.queryOptions({ id }));
 
   const [isEditing, setIsEditing] = useState(false);
+  const editButtonRef = useRef<HTMLButtonElement>(null);
+
+  const exitEditing = () => {
+    setIsEditing(false);
+    requestAnimationFrame(() => editButtonRef.current?.focus());
+  };
 
   if (isLoading) {
     return (
@@ -53,21 +59,28 @@ export function LeadProfileView({ id }: { id: string }) {
         lead={lead}
         isEditing={isEditing}
         onEdit={() => setIsEditing(true)}
+        editButtonRef={editButtonRef}
       />
 
       {isEditing ? (
-        <LeadEditForm
-          lead={lead}
-          onCancel={() => setIsEditing(false)}
-          onSuccess={() => setIsEditing(false)}
-        />
+        <>
+          <h2 className="sr-only">Edit Lead</h2>
+          <LeadEditForm
+            lead={lead}
+            onCancel={exitEditing}
+            onSuccess={exitEditing}
+          />
+        </>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
           <div className="flex flex-col gap-6">
+            <h2 className="sr-only">Score & Qualification</h2>
             <ScoreBreakdown lead={lead} />
+            <h2 className="sr-only">Lead Information</h2>
             <LeadDetails lead={lead} />
           </div>
           <div className="flex flex-col gap-6">
+            <h2 className="sr-only">Gaps & History</h2>
             <QualificationGaps lead={lead} />
             <ConversationHistory />
           </div>

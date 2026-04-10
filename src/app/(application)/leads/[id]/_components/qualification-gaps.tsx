@@ -9,16 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
-import { factorLabel, impactTone } from "../_lib/display";
+import { type FactorKey, factorLabel, impactTone } from "../_lib/display";
 import type { Lead } from "./lead-profile-view";
-
-type FactorKey =
-  | "land"
-  | "finance"
-  | "timeline"
-  | "budget"
-  | "propertyType"
-  | "engagement";
 
 export function QualificationGaps({ lead }: { lead: Lead }) {
   const metadata = lead.scoreMetadata;

@@ -6,7 +6,7 @@ export default function LeadNotFound() {
   return (
     <div className="flex flex-1 items-center justify-center p-4">
       <div className="text-center">
-        <Users size={48} className="mx-auto mb-4 text-muted-foreground/50" />
+        <Users className="mx-auto mb-4 size-12 text-muted-foreground/50" />
         <h2 className="font-semibold text-lg">Lead not found</h2>
         <p className="mt-1 max-w-sm text-muted-foreground text-sm">
           This lead doesn&apos;t exist or has been deleted.

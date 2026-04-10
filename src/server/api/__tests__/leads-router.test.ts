@@ -153,7 +153,8 @@ async function getCaller(): Promise<Caller> {
 describe("leads.create", () => {
   test("creates a lead with full form data", async () => {
     const returning = rs.fn().mockResolvedValue([mockLead]);
-    const values = rs.fn().mockReturnValue({ returning });
+    const onConflictDoUpdate = rs.fn().mockReturnValue({ returning });
+    const values = rs.fn().mockReturnValue({ onConflictDoUpdate });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     const caller = await getCaller();
@@ -174,7 +175,12 @@ describe("leads.create", () => {
   test("creates a lead with quick capture data", async () => {
     const quickLead = { ...mockLead, email: null, notes: "Met at BBQ" };
     const insertReturning = rs.fn().mockResolvedValue([quickLead]);
-    const values = rs.fn().mockReturnValue({ returning: insertReturning });
+    const insertOnConflict = rs
+      .fn()
+      .mockReturnValue({ returning: insertReturning });
+    const values = rs
+      .fn()
+      .mockReturnValue({ onConflictDoUpdate: insertOnConflict });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     // scoreLead's db.update returns the scored version of the same row so
@@ -216,7 +222,8 @@ describe("leads.create — HubSpot sync", () => {
   test("creates HubSpot contact when no dedup match", async () => {
     const leadWithHs = { ...mockLead, hubspotContactId: "hs-123" };
     const returning = rs.fn().mockResolvedValue([leadWithHs]);
-    const values = rs.fn().mockReturnValue({ returning });
+    const onConflictDoUpdate = rs.fn().mockReturnValue({ returning });
+    const values = rs.fn().mockReturnValue({ onConflictDoUpdate });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     const { createContact } = await import("~/server/hubspot");
@@ -244,7 +251,8 @@ describe("leads.create — HubSpot sync", () => {
 
     const leadWithHs = { ...mockLead, hubspotContactId: "hs-existing" };
     const returning = rs.fn().mockResolvedValue([leadWithHs]);
-    const values = rs.fn().mockReturnValue({ returning });
+    const onConflictDoUpdate = rs.fn().mockReturnValue({ returning });
+    const values = rs.fn().mockReturnValue({ onConflictDoUpdate });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     const caller = await getCaller();
@@ -262,7 +270,8 @@ describe("leads.create — HubSpot sync", () => {
 
   test("throws INTERNAL_SERVER_ERROR on DB failure after HubSpot success", async () => {
     const returning = rs.fn().mockRejectedValue(new Error("DB down"));
-    const values = rs.fn().mockReturnValue({ returning });
+    const onConflictDoUpdate = rs.fn().mockReturnValue({ returning });
+    const values = rs.fn().mockReturnValue({ onConflictDoUpdate });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     const caller = await getCaller();
@@ -541,7 +550,12 @@ describe("leads.create — scoring integration", () => {
 
     // Insert returns the unscored row
     const insertReturning = rs.fn().mockResolvedValue([mockLead]);
-    const values = rs.fn().mockReturnValue({ returning: insertReturning });
+    const insertOnConflict = rs
+      .fn()
+      .mockReturnValue({ returning: insertReturning });
+    const values = rs
+      .fn()
+      .mockReturnValue({ onConflictDoUpdate: insertOnConflict });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     // scoreLead's db.update returns the fully-scored row
@@ -616,7 +630,12 @@ describe("leads.create — scoring integration", () => {
 
     const quickLead = { ...mockLead, email: null };
     const insertReturning = rs.fn().mockResolvedValue([quickLead]);
-    const values = rs.fn().mockReturnValue({ returning: insertReturning });
+    const insertOnConflict = rs
+      .fn()
+      .mockReturnValue({ returning: insertReturning });
+    const values = rs
+      .fn()
+      .mockReturnValue({ onConflictDoUpdate: insertOnConflict });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     const scoredQuickLead = {

@@ -87,11 +87,36 @@ export function uniquePhone(): string {
 
 /**
  * Delete leads created by E2E tests, identified by test email patterns.
+ *
+ * NOTE: This is called by hubspot-sync.spec.ts's beforeAll/afterAll to sweep
+ * HubSpot-synced leads. It runs concurrently with other test files — so it
+ * must stay narrow: only match patterns owned by hubspot-sync and the long-
+ * established Quick Capture tests. Pipeline-board leads have their own
+ * separate cleanup function below.
  */
 export async function deleteTestLeads(): Promise<void> {
   await sql()`
     DELETE FROM "leads"
     WHERE email LIKE 'e2e-%@test.rekurve.dev'
        OR (first_name = 'Quick' AND last_name LIKE 'Capture %')
+  `;
+}
+
+/**
+ * Delete leads created by the pipeline-board tests in leads-crud.spec.ts.
+ * Kept separate from `deleteTestLeads` because hubspot-sync.spec.ts calls
+ * that one mid-run and would otherwise delete these leads during concurrent
+ * execution.
+ */
+export async function deletePipelineTestLeads(): Promise<void> {
+  await sql()`
+    DELETE FROM "leads"
+    WHERE (first_name = 'Pipeline' AND last_name LIKE 'Unqualified %')
+       OR (first_name = 'Pipeline' AND last_name LIKE 'Hot %')
+       OR (first_name = 'QC' AND last_name LIKE 'Capture %')
+       OR (first_name = 'Nav' AND last_name LIKE 'Test %')
+       OR (first_name = 'Count' AND last_name LIKE 'Update %')
+       OR (first_name = 'FHOG' AND last_name LIKE 'Buyer %')
+       OR (first_name = 'FHOG' AND last_name LIKE 'Investor %')
   `;
 }

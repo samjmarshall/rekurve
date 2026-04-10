@@ -118,8 +118,19 @@ export const leadFilterSchema = z.object({
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
 
+// Filters consumed by leads.getByStage for the Pipeline Board view.
+// Stage visibility is a client-side render concern, not a backend filter.
+export const pipelineFiltersSchema = z
+  .object({
+    constructionTimeline: constructionTimelineSchema.nullish(),
+    preferredEstate: z.string().min(1).max(100).nullish(),
+    fhogEligible: z.boolean().nullish(),
+  })
+  .nullish();
+
 // Type exports for form components
 export type LeadCreate = z.infer<typeof leadCreateSchema>;
 export type LeadQuickCapture = z.infer<typeof leadQuickCaptureSchema>;
 export type LeadUpdate = z.infer<typeof leadUpdateSchema>;
 export type LeadFilter = z.infer<typeof leadFilterSchema>;
+export type PipelineFilters = z.infer<typeof pipelineFiltersSchema>;

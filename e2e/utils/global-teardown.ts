@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { deletePipelineTestLeads, deleteTestLeads } from "./auth-helper";
+import { deleteTestLeads } from "./auth-helper";
 import { deleteTestContacts } from "./hubspot-helper";
 
 /**
@@ -24,11 +24,6 @@ export default async function globalTeardown() {
       await deleteTestLeads();
     } catch (err) {
       console.error("[e2e teardown] deleteTestLeads failed:", err);
-    }
-    try {
-      await deletePipelineTestLeads();
-    } catch (err) {
-      console.error("[e2e teardown] deletePipelineTestLeads failed:", err);
     }
   }
 }

@@ -13,6 +13,11 @@ type TestFixtures = {
 
 export const test = base.extend<TestFixtures>({
   analytics: async ({ page }, use) => {
+    // Must run before any page script so the flag is present when
+    // instrumentation-client.ts executes on the next goto().
+    await page.addInitScript(() => {
+      (window as Window & { __E2E_MODE__?: boolean }).__E2E_MODE__ = true;
+    });
     const analytics = new AnalyticsHelper(page);
     await analytics.startCapturing();
     await use(analytics);

@@ -94,7 +94,12 @@ export const leadsRouter = createTRPCRouter({
         ? await updateHubSpotContact(existing.id, hubspotData)
         : await createContact(hubspotData);
 
-      // 3. Write to local DB with hubspotContactId
+      // 3. Write to local DB with hubspotContactId. Upsert on
+      // hubspot_contact_id so we cooperate with the inbound webhook: if
+      // HubSpot's contact.creation webhook lands first (e.g. when HubSpot
+      // fires it between our HubSpot write and this insert), its
+      // placeholder row is replaced with the full form data instead of
+      // causing a unique-constraint error.
       let lead: typeof leads.$inferSelect;
       try {
         const [inserted] = await ctx.db
@@ -104,6 +109,14 @@ export const leadsRouter = createTRPCRouter({
             hubspotContactId: hubspotContact.id,
             leadStage: "unqualified",
             leadScore: 0,
+          })
+          .onConflictDoUpdate({
+            target: leads.hubspotContactId,
+            set: {
+              ...input,
+              hubspotContactId: hubspotContact.id,
+              updatedAt: new Date(),
+            },
           })
           .returning();
         lead = inserted!;

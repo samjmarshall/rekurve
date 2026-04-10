@@ -67,7 +67,7 @@ export default async function ApplicationLayout({
                       email: session.user.email,
                     }}
                   />
-                  <main className="flex flex-1 flex-col pb-16 md:pb-0">
+                  <main className="flex min-w-0 flex-1 flex-col pb-16 md:pb-0">
                     {children}
                   </main>
                   <BottomNav />

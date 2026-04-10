@@ -5,6 +5,7 @@ import {
   leadCreateSchema,
   leadFilterSchema,
   leadUpdateSchema,
+  pipelineFiltersSchema,
 } from "~/server/api/schemas/leads";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { leads } from "~/server/db/schema";
@@ -255,16 +256,32 @@ export const leadsRouter = createTRPCRouter({
       return deleted;
     }),
 
-  getByStage: protectedProcedure.query(async ({ ctx }) => {
-    const allLeads = await ctx.db.query.leads.findMany({
-      orderBy: desc(leads.leadScore),
-    });
+  getByStage: protectedProcedure
+    .input(pipelineFiltersSchema)
+    .query(async ({ ctx, input }) => {
+      const conditions = [];
+      if (input?.constructionTimeline)
+        conditions.push(
+          eq(leads.constructionTimeline, input.constructionTimeline),
+        );
+      if (input?.fhogEligible)
+        conditions.push(eq(leads.propertyType, "first_home_buyer"));
+      if (input?.preferredEstate)
+        conditions.push(
+          sql`${input.preferredEstate} = ANY(${leads.preferredEstates})`,
+        );
 
-    return {
-      unqualified: allLeads.filter((l) => l.leadStage === "unqualified"),
-      nurture: allLeads.filter((l) => l.leadStage === "nurture"),
-      warm: allLeads.filter((l) => l.leadStage === "warm"),
-      hot: allLeads.filter((l) => l.leadStage === "hot"),
-    };
-  }),
+      const where = conditions.length > 0 ? and(...conditions) : undefined;
+      const allLeads = await ctx.db.query.leads.findMany({
+        where,
+        orderBy: desc(leads.leadScore),
+      });
+
+      return {
+        unqualified: allLeads.filter((l) => l.leadStage === "unqualified"),
+        nurture: allLeads.filter((l) => l.leadStage === "nurture"),
+        warm: allLeads.filter((l) => l.leadStage === "warm"),
+        hot: allLeads.filter((l) => l.leadStage === "hot"),
+      };
+    }),
 });

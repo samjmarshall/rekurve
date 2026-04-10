@@ -628,4 +628,60 @@ describe("leads.getByStage", () => {
     expect(result.warm).toHaveLength(0);
     expect(result.hot).toHaveLength(0);
   });
+
+  test("runs an unfiltered query when input is undefined", async () => {
+    const findMany = (
+      mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
+    ).leads.findMany;
+    findMany.mockResolvedValue([]);
+
+    const caller = await getCaller();
+    await caller.leads.getByStage();
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: undefined }),
+    );
+  });
+
+  test("applies fhogEligible filter", async () => {
+    const findMany = (
+      mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
+    ).leads.findMany;
+    findMany.mockResolvedValue([]);
+
+    const caller = await getCaller();
+    await caller.leads.getByStage({ fhogEligible: true });
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.anything() }),
+    );
+  });
+
+  test("applies constructionTimeline filter", async () => {
+    const findMany = (
+      mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
+    ).leads.findMany;
+    findMany.mockResolvedValue([]);
+
+    const caller = await getCaller();
+    await caller.leads.getByStage({ constructionTimeline: "ready_now" });
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.anything() }),
+    );
+  });
+
+  test("applies preferredEstate filter", async () => {
+    const findMany = (
+      mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
+    ).leads.findMany;
+    findMany.mockResolvedValue([]);
+
+    const caller = await getCaller();
+    await caller.leads.getByStage({ preferredEstate: "Springfield Rise" });
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.anything() }),
+    );
+  });
 });

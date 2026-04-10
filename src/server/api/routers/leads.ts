@@ -18,42 +18,46 @@ import {
 import type { ScoreMetadata } from "~/server/scoring";
 import { qualifyAndScore } from "~/server/scoring";
 
-/** Fire-and-forget scoring — errors are logged, never thrown. */
-async function scoreLeadAsync(
+/**
+ * Synchronously re-score a lead, persist the new score/stage/metadata, and
+ * push the score/stage to HubSpot if linked. Returns the fully-scored row so
+ * callers can send an authoritative response back to the client.
+ *
+ * Scoring and the score write propagate errors. HubSpot push errors are
+ * logged, not thrown — scoring must not fail because of a CRM outage.
+ */
+async function scoreLead(
   db: typeof import("~/server/db").db,
-  leadId: string,
-  lead: Parameters<typeof qualifyAndScore>[0],
+  lead: typeof leads.$inferSelect,
   hubspotContactId: string | null,
-): Promise<void> {
-  try {
-    const result = qualifyAndScore(lead);
+): Promise<typeof leads.$inferSelect> {
+  const result = qualifyAndScore(lead);
+  const metadata: ScoreMetadata = {
+    ...result,
+    scoredAt: new Date().toISOString(),
+  };
 
-    const metadata: ScoreMetadata = {
-      ...result,
-      scoredAt: new Date().toISOString(),
-    };
+  const [scored] = await db
+    .update(leads)
+    .set({
+      leadScore: result.score,
+      leadStage: result.stage,
+      scoreMetadata: metadata,
+      updatedAt: new Date(),
+    })
+    .where(eq(leads.id, lead.id))
+    .returning();
 
-    await db
-      .update(leads)
-      .set({
-        leadScore: result.score,
-        leadStage: result.stage,
-        scoreMetadata: metadata,
-        updatedAt: new Date(),
-      })
-      .where(eq(leads.id, leadId));
-
-    if (hubspotContactId) {
-      await updateHubSpotContact(hubspotContactId, {
-        leadScore: String(result.score),
-        leadStage: result.stage,
-      }).catch((err) => {
-        console.error(`[scoring] HubSpot sync failed for lead ${leadId}:`, err);
-      });
-    }
-  } catch (err) {
-    console.error(`[scoring] Failed to score lead ${leadId}:`, err);
+  if (hubspotContactId) {
+    await updateHubSpotContact(hubspotContactId, {
+      leadScore: String(result.score),
+      leadStage: result.stage,
+    }).catch((err) => {
+      console.error(`[scoring] HubSpot sync failed for lead ${lead.id}:`, err);
+    });
   }
+
+  return scored!;
 }
 
 // Qualification fields that trigger re-scoring
@@ -91,8 +95,9 @@ export const leadsRouter = createTRPCRouter({
         : await createContact(hubspotData);
 
       // 3. Write to local DB with hubspotContactId
+      let lead: typeof leads.$inferSelect;
       try {
-        const [lead] = await ctx.db
+        const [inserted] = await ctx.db
           .insert(leads)
           .values({
             ...input,
@@ -101,11 +106,7 @@ export const leadsRouter = createTRPCRouter({
             leadScore: 0,
           })
           .returning();
-
-        // Fire-and-forget — don't block the response
-        void scoreLeadAsync(ctx.db, lead!.id, lead!, lead!.hubspotContactId);
-
-        return lead!;
+        lead = inserted!;
       } catch (err) {
         const cause = err instanceof Error ? err.cause : undefined;
         console.error(
@@ -119,6 +120,9 @@ export const leadsRouter = createTRPCRouter({
           message: `Lead saved to HubSpot (contact ID: ${hubspotContact.id}) but local save failed. Retry or check HubSpot.`,
         });
       }
+
+      // 4. Score synchronously so the response reflects the final score/stage
+      return await scoreLead(ctx.db, lead, lead.hubspotContactId);
     }),
 
   getById: protectedProcedure
@@ -226,17 +230,13 @@ export const leadsRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND", message: "Lead not found" });
       }
 
-      // Re-score if qualification fields changed
+      // Re-score if qualification fields changed — awaited so the returned
+      // row always reflects the latest score/stage/scoreMetadata.
       const hasQualificationChange = Object.keys(data).some((k) =>
         SCORING_FIELDS.has(k),
       );
       if (hasQualificationChange) {
-        void scoreLeadAsync(
-          ctx.db,
-          updated.id,
-          updated,
-          updated.hubspotContactId,
-        );
+        return await scoreLead(ctx.db, updated, updated.hubspotContactId);
       }
 
       return updated;

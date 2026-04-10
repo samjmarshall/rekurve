@@ -54,6 +54,21 @@ test.describe("CTA Click Tracking", () => {
     await homePage.goto();
   });
 
+  test("[phase 1 smoke] hero primary CTA emits cta_clicked", async ({
+    homePage,
+    analytics,
+  }) => {
+    await homePage.hero.clickPrimaryCta();
+
+    // Temporary Phase 1 scaffold — uses the already-async waitForEvent helper
+    // instead of the sync fluent toBeFired() API to avoid racing event arrival.
+    // This smoke test will be deleted in Phase 2 once the fluent API is async
+    // and the real fixme'd tests are unskipped.
+    const event = await analytics.waitForEvent("cta_clicked", 5000);
+    expect(event).not.toBeNull();
+    expect(event?.properties.location).toBe("hero_primary");
+  });
+
   test.fixme("hero primary CTA tracks click event", async ({
     homePage,
     analytics,

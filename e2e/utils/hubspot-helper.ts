@@ -120,13 +120,41 @@ const TEST_FIRST_NAMES = [
 ];
 
 /**
- * Delete HubSpot contacts created by E2E tests. Catches two patterns:
- *   - Full-form / inbound-sync tests: email containing `test.rekurve.dev`
- *   - All other tests: firstname in {@link TEST_FIRST_NAMES}
+ * Delete HubSpot contacts created by E2E tests.
  *
- * `filterGroups` are OR'd, filters within a group are AND'd.
+ * Phase 1 — DB lookup: query the local `leads` table for `hubspot_contact_id`
+ * values and archive those contacts by ID. This is immediately consistent and
+ * avoids the HubSpot search indexing delay (~30 s) that causes contacts
+ * created during the same test run to be missed.
+ *
+ * Phase 2 — Search fallback: sweep any orphaned contacts from previous runs
+ * whose DB rows were already deleted. Uses two patterns (OR'd):
+ *   - email containing `test.rekurve.dev` (full-form / inbound-sync tests)
+ *   - firstname in {@link TEST_FIRST_NAMES} (quick-capture and other tests)
  */
 export async function deleteTestContacts(): Promise<void> {
+  const archived = new Set<string>();
+
+  // Phase 1: archive by ID from the local DB (no search lag)
+  if (process.env.DATABASE_URL) {
+    const rows = await sql()`
+      SELECT hubspot_contact_id FROM "leads"
+      WHERE (email LIKE 'e2e-%@test.rekurve.dev'
+         OR first_name IN ('Quick', 'E2E', 'FHOG', 'Nav', 'QC', 'Count', 'Pipeline'))
+        AND hubspot_contact_id IS NOT NULL
+    `;
+    for (const row of rows) {
+      const id = row.hubspot_contact_id as string;
+      try {
+        await hubspot().crm.contacts.basicApi.archive(id);
+        archived.add(id);
+      } catch {
+        // Already deleted — ignore
+      }
+    }
+  }
+
+  // Phase 2: search-based fallback for orphaned contacts
   const response = await hubspot().crm.contacts.searchApi.doSearch({
     filterGroups: [
       {
@@ -155,12 +183,41 @@ export async function deleteTestContacts(): Promise<void> {
   });
 
   for (const contact of response.results) {
+    if (archived.has(contact.id)) continue;
     try {
       await hubspot().crm.contacts.basicApi.archive(contact.id);
     } catch {
       // Already deleted — ignore
     }
   }
+}
+
+/**
+ * Clean up leads and their HubSpot contacts by phone number. Designed to be
+ * called from per-spec `afterAll` hooks where the DB rows still exist (no
+ * HubSpot search indexing delay). This is the primary cleanup path — global
+ * teardown is a fallback only.
+ */
+export async function cleanupTestLeadsByPhone(phones: string[]): Promise<void> {
+  if (phones.length === 0) return;
+
+  const rows = await sql()`
+    SELECT hubspot_contact_id FROM "leads"
+    WHERE phone = ANY(${phones})
+      AND hubspot_contact_id IS NOT NULL
+  `;
+
+  for (const row of rows) {
+    try {
+      await hubspot().crm.contacts.basicApi.archive(
+        row.hubspot_contact_id as string,
+      );
+    } catch {
+      // Already archived — ignore
+    }
+  }
+
+  await sql()`DELETE FROM "leads" WHERE phone = ANY(${phones})`;
 }
 
 /**

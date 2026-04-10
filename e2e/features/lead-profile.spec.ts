@@ -8,6 +8,7 @@ import {
   type TestSession,
   uniquePhone,
 } from "../utils/auth-helper";
+import { cleanupTestLeadsByPhone } from "../utils/hubspot-helper";
 import { getLeadIdByPhone } from "../utils/leads-helper";
 import { getSessionCookie } from "../utils/session-cookie";
 
@@ -18,12 +19,14 @@ test.describe("Lead Profile — E2E", () => {
   );
 
   let session: TestSession;
+  const phones: string[] = [];
 
   test.beforeAll(async () => {
     session = await createTestSession();
   });
 
   test.afterAll(async () => {
+    await cleanupTestLeadsByPhone(phones);
     await deleteTestSession(session.userId);
   });
 
@@ -35,6 +38,7 @@ test.describe("Lead Profile — E2E", () => {
     await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     const phone = uniquePhone();
+    phones.push(phone);
     const uniqueId = Date.now().toString(36);
     const lastName = `Unqualified ${uniqueId}`;
 
@@ -71,6 +75,7 @@ test.describe("Lead Profile — E2E", () => {
 
     const uniqueId = Date.now().toString(36);
     const phone = uniquePhone();
+    phones.push(phone);
     const email = `e2e-${uniqueId}@test.rekurve.dev`;
     const lastName = `Hot ${uniqueId}`;
 
@@ -121,6 +126,7 @@ test.describe("Lead Profile — E2E", () => {
 
     const uniqueId = Date.now().toString(36);
     const phone = uniquePhone();
+    phones.push(phone);
     const email = `e2e-${uniqueId}@test.rekurve.dev`;
     const lastName = `Breakdown ${uniqueId}`;
 
@@ -172,6 +178,7 @@ test.describe("Lead Profile — E2E", () => {
 
     const uniqueId = Date.now().toString(36);
     const phone = uniquePhone();
+    phones.push(phone);
     const email = `e2e-${uniqueId}@test.rekurve.dev`;
     const lastName = `NoLand ${uniqueId}`;
 

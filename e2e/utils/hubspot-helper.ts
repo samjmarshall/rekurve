@@ -105,10 +105,24 @@ export async function archiveTestContact(hubspotId: string): Promise<void> {
 }
 
 /**
+ * Known first-name markers used by E2E tests. Every e2e test that creates a
+ * lead without a `test.rekurve.dev` email MUST use one of these as firstName
+ * so the sweeper can find it. Keep in sync with deleteTestLeads().
+ */
+const TEST_FIRST_NAMES = [
+  "Quick",
+  "E2E",
+  "FHOG",
+  "Nav",
+  "QC",
+  "Count",
+  "Pipeline",
+];
+
+/**
  * Delete HubSpot contacts created by E2E tests. Catches two patterns:
  *   - Full-form / inbound-sync tests: email containing `test.rekurve.dev`
- *   - Quick-capture tests: firstname `Quick` + lastname containing `Capture`
- *     (quick capture has no email field, so the email filter can't find them)
+ *   - All other tests: firstname in {@link TEST_FIRST_NAMES}
  *
  * `filterGroups` are OR'd, filters within a group are AND'd.
  */
@@ -128,13 +142,8 @@ export async function deleteTestContacts(): Promise<void> {
         filters: [
           {
             propertyName: "firstname",
-            operator: FilterOperatorEnum.Eq,
-            value: "Quick",
-          },
-          {
-            propertyName: "lastname",
-            operator: FilterOperatorEnum.ContainsToken,
-            value: "Capture",
+            operator: FilterOperatorEnum.In,
+            values: TEST_FIRST_NAMES,
           },
         ],
       },

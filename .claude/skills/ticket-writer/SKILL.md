@@ -241,6 +241,50 @@ Then I should receive a reset email within 2 minutes
 - Tables for structured data
 - Mermaid diagrams for technical documentation
 
+#### Parent/Child & Dependency Linking
+
+**On epic breakdowns, linking is part of creation.** Once the breakdown plan is approved, create issues and wire relationships in the same turn. Don't ask about linking separately.
+
+**Parent/child (sub-issues)** — REST API:
+
+```bash
+# Fetch the REST numeric id (not the GraphQL node_id):
+CHILD_ID=$(gh api /repos/OWNER/REPO/issues/<CHILD_NUM> --jq .id)
+
+# Link — -F for integer, not -f:
+gh api -X POST /repos/OWNER/REPO/issues/<PARENT_NUM>/sub_issues \
+  -F "sub_issue_id=$CHILD_ID"
+```
+
+Gotchas:
+- `sub_issue_id` must be an integer — `-F`, not `-f`. Strings get `422 "not of type integer"`.
+- Use the REST numeric `.id`, not the GraphQL `node_id`.
+- Shows as sub-issue progress on the parent (e.g. "3/10").
+
+**Blocked-by / blocks** — no native typed field on classic issues. Use body-text sections; they render as cross-references and surface in Projects views:
+
+```markdown
+## Blocked by
+- #<N> — <short reason>
+
+## Blocks
+- #<N> — <short reason>
+```
+
+Bake these into the body **at creation time**. Create issues **in dependency order** so each body can reference numbers above it.
+
+**Sequence** (one turn, no mid-flow prompts):
+
+1. Create the first child (no blocked-by refs).
+2. Capture its number. Remaining children will be `N+1 … N+k` barring concurrent creates.
+3. Draft remaining bodies with `#N` refs baked in.
+4. Create them sequentially.
+5. Link every child as a sub-issue of the parent.
+6. Add every child to the project, capture the item id.
+7. Set project fields via one aliased GraphQL mutation per item.
+
+Stop to confirm only if the plan changes — never for mechanics.
+
 #### GitHub Projects Integration
 
 When issues are added to a GitHub Project, set these fields:
@@ -450,8 +494,8 @@ When MCP servers are available, the ticket-writer skill can directly create, upd
 1. **Gather requirements** through questioning
 2. **Draft ticket content** collaboratively
 3. **Review with user** for completeness
-4. **If MCP available**: Offer to create ticket directly in the system
-5. **If not available**: Provide formatted markdown for manual entry
+4. **Create + link + populate in one turn**: After plan approval, create tickets, wire sub-issue relationships, add to the project, and set fields — one turn, no re-confirmation. Linking and field assignment are part of "create".
+5. **If no MCP / CLI available**: Provide formatted markdown for manual entry.
 
 ### Benefits of MCP Integration
 

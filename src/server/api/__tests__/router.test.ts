@@ -55,14 +55,9 @@ describe("tRPC — Authenticated", () => {
     }));
   });
 
-  // leads router has its own dedicated tests in leads-router.test.ts
+  // leads and messages routers have dedicated tests in *-router.test.ts
   const stubs = [
     { name: "lots.getAll", call: (c: Caller) => c.lots.getAll(), expected: [] },
-    {
-      name: "messages.getPending",
-      call: (c: Caller) => c.messages.getPending(),
-      expected: [],
-    },
     {
       name: "nurture.getActive",
       call: (c: Caller) => c.nurture.getActive(),

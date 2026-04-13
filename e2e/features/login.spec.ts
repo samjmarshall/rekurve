@@ -253,20 +253,7 @@ test.describe("Login Page — OTP Step", () => {
   });
 });
 
-/**
- * POSTHOG EVENT TESTS — MARKED AS FIXME
- *
- * PostHog batches events and sends them asynchronously via sendBeacon()
- * on page unload. During E2E tests, events are queued but never sent
- * because the page doesn't naturally unload. See cta-tracking.spec.ts
- * for the full explanation and potential fix options.
- */
 test.describe("Login Page — PostHog Events", () => {
-  test.fixme(
-    true,
-    "PostHog events are batched and sent via sendBeacon — not capturable in E2E tests without flush config",
-  );
-
   test("fires login_otp_requested on email submit", async ({
     loginPage,
     analytics,
@@ -280,7 +267,7 @@ test.describe("Login Page — PostHog Events", () => {
 
     await loginPage.page.waitForTimeout(500);
 
-    analytics
+    await analytics
       .expectEvent("login_otp_requested")
       .withProperty("method", "email_otp")
       .toBeFired();
@@ -303,7 +290,7 @@ test.describe("Login Page — PostHog Events", () => {
 
     await loginPage.page.waitForTimeout(500);
 
-    analytics
+    await analytics
       .expectEvent("login_success")
       .withProperty("method", "email_otp")
       .toBeFired();
@@ -324,6 +311,9 @@ test.describe("Login Page — PostHog Events", () => {
     await loginPage.page.keyboard.type("123456");
     await loginPage.submitOtp();
 
+    // Wait briefly to give any potential (unwanted) event time to fire before
+    // asserting absence — analytics.expectNoEvent() is async but synchronous
+    // in semantics, so we pair it with a small wait.
     await loginPage.page.waitForTimeout(500);
 
     analytics.expectNoEvent("login_success");

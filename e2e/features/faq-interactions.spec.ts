@@ -85,16 +85,13 @@ test.describe("FAQ Search", () => {
     await homePage.faq.expectSearchResults(initialCount);
   });
 
-  /**
-   * ANALYTICS TEST - See booking-form.spec.ts for PostHog batching explanation
-   */
-  test.fixme("search tracks analytics event after debounce", async ({
+  test("search tracks analytics event after debounce", async ({
     homePage,
     analytics,
   }) => {
     await homePage.faq.search("pilot");
 
-    analytics
+    await analytics
       .expectEvent("faq_searched")
       .withPropertyPresent("query")
       .toBeFired();
@@ -107,16 +104,13 @@ test.describe("FAQ Accordion", () => {
     await homePage.faq.scrollIntoView();
   });
 
-  /**
-   * ANALYTICS TEST - See booking-form.spec.ts for PostHog batching explanation
-   */
-  test.fixme("expanding FAQ tracks analytics event", async ({
+  test("expanding FAQ tracks analytics event", async ({
     homePage,
     analytics,
   }) => {
     await homePage.faq.expandQuestion(/integrate with our existing CRM/i);
 
-    analytics
+    await analytics
       .expectEvent("faq_expanded")
       .withPropertyPresent("question_id")
       .withPropertyPresent("question")

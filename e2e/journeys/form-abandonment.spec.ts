@@ -1,15 +1,8 @@
 import { createAbandonmentUser } from "../data/test-users";
 import { test } from "../fixtures/test";
 
-/**
- * ANALYTICS TESTS - ALL MARKED AS FIXME
- *
- * These tests verify that partial form data is captured for abandoned leads.
- * They're disabled because PostHog batches events - see booking-form.spec.ts
- * for detailed explanation and solutions.
- */
 test.describe("Form Abandonment Tracking", () => {
-  test.fixme("abandonment tracked when leaving after step 1", async ({
+  test("abandonment tracked when leaving after step 1", async ({
     homePage,
     analytics,
     page: _page,
@@ -31,13 +24,13 @@ test.describe("Form Abandonment Tracking", () => {
     // We can verify the form state was captured
 
     // Clear analytics and check the form state was tracked
-    analytics
+    await analytics
       .expectEvent("form_step_completed")
       .withProperty("step", 1)
       .toBeFired();
   });
 
-  test.fixme("partial lead data is captured at each step", async ({
+  test("partial lead data is captured at each step", async ({
     homePage,
     analytics,
   }) => {
@@ -51,14 +44,14 @@ test.describe("Form Abandonment Tracking", () => {
     await homePage.bookingForm.clickNext();
 
     // Verify lead was identified even without completing form
-    analytics.expectEvent("lead_identified").toBeFired();
+    await analytics.expectEvent("lead_identified").toBeFired();
 
     // Complete step 2
     await homePage.bookingForm.fillStep2(user);
     await homePage.bookingForm.clickNext();
 
     // Step 2 completion tracked
-    analytics
+    await analytics
       .expectEvent("form_step_completed")
       .withProperty("step", 2)
       .toBeFired();

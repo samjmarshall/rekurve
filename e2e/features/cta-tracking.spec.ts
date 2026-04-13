@@ -1,111 +1,52 @@
-import { expect, test } from "../fixtures/test";
+import { test } from "../fixtures/test";
 
-/**
- * CTA CLICK TRACKING TESTS - ALL ANALYTICS TESTS MARKED AS FIXME
- *
- * Issue: PostHog batches events and sends them asynchronously, typically on
- * page unload via sendBeacon(). During E2E tests, events are queued but never
- * sent because the page doesn't naturally unload.
- *
- * What We Tried:
- * - Waiting 500ms-2000ms after actions for events to be sent
- * - Using page.on('request') to intercept PostHog requests
- * - Adding pako for gzip decompression of PostHog payloads
- * - Attempting to call posthog.flush() via page.evaluate()
- *
- * Why It Didn't Work:
- * PostHog's default configuration uses a flush_interval (typically 10s) and
- * sendBeacon on page unload. Neither triggers during test execution.
- *
- * To Enable These Tests:
- *
- * Option 1: Configure PostHog for Testing (Recommended)
- * In src/instrumentation-client.ts, add test-mode detection:
- * ```ts
- * posthog.init(key, {
- *   ...existingConfig,
- *   // Test mode settings
- *   ...(process.env.NODE_ENV === 'test' && {
- *     flush_interval: 0,        // Flush immediately
- *     capture_mode: 'form',     // Use XHR instead of sendBeacon
- *   }),
- * });
- * ```
- *
- * Option 2: Mock PostHog in Tests
- * In e2e/fixtures/test.ts, inject a mock before navigation:
- * ```ts
- * await page.addInitScript(() => {
- *   window.__posthogEvents = [];
- *   window.posthog = {
- *     capture: (event, props) => window.__posthogEvents.push({ event, props }),
- *     identify: () => {},
- *     // ... other methods
- *   };
- * });
- * ```
- *
- * Option 3: Use PostHog's Test API
- * Some analytics platforms offer a test/debug endpoint that returns
- * captured events. Check PostHog docs for similar functionality.
- */
 test.describe("CTA Click Tracking", () => {
   test.beforeEach(async ({ homePage }) => {
     await homePage.goto();
   });
 
-  test("[phase 1 smoke] hero primary CTA emits cta_clicked", async ({
+  test("hero primary CTA tracks click event", async ({
     homePage,
     analytics,
   }) => {
     await homePage.hero.clickPrimaryCta();
 
-    // Temporary Phase 1 scaffold — uses the already-async waitForEvent helper
-    // instead of the sync fluent toBeFired() API to avoid racing event arrival.
-    // This smoke test will be deleted in Phase 2 once the fluent API is async
-    // and the real fixme'd tests are unskipped.
-    const event = await analytics.waitForEvent("cta_clicked", 5000);
-    expect(event).not.toBeNull();
-    expect(event?.properties.location).toBe("hero_primary");
-  });
-
-  test.fixme("hero primary CTA tracks click event", async ({
-    homePage,
-    analytics,
-  }) => {
-    await homePage.hero.clickPrimaryCta();
-
-    analytics
+    await analytics
       .expectEvent("cta_clicked")
       .withProperty("location", "hero_primary")
       .toBeFired();
   });
 
-  test.fixme("hero secondary CTA tracks click event", async ({
+  test("hero secondary CTA tracks click event", async ({
     homePage,
     analytics,
   }) => {
     await homePage.hero.clickSecondaryCta();
 
-    analytics
+    await analytics
       .expectEvent("cta_clicked")
       .withProperty("location", "hero_secondary")
       .toBeFired();
   });
 
-  test.fixme("navbar desktop CTA tracks click event", async ({
+  test("navbar desktop CTA tracks click event", async ({
     homePage,
     analytics,
-  }) => {
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "desktop",
+      "Desktop-only navbar CTA — tablet/mobile show a hamburger menu",
+    );
+
     await homePage.navbar.clickCta();
 
-    analytics
+    await analytics
       .expectEvent("cta_clicked")
       .withProperty("location", "header")
       .toBeFired();
   });
 
-  test.fixme("pricing tier CTAs track click events", async ({
+  test("pricing tier CTAs track click events", async ({
     homePage,
     analytics,
   }) => {
@@ -113,7 +54,7 @@ test.describe("CTA Click Tracking", () => {
 
     // Test foundation tier
     await homePage.pricing.clickTierCta("foundation");
-    analytics
+    await analytics
       .expectEvent("cta_clicked")
       .withProperty("location", "pricing_foundation")
       .toBeFired();
@@ -125,33 +66,30 @@ test.describe("CTA Click Tracking", () => {
 
     // Test growth tier
     await homePage.pricing.clickTierCta("growth");
-    analytics
+    await analytics
       .expectEvent("cta_clicked")
       .withProperty("location", "pricing_growth")
       .toBeFired();
   });
 
-  test.fixme("final CTA section tracks click event", async ({
+  test("final CTA section tracks click event", async ({
     homePage,
     analytics,
   }) => {
     await homePage.finalCta.scrollIntoView();
     await homePage.finalCta.clickPrimaryCta();
 
-    analytics
+    await analytics
       .expectEvent("cta_clicked")
       .withProperty("location", "final_cta_primary")
       .toBeFired();
   });
 
-  test.fixme("FAQ bottom CTA tracks click event", async ({
-    homePage,
-    analytics,
-  }) => {
+  test("FAQ bottom CTA tracks click event", async ({ homePage, analytics }) => {
     await homePage.faq.scrollIntoView();
     await homePage.faq.clickBottomCta();
 
-    analytics
+    await analytics
       .expectEvent("cta_clicked")
       .withProperty("location", "faq_bottom")
       .toBeFired();

@@ -9,6 +9,7 @@ IMPLEMENT_MODEL="sonnet"
 VALIDATE_MODEL="opus"
 IMPLEMENT_PROMPT=".claude/prompts/ralph-implement.md"
 VALIDATE_PROMPT=".claude/prompts/ralph-validate.md"
+GRANULARITY="section"    # "section" or "checkbox"
 NO_DEVSERVER=false
 NO_NEON=false
 NO_PR=false
@@ -30,6 +31,7 @@ Options:
   --validate-model MODEL   Claude model for validate phase (default: sonnet)
   --implement-prompt PATH  Override implement prompt (default: .claude/prompts/ralph-implement.md)
   --validate-prompt PATH   Override validate prompt (default: .claude/prompts/ralph-validate.md)
+  --granularity MODE       "section" or "checkbox" (default: section)
   --no-devserver           Skip dev server (yarn dev) for plans without e2e/UI
   --no-neon                Skip Neon branch even if migrations detected
   --no-pr                  Skip PR creation after loop completes
@@ -60,6 +62,7 @@ while [[ $# -gt 0 ]]; do
     --validate-model)  VALIDATE_MODEL="$2"; shift 2 ;;
     --implement-prompt) IMPLEMENT_PROMPT="$2"; shift 2 ;;
     --validate-prompt)  VALIDATE_PROMPT="$2"; shift 2 ;;
+    --granularity)   GRANULARITY="$2"; shift 2 ;;
     --no-devserver)  NO_DEVSERVER=true; shift ;;
     --no-neon)       NO_NEON=true; shift ;;
     --no-pr)         NO_PR=true; shift ;;
@@ -159,14 +162,14 @@ verify_auth
 
 # ── Spec Parsing ─────────────────────────────────────────
 
-# Find the next incomplete task in the spec.
-# Returns: prints "TASK_ID\tTASK_TITLE\tSTATE" (tab-separated) to stdout.
-# Exit 0 if found, exit 1 if all tasks complete.
-find_next_task() {
+# Find the next incomplete section in the spec.
+# Returns: prints "SECTION_ID\tSECTION_TITLE\tSTATE" (tab-separated) to stdout.
+# Exit 0 if found, exit 1 if all sections complete.
+find_next_section() {
   local spec="$1"
   local result
   result=$(jq -r '
-    [.tasks[] | select(.state == "pending" or .state == "implemented")][0] // empty |
+    [.sections[] | select(.state == "pending" or .state == "implemented")][0] // empty |
     [.id, .title, (if .state == "pending" then "implement" else "validate" end)] |
     @tsv
   ' "$spec") || return 1
@@ -176,67 +179,32 @@ find_next_task() {
   echo "$result"
 }
 
-count_tasks() {
+count_sections() {
   local spec="$1"
   local total complete
-  total=$(jq '.tasks | length' "$spec")
-  complete=$(jq '[.tasks[] | select(.state == "validated")] | length' "$spec")
+  total=$(jq '.sections | length' "$spec")
+  complete=$(jq '[.sections[] | select(.state == "validated")] | length' "$spec")
   echo "$complete/$total"
 }
 
 # Write a state transition to the spec file.
-# Usage: update_task_state <spec-path> <task-id> <new-state>
-update_task_state() {
+# Usage: update_section_state <spec-path> <section-id> <new-state>
+update_section_state() {
   local spec="$1"
-  local task_id="$2"
+  local section_id="$2"
   local new_state="$3"
   local tmp="${spec}.tmp"
-  jq --arg id "$task_id" --arg state "$new_state" '
-    .tasks |= map(if .id == $id then .state = $state else . end)
-  ' "$spec" > "$tmp" && mv "$tmp" "$spec"
-}
-
-# Append a progress note to a task in the spec file.
-# Extracts the last portion of Claude's result text so the next attempt
-# knows what was tried and what happened.
-# Usage: append_task_notes <spec-path> <task-id> <phase> <success|failure>
-append_task_notes() {
-  local spec="$1"
-  local task_id="$2"
-  local phase="$3"
-  local outcome="$4"  # "success" or "failure"
-  local output="$LAST_OUTPUT"
-  local tmp="${spec}.tmp"
-
-  # Extract Claude's result text, truncate to last 2000 chars to keep spec manageable
-  local result_text
-  result_text=$(echo "$output" | jq -r '.result // ""' 2>/dev/null | tail -c 2000) || result_text=""
-
-  if [[ -z "$result_text" ]]; then
-    result_text="(no output captured)"
-  fi
-
-  local timestamp
-  timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-
-  local note="[$timestamp] $phase $outcome:
-$result_text"
-
-  jq --arg id "$task_id" --arg note "$note" '
-    .tasks |= map(
-      if .id == $id then
-        .notes = ((.notes // []) + [$note])
-      else . end
-    )
+  jq --arg id "$section_id" --arg state "$new_state" '
+    .sections |= map(if .id == $id then .state = $state else . end)
   ' "$spec" > "$tmp" && mv "$tmp" "$spec"
 }
 
 # ── Dry Run ───────────────────────────────────────────────
 if $DRY_RUN; then
-  log "Dry run — tasks from spec:"
+  log "Dry run — sections from spec:"
   echo ""
 
-  jq -r '.tasks[] |
+  jq -r '.sections[] |
     "  " +
     (if .state == "pending" then "[ ]"
      elif .state == "implemented" then "[/]"
@@ -245,14 +213,14 @@ if $DRY_RUN; then
   ' "$SPEC_PATH"
 
   echo ""
-  progress=$(count_tasks "$SPEC_PATH")
-  log "Progress: $progress tasks complete"
+  progress=$(count_sections "$SPEC_PATH")
+  log "Progress: $progress sections complete"
 
-  if result=$(find_next_task "$SPEC_PATH"); then
-    IFS=$'\t' read -r tid ttitle tstate <<< "$result"
-    log "Next target: $tid $ttitle ($tstate)"
+  if result=$(find_next_section "$SPEC_PATH"); then
+    IFS=$'\t' read -r sid stitle sstate <<< "$result"
+    log "Next target: $sid $stitle ($sstate)"
   else
-    log "All tasks complete"
+    log "All sections complete"
   fi
 
   exit 0
@@ -285,11 +253,11 @@ cleanup() {
   if [[ -f "$METRICS_FILE" ]]; then
     local api_cost total_sections
     api_cost=$(jq -s '[.[].api_equivalent_cost_usd] | add // 0' "$METRICS_FILE")
-    total_tasks=$(jq -s '[.[].section] | unique | length' "$METRICS_FILE")
+    total_sections=$(jq -s '[.[].section] | unique | length' "$METRICS_FILE")
     if [[ "$BILLING" == "max" ]]; then
-      log "Summary: $total_tasks tasks, \$$api_cost API-equivalent cost (covered by Max subscription)"
+      log "Summary: $total_sections sections, \$$api_cost API-equivalent cost (covered by Max subscription)"
     else
-      log "Summary: $total_tasks tasks, \$$api_cost total API cost"
+      log "Summary: $total_sections sections, \$$api_cost total API cost"
     fi
     log "Metrics: $METRICS_FILE"
   fi
@@ -472,8 +440,8 @@ LAST_COMMIT_SHA=""
 
 run_claude() {
   local phase="$1"    # "implement" or "validate"
-  local task_id="$2"
-  local task_title="$3"
+  local section_id="$2"
+  local section_title="$3"
   local prompt_file tools prompt_text model
   local worktree_spec="$WORKTREE_DIR/$SPEC_PATH"
 
@@ -487,18 +455,15 @@ run_claude() {
     model="$VALIDATE_MODEL"
   fi
 
-  # Inline task content from the spec into the prompt, including any prior attempt notes
-  prompt_text=$(jq -r --arg id "$task_id" --arg phase "$phase" --arg plan "$PLAN_PATH" '
-    .tasks[] | select(.id == $id) |
+  # Inline section content from the spec into the prompt
+  prompt_text=$(jq -r --arg id "$section_id" --arg phase "$phase" --arg plan "$PLAN_PATH" '
+    .sections[] | select(.id == $id) |
     (if $phase == "implement" then "Implement" else "Validate" end) +
-    " task \(.id): \(.title)\n\n" +
+    " section \(.id): \(.title)\n\n" +
     "Plan: \($plan)\n\n" +
-    "Tasks:\n- " + .task + "\n\n" +
+    "Tasks:\n" + (.tasks | map("- " + .) | join("\n")) + "\n\n" +
     "Files to read first:\n" + (.files | map("- " + .) | join("\n")) + "\n\n" +
-    "Verify:\n" + (.verify | map("- " + .) | join("\n")) +
-    (if (.notes // []) | length > 0 then
-      "\n\nPrior attempts:\n" + (.notes | map("---\n" + .) | join("\n"))
-    else "" end)
+    "Verify:\n" + (.verify | map("- " + .) | join("\n"))
   ' "$worktree_spec")
 
   local start_time
@@ -541,7 +506,7 @@ run_claude() {
 
 check_success() {
   local phase="$1"
-  local task_id="$2"
+  local section_id="$2"
   local output="$LAST_OUTPUT"
   local exit_code=$LAST_EXIT_CODE
   local worktree_spec="$WORKTREE_DIR/$SPEC_PATH"
@@ -581,8 +546,8 @@ check_success() {
       err "Verify command failed: $verify_cmd"
       return 1
     fi
-  done < <(jq -r --arg id "$task_id" '
-    .tasks[] | select(.id == $id) | .verify[]
+  done < <(jq -r --arg id "$section_id" '
+    .sections[] | select(.id == $id) | .verify[]
   ' "$worktree_spec")
 
   return 0
@@ -592,8 +557,8 @@ check_success() {
 
 record_metrics() {
   local phase="$1"
-  local task_id="$2"
-  local task_title="$3"
+  local section_id="$2"
+  local section_title="$3"
   local output="$LAST_OUTPUT"
   local duration_ms="$LAST_DURATION_MS"
   local exit_code=$LAST_EXIT_CODE
@@ -620,8 +585,8 @@ record_metrics() {
   jq -nc \
     --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     --arg plan "$PLAN_NAME" \
-    --arg section "$task_id" \
-    --arg section_title "$task_title" \
+    --arg section "$section_id" \
+    --arg section_title "$section_title" \
     --arg phase "$phase" \
     --arg subtype "$subtype" \
     --arg billing "$BILLING" \
@@ -782,54 +747,50 @@ LOOP_FAILED=false
 while true; do
   worktree_spec="$WORKTREE_DIR/$SPEC_PATH"
 
-  result=$(find_next_task "$worktree_spec") || {
-    log "All tasks complete!"
+  result=$(find_next_section "$worktree_spec") || {
+    log "All sections complete!"
     push_and_create_pr
     break
   }
 
-  IFS=$'\t' read -r TASK_ID TASK_TITLE TASK_STATE <<< "$result"
-  log "Task $TASK_ID: $TASK_TITLE ($TASK_STATE)"
+  IFS=$'\t' read -r SECTION_ID SECTION_TITLE SECTION_STATE <<< "$result"
+  log "Section $SECTION_ID: $SECTION_TITLE ($SECTION_STATE)"
 
   # Implement phase (skip if already implemented)
-  if [[ "$TASK_STATE" == "implement" ]]; then
+  if [[ "$SECTION_STATE" == "implement" ]]; then
     log "Phase: implement"
     LAST_COMMIT_SHA=""
-    run_claude "implement" "$TASK_ID" "$TASK_TITLE"
-    record_metrics "implement" "$TASK_ID" "$TASK_TITLE"
+    run_claude "implement" "$SECTION_ID" "$SECTION_TITLE"
+    record_metrics "implement" "$SECTION_ID" "$SECTION_TITLE"
 
-    if ! check_success "implement" "$TASK_ID"; then
-      append_task_notes "$worktree_spec" "$TASK_ID" "implement" "failure"
-      err "Implement failed for task $TASK_ID"
+    if ! check_success "implement" "$SECTION_ID"; then
+      err "Implement failed for section $SECTION_ID"
       LOOP_FAILED=true
       break
     fi
 
-    append_task_notes "$worktree_spec" "$TASK_ID" "implement" "success"
-    update_task_state "$worktree_spec" "$TASK_ID" "implemented"
-    log "Implement succeeded for task $TASK_ID"
+    update_section_state "$worktree_spec" "$SECTION_ID" "implemented"
+    log "Implement succeeded for section $SECTION_ID"
   fi
 
   # Validate phase
   log "Phase: validate"
   LAST_COMMIT_SHA=""
-  run_claude "validate" "$TASK_ID" "$TASK_TITLE"
+  run_claude "validate" "$SECTION_ID" "$SECTION_TITLE"
 
-  if ! check_success "validate" "$TASK_ID"; then
-    append_task_notes "$worktree_spec" "$TASK_ID" "validate" "failure"
-    record_metrics "validate" "$TASK_ID" "$TASK_TITLE"
-    err "Validate failed for task $TASK_ID"
+  if ! check_success "validate" "$SECTION_ID"; then
+    record_metrics "validate" "$SECTION_ID" "$SECTION_TITLE"
+    err "Validate failed for section $SECTION_ID"
     LOOP_FAILED=true
     break
   fi
 
   # Capture commit SHA after successful validation (validate agent commits on success)
   LAST_COMMIT_SHA=$(cd "$WORKTREE_DIR" && git rev-parse HEAD)
-  append_task_notes "$worktree_spec" "$TASK_ID" "validate" "success"
-  record_metrics "validate" "$TASK_ID" "$TASK_TITLE"
+  record_metrics "validate" "$SECTION_ID" "$SECTION_TITLE"
 
-  update_task_state "$worktree_spec" "$TASK_ID" "validated"
-  log "Task $TASK_ID complete (commit: ${LAST_COMMIT_SHA:0:8})"
+  update_section_state "$worktree_spec" "$SECTION_ID" "validated"
+  log "Section $SECTION_ID complete (commit: ${LAST_COMMIT_SHA:0:8})"
 done
 
 if $LOOP_FAILED; then

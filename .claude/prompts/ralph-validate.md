@@ -72,13 +72,6 @@ for the four core dashboard routes.
 [ralph] thoughts/plans/2026-04-01-dashboard-app-shell.md §2.1
 ```
 
-## Prior Attempts
-
-If a "Prior attempts" section appears in your prompt, this task has been tried before. Read the notes carefully:
-- Do NOT repeat approaches that already failed
-- Check `git diff` and `git status` to see what's already changed from prior attempts
-- Focus on fixing the specific issue that caused the previous failure
-
 ## On Failure
 
 Do NOT create a commit. Explain what failed and why.

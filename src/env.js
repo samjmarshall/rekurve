@@ -27,6 +27,7 @@ export const env = createEnv({
     RESEND_API_KEY: z.string().min(1),
     HUBSPOT_ACCESS_TOKEN: z.string().min(1),
     HUBSPOT_CLIENT_SECRET: z.string().min(1),
+    ANTHROPIC_API_KEY: z.string().min(1),
     ROBOTS_TXT: z.string().default("Disallow"),
   },
 
@@ -57,6 +58,7 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     HUBSPOT_ACCESS_TOKEN: process.env.HUBSPOT_ACCESS_TOKEN,
     HUBSPOT_CLIENT_SECRET: process.env.HUBSPOT_CLIENT_SECRET,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     ROBOTS_TXT: process.env.ROBOTS_TXT,
   },
   /**

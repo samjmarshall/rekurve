@@ -1,40 +1,26 @@
-import { Plus, Users } from "lucide-react";
-import Link from "next/link";
-import { buttonVariants } from "~/components/ui/button-variants";
+import type { Metadata } from "next";
+import { HydrateClient, prefetch, trpc } from "~/trpc/server";
+import { PipelineBoard } from "./_components/pipeline-board";
+import { parseFiltersFromSearchParams } from "./_lib/filters";
 
-export default function PipelinePage() {
+export const metadata: Metadata = {
+  title: "Pipeline | Rekurve",
+};
+
+interface PipelinePageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function PipelinePage({
+  searchParams,
+}: PipelinePageProps) {
+  const params = await searchParams;
+  const filters = parseFiltersFromSearchParams(params);
+  prefetch(trpc.leads.getByStage.queryOptions(filters));
+
   return (
-    <div className="flex flex-1 flex-col">
-      <header className="flex items-center justify-between border-b px-4 py-3">
-        <h1 className="font-semibold text-lg">Pipeline</h1>
-        <Link
-          href="/leads/new"
-          className={buttonVariants({ variant: "primary", size: "md" })}
-        >
-          <Plus className="mr-1.5 size-4" />
-          Add Lead
-        </Link>
-      </header>
-      <div className="flex flex-1 items-center justify-center p-4">
-        <div className="text-center">
-          <Users size={48} className="mx-auto mb-4 text-muted-foreground/50" />
-          <h2 className="font-semibold text-lg">No leads yet</h2>
-          <p className="mt-1 max-w-sm text-muted-foreground text-sm">
-            Your leads will appear here, grouped by stage
-          </p>
-          <Link
-            href="/leads/new"
-            className={buttonVariants({
-              variant: "outline",
-              size: "md",
-              className: "mt-4",
-            })}
-          >
-            <Plus className="mr-1.5 size-4" />
-            Add your first lead
-          </Link>
-        </div>
-      </div>
-    </div>
+    <HydrateClient>
+      <PipelineBoard />
+    </HydrateClient>
   );
 }

@@ -86,12 +86,15 @@ export function uniquePhone(): string {
 }
 
 /**
- * Delete leads created by E2E tests, identified by test email patterns.
+ * Delete leads created by E2E tests. Two patterns:
+ *   - Full-form tests: email matches `e2e-%@test.rekurve.dev`
+ *   - All other tests: first_name in the known test marker list.
+ *     Keep in sync with TEST_FIRST_NAMES in hubspot-helper.ts.
  */
 export async function deleteTestLeads(): Promise<void> {
   await sql()`
     DELETE FROM "leads"
     WHERE email LIKE 'e2e-%@test.rekurve.dev'
-       OR (first_name = 'Quick' AND last_name LIKE 'Capture %')
+       OR first_name IN ('Quick', 'E2E', 'FHOG', 'Nav', 'QC', 'Count', 'Pipeline')
   `;
 }

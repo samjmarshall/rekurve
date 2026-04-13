@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { LeadFormSection } from "../pages/sections/lead-form.section";
+import { PipelineBoardSection } from "../pages/sections/pipeline-board.section";
 import { QuickCaptureSection } from "../pages/sections/quick-capture.section";
 import {
   createTestSession,
@@ -7,6 +8,7 @@ import {
   type TestSession,
   uniquePhone,
 } from "../utils/auth-helper";
+import { cleanupTestLeadsByPhone } from "../utils/hubspot-helper";
 import { getSessionCookie } from "../utils/session-cookie";
 
 test.describe("Leads CRUD — E2E", () => {
@@ -16,15 +18,14 @@ test.describe("Leads CRUD — E2E", () => {
   );
 
   let session: TestSession;
+  const phones: string[] = [];
 
   test.beforeAll(async () => {
     session = await createTestSession();
   });
 
   test.afterAll(async () => {
-    // Leads and HubSpot contacts created here are cleaned up by
-    // e2e/utils/global-teardown.ts after every worker has finished — doing it
-    // here would race with concurrent hubspot-sync tests in other workers.
+    await cleanupTestLeadsByPhone(phones);
     await deleteTestSession(session.userId);
   });
 
@@ -42,12 +43,14 @@ test.describe("Leads CRUD — E2E", () => {
 
     const form = new LeadFormSection(page);
     const uniqueId = Date.now().toString(36);
+    const phone = uniquePhone();
+    phones.push(phone);
 
     // Step 1: Contact
     await form.fillStep1({
       firstName: "E2E",
       lastName: `Test ${uniqueId}`,
-      phone: uniquePhone(),
+      phone,
       email: `e2e-${uniqueId}@test.rekurve.dev`,
     });
     await form.selectSegmented("Preferred contact time", "Anytime");
@@ -130,6 +133,8 @@ test.describe("Leads CRUD — E2E", () => {
 
     const quickCapture = new QuickCaptureSection(page);
     const uniqueId = Date.now().toString(36);
+    const phone = uniquePhone();
+    phones.push(phone);
 
     await quickCapture.open();
     await expect(quickCapture.firstNameInput).toBeFocused();
@@ -137,7 +142,7 @@ test.describe("Leads CRUD — E2E", () => {
     await quickCapture.fill({
       firstName: "Quick",
       lastName: `Capture ${uniqueId}`,
-      phone: uniquePhone(),
+      phone,
       notes: "Met at BBQ",
     });
     await quickCapture.submit();
@@ -185,8 +190,216 @@ test.describe("Leads CRUD — E2E", () => {
     test.fixme();
   });
 
-  test("pipeline board displays leads grouped by stage (unqualified, nurture, warm, hot)", () => {
-    test.fixme();
+  test("pipeline board displays leads grouped by stage (unqualified, nurture, warm, hot)", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+    const uniqueId = Date.now().toString(36);
+
+    // Seed one quick-capture lead (→ unqualified) and one full-form
+    // fully-qualified lead (→ hot after scoring).
+    await page.goto("/dashboard");
+    const quickCapture = new QuickCaptureSection(page);
+    await quickCapture.open();
+    await quickCapture.fill({
+      firstName: "Pipeline",
+      lastName: `Unqualified ${uniqueId}`,
+      phone: uniquePhone(),
+    });
+    await quickCapture.submit();
+    await quickCapture.expectSuccessToast(`Pipeline Unqualified ${uniqueId}`);
+
+    await page.goto("/leads/new");
+    const form = new LeadFormSection(page);
+    await form.fillStep1({
+      firstName: "Pipeline",
+      lastName: `Hot ${uniqueId}`,
+      phone: uniquePhone(),
+      email: `e2e-${uniqueId}-hot@test.rekurve.dev`,
+    });
+    await form.clickNext();
+    await form.selectSegmented("Has land", "Yes");
+    await form.landAddressInput.waitFor({ state: "visible" });
+    await form.selectSegmented("Land registered", "Yes");
+    await form.landAddressInput.fill("1 Hot St");
+    await form.landSqmInput.fill("450");
+    await form.clickNext();
+    await form.selectSegmented("Property type", "First Home Buyer");
+    await form.budgetInput.fill("$650,000");
+    await form.selectSegmented("Seen broker", "Yes");
+    await form.selectSegmented("Construction timeline", "Ready Now");
+    await form.clickNext();
+    await form.clickSubmit();
+    await form.expectSuccess(`Pipeline Hot ${uniqueId}`);
+
+    // Scoring is fire-and-forget, so poll until the hot lead lands in the hot column.
+    await page.goto("/pipeline");
+    const board = new PipelineBoardSection(page);
+
+    await expect(
+      board.column("unqualified").getByText(`Pipeline Unqualified ${uniqueId}`),
+    ).toBeVisible({ timeout: 15_000 });
+
+    await expect(
+      board.column("hot").getByText(`Pipeline Hot ${uniqueId}`),
+    ).toBeVisible({ timeout: 15_000 });
+  });
+
+  test("quick-capture lead appears in the Unqualified column with score 0", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+    const uniqueId = Date.now().toString(36);
+
+    await page.goto("/dashboard");
+    const quickCapture = new QuickCaptureSection(page);
+    await quickCapture.open();
+    await quickCapture.fill({
+      firstName: "QC",
+      lastName: `Capture ${uniqueId}`,
+      phone: uniquePhone(),
+    });
+    await quickCapture.submit();
+    await quickCapture.expectSuccessToast(`QC Capture ${uniqueId}`);
+
+    await page.goto("/pipeline");
+    const board = new PipelineBoardSection(page);
+    const card = board
+      .column("unqualified")
+      .locator('[data-testid^="lead-card-"]', {
+        hasText: `QC Capture ${uniqueId}`,
+      });
+    await expect(card).toBeVisible({ timeout: 15_000 });
+    await expect(card.locator('[data-testid^="lead-card-score-"]')).toHaveText(
+      "0",
+    );
+  });
+
+  test("tapping a lead card navigates to /leads/[id]", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+    const uniqueId = Date.now().toString(36);
+
+    // Seed a lead
+    await page.goto("/dashboard");
+    const quickCapture = new QuickCaptureSection(page);
+    await quickCapture.open();
+    await quickCapture.fill({
+      firstName: "Nav",
+      lastName: `Test ${uniqueId}`,
+      phone: uniquePhone(),
+    });
+    await quickCapture.submit();
+    await quickCapture.expectSuccessToast(`Nav Test ${uniqueId}`);
+
+    await page.goto("/pipeline");
+    const board = new PipelineBoardSection(page);
+    const card = board
+      .column("unqualified")
+      .locator('[data-testid^="lead-card-"]', {
+        hasText: `Nav Test ${uniqueId}`,
+      });
+    await expect(card).toBeVisible({ timeout: 15_000 });
+    await card.click();
+    // Profile page is not built yet (#101) — just assert URL shape.
+    await page.waitForURL(/\/leads\/[0-9a-f-]{36}$/);
+  });
+
+  test("new lead appears in the pipeline board after quick capture", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+    const uniqueId = Date.now().toString(36);
+
+    // QuickCapture FAB lives on /dashboard.
+    await page.goto("/dashboard");
+    const quickCapture = new QuickCaptureSection(page);
+    await quickCapture.open();
+    await quickCapture.fill({
+      firstName: "Count",
+      lastName: `Update ${uniqueId}`,
+      phone: uniquePhone(),
+    });
+    await quickCapture.submit();
+    await quickCapture.expectSuccessToast(`Count Update ${uniqueId}`);
+
+    // The new lead should land in the Unqualified column. The absolute
+    // column count is racy under parallel test runs against a shared DB,
+    // so assert on the card's presence instead.
+    await page.goto("/pipeline");
+    const board = new PipelineBoardSection(page);
+    await expect(
+      board.column("unqualified").getByText(`Count Update ${uniqueId}`),
+    ).toBeVisible({ timeout: 15_000 });
+  });
+
+  test("FHOG filter narrows to first home buyer leads", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+    const uniqueId = Date.now().toString(36);
+
+    // Seed one first_home_buyer lead and one investment lead via full form.
+    const form = new LeadFormSection(page);
+
+    await page.goto("/leads/new");
+    await form.fillStep1({
+      firstName: "FHOG",
+      lastName: `Buyer ${uniqueId}`,
+      phone: uniquePhone(),
+      email: `e2e-${uniqueId}-fhog-buyer@test.rekurve.dev`,
+    });
+    await form.clickNext();
+    await form.clickNext();
+    await form.selectSegmented("Property type", "First Home Buyer");
+    await form.clickNext();
+    await form.clickSubmit();
+    await form.expectSuccess(`FHOG Buyer ${uniqueId}`);
+
+    await page.goto("/leads/new");
+    await form.fillStep1({
+      firstName: "FHOG",
+      lastName: `Investor ${uniqueId}`,
+      phone: uniquePhone(),
+      email: `e2e-${uniqueId}-fhog-investor@test.rekurve.dev`,
+    });
+    await form.clickNext();
+    await form.clickNext();
+    await form.selectSegmented("Property type", "Investment");
+    await form.clickNext();
+    await form.clickSubmit();
+    await form.expectSuccess(`FHOG Investor ${uniqueId}`);
+
+    await page.goto("/pipeline");
+    const board = new PipelineBoardSection(page);
+
+    // Both visible before filter applied.
+    await expect(board.board.getByText(`FHOG Buyer ${uniqueId}`)).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(
+      board.board.getByText(`FHOG Investor ${uniqueId}`),
+    ).toBeVisible();
+
+    // Apply FHOG filter.
+    await board.filterFhog.click();
+    await page.waitForURL(/fhog=true/);
+
+    await expect(board.board.getByText(`FHOG Buyer ${uniqueId}`)).toBeVisible();
+    await expect(
+      board.board.getByText(`FHOG Investor ${uniqueId}`),
+    ).not.toBeVisible();
   });
 
   test("Zod validation errors surface in the UI when submitting invalid form data", () => {

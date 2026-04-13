@@ -70,6 +70,19 @@ beforeEach(() => {
     },
   };
 
+  // Default chainable mock for db.update used by synchronous re-scoring in
+  // create/update. Tests can override this by calling mockReturnValue again.
+  const defaultUpdateReturning = rs.fn().mockResolvedValue([mockLead]);
+  const defaultUpdateWhere = rs
+    .fn()
+    .mockReturnValue({ returning: defaultUpdateReturning });
+  const defaultUpdateSet = rs
+    .fn()
+    .mockReturnValue({ where: defaultUpdateWhere });
+  (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({
+    set: defaultUpdateSet,
+  });
+
   rs.doMock("~/server/db", () => ({ db: mockDb }));
 
   rs.doMock("~/server/scoring", () => ({
@@ -140,7 +153,8 @@ async function getCaller(): Promise<Caller> {
 describe("leads.create", () => {
   test("creates a lead with full form data", async () => {
     const returning = rs.fn().mockResolvedValue([mockLead]);
-    const values = rs.fn().mockReturnValue({ returning });
+    const onConflictDoUpdate = rs.fn().mockReturnValue({ returning });
+    const values = rs.fn().mockReturnValue({ onConflictDoUpdate });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     const caller = await getCaller();
@@ -160,9 +174,21 @@ describe("leads.create", () => {
 
   test("creates a lead with quick capture data", async () => {
     const quickLead = { ...mockLead, email: null, notes: "Met at BBQ" };
-    const returning = rs.fn().mockResolvedValue([quickLead]);
-    const values = rs.fn().mockReturnValue({ returning });
+    const insertReturning = rs.fn().mockResolvedValue([quickLead]);
+    const insertOnConflict = rs
+      .fn()
+      .mockReturnValue({ returning: insertReturning });
+    const values = rs
+      .fn()
+      .mockReturnValue({ onConflictDoUpdate: insertOnConflict });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
+
+    // scoreLead's db.update returns the scored version of the same row so
+    // the router's response still carries the quick-capture fields.
+    const updateReturning = rs.fn().mockResolvedValue([quickLead]);
+    const where = rs.fn().mockReturnValue({ returning: updateReturning });
+    const set = rs.fn().mockReturnValue({ where });
+    (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
 
     const caller = await getCaller();
     const result = await caller.leads.create({
@@ -196,7 +222,8 @@ describe("leads.create — HubSpot sync", () => {
   test("creates HubSpot contact when no dedup match", async () => {
     const leadWithHs = { ...mockLead, hubspotContactId: "hs-123" };
     const returning = rs.fn().mockResolvedValue([leadWithHs]);
-    const values = rs.fn().mockReturnValue({ returning });
+    const onConflictDoUpdate = rs.fn().mockReturnValue({ returning });
+    const values = rs.fn().mockReturnValue({ onConflictDoUpdate });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     const { createContact } = await import("~/server/hubspot");
@@ -224,7 +251,8 @@ describe("leads.create — HubSpot sync", () => {
 
     const leadWithHs = { ...mockLead, hubspotContactId: "hs-existing" };
     const returning = rs.fn().mockResolvedValue([leadWithHs]);
-    const values = rs.fn().mockReturnValue({ returning });
+    const onConflictDoUpdate = rs.fn().mockReturnValue({ returning });
+    const values = rs.fn().mockReturnValue({ onConflictDoUpdate });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     const caller = await getCaller();
@@ -242,7 +270,8 @@ describe("leads.create — HubSpot sync", () => {
 
   test("throws INTERNAL_SERVER_ERROR on DB failure after HubSpot success", async () => {
     const returning = rs.fn().mockRejectedValue(new Error("DB down"));
-    const values = rs.fn().mockReturnValue({ returning });
+    const onConflictDoUpdate = rs.fn().mockReturnValue({ returning });
+    const values = rs.fn().mockReturnValue({ onConflictDoUpdate });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
 
     const caller = await getCaller();
@@ -502,91 +531,274 @@ describe("leads.delete", () => {
 // --- leads.create — scoring integration ---
 
 describe("leads.create — scoring integration", () => {
-  test("returns lead immediately without waiting for scoring", async () => {
+  test("returns a scored lead when input contains qualifying data", async () => {
     const { qualifyAndScore } = await import("~/server/scoring");
-    (qualifyAndScore as ReturnType<typeof rs.fn>).mockImplementation(() => ({
-      score: 0,
-      stage: "unqualified",
-      breakdown: {},
+    (qualifyAndScore as ReturnType<typeof rs.fn>).mockReturnValueOnce({
+      score: 85,
+      stage: "hot",
+      breakdown: {
+        land: { score: 30, maxScore: 30, reasoning: "registered" },
+        finance: { score: 15, maxScore: 25, reasoning: "broker" },
+        timeline: { score: 20, maxScore: 20, reasoning: "ready now" },
+        budget: { score: 10, maxScore: 10, reasoning: "in range" },
+        propertyType: { score: 10, maxScore: 10, reasoning: "clear intent" },
+        engagement: { score: 0, maxScore: 5, reasoning: "no data" },
+      },
       gaps: [],
-      nextQuestion: "",
-    }));
+      nextQuestion: "All good",
+    });
 
-    const returning = rs.fn().mockResolvedValue([mockLead]);
-    const values = rs.fn().mockReturnValue({ returning });
+    // Insert returns the unscored row
+    const insertReturning = rs.fn().mockResolvedValue([mockLead]);
+    const insertOnConflict = rs
+      .fn()
+      .mockReturnValue({ returning: insertReturning });
+    const values = rs
+      .fn()
+      .mockReturnValue({ onConflictDoUpdate: insertOnConflict });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
+
+    // scoreLead's db.update returns the fully-scored row
+    const scoredLead = {
+      ...mockLead,
+      leadScore: 85,
+      leadStage: "hot" as const,
+      scoreMetadata: {
+        score: 85,
+        stage: "hot" as const,
+        breakdown: {
+          land: { score: 30, maxScore: 30, reasoning: "registered" },
+          finance: { score: 15, maxScore: 25, reasoning: "broker" },
+          timeline: { score: 20, maxScore: 20, reasoning: "ready now" },
+          budget: { score: 10, maxScore: 10, reasoning: "in range" },
+          propertyType: { score: 10, maxScore: 10, reasoning: "clear intent" },
+          engagement: { score: 0, maxScore: 5, reasoning: "no data" },
+        },
+        gaps: [],
+        nextQuestion: "All good",
+        scoredAt: "2026-04-10T00:00:00.000Z",
+      },
+    };
+    const updateReturning = rs.fn().mockResolvedValue([scoredLead]);
+    const where = rs.fn().mockReturnValue({ returning: updateReturning });
+    const set = rs.fn().mockReturnValue({ where });
+    (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
 
     const caller = await getCaller();
     const result = await caller.leads.create({
       firstName: "John",
       lastName: "Smith",
+      hasLand: true,
+      landRegistered: true,
+      landSizeSqm: "450",
+      seenBroker: true,
+      constructionTimeline: "ready_now",
+      budget: "$650000",
+      propertyType: "first_home_buyer",
     });
 
-    // Should return immediately, not wait for scoring
-    expect(result.firstName).toBe("John");
+    expect(result.leadScore).toBe(85);
+    expect(result.leadStage).toBe("hot");
+    expect(result.scoreMetadata).not.toBeNull();
+    expect(result.scoreMetadata?.score).toBe(85);
+    expect(result.scoreMetadata?.gaps).toHaveLength(0);
+    expect(qualifyAndScore).toHaveBeenCalled();
   });
 
-  test("create succeeds even when scoring throws", async () => {
+  test("returns an unqualified lead with 5 gaps for quick-capture input", async () => {
     const { qualifyAndScore } = await import("~/server/scoring");
-    (qualifyAndScore as ReturnType<typeof rs.fn>).mockImplementation(() => {
-      throw new Error("Scoring failed");
+    (qualifyAndScore as ReturnType<typeof rs.fn>).mockReturnValueOnce({
+      score: 0,
+      stage: "unqualified",
+      breakdown: {
+        land: { score: 0, maxScore: 30, reasoning: "none" },
+        finance: { score: 0, maxScore: 25, reasoning: "unknown" },
+        timeline: { score: 0, maxScore: 20, reasoning: "none" },
+        budget: { score: 0, maxScore: 10, reasoning: "none" },
+        propertyType: { score: 0, maxScore: 10, reasoning: "none" },
+        engagement: { score: 0, maxScore: 5, reasoning: "no data" },
+      },
+      gaps: [
+        { field: "land", impact: "high", description: "No land" },
+        { field: "finance", impact: "high", description: "Unknown" },
+        { field: "timeline", impact: "high", description: "No timeline" },
+        { field: "budget", impact: "medium", description: "No budget" },
+        { field: "propertyType", impact: "medium", description: "No type" },
+      ],
+      nextQuestion: "Do you have land?",
     });
 
-    const returning = rs.fn().mockResolvedValue([mockLead]);
-    const values = rs.fn().mockReturnValue({ returning });
+    const quickLead = { ...mockLead, email: null };
+    const insertReturning = rs.fn().mockResolvedValue([quickLead]);
+    const insertOnConflict = rs
+      .fn()
+      .mockReturnValue({ returning: insertReturning });
+    const values = rs
+      .fn()
+      .mockReturnValue({ onConflictDoUpdate: insertOnConflict });
     (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
+
+    const scoredQuickLead = {
+      ...quickLead,
+      leadScore: 0,
+      leadStage: "unqualified" as const,
+      scoreMetadata: {
+        score: 0,
+        stage: "unqualified" as const,
+        breakdown: {
+          land: { score: 0, maxScore: 30, reasoning: "none" },
+          finance: { score: 0, maxScore: 25, reasoning: "unknown" },
+          timeline: { score: 0, maxScore: 20, reasoning: "none" },
+          budget: { score: 0, maxScore: 10, reasoning: "none" },
+          propertyType: { score: 0, maxScore: 10, reasoning: "none" },
+          engagement: { score: 0, maxScore: 5, reasoning: "no data" },
+        },
+        gaps: [
+          {
+            field: "land",
+            impact: "high" as const,
+            description: "No land",
+          },
+          {
+            field: "finance",
+            impact: "high" as const,
+            description: "Unknown",
+          },
+          {
+            field: "timeline",
+            impact: "high" as const,
+            description: "No timeline",
+          },
+          {
+            field: "budget",
+            impact: "medium" as const,
+            description: "No budget",
+          },
+          {
+            field: "propertyType",
+            impact: "medium" as const,
+            description: "No type",
+          },
+        ],
+        nextQuestion: "Do you have land?",
+        scoredAt: "2026-04-10T00:00:00.000Z",
+      },
+    };
+    const updateReturning = rs.fn().mockResolvedValue([scoredQuickLead]);
+    const where = rs.fn().mockReturnValue({ returning: updateReturning });
+    const set = rs.fn().mockReturnValue({ where });
+    (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
 
     const caller = await getCaller();
     const result = await caller.leads.create({
       firstName: "John",
       lastName: "Smith",
+      phone: "0412345678",
     });
 
-    expect(result.firstName).toBe("John");
     expect(result.leadScore).toBe(0);
+    expect(result.leadStage).toBe("unqualified");
+    expect(result.scoreMetadata?.gaps).toHaveLength(5);
   });
 });
 
 // --- leads.update — scoring integration ---
 
 describe("leads.update — scoring integration", () => {
-  test("triggers re-scoring when qualification fields change", async () => {
+  test("re-scores and returns the new score when a scoring field changes", async () => {
     (
       mockDb.query as { leads: { findFirst: ReturnType<typeof rs.fn> } }
     ).leads.findFirst.mockResolvedValue({ hubspotContactId: null });
 
     const { qualifyAndScore } = await import("~/server/scoring");
-    const updatedLead = { ...mockLead, budget: "$700K" };
-    const returning = rs.fn().mockResolvedValue([updatedLead]);
+    (qualifyAndScore as ReturnType<typeof rs.fn>).mockReturnValueOnce({
+      score: 20,
+      stage: "unqualified",
+      breakdown: {
+        land: { score: 0, maxScore: 30, reasoning: "none" },
+        finance: { score: 0, maxScore: 25, reasoning: "unknown" },
+        timeline: { score: 20, maxScore: 20, reasoning: "ready now" },
+        budget: { score: 0, maxScore: 10, reasoning: "none" },
+        propertyType: { score: 0, maxScore: 10, reasoning: "none" },
+        engagement: { score: 0, maxScore: 5, reasoning: "no data" },
+      },
+      gaps: [],
+      nextQuestion: "All good",
+    });
+
+    // First call: main update returns the unscored edited row.
+    // Second call: scoreLead's update returns the scored row.
+    const editedLead = {
+      ...mockLead,
+      constructionTimeline: "ready_now" as const,
+    };
+    const scoredEditedLead = {
+      ...editedLead,
+      leadScore: 20,
+      leadStage: "unqualified" as const,
+      scoreMetadata: {
+        score: 20,
+        stage: "unqualified" as const,
+        breakdown: {
+          land: { score: 0, maxScore: 30, reasoning: "none" },
+          finance: { score: 0, maxScore: 25, reasoning: "unknown" },
+          timeline: { score: 20, maxScore: 20, reasoning: "ready now" },
+          budget: { score: 0, maxScore: 10, reasoning: "none" },
+          propertyType: { score: 0, maxScore: 10, reasoning: "none" },
+          engagement: { score: 0, maxScore: 5, reasoning: "no data" },
+        },
+        gaps: [],
+        nextQuestion: "All good",
+        scoredAt: "2026-04-10T00:00:00.000Z",
+      },
+    };
+    const returning = rs
+      .fn()
+      .mockResolvedValueOnce([editedLead])
+      .mockResolvedValueOnce([scoredEditedLead]);
     const where = rs.fn().mockReturnValue({ returning });
     const set = rs.fn().mockReturnValue({ where });
     (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
 
     const caller = await getCaller();
-    await caller.leads.update({ id: mockLead.id, budget: "$700K" });
+    const result = await caller.leads.update({
+      id: mockLead.id,
+      constructionTimeline: "ready_now",
+    });
 
-    // Give the microtask queue a tick
-    await new Promise((r) => setTimeout(r, 0));
     expect(qualifyAndScore).toHaveBeenCalled();
+    expect(result.leadScore).toBe(20);
+    expect(result.scoreMetadata?.breakdown.timeline.score).toBe(20);
   });
 
-  test("does not re-score when only non-qualification fields change", async () => {
+  test("does not re-score or rewrite scoreMetadata for non-scoring fields", async () => {
     (
       mockDb.query as { leads: { findFirst: ReturnType<typeof rs.fn> } }
     ).leads.findFirst.mockResolvedValue({ hubspotContactId: null });
 
     const { qualifyAndScore } = await import("~/server/scoring");
-    const updatedLead = { ...mockLead, referrerName: "Bob" };
+    const updatedLead = {
+      ...mockLead,
+      notes: "Met at BBQ",
+      leadScore: 42,
+      scoreMetadata: null,
+    };
     const returning = rs.fn().mockResolvedValue([updatedLead]);
     const where = rs.fn().mockReturnValue({ returning });
     const set = rs.fn().mockReturnValue({ where });
     (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
 
     const caller = await getCaller();
-    await caller.leads.update({ id: mockLead.id, referrerName: "Bob" });
+    const result = await caller.leads.update({
+      id: mockLead.id,
+      notes: "Met at BBQ",
+    });
 
-    await new Promise((r) => setTimeout(r, 0));
     expect(qualifyAndScore).not.toHaveBeenCalled();
+    // Main update was called exactly once (no second score-write)
+    expect(set).toHaveBeenCalledTimes(1);
+    expect(result.leadScore).toBe(42);
+    expect(result.scoreMetadata).toBeNull();
   });
 });
 
@@ -627,5 +839,61 @@ describe("leads.getByStage", () => {
     expect(result.nurture).toHaveLength(0);
     expect(result.warm).toHaveLength(0);
     expect(result.hot).toHaveLength(0);
+  });
+
+  test("runs an unfiltered query when input is undefined", async () => {
+    const findMany = (
+      mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
+    ).leads.findMany;
+    findMany.mockResolvedValue([]);
+
+    const caller = await getCaller();
+    await caller.leads.getByStage();
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: undefined }),
+    );
+  });
+
+  test("applies fhogEligible filter", async () => {
+    const findMany = (
+      mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
+    ).leads.findMany;
+    findMany.mockResolvedValue([]);
+
+    const caller = await getCaller();
+    await caller.leads.getByStage({ fhogEligible: true });
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.anything() }),
+    );
+  });
+
+  test("applies constructionTimeline filter", async () => {
+    const findMany = (
+      mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
+    ).leads.findMany;
+    findMany.mockResolvedValue([]);
+
+    const caller = await getCaller();
+    await caller.leads.getByStage({ constructionTimeline: "ready_now" });
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.anything() }),
+    );
+  });
+
+  test("applies preferredEstate filter", async () => {
+    const findMany = (
+      mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
+    ).leads.findMany;
+    findMany.mockResolvedValue([]);
+
+    const caller = await getCaller();
+    await caller.leads.getByStage({ preferredEstate: "Springfield Rise" });
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.anything() }),
+    );
   });
 });

@@ -2,23 +2,7 @@ import { createTestUser } from "../data/test-users";
 import { expect, test } from "../fixtures/test";
 
 test.describe("Lead Conversion Journey", () => {
-  /**
-   * ANALYTICS TEST - MARKED AS FIXME
-   *
-   * This is the full happy-path journey test with analytics verification.
-   * It's disabled because PostHog batches events.
-   *
-   * See e2e/features/booking-form.spec.ts for detailed explanation of:
-   * - Why PostHog events aren't captured in tests
-   * - How to configure PostHog for testing
-   * - Alternative mocking approaches
-   *
-   * To Enable:
-   * 1. Configure PostHog test mode (flush_interval: 0)
-   * 2. Or mock PostHog capture calls
-   * 3. Then remove the .fixme() marker
-   */
-  test.fixme("complete journey from landing to form submission with analytics", async ({
+  test("complete journey from landing to form submission with analytics", async ({
     homePage,
     analytics,
     page: _page,
@@ -35,7 +19,7 @@ test.describe("Lead Conversion Journey", () => {
     await homePage.hero.clickPrimaryCta();
 
     // Verify CTA tracking
-    analytics
+    await analytics
       .expectEvent("cta_clicked")
       .withProperty("location", "hero_primary")
       .toBeFired();
@@ -49,8 +33,8 @@ test.describe("Lead Conversion Journey", () => {
     await homePage.bookingForm.clickNext();
 
     // Verify form tracking
-    analytics.expectEvent("booking_form_started").toBeFired();
-    analytics
+    await analytics.expectEvent("booking_form_started").toBeFired();
+    await analytics
       .expectEvent("form_step_completed")
       .withProperty("step", 1)
       .toBeFired();
@@ -74,7 +58,7 @@ test.describe("Lead Conversion Journey", () => {
     await homePage.bookingForm.expectSuccess();
 
     // Verify final analytics events
-    analytics
+    await analytics
       .expectEvent("booking_form_submitted")
       .withPropertyPresent("lead_email")
       .toBeFired();
@@ -113,13 +97,7 @@ test.describe("Lead Conversion Journey", () => {
 });
 
 test.describe("Multi-Touch Attribution", () => {
-  /**
-   * ANALYTICS TEST - MARKED AS FIXME
-   *
-   * This test verifies UTM parameters are captured in analytics events.
-   * Disabled due to PostHog event batching - see booking-form.spec.ts.
-   */
-  test.fixme("UTM parameters are tracked", async ({ homePage, analytics }) => {
+  test("UTM parameters are tracked", async ({ homePage, analytics }) => {
     await homePage.gotoWithUtm({
       source: "google",
       medium: "cpc",
@@ -127,7 +105,7 @@ test.describe("Multi-Touch Attribution", () => {
     });
 
     // UTM params should be captured in utm_captured event
-    analytics
+    await analytics
       .expectEvent("utm_captured")
       .withProperty("utm_source", "google")
       .toBeFired();

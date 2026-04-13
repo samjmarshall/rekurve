@@ -89,12 +89,12 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 ```
 
 **Tasks**:
-- [ ] Open `src/instrumentation-client.ts` and add a `declare global { interface Window { __E2E_MODE__?: boolean; } }` block after the existing imports
-- [ ] Add the line `const isE2E = typeof window !== "undefined" && window.__E2E_MODE__ === true;` after the global declaration
-- [ ] Inside the existing `posthog.init()` options object, add a conditional spread placeholder: `...(isE2E && { }),`
-- [ ] Inside the conditional spread object, add the key `request_batching: false`
-- [ ] Inside the same conditional spread object, add the key `disable_session_recording: true`
-- [ ] Add an inline comment directly above the conditional spread explaining: "Playwright E2E mode: disable batching so captures fire immediately and can be intercepted by AnalyticsHelper. Session recording is disabled to avoid test traffic leaking to the real PostHog project."
+- [x] Open `src/instrumentation-client.ts` and add a `declare global { interface Window { __E2E_MODE__?: boolean; } }` block after the existing imports
+- [x] Add the line `const isE2E = typeof window !== "undefined" && window.__E2E_MODE__ === true;` after the global declaration
+- [x] Inside the existing `posthog.init()` options object, add a conditional spread placeholder: `...(isE2E && { }),`
+- [x] Inside the conditional spread object, add the key `request_batching: false`
+- [x] Inside the same conditional spread object, add the key `disable_session_recording: true`
+- [x] Add an inline comment directly above the conditional spread explaining: "Playwright E2E mode: disable batching so captures fire immediately and can be intercepted by AnalyticsHelper. Session recording is disabled to avoid test traffic leaking to the real PostHog project."
 
 #### 2. Inject the flag in the analytics fixture
 **File**: `e2e/fixtures/test.ts`
@@ -117,10 +117,10 @@ analytics: async ({ page }, use) => {
 ```
 
 **Tasks**:
-- [ ] Open `e2e/fixtures/test.ts` and locate the `analytics` fixture body at lines 15-20
-- [ ] Before the `const analytics = new AnalyticsHelper(page)` line, add an `await page.addInitScript(() => { ... });` call
-- [ ] Inside the `addInitScript` callback, set `(window as Window & { __E2E_MODE__?: boolean }).__E2E_MODE__ = true`
-- [ ] Add a comment directly above the `addInitScript` call explaining it must run before any page script so the next `goto()` injects the flag into the fresh document where `instrumentation-client.ts` will read it
+- [x] Open `e2e/fixtures/test.ts` and locate the `analytics` fixture body at lines 15-20
+- [x] Before the `const analytics = new AnalyticsHelper(page)` line, add an `await page.addInitScript(() => { ... });` call
+- [x] Inside the `addInitScript` callback, set `(window as Window & { __E2E_MODE__?: boolean }).__E2E_MODE__ = true`
+- [x] Add a comment directly above the `addInitScript` call explaining it must run before any page script so the next `goto()` injects the flag into the fresh document where `instrumentation-client.ts` will read it
 
 #### 3. Smoke test
 **File**: `e2e/features/cta-tracking.spec.ts`
@@ -148,25 +148,25 @@ test("[phase 1 smoke] hero primary CTA emits cta_clicked", async ({
 Leave the top-of-file explanatory comment in place for now — it will be removed in Phase 3. This smoke test is a temporary scaffold: it exercises the `__E2E_MODE__` → `request_batching: false` plumbing end-to-end using the already-async `waitForEvent` helper (`e2e/utils/analytics-helper.ts:138-153`), so Phase 1 can be verified independently without depending on Phase 2's async fluent API. Phase 2 deletes this smoke test once its own validation covers the same ground through the fluent API.
 
 **Tasks**:
-- [ ] At `e2e/features/cta-tracking.spec.ts:1`, change `import { test } from "../fixtures/test";` to `import { expect, test } from "../fixtures/test";`
-- [ ] Inside the `CTA Click Tracking` describe block, add a new `test("[phase 1 smoke] hero primary CTA emits cta_clicked", async ({ homePage, analytics }) => { ... });`
-- [ ] Inside the smoke test body, call `await homePage.hero.clickPrimaryCta();`
-- [ ] Inside the smoke test body, call `const event = await analytics.waitForEvent("cta_clicked", 5000);`
-- [ ] Assert `expect(event).not.toBeNull();`
-- [ ] Assert `expect(event?.properties.location).toBe("hero_primary");`
-- [ ] Add an inline comment inside the smoke test noting it is a temporary Phase 1 scaffold using `waitForEvent` (not the sync fluent API) and will be replaced in Phase 2
-- [ ] Leave the top-of-file "PostHog batches events" JSDoc comment untouched (Phase 3 removes it)
+- [x] At `e2e/features/cta-tracking.spec.ts:1`, change `import { test } from "../fixtures/test";` to `import { expect, test } from "../fixtures/test";`
+- [x] Inside the `CTA Click Tracking` describe block, add a new `test("[phase 1 smoke] hero primary CTA emits cta_clicked", async ({ homePage, analytics }) => { ... });`
+- [x] Inside the smoke test body, call `await homePage.hero.clickPrimaryCta();`
+- [x] Inside the smoke test body, call `const event = await analytics.waitForEvent("cta_clicked", 5000);`
+- [x] Assert `expect(event).not.toBeNull();`
+- [x] Assert `expect(event?.properties.location).toBe("hero_primary");`
+- [x] Add an inline comment inside the smoke test noting it is a temporary Phase 1 scaffold using `waitForEvent` (not the sync fluent API) and will be replaced in Phase 2
+- [x] Leave the top-of-file "PostHog batches events" JSDoc comment untouched (Phase 3 removes it)
 
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `make check` passes (typecheck + lint)
-- [ ] `yarn test:e2e --project=desktop -g "\[phase 1 smoke\] hero primary CTA"` passes on 3 consecutive runs
-- [ ] The HTML report shows 1 captured `cta_clicked` event with `location: "hero_primary"`
+- [x] `make check` passes (typecheck + lint)
+- [x] `yarn test:e2e --project=desktop -g "\[phase 1 smoke\] hero primary CTA"` passes on 3 consecutive runs
+- [x] The HTML report shows 1 captured `cta_clicked` event with `location: "hero_primary"`
 
 #### Manual Verification:
-- [ ] Open devtools on a production page and confirm `window.__E2E_MODE__` is `undefined` (i.e., the flag is truly test-only and not leaking)
-- [ ] In the same session, run `window.__E2E_MODE__ = true; location.reload()` and confirm PostHog still works but network traffic shows one request per event instead of batched payloads (use Network tab filter `/rk/`)
+- [x] Open devtools on a production page and confirm `window.__E2E_MODE__` is `undefined` (i.e., the flag is truly test-only and not leaking)
+- [x] In the same session, run `window.__E2E_MODE__ = true; location.reload()` and confirm PostHog still works but network traffic shows one request per event instead of batched payloads (use Network tab filter `/rk/`)
 
 ---
 
@@ -248,33 +248,33 @@ async toBeFiredTimes(count: number, timeoutMs = 5000): Promise<void> {
 ```
 
 **Tasks — toBeFired (async polling)**:
-- [ ] Change the `toBeFired()` signature at `e2e/utils/analytics-helper.ts:233` from `toBeFired(): void` to `async toBeFired(timeoutMs = 5000): Promise<void>`
-- [ ] Inside `toBeFired`, record `const startedAt = Date.now();` as the first line
-- [ ] Wrap the existing match logic in a `while (Date.now() - startedAt < timeoutMs) { ... }` polling loop
-- [ ] Inside the loop, filter `this.events` into `const matchingEvents = this.events.filter((e) => e.event === this.eventName);`
-- [ ] Inside the loop, if `matchingEvents.length > 0 && this.propertyMatchers.length === 0`, `return` immediately (success path, no property matchers)
-- [ ] Inside the loop, if `matchingEvents.length > 0` and there ARE property matchers, use `matchingEvents.find((event) => this.propertyMatchers.every(({ key, matcher }) => matcher(event.properties[key])))` and `return` when a fully-matching event is found
-- [ ] At the end of each loop iteration, `await new Promise((r) => setTimeout(r, 50));` to yield control
-- [ ] After the loop (timeout branch), re-compute `matchingEvents` from the current `this.events` so the failure message reflects the final state
-- [ ] Raise the existing `expect(matchingEvents.length, ...).toBeGreaterThan(0)` assertion with a message referencing `this.eventName`, `timeoutMs`, and the captured event names
-- [ ] Build a `conditions` string by joining `this.propertyMatchers.map((m) => m.description)` with `", "`
-- [ ] Build an `actualProps` string by joining `matchingEvents.map((e) => JSON.stringify(e.properties))` with newlines
-- [ ] Throw a final `Error` with message `"Expected '${this.eventName}' with [${conditions}] within ${timeoutMs}ms, but no matching event found.\nActual '${this.eventName}' events:\n${actualProps}"`
+- [x] Change the `toBeFired()` signature at `e2e/utils/analytics-helper.ts:233` from `toBeFired(): void` to `async toBeFired(timeoutMs = 5000): Promise<void>`
+- [x] Inside `toBeFired`, record `const startedAt = Date.now();` as the first line
+- [x] Wrap the existing match logic in a `while (Date.now() - startedAt < timeoutMs) { ... }` polling loop
+- [x] Inside the loop, filter `this.events` into `const matchingEvents = this.events.filter((e) => e.event === this.eventName);`
+- [x] Inside the loop, if `matchingEvents.length > 0 && this.propertyMatchers.length === 0`, `return` immediately (success path, no property matchers)
+- [x] Inside the loop, if `matchingEvents.length > 0` and there ARE property matchers, use `matchingEvents.find((event) => this.propertyMatchers.every(({ key, matcher }) => matcher(event.properties[key])))` and `return` when a fully-matching event is found
+- [x] At the end of each loop iteration, `await new Promise((r) => setTimeout(r, 50));` to yield control
+- [x] After the loop (timeout branch), re-compute `matchingEvents` from the current `this.events` so the failure message reflects the final state
+- [x] Raise the existing `expect(matchingEvents.length, ...).toBeGreaterThan(0)` assertion with a message referencing `this.eventName`, `timeoutMs`, and the captured event names
+- [x] Build a `conditions` string by joining `this.propertyMatchers.map((m) => m.description)` with `", "`
+- [x] Build an `actualProps` string by joining `matchingEvents.map((e) => JSON.stringify(e.properties))` with newlines
+- [x] Throw a final `Error` with message `"Expected '${this.eventName}' with [${conditions}] within ${timeoutMs}ms, but no matching event found.\nActual '${this.eventName}' events:\n${actualProps}"`
 
 **Tasks — toBeFiredTimes (async polling)**:
-- [ ] Change the `toBeFiredTimes()` signature at `e2e/utils/analytics-helper.ts:269` from `toBeFiredTimes(count: number): void` to `async toBeFiredTimes(count: number, timeoutMs = 5000): Promise<void>`
-- [ ] Inside `toBeFiredTimes`, record `const startedAt = Date.now();` as the first line
-- [ ] Wrap the existing match logic in a `while (Date.now() - startedAt < timeoutMs) { ... }` polling loop
-- [ ] Inside the loop, compute `const matching = this.events.filter((e) => { if (e.event !== this.eventName) return false; if (this.propertyMatchers.length === 0) return true; return this.propertyMatchers.every(({ key, matcher }) => matcher(e.properties[key])); });`
-- [ ] Inside the loop, if `matching.length === count`, `return` immediately (success)
-- [ ] Inside the loop, if `matching.length > count`, `break` to fail fast on overshoot
-- [ ] At the end of each loop iteration, `await new Promise((r) => setTimeout(r, 50));`
-- [ ] After the loop (timeout or overshoot branch), re-compute `matching` from the current `this.events`
-- [ ] Raise `expect(matching).toHaveLength(count);` so Playwright surfaces its rich length-diff failure
+- [x] Change the `toBeFiredTimes()` signature at `e2e/utils/analytics-helper.ts:269` from `toBeFiredTimes(count: number): void` to `async toBeFiredTimes(count: number, timeoutMs = 5000): Promise<void>`
+- [x] Inside `toBeFiredTimes`, record `const startedAt = Date.now();` as the first line
+- [x] Wrap the existing match logic in a `while (Date.now() - startedAt < timeoutMs) { ... }` polling loop
+- [x] Inside the loop, compute `const matching = this.events.filter((e) => { if (e.event !== this.eventName) return false; if (this.propertyMatchers.length === 0) return true; return this.propertyMatchers.every(({ key, matcher }) => matcher(e.properties[key])); });`
+- [x] Inside the loop, if `matching.length === count`, `return` immediately (success)
+- [x] Inside the loop, if `matching.length > count`, `break` to fail fast on overshoot
+- [x] At the end of each loop iteration, `await new Promise((r) => setTimeout(r, 50));`
+- [x] After the loop (timeout or overshoot branch), re-compute `matching` from the current `this.events`
+- [x] Raise `expect(matching).toHaveLength(count);` so Playwright surfaces its rich length-diff failure
 
 **Tasks — untouched surfaces**:
-- [ ] Verify `expectNoEvent` at `e2e/utils/analytics-helper.ts:161` remains sync — do NOT add `async` or `await` (per "What We're NOT Doing")
-- [ ] Verify `waitForEvent` at `e2e/utils/analytics-helper.ts:138-153` is NOT touched — it already polls correctly and is used as-is by the Phase 1 smoke test
+- [x] Verify `expectNoEvent` at `e2e/utils/analytics-helper.ts:161` remains sync — do NOT add `async` or `await` (per "What We're NOT Doing")
+- [x] Verify `waitForEvent` at `e2e/utils/analytics-helper.ts:138-153` is NOT touched — it already polls correctly and is used as-is by the Phase 1 smoke test
 
 #### 2. Replace the Phase 1 smoke test with a fluent-API smoke test
 **File**: `e2e/features/cta-tracking.spec.ts`
@@ -295,21 +295,21 @@ test("[phase 2 smoke] hero primary CTA fluent assertion", async ({
 ```
 
 **Tasks**:
-- [ ] In `e2e/features/cta-tracking.spec.ts`, delete the entire `[phase 1 smoke] hero primary CTA emits cta_clicked` test added in Phase 1
-- [ ] Add a new `test("[phase 2 smoke] hero primary CTA fluent assertion", async ({ homePage, analytics }) => { ... });` in its place, inside the `CTA Click Tracking` describe block
-- [ ] Inside the new smoke test body, call `await homePage.hero.clickPrimaryCta();`
-- [ ] Inside the new smoke test body, await the fluent chain: `await analytics.expectEvent("cta_clicked").withProperty("location", "hero_primary").toBeFired();`
-- [ ] Add an inline comment noting this smoke test will be deleted in Phase 3 once the real unskipped tests cover the same plumbing
+- [x] In `e2e/features/cta-tracking.spec.ts`, delete the entire `[phase 1 smoke] hero primary CTA emits cta_clicked` test added in Phase 1
+- [x] Add a new `test("[phase 2 smoke] hero primary CTA fluent assertion", async ({ homePage, analytics }) => { ... });` in its place, inside the `CTA Click Tracking` describe block
+- [x] Inside the new smoke test body, call `await homePage.hero.clickPrimaryCta();`
+- [x] Inside the new smoke test body, await the fluent chain: `await analytics.expectEvent("cta_clicked").withProperty("location", "hero_primary").toBeFired();`
+- [x] Add an inline comment noting this smoke test will be deleted in Phase 3 once the real unskipped tests cover the same plumbing
 
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `make check` passes
-- [ ] `yarn test:e2e --project=desktop -g "\[phase 2 smoke\] hero primary CTA fluent assertion"` passes on 10 consecutive runs (stability check — polling should make this non-flaky)
-- [ ] Intentionally break the app instrumentation (temporarily rename `cta_clicked` to `cta_clicked_xxx` in `src/lib/posthog.ts:177`) and confirm the test fails with the polling timeout message within ~5s, not hanging. Revert the rename before moving on.
+- [x] `make check` passes
+- [x] `yarn test:e2e --project=desktop -g "\[phase 2 smoke\] hero primary CTA fluent assertion"` passes on 10 consecutive runs (stability check — polling should make this non-flaky)
+- [x] Intentionally break the app instrumentation (temporarily rename `cta_clicked` to `cta_clicked_xxx` in `src/lib/posthog.ts:177`) and confirm the test fails with the polling timeout message within ~5s, not hanging. Revert the rename before moving on.
 
 #### Manual Verification:
-- [ ] Error message on failure lists both the expected event + conditions AND the actual captured events — useful when debugging real failures
+- [x] Error message on failure lists both the expected event + conditions AND the actual captured events — useful when debugging real failures
 
 ---
 
@@ -322,109 +322,109 @@ Mechanical change across 6 spec files: remove every `test.fixme` marker on analy
 
 #### 1. `e2e/features/cta-tracking.spec.ts`
 **Tasks — cleanup**:
-- [ ] Delete the top-of-file JSDoc comment block at `e2e/features/cta-tracking.spec.ts:3-51` ("CTA CLICK TRACKING TESTS - ALL ANALYTICS TESTS MARKED AS FIXME…")
-- [ ] Delete the `[phase 2 smoke] hero primary CTA fluent assertion` test — the unfixme'd "hero primary CTA tracks click event" now covers the same plumbing
+- [x] Delete the top-of-file JSDoc comment block at `e2e/features/cta-tracking.spec.ts:3-51` ("CTA CLICK TRACKING TESTS - ALL ANALYTICS TESTS MARKED AS FIXME…")
+- [x] Delete the `[phase 2 smoke] hero primary CTA fluent assertion` test — the unfixme'd "hero primary CTA tracks click event" now covers the same plumbing
 
 **Tasks — unfixme per test**:
-- [ ] Change `test.fixme("hero primary CTA tracks click event", …)` at line 57 to `test("hero primary CTA tracks click event", …)`
-- [ ] Change `test.fixme("hero secondary CTA tracks click event", …)` at line 69 to `test("hero secondary CTA tracks click event", …)`
-- [ ] Change `test.fixme("navbar desktop CTA tracks click event", …)` at line 81 to `test("navbar desktop CTA tracks click event", …)`
-- [ ] Change `test.fixme("pricing tier CTAs track click events", …)` at line 93 to `test("pricing tier CTAs track click events", …)`
-- [ ] Change `test.fixme("final CTA section tracks click event", …)` at line 119 to `test("final CTA section tracks click event", …)`
-- [ ] Change `test.fixme("FAQ bottom CTA tracks click event", …)` at line 132 to `test("FAQ bottom CTA tracks click event", …)`
+- [x] Change `test.fixme("hero primary CTA tracks click event", …)` at line 57 to `test("hero primary CTA tracks click event", …)`
+- [x] Change `test.fixme("hero secondary CTA tracks click event", …)` at line 69 to `test("hero secondary CTA tracks click event", …)`
+- [x] Change `test.fixme("navbar desktop CTA tracks click event", …)` at line 81 to `test("navbar desktop CTA tracks click event", …)`
+- [x] Change `test.fixme("pricing tier CTAs track click events", …)` at line 93 to `test("pricing tier CTAs track click events", …)`
+- [x] Change `test.fixme("final CTA section tracks click event", …)` at line 119 to `test("final CTA section tracks click event", …)`
+- [x] Change `test.fixme("FAQ bottom CTA tracks click event", …)` at line 132 to `test("FAQ bottom CTA tracks click event", …)`
 
 **Tasks — await every assertion**:
-- [ ] Prefix the `.toBeFired()` call inside "hero primary CTA tracks click event" with `await`
-- [ ] Prefix the `.toBeFired()` call inside "hero secondary CTA tracks click event" with `await`
-- [ ] Prefix the `.toBeFired()` call inside "navbar desktop CTA tracks click event" with `await`
-- [ ] Prefix the first `.toBeFired()` call (pricing_foundation, before `analytics.clearEvents()`) inside "pricing tier CTAs track click events" with `await`
-- [ ] Prefix the second `.toBeFired()` call (pricing_growth, after `analytics.clearEvents()`) inside "pricing tier CTAs track click events" with `await`
-- [ ] Prefix the `.toBeFired()` call inside "final CTA section tracks click event" with `await`
-- [ ] Prefix the `.toBeFired()` call inside "FAQ bottom CTA tracks click event" with `await`
+- [x] Prefix the `.toBeFired()` call inside "hero primary CTA tracks click event" with `await`
+- [x] Prefix the `.toBeFired()` call inside "hero secondary CTA tracks click event" with `await`
+- [x] Prefix the `.toBeFired()` call inside "navbar desktop CTA tracks click event" with `await`
+- [x] Prefix the first `.toBeFired()` call (pricing_foundation, before `analytics.clearEvents()`) inside "pricing tier CTAs track click events" with `await`
+- [x] Prefix the second `.toBeFired()` call (pricing_growth, after `analytics.clearEvents()`) inside "pricing tier CTAs track click events" with `await`
+- [x] Prefix the `.toBeFired()` call inside "final CTA section tracks click event" with `await`
+- [x] Prefix the `.toBeFired()` call inside "FAQ bottom CTA tracks click event" with `await`
 
 #### 2. `e2e/features/booking-form.spec.ts`
 **Tasks — cleanup**:
-- [ ] Delete the mid-file JSDoc comment block at `e2e/features/booking-form.spec.ts:177-203` ("ANALYTICS TESTS - ALL MARKED AS FIXME…") — note this is mid-file, not top-of-file, because two other describe blocks precede it
+- [x] Delete the mid-file JSDoc comment block at `e2e/features/booking-form.spec.ts:177-203` ("ANALYTICS TESTS - ALL MARKED AS FIXME…") — note this is mid-file, not top-of-file, because two other describe blocks precede it
 
 **Tasks — unfixme per test**:
-- [ ] Change `test.fixme("form interaction fires form_started event", …)` at line 210 to `test("form interaction fires form_started event", …)`
-- [ ] Change `test.fixme("step completion fires step_completed event", …)` at line 219 to `test("step completion fires step_completed event", …)`
-- [ ] Change `test.fixme("lead identification happens after step 1", …)` at line 235 to `test("lead identification happens after step 1", …)`
-- [ ] Change `test.fixme("successful submission fires form_submitted event", …)` at line 311 to `test("successful submission fires form_submitted event", …)`
+- [x] Change `test.fixme("form interaction fires form_started event", …)` at line 210 to `test("form interaction fires form_started event", …)`
+- [x] Change `test.fixme("step completion fires step_completed event", …)` at line 219 to `test("step completion fires step_completed event", …)`
+- [x] Change `test.fixme("lead identification happens after step 1", …)` at line 235 to `test("lead identification happens after step 1", …)`
+- [x] Change `test.fixme("successful submission fires form_submitted event", …)` at line 311 to `test("successful submission fires form_submitted event", …)`
 
 **Tasks — await every assertion**:
-- [ ] Prefix the `.toBeFired()` call inside "form interaction fires form_started event" with `await`
-- [ ] Prefix the `.toBeFired()` call inside "step completion fires step_completed event" with `await`
-- [ ] Prefix the `.toBeFired()` call inside "lead identification happens after step 1" with `await`
-- [ ] Prefix the `.toBeFired()` call inside "successful submission fires form_submitted event" with `await`
+- [x] Prefix the `.toBeFired()` call inside "form interaction fires form_started event" with `await`
+- [x] Prefix the `.toBeFired()` call inside "step completion fires step_completed event" with `await`
+- [x] Prefix the `.toBeFired()` call inside "lead identification happens after step 1" with `await`
+- [x] Prefix the `.toBeFired()` call inside "successful submission fires form_submitted event" with `await`
 
 #### 3. `e2e/features/login.spec.ts`
 **Tasks — cleanup**:
-- [ ] Delete the pre-describe JSDoc comment block at `e2e/features/login.spec.ts:256-263` ("POSTHOG EVENT TESTS — MARKED AS FIXME…")
-- [ ] Delete the describe-level `test.fixme(true, "PostHog events are batched…")` call at lines 265-268 that currently blocks the entire "Login Page — PostHog Events" describe
+- [x] Delete the pre-describe JSDoc comment block at `e2e/features/login.spec.ts:256-263` ("POSTHOG EVENT TESTS — MARKED AS FIXME…")
+- [x] Delete the describe-level `test.fixme(true, "PostHog events are batched…")` call at lines 265-268 that currently blocks the entire "Login Page — PostHog Events" describe
 
 **Tasks — await every assertion**:
-- [ ] Prefix the `.toBeFired()` call inside "fires login_otp_requested on email submit" (starts at line 270) with `await`
-- [ ] Prefix the `.toBeFired()` call inside "fires login_success on successful OTP verify" (starts at line 289) with `await`
+- [x] Prefix the `.toBeFired()` call inside "fires login_otp_requested on email submit" (starts at line 270) with `await`
+- [x] Prefix the `.toBeFired()` call inside "fires login_success on successful OTP verify" (starts at line 289) with `await`
 
 **Tasks — do-not-touch guardrails**:
-- [ ] Verify the `analytics.expectNoEvent("login_success")` call at line 329 remains **sync** (do NOT add `await`) — `expectNoEvent` stays sync per "What We're NOT Doing"
-- [ ] Leave all `loginPage.page.waitForTimeout(500)` calls in this file untouched — they are belt-and-braces on top of polling and genuinely needed for the sync `expectNoEvent` assertion
+- [x] Verify the `analytics.expectNoEvent("login_success")` call at line 329 remains **sync** (do NOT add `await`) — `expectNoEvent` stays sync per "What We're NOT Doing"
+- [x] Leave all `loginPage.page.waitForTimeout(500)` calls in this file untouched — they are belt-and-braces on top of polling and genuinely needed for the sync `expectNoEvent` assertion
 
 #### 4. `e2e/features/faq-interactions.spec.ts`
 **Tasks — cleanup**:
-- [ ] Delete the inline JSDoc comment at `e2e/features/faq-interactions.spec.ts:88-90` ("ANALYTICS TEST - See booking-form.spec.ts…")
-- [ ] Delete the inline JSDoc comment at `e2e/features/faq-interactions.spec.ts:110-112` ("ANALYTICS TEST - See booking-form.spec.ts…")
+- [x] Delete the inline JSDoc comment at `e2e/features/faq-interactions.spec.ts:88-90` ("ANALYTICS TEST - See booking-form.spec.ts…")
+- [x] Delete the inline JSDoc comment at `e2e/features/faq-interactions.spec.ts:110-112` ("ANALYTICS TEST - See booking-form.spec.ts…")
 
 **Tasks — unfixme per test**:
-- [ ] Change `test.fixme("search tracks analytics event after debounce", …)` at line 91 to `test("search tracks analytics event after debounce", …)`
-- [ ] Change `test.fixme("expanding FAQ tracks analytics event", …)` at line 113 to `test("expanding FAQ tracks analytics event", …)`
+- [x] Change `test.fixme("search tracks analytics event after debounce", …)` at line 91 to `test("search tracks analytics event after debounce", …)`
+- [x] Change `test.fixme("expanding FAQ tracks analytics event", …)` at line 113 to `test("expanding FAQ tracks analytics event", …)`
 
 **Tasks — await every assertion**:
-- [ ] Prefix the `.toBeFired()` call inside "search tracks analytics event after debounce" with `await`
-- [ ] Prefix the `.toBeFired()` call inside "expanding FAQ tracks analytics event" with `await`
+- [x] Prefix the `.toBeFired()` call inside "search tracks analytics event after debounce" with `await`
+- [x] Prefix the `.toBeFired()` call inside "expanding FAQ tracks analytics event" with `await`
 
 #### 5. `e2e/journeys/form-abandonment.spec.ts`
 **Tasks — cleanup**:
-- [ ] Delete the top-of-file JSDoc comment block at `e2e/journeys/form-abandonment.spec.ts:4-10` ("ANALYTICS TESTS - ALL MARKED AS FIXME…")
+- [x] Delete the top-of-file JSDoc comment block at `e2e/journeys/form-abandonment.spec.ts:4-10` ("ANALYTICS TESTS - ALL MARKED AS FIXME…")
 
 **Tasks — unfixme per test**:
-- [ ] Change `test.fixme("abandonment tracked when leaving after step 1", …)` at line 12 to `test("abandonment tracked when leaving after step 1", …)`
-- [ ] Change `test.fixme("partial lead data is captured at each step", …)` at line 40 to `test("partial lead data is captured at each step", …)`
+- [x] Change `test.fixme("abandonment tracked when leaving after step 1", …)` at line 12 to `test("abandonment tracked when leaving after step 1", …)`
+- [x] Change `test.fixme("partial lead data is captured at each step", …)` at line 40 to `test("partial lead data is captured at each step", …)`
 
 **Tasks — await every assertion**:
-- [ ] Prefix the `analytics.expectEvent("form_step_completed").withProperty("step", 1).toBeFired()` call inside "abandonment tracked when leaving after step 1" with `await`
-- [ ] Prefix the `analytics.expectEvent("lead_identified").toBeFired()` call inside "partial lead data is captured at each step" with `await`
-- [ ] Prefix the `analytics.expectEvent("form_step_completed").withProperty("step", 2).toBeFired()` call inside "partial lead data is captured at each step" with `await`
+- [x] Prefix the `analytics.expectEvent("form_step_completed").withProperty("step", 1).toBeFired()` call inside "abandonment tracked when leaving after step 1" with `await`
+- [x] Prefix the `analytics.expectEvent("lead_identified").toBeFired()` call inside "partial lead data is captured at each step" with `await`
+- [x] Prefix the `analytics.expectEvent("form_step_completed").withProperty("step", 2).toBeFired()` call inside "partial lead data is captured at each step" with `await`
 
 #### 6. `e2e/journeys/lead-conversion.spec.ts`
 **Tasks — cleanup**:
-- [ ] Delete the pre-test JSDoc comment block at `e2e/journeys/lead-conversion.spec.ts:5-20` ("ANALYTICS TEST - MARKED AS FIXME…")
-- [ ] Delete the pre-test JSDoc comment block at `e2e/journeys/lead-conversion.spec.ts:116-121` ("ANALYTICS TEST - MARKED AS FIXME…")
+- [x] Delete the pre-test JSDoc comment block at `e2e/journeys/lead-conversion.spec.ts:5-20` ("ANALYTICS TEST - MARKED AS FIXME…")
+- [x] Delete the pre-test JSDoc comment block at `e2e/journeys/lead-conversion.spec.ts:116-121` ("ANALYTICS TEST - MARKED AS FIXME…")
 
 **Tasks — unfixme per test**:
-- [ ] Change `test.fixme("complete journey from landing to form submission with analytics", …)` at line 21 to `test("complete journey from landing to form submission with analytics", …)`
-- [ ] Change `test.fixme("UTM parameters are tracked", …)` at line 122 to `test("UTM parameters are tracked", …)`
+- [x] Change `test.fixme("complete journey from landing to form submission with analytics", …)` at line 21 to `test("complete journey from landing to form submission with analytics", …)`
+- [x] Change `test.fixme("UTM parameters are tracked", …)` at line 122 to `test("UTM parameters are tracked", …)`
 
 **Tasks — await every assertion in the complete-journey test**:
-- [ ] Prefix the `analytics.expectEvent("cta_clicked").withProperty("location", "hero_primary").toBeFired()` call with `await`
-- [ ] Prefix the `analytics.expectEvent("booking_form_started").toBeFired()` call with `await`
-- [ ] Prefix the `analytics.expectEvent("form_step_completed").withProperty("step", 1).toBeFired()` call with `await`
-- [ ] Prefix the `analytics.expectEvent("booking_form_submitted").withPropertyPresent("lead_email").toBeFired()` call with `await`
+- [x] Prefix the `analytics.expectEvent("cta_clicked").withProperty("location", "hero_primary").toBeFired()` call with `await`
+- [x] Prefix the `analytics.expectEvent("booking_form_started").toBeFired()` call with `await`
+- [x] Prefix the `analytics.expectEvent("form_step_completed").withProperty("step", 1).toBeFired()` call with `await`
+- [x] Prefix the `analytics.expectEvent("booking_form_submitted").withPropertyPresent("lead_email").toBeFired()` call with `await`
 
 **Tasks — await every assertion in the UTM test**:
-- [ ] Prefix the `analytics.expectEvent("utm_captured").withProperty("utm_source", "google").toBeFired()` call with `await`
+- [x] Prefix the `analytics.expectEvent("utm_captured").withProperty("utm_source", "google").toBeFired()` call with `await`
 
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `make check` passes (typecheck — note: biome 2.4.9's `noFloatingPromises` rule is in nursery and NOT enabled in this project's `biome.json`, and TypeScript `strict` doesn't catch unawaited promises either. Static analysis will NOT catch a missed `await` on `.toBeFired()` — the checks below are the real safety net.)
-- [ ] Grep confirms zero `test.fixme` calls remain in the 6 analytics spec files: `rg "test\.fixme" e2e/features/cta-tracking.spec.ts e2e/features/booking-form.spec.ts e2e/features/login.spec.ts e2e/features/faq-interactions.spec.ts e2e/journeys/form-abandonment.spec.ts e2e/journeys/lead-conversion.spec.ts` returns nothing
-- [ ] Grep confirms every `.toBeFired(` or `.toBeFiredTimes(` call is preceded by `await`: `rg --multiline --multiline-dotall "^\s*analytics\b(?:(?!await).)*?\.toBeFired" e2e/features e2e/journeys` returns nothing. (The pattern matches statements beginning with `analytics` that chain into `.toBeFired` without an `await` on the same statement.)
-- [ ] `make test_e2e` shows ≥ 200 passed (up from 145), ≤ 55 skipped (down from 111), 0 failed on the first run. If a test silently passed due to a missed `await` on an assertion, Playwright's unhandled-rejection handler surfaces it as a failure here — rerun after fixing.
+- [x] `make check` passes (typecheck — note: biome 2.4.9's `noFloatingPromises` rule is in nursery and NOT enabled in this project's `biome.json`, and TypeScript `strict` doesn't catch unawaited promises either. Static analysis will NOT catch a missed `await` on `.toBeFired()` — the checks below are the real safety net.)
+- [x] Grep confirms zero `test.fixme` calls remain in the 6 analytics spec files: `rg "test\.fixme" e2e/features/cta-tracking.spec.ts e2e/features/booking-form.spec.ts e2e/features/login.spec.ts e2e/features/faq-interactions.spec.ts e2e/journeys/form-abandonment.spec.ts e2e/journeys/lead-conversion.spec.ts` returns nothing
+- [x] Grep confirms every `.toBeFired(` or `.toBeFiredTimes(` call is preceded by `await`: `rg --multiline --multiline-dotall "^\s*analytics\b(?:(?!await).)*?\.toBeFired" e2e/features e2e/journeys` returns nothing. (The pattern matches statements beginning with `analytics` that chain into `.toBeFired` without an `await` on the same statement.)
+- [x] `make test_e2e` shows ≥ 200 passed (up from 145), ≤ 55 skipped (down from 111), 0 failed on the first run. If a test silently passed due to a missed `await` on an assertion, Playwright's unhandled-rejection handler surfaces it as a failure here — rerun after fixing.
 
 #### Manual Verification:
-- [ ] Spot-check HTML report: click into 2-3 of the newly-passing tests and confirm the "events captured" count matches expectations (e.g., the `pricing tier CTAs` test should show both `pricing_foundation` and `pricing_growth` captures)
+- [x] Spot-check HTML report: click into 2-3 of the newly-passing tests and confirm the "events captured" count matches expectations (e.g., the `pricing tier CTAs` test should show both `pricing_foundation` and `pricing_growth` captures)
 
 ---
 
@@ -439,11 +439,11 @@ Run the full suite, expect most tests to pass, and triage any that fail for reas
 **Command**: `make test_e2e` → capture the JSON reporter output with the same parsing approach used in the skip audit earlier in this branch.
 
 **Tasks**:
-- [ ] Confirm the working tree is clean (no unrelated diffs that could skew failures)
-- [ ] Run `make test_e2e` end-to-end against a clean worktree
-- [ ] Capture the JSON reporter output to a scratch file (e.g. `/tmp/posthog-triage.json`) for parsing
-- [ ] Parse the JSON into a list of `(test title, source file, error message)` tuples for the failures
-- [ ] Save the parsed failure list to a scratch file for use during triage
+- [x] Confirm the working tree is clean (no unrelated diffs that could skew failures)
+- [x] Run `make test_e2e` end-to-end against a clean worktree
+- [x] Capture the JSON reporter output to a scratch file (e.g. `/tmp/posthog-triage.json`) for parsing
+- [x] Parse the JSON into a list of `(test title, source file, error message)` tuples for the failures
+- [x] Save the parsed failure list to a scratch file for use during triage
 
 #### 2. Triage bucket
 For each failure:
@@ -452,51 +452,51 @@ For each failure:
 - **Race with `safeCapture` ready-gate** — if a test fires an action immediately after `goto()` and the `[PostHog] Not ready, event queued` log appears in the page console, add a `waitForPostHogReady()` helper to the analytics fixture that does `await page.waitForFunction(() => (window as any).posthog?.__loaded === true, { timeout: 5000 })` and call it at the top of affected tests.
 
 **Tasks — classify**:
-- [ ] For each failure in the parsed list, label it `property-mismatch`, `event-never-fires`, or `safeCapture-race`
-- [ ] Note any failure that doesn't fit cleanly into one of those three buckets — surface it before continuing
+- [x] For each failure in the parsed list, label it `property-mismatch`, `event-never-fires`, or `safeCapture-race`
+- [x] Note any failure that doesn't fit cleanly into one of those three buckets — surface it before continuing
 
 **Tasks — property-mismatch failures**:
-- [ ] For each property-mismatch failure, open `src/lib/posthog.ts` and locate the `trackX()` call site that emits the event
-- [ ] Compare the test's `withProperty(...)` keys/values against the app's actual capture payload and identify which side diverges
-- [ ] Decide per failure whether to fix the test or the app — prefer fixing the test when the app shape is a deliberate schema, prefer fixing the app when it's a clear oversight
-- [ ] Apply the chosen fix
-- [ ] Re-run just that single test (e.g. `yarn test:e2e -g "<test title>"`) to confirm it passes
+- [x] For each property-mismatch failure, open `src/lib/posthog.ts` and locate the `trackX()` call site that emits the event
+- [x] Compare the test's `withProperty(...)` keys/values against the app's actual capture payload and identify which side diverges
+- [x] Decide per failure whether to fix the test or the app — prefer fixing the test when the app shape is a deliberate schema, prefer fixing the app when it's a clear oversight
+- [x] Apply the chosen fix
+- [x] Re-run just that single test (e.g. `yarn test:e2e -g "<test title>"`) to confirm it passes
 
 **Tasks — event-never-fires failures**:
-- [ ] For each "event never fires" failure, identify the user action in the test that should have triggered the event
-- [ ] Trace that user action back to the corresponding handler in the app source
-- [ ] Verify the handler calls the expected `trackX()` function from `src/lib/posthog.ts`
-- [ ] If the `trackX()` call site is missing, add it
-- [ ] Re-run that single test to confirm it passes
+- [x] For each "event never fires" failure, identify the user action in the test that should have triggered the event
+- [x] Trace that user action back to the corresponding handler in the app source
+- [x] Verify the handler calls the expected `trackX()` function from `src/lib/posthog.ts`
+- [x] If the `trackX()` call site is missing, add it
+- [x] Re-run that single test to confirm it passes
 
 **Tasks — safeCapture-race failures**:
-- [ ] For each suspected `safeCapture` race, look for `[PostHog] Not ready, event queued` in the test's page console output to confirm the diagnosis
-- [ ] If confirmed, add a `waitForPostHogReady()` helper to `e2e/fixtures/test.ts` that calls `await page.waitForFunction(() => (window as any).posthog?.__loaded === true, { timeout: 5000 })`
-- [ ] Export `waitForPostHogReady` (or expose it through the analytics fixture API) so tests can call it
-- [ ] Call `waitForPostHogReady()` at the top of each test that hit the race
-- [ ] Re-run each affected test to confirm it passes
+- [x] For each suspected `safeCapture` race, look for `[PostHog] Not ready, event queued` in the test's page console output to confirm the diagnosis
+- [x] If confirmed, add a `waitForPostHogReady()` helper to `e2e/fixtures/test.ts` that calls `await page.waitForFunction(() => (window as any).posthog?.__loaded === true, { timeout: 5000 })`
+- [x] Export `waitForPostHogReady` (or expose it through the analytics fixture API) so tests can call it
+- [x] Call `waitForPostHogReady()` at the top of each test that hit the race
+- [x] Re-run each affected test to confirm it passes
 
 #### 3. Handle out-of-scope app gaps
 If triage uncovers a missing instrumentation site that requires non-trivial app-side work (e.g., "we never fire `utm_captured` on first load, only on re-visit"), **do not fix inline**. File a follow-up issue and mark that specific test with `test.fixme("TODO: #<issue-number> — app-side instrumentation missing")`. The current branch's goal is the batching fix; deferring correctness work to its own ticket keeps the diff reviewable.
 
 **Tasks**:
-- [ ] For each failure that requires non-trivial app-side instrumentation, draft a GitHub issue title and body describing the failing test, the missing event/property, and the proposed fix
-- [ ] File the follow-up issues via `gh issue create`, capturing the returned issue numbers
-- [ ] For each filed issue, re-apply `test.fixme("TODO: #<issue-number> — app-side instrumentation missing")` on the corresponding test (only — leave all other newly-unskipped tests untouched)
-- [ ] After re-applying the targeted fixmes, re-run `make test_e2e` and confirm 0 failures (the deferred tests now skip, the rest pass)
-- [ ] Run `make check` one more time to confirm typecheck and lint still pass with the targeted fixmes in place
+- [x] For each failure that requires non-trivial app-side instrumentation, draft a GitHub issue title and body describing the failing test, the missing event/property, and the proposed fix
+- [x] File the follow-up issues via `gh issue create`, capturing the returned issue numbers
+- [x] For each filed issue, re-apply `test.fixme("TODO: #<issue-number> — app-side instrumentation missing")` on the corresponding test (only — leave all other newly-unskipped tests untouched)
+- [x] After re-applying the targeted fixmes, re-run `make test_e2e` and confirm 0 failures (the deferred tests now skip, the rest pass)
+- [x] Run `make check` one more time to confirm typecheck and lint still pass with the targeted fixmes in place
 
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] `make test_e2e` reports 0 failed across all 3 viewport projects
-- [ ] Passed count is ≥ 200 (allowing for 2-3 Phase 4 follow-up fixmes if genuinely blocked on app work)
-- [ ] `make check` still passes
+- [x] `make test_e2e` reports 0 failed across all 3 viewport projects
+- [x] Passed count is ≥ 200 (allowing for 2-3 Phase 4 follow-up fixmes if genuinely blocked on app work)
+- [x] `make check` still passes
 
 #### Manual Verification:
-- [ ] Visual inspection of the HTML report shows the formerly-skipped tests now in the "passed" column
-- [ ] Spot check one newly-passing test in each file to confirm the assertions are meaningful (not just passing because the capture array is empty and `expectNoEvent` is being used)
-- [ ] Open the PostHog project in the browser and confirm the test run did NOT create a flood of session recordings (validates that `disable_session_recording: true` kicked in)
+- [x] Visual inspection of the HTML report shows the formerly-skipped tests now in the "passed" column
+- [x] Spot check one newly-passing test in each file to confirm the assertions are meaningful (not just passing because the capture array is empty and `expectNoEvent` is being used)
+- [x] Open the PostHog project in the browser and confirm the test run did NOT create a flood of session recordings (validates that `disable_session_recording: true` kicked in)
 
 ---
 

@@ -174,49 +174,22 @@ test.describe("Booking Form Validation", () => {
   });
 });
 
-/**
- * ANALYTICS TESTS - ALL MARKED AS FIXME
- *
- * Issue: PostHog batches events and sends them asynchronously, typically on
- * page unload via sendBeacon(). During tests, events are queued but never
- * sent because the page doesn't unload naturally.
- *
- * Root Cause: PostHog default configuration optimizes for production
- * (batching reduces network requests) but breaks test assertions.
- *
- * To Enable These Tests:
- * 1. Configure PostHog with test-friendly settings:
- *    ```ts
- *    posthog.init(key, {
- *      flush_interval: 0,           // Send immediately
- *      capture_mode: 'form',        // Use XHR instead of sendBeacon
- *      disable_session_recording: true,
- *    })
- *    ```
- * 2. Or mock PostHog in tests:
- *    ```ts
- *    await page.addInitScript(() => {
- *      window.posthog = { capture: (e, p) => window.__captured.push({e, p}) };
- *    });
- *    ```
- * 3. Or call posthog.flush() and wait for the network request
- */
 test.describe("Booking Form Analytics", () => {
   test.beforeEach(async ({ homePage }) => {
     await homePage.goto();
     await homePage.bookingForm.scrollIntoView();
   });
 
-  test.fixme("form interaction fires form_started event", async ({
+  test("form interaction fires form_started event", async ({
     homePage,
     analytics,
   }) => {
     await homePage.bookingForm.focusFirstField();
 
-    analytics.expectEvent("booking_form_started").toBeFired();
+    await analytics.expectEvent("booking_form_started").toBeFired();
   });
 
-  test.fixme("step completion fires step_completed event", async ({
+  test("step completion fires step_completed event", async ({
     homePage,
     analytics,
   }) => {
@@ -225,14 +198,14 @@ test.describe("Booking Form Analytics", () => {
     await homePage.bookingForm.fillStep1(user);
     await homePage.bookingForm.clickNext();
 
-    analytics
+    await analytics
       .expectEvent("form_step_completed")
       .withProperty("step", 1)
       .withProperty("step_name", "basic_info")
       .toBeFired();
   });
 
-  test.fixme("lead identification happens after step 1", async ({
+  test("lead identification happens after step 1", async ({
     homePage,
     analytics,
   }) => {
@@ -241,7 +214,7 @@ test.describe("Booking Form Analytics", () => {
     await homePage.bookingForm.fillStep1(user);
     await homePage.bookingForm.clickNext();
 
-    analytics
+    await analytics
       .expectEvent("lead_identified")
       .withProperty("identification_point", "step_1_complete")
       .toBeFired();
@@ -308,7 +281,7 @@ test.describe("Booking Form Submission", () => {
     ).toHaveCount(0);
   });
 
-  test.fixme("successful submission fires form_submitted event", async ({
+  test("successful submission fires form_submitted event", async ({
     homePage,
     analytics,
   }) => {
@@ -317,7 +290,7 @@ test.describe("Booking Form Submission", () => {
     await homePage.goto();
     await homePage.bookingForm.completeAllSteps(user);
 
-    analytics
+    await analytics
       .expectEvent("booking_form_submitted")
       .withPropertyPresent("lead_email")
       .withPropertyPresent("lead_company")

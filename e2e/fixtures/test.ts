@@ -12,6 +12,25 @@ type TestFixtures = {
 };
 
 export const test = base.extend<TestFixtures>({
+  // Override the built-in page fixture to inject E2E test flags before any
+  // page scripts. This MUST live on `page` (not `analytics`) because
+  // Playwright sets up beforeEach-requested fixtures first — if it lived on
+  // `analytics` it would miss the initial goto() triggered by beforeEach.
+  page: async ({ page }, use) => {
+    await page.addInitScript(`
+      // Set E2E mode flag so instrumentation-client.ts installs the
+      // before_send hook that emits captures via console.info.
+      window.__E2E_MODE__ = true;
+      // Override navigator.webdriver so PostHog's bot detection doesn't
+      // silently drop all capture events (Playwright sets webdriver=true).
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => false,
+        configurable: true,
+      });
+    `);
+    await use(page);
+  },
+
   analytics: async ({ page }, use) => {
     const analytics = new AnalyticsHelper(page);
     await analytics.startCapturing();

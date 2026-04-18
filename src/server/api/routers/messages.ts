@@ -7,7 +7,7 @@ import {
   messageSnoozeSchema,
 } from "~/server/api/schemas/messages";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { messageQueue } from "~/server/db/schema";
+import { leads, messageQueue } from "~/server/db/schema";
 
 /**
  * Fetch a message_queue row and assert its status permits a user action.
@@ -36,16 +36,41 @@ async function loadActionable(
 
 export const messagesRouter = createTRPCRouter({
   listPending: protectedProcedure.query(async ({ ctx }) => {
-    return await ctx.db.query.messageQueue.findMany({
-      where: and(
-        eq(messageQueue.status, "pending"),
-        or(
-          isNull(messageQueue.snoozedUntil),
-          lte(messageQueue.snoozedUntil, new Date()),
+    return await ctx.db
+      .select({
+        id: messageQueue.id,
+        leadId: messageQueue.leadId,
+        channel: messageQueue.channel,
+        subject: messageQueue.subject,
+        body: messageQueue.body,
+        aiReasoning: messageQueue.aiReasoning,
+        priority: messageQueue.priority,
+        status: messageQueue.status,
+        snoozedUntil: messageQueue.snoozedUntil,
+        originalBody: messageQueue.originalBody,
+        approvedAt: messageQueue.approvedAt,
+        sentAt: messageQueue.sentAt,
+        createdAt: messageQueue.createdAt,
+        lead: {
+          id: leads.id,
+          firstName: leads.firstName,
+          lastName: leads.lastName,
+          leadScore: leads.leadScore,
+          leadStage: leads.leadStage,
+        },
+      })
+      .from(messageQueue)
+      .innerJoin(leads, eq(messageQueue.leadId, leads.id))
+      .where(
+        and(
+          eq(messageQueue.status, "pending"),
+          or(
+            isNull(messageQueue.snoozedUntil),
+            lte(messageQueue.snoozedUntil, new Date()),
+          ),
         ),
-      ),
-      orderBy: [desc(messageQueue.priority), asc(messageQueue.createdAt)],
-    });
+      )
+      .orderBy(desc(messageQueue.priority), asc(messageQueue.createdAt));
   }),
 
   approve: protectedProcedure

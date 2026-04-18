@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Test-Driven Development workflow enforcing vertical slicing — one test → one implementation → repeat. Use when writing tests alongside new code, designing interfaces for testability, deciding what to mock, or when a plan phase requires test-first development. Also triggers when user asks about "TDD", "red/green", "tracer bullet", or whether tests are testing behavior vs implementation.
+description: Test-Driven Development workflow enforcing vertical slicing - one test → one implementation → repeat. Use when writing tests alongside new code, designing interfaces for testability, deciding what to mock, or when a plan phase requires test-first development. Also triggers when user asks about "TDD", "red/green", "tracer bullet", or whether tests are testing behavior vs implementation.
 ---
 
 # Test-Driven Development

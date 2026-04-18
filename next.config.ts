@@ -7,6 +7,7 @@ import type { NextConfig } from "next";
 import { env } from "~/env";
 
 const isPreview = process.env.VERCEL_ENV === "preview";
+const isDev = env.NODE_ENV === "development";
 
 const config: NextConfig = {
   skipTrailingSlashRedirect: true,
@@ -58,7 +59,7 @@ const config: NextConfig = {
             "manifest-src 'self';",
             // 'unsafe-eval' is only required by webpack HMR in development; safe to remove in production
             // but Next.js injects it unconditionally — monitor if removing causes build errors
-            "script-src 'self';",
+            `script-src 'self'${isDev ? " 'unsafe-eval'" : ""};`,
             // 'unsafe-inline' required by Next.js App Router inline hydration scripts and JSON-LD <script> tags
             // Nonces via middleware would eliminate this but require significant infrastructure changes
             `script-src-elem 'self' 'unsafe-inline'${isPreview ? " https://vercel.live" : ""};`,

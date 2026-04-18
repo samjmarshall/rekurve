@@ -116,6 +116,9 @@ test.describe("Action Queue — E2E", () => {
     await queue.editSave(msg.id).click();
 
     await expect(queue.row(msg.id)).toBeHidden();
+    // Wait for the success toast before reading the DB. The optimistic update
+    // hides the row instantly, but the mutation is still in flight.
+    await expect(page.getByText(/Your edits were saved/i)).toBeVisible();
 
     const record = await getMessageStatus(msg.id);
     expect(record?.status).toBe("edited_and_approved");
@@ -154,6 +157,7 @@ test.describe("Action Queue — E2E", () => {
     await queue.snoozeSave(msg.id).click();
 
     await expect(queue.row(msg.id)).toBeHidden();
+    await expect(page.getByText(/Snoozed until/i)).toBeVisible();
 
     const record = await getMessageStatus(msg.id);
     expect(record?.status).toBe("snoozed");
@@ -186,6 +190,7 @@ test.describe("Action Queue — E2E", () => {
     await queue.dismissConfirm(msg.id).click();
 
     await expect(queue.row(msg.id)).toBeHidden();
+    await expect(page.getByText(/Draft dismissed/i)).toBeVisible();
 
     const record = await getMessageStatus(msg.id);
     expect(record?.status).toBe("dismissed");

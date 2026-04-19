@@ -29,7 +29,7 @@ export class QuickCaptureSection {
       '[data-testid="quick-capture-lead-source"]',
     );
     this.submitButton = page.locator('[data-testid="quick-capture-submit"]');
-    this.toast = page.locator('[data-testid="quick-capture-toast"]');
+    this.toast = page.locator('[data-testid="app-toast"]');
   }
 
   async open() {

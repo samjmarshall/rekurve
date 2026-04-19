@@ -45,10 +45,10 @@ beforeEach(() => {
 
   mockDb = {
     update: rs.fn(),
+    select: rs.fn(),
     query: {
       messageQueue: {
         findFirst: rs.fn(),
-        findMany: rs.fn(),
       },
     },
   };
@@ -72,25 +72,51 @@ function mockUpdateReturning(row: unknown) {
   return { set, where, returning };
 }
 
+// Helper — wire up the chainable select()/from()/innerJoin()/where()/orderBy()
+// pipeline that listPending uses, resolving to the given rows.
+function mockSelectListPending(rows: unknown[]) {
+  const orderBy = rs.fn().mockResolvedValue(rows);
+  const where = rs.fn().mockReturnValue({ orderBy });
+  const innerJoin = rs.fn().mockReturnValue({ where });
+  const from = rs.fn().mockReturnValue({ innerJoin });
+  const select = rs.fn().mockReturnValue({ from });
+  (mockDb.select as ReturnType<typeof rs.fn>).mockImplementation(select);
+  return { select, from, innerJoin, where, orderBy };
+}
+
 // --- messages.listPending ---
 
 describe("messages.listPending", () => {
-  test("returns rows from findMany", async () => {
-    (
-      mockDb.query as { messageQueue: { findMany: ReturnType<typeof rs.fn> } }
-    ).messageQueue.findMany.mockResolvedValue([baseMessage]);
+  const joinedRow = {
+    ...baseMessage,
+    lead: {
+      id: LEAD_ID,
+      firstName: "Jane",
+      lastName: "Doe",
+      leadScore: 75,
+      leadStage: "warm" as const,
+    },
+  };
+
+  test("returns rows with joined lead context", async () => {
+    mockSelectListPending([joinedRow]);
 
     const caller = await getCaller();
     const result = await caller.messages.listPending();
 
     expect(result).toHaveLength(1);
     expect(result[0]?.id).toBe(MSG_ID);
+    expect(result[0]?.lead).toEqual({
+      id: LEAD_ID,
+      firstName: "Jane",
+      lastName: "Doe",
+      leadScore: 75,
+      leadStage: "warm",
+    });
   });
 
   test("returns empty array when no pending rows", async () => {
-    (
-      mockDb.query as { messageQueue: { findMany: ReturnType<typeof rs.fn> } }
-    ).messageQueue.findMany.mockResolvedValue([]);
+    mockSelectListPending([]);
 
     const caller = await getCaller();
     const result = await caller.messages.listPending();
@@ -98,21 +124,15 @@ describe("messages.listPending", () => {
     expect(result).toEqual([]);
   });
 
-  test("orders by priority desc then createdAt asc", async () => {
-    const findMany = (
-      mockDb.query as { messageQueue: { findMany: ReturnType<typeof rs.fn> } }
-    ).messageQueue.findMany;
-    findMany.mockResolvedValue([]);
+  test("inner-joins leads and filters by status + snoozedUntil", async () => {
+    const { innerJoin, where, orderBy } = mockSelectListPending([]);
 
     const caller = await getCaller();
     await caller.messages.listPending();
 
-    expect(findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        orderBy: expect.anything(),
-        where: expect.anything(),
-      }),
-    );
+    expect(innerJoin).toHaveBeenCalled();
+    expect(where).toHaveBeenCalled();
+    expect(orderBy).toHaveBeenCalled();
   });
 });
 

@@ -22,7 +22,7 @@ function ToastViewport() {
           <Toast.Root
             key={t.id}
             toast={t}
-            data-testid="quick-capture-toast"
+            data-testid="app-toast"
             className={cn(
               "group relative flex w-full items-start gap-3 rounded-lg border bg-background p-4 shadow-lg",
               "data-open:fade-in-0 data-open:slide-in-from-bottom-4 data-open:animate-in",

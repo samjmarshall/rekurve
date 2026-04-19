@@ -110,6 +110,25 @@ Based on ticket type, offer the relevant template from references:
 
 Acceptance criteria are THE MOST IMPORTANT part of any ticket. Push for clarity.
 
+### Work-Readiness Tag (HITL vs AFK)
+
+Every ticket should carry one of two tags in its body, right under the title:
+
+- **AFK** (Away From Keyboard) — a Claude Code agent can implement and merge this without human interaction. All decisions are resolved; acceptance criteria are testable; scope is clear.
+- **HITL** (Human In The Loop) — requires human judgment during implementation: architectural decision, design review, UX trade-off, or security call.
+
+Prefer AFK where possible. If a ticket is HITL, note *why* in one line (e.g. "HITL — needs design review before shipping", "HITL — schema trade-off needs product input").
+
+For GitHub, this goes in the issue body, not as a label. Format:
+
+    **Work-readiness:** AFK
+
+    or
+
+    **Work-readiness:** HITL — <reason>
+
+When breaking an epic down, mark each child ticket. A well-decomposed epic is mostly AFK with a few HITL tickets gating the rest.
+
 ### Characteristics of Good Acceptance Criteria
 
 **Testable** (binary pass/fail):
@@ -349,6 +368,7 @@ Before marking "Ready for Development," ensure:
 - [ ] Can be completed within one sprint
 - [ ] No blocking dependencies (or documented)
 - [ ] Team understands requirements (no unresolved questions)
+- [ ] Work-readiness tag set (AFK or HITL with reason)
 
 **User stories:**
 - [ ] Story format complete

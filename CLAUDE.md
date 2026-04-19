@@ -1,10 +1,8 @@
 # CLAUDE.md
 
-The role of this file is to describe common mistakes, confusion points and workflows that agents might encounter when they work in this project. If you encounter something in this project that surprises you, make an update to the CLAUDE.md file to help prevent future agents from having the same issue.
-
 ---
 
-## Quick Start: Current Project State
+## Current Project State
 
 **Status**: Pre-PMF validation phase. Running free Release Pilot to validate use cases.
 
@@ -23,6 +21,10 @@ Prefer Makefile targets with `yarn` as a fallback — never use `npm` or `npx` d
 - `make start` — local dev server (`yarn dev`)
 - `make install` — install dependencies (`yarn`)
 
+The dev server runs via Vercel Portless - no port.
+- Main worktree (no prefix): https://www.localhost
+- Linked worktree on branch "fix-ui": https://fix-ui.www.localhost
+
 ---
 
 ## Database Migrations
@@ -31,8 +33,15 @@ Prefer Makefile targets with `yarn` as a fallback — never use `npm` or `npx` d
 
 Always use this two-step process:
 
+
 1. `yarn db:generate` — generate a migration SQL file in `drizzle/`
 2. `yarn db:migrate` — apply pending migrations and record them in `__drizzle_migrations`
+
+---
+
+## E2E Testing
+
+**_BEFORE marking e2e test changes complete:_** Audit every locator in every method you modified or called. If any uses `getByRole()`, `getByText()`, `getByLabel()`, or CSS selectors instead of `getByTestId()`, check the source component — if it already has a `data-testid`, switch to it; if not, add one to the source, then kill any Next.js server and build and start to verify. This is a **blocking gate** — do not check off e2e test task items until this audit is done.
 
 ---
 

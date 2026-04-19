@@ -35,5 +35,3 @@ Review the complete diff above. This contains all code changes in the PR.
 
 OBJECTIVE:
 Use the **@agent-design-reviewer** to comprehensively review the complete diff above, and reply back to the user with the design and review report. Your final reply must contain the markdown report and nothing else.
-
-Follow and implement the design principles and brand guidelines located in the .claude/skills/frontend-design/SKILL.md, .claude/skills/frontend-design/design-checklist.md and .claude/skills/brand-guidelines/SKILL.md docs.

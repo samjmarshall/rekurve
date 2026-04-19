@@ -50,3 +50,7 @@ Always use this two-step process:
 ### Building & Reviewing UI
 
 Use the `frontend-design` skill when implementing UI components, pages, or layouts. After completing UI/UX work in `src/`, run `/design_review` before committing.
+
+### Verification
+
+Delegate make-target verification (`make build`, `make check`, `make test`, `make test_e2e`) to the `codebase-verification` sub-agent. It isolates verbose build/test output from the main context and returns a compact pass/fail result.

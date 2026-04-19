@@ -105,6 +105,29 @@ describe("messageSnoozeSchema", () => {
     ).toBe(false);
   });
 
+  test("rejects a time inside the 15-minute buffer", () => {
+    const tooSoon = new Date(Date.now() + 14 * 60 * 1000);
+    const result = messageSnoozeSchema.safeParse({
+      id: VALID_UUID,
+      snoozedUntil: tooSoon,
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toMatch(/15 minutes/i);
+    }
+  });
+
+  test("accepts a time at the 15-minute boundary", () => {
+    // +15 min + 1 s cushion to avoid clock drift in the refine call
+    const atBoundary = new Date(Date.now() + 15 * 60 * 1000 + 1000);
+    expect(
+      messageSnoozeSchema.safeParse({
+        id: VALID_UUID,
+        snoozedUntil: atBoundary,
+      }).success,
+    ).toBe(true);
+  });
+
   test("rejects unparseable input", () => {
     expect(
       messageSnoozeSchema.safeParse({

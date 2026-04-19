@@ -134,6 +134,21 @@ describe("messages.listPending", () => {
     expect(where).toHaveBeenCalled();
     expect(orderBy).toHaveBeenCalled();
   });
+
+  test("includes status=snoozed rows whose snoozedUntil has elapsed", async () => {
+    const elapsed = {
+      ...joinedRow,
+      status: "snoozed" as const,
+      snoozedUntil: new Date(Date.now() - 60 * 60 * 1000),
+    };
+    mockSelectListPending([elapsed]);
+
+    const caller = await getCaller();
+    const result = await caller.messages.listPending();
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.status).toBe("snoozed");
+  });
 });
 
 // --- messages.approve ---
@@ -349,6 +364,37 @@ describe("messages.snooze", () => {
     } catch (e) {
       expect((e as TRPCError).code).toBe("BAD_REQUEST");
     }
+  });
+
+  test("rejects snoozedUntil inside the 15-minute buffer", async () => {
+    const tooSoon = new Date(Date.now() + 14 * 60 * 1000);
+    const caller = await getCaller();
+    try {
+      await caller.messages.snooze({ id: MSG_ID, snoozedUntil: tooSoon });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect((e as TRPCError).code).toBe("BAD_REQUEST");
+    }
+  });
+
+  test("accepts snoozedUntil at the 15-minute boundary", async () => {
+    (
+      mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
+    ).messageQueue.findFirst.mockResolvedValue(baseMessage);
+
+    const atBoundary = new Date(Date.now() + 15 * 60 * 1000 + 1000);
+    mockUpdateReturning({
+      ...baseMessage,
+      status: "snoozed",
+      snoozedUntil: atBoundary,
+    });
+
+    const caller = await getCaller();
+    const result = await caller.messages.snooze({
+      id: MSG_ID,
+      snoozedUntil: atBoundary,
+    });
+    expect(result.status).toBe("snoozed");
   });
 
   test("rejects terminal state", async () => {

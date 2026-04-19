@@ -62,10 +62,16 @@ export const messagesRouter = createTRPCRouter({
       .from(messageQueue)
       .innerJoin(leads, eq(messageQueue.leadId, leads.id))
       .where(
-        and(
-          eq(messageQueue.status, "pending"),
-          or(
-            isNull(messageQueue.snoozedUntil),
+        or(
+          and(
+            eq(messageQueue.status, "pending"),
+            or(
+              isNull(messageQueue.snoozedUntil),
+              lte(messageQueue.snoozedUntil, new Date()),
+            ),
+          ),
+          and(
+            eq(messageQueue.status, "snoozed"),
             lte(messageQueue.snoozedUntil, new Date()),
           ),
         ),

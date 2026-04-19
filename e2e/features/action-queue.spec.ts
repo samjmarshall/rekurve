@@ -34,20 +34,9 @@ test.describe("Action Queue — E2E", () => {
     await deleteTestSession(session.userId);
   });
 
-  test("empty state renders when no pending messages", async ({
-    context,
-    page,
-    baseURL,
-  }) => {
-    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
-    await page.goto("/dashboard");
-
-    const queue = new ActionQueueSection(page);
-    // Other parallel tests may have seeded rows. Only assert empty state if
-    // we can see no rows. This is a soft assertion via the count badge, which
-    // is always present.
-    await expect(queue.count).toBeVisible();
-  });
+  // Empty-state coverage lives in e2e/features/dashboard-shell.spec.ts:139-146.
+  // A seed-free assertion here could not distinguish empty state from rows
+  // seeded by parallel tests, so it was removed.
 
   test("approve removes the row and toasts success", async ({
     context,
@@ -79,7 +68,11 @@ test.describe("Action Queue — E2E", () => {
     await queue.approveButton(msg.id).click();
 
     await expect(queue.row(msg.id)).toBeHidden();
-    await expect(page.getByText(/Sent via SMS/i)).toBeVisible();
+    await expect(
+      page
+        .getByTestId("app-toast")
+        .filter({ hasText: /Approved — will send shortly/i }),
+    ).toBeVisible();
 
     const record = await getMessageStatus(msg.id);
     expect(record?.status).toBe("approved");

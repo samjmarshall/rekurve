@@ -110,13 +110,18 @@ export async function archiveTestContact(hubspotId: string): Promise<void> {
  * so the sweeper can find it. Keep in sync with deleteTestLeads().
  */
 const TEST_FIRST_NAMES = [
-  "Quick",
+  "Approve",
+  "Count",
+  "Dismiss",
   "E2E",
+  "Edit",
   "FHOG",
   "Nav",
-  "QC",
-  "Count",
+  "Order",
   "Pipeline",
+  "QC",
+  "Quick",
+  "Snooze",
 ];
 
 /**
@@ -140,7 +145,10 @@ export async function deleteTestContacts(): Promise<void> {
     const rows = await sql()`
       SELECT hubspot_contact_id FROM "leads"
       WHERE (email LIKE 'e2e-%@test.rekurve.dev'
-         OR first_name IN ('Quick', 'E2E', 'FHOG', 'Nav', 'QC', 'Count', 'Pipeline'))
+         OR first_name IN (
+           'Approve', 'Count', 'Dismiss', 'E2E', 'Edit', 'FHOG',
+           'Nav', 'Order', 'Pipeline', 'QC', 'Quick', 'Snooze'
+         ))
         AND hubspot_contact_id IS NOT NULL
     `;
     for (const row of rows) {

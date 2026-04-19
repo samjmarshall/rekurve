@@ -1,5 +1,6 @@
 import { describe, expect, test } from "@rstest/core";
 import {
+  MIN_BUFFER_MS,
   nextMonday9am,
   toLocalInputValue,
   validateSnoozeTime,
@@ -18,12 +19,26 @@ describe("validateSnoozeTime", () => {
     const past = toLocalInputValue(new Date(now.getTime() - 60 * 1000));
     const result = validateSnoozeTime(past, now);
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toMatch(/future/i);
+    if (!result.ok) expect(result.error).toMatch(/15 minutes/i);
   });
 
   test("rejects exactly-now", () => {
     const result = validateSnoozeTime(toLocalInputValue(now), now);
     expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/15 minutes/i);
+  });
+
+  test("rejects a time inside the 15-minute buffer", () => {
+    const tooSoon = toLocalInputValue(new Date(now.getTime() + 5 * 60 * 1000));
+    const result = validateSnoozeTime(tooSoon, now);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/15 minutes/i);
+  });
+
+  test("accepts a time exactly at the buffer boundary", () => {
+    const atBoundary = new Date(now.getTime() + MIN_BUFFER_MS);
+    const result = validateSnoozeTime(toLocalInputValue(atBoundary), now);
+    expect(result.ok).toBe(true);
   });
 
   test("accepts a future datetime and returns the parsed Date", () => {

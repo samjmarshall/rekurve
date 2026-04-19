@@ -6,10 +6,10 @@ You are tasked with implementing an approved technical plan from `thoughts/plans
 
 When given a plan path:
 - Read the plan completely and check for any existing checkmarks (- [x])
-- Read the original ticket and all files mentioned in the plan
+- Read the ticket linked under `## References` and every `file:line` anchor cited in `## Current State` and each phase's `### Changes` — these are load-bearing; the plan assumes you've seen them
 - **Read files fully** - never use limit/offset parameters, you need complete context
 - Think deeply about how the pieces fit together
-- Create a todo list to track your progress
+- Create a todo list mirroring the plan's phases and per-phase `### Changes` entries
 - Start implementing if you understand what needs to be done
 
 If no plan path provided, ask for one.
@@ -21,6 +21,17 @@ Plans are carefully designed, but reality can be messy. Your job is to:
 - Implement each phase fully before moving to the next
 - Verify your work makes sense in the broader codebase context
 - Update checkboxes in the plan as you complete sections
+
+## TDD Loop
+
+Plans list test files alongside implementation files under `### Changes` (e.g. `path/to/file.ts` + `path/to/file.test.ts`). For each such pair, follow the `tdd` skill's vertical-slice loop:
+
+1. Write the test first — narrowest slice that exercises the behaviour
+2. Run it and confirm it fails for the right reason
+3. Implement the minimum to make it pass
+4. Repeat for the next slice
+
+For refactors, write characterization tests capturing current behaviour **before** changing any implementation.
 
 When things don't match the plan exactly, think about why and communicate clearly. The plan is your guide, but your judgment matters too.
 
@@ -39,10 +50,10 @@ If you encounter a mismatch:
 ## Verification Approach
 
 After implementing a phase:
-- Run the success criteria checks (usually `make test` covers everything)
+- Run **every** command listed under the phase's `**Automated**` checklist (typically some combination of `make check`, `make test`, `make test_e2e`) — don't assume one covers the others
 - Fix any issues before proceeding
-- Update your progress in both the plan and your todos
-- Check off completed items in the plan file itself using Edit
+- Walk the phase's `**Manual**` checklist; check off only what you've actually observed
+- Update checkboxes in the plan file using Edit as items are verified
 
 Don't let verification interrupt your flow - batch it at natural stopping points.
 

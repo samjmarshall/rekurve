@@ -19,8 +19,8 @@ When invoked:
    git log --oneline -n 20
    git diff HEAD~N..HEAD  # Where N covers implementation commits
 
-   # Run comprehensive checks
-   cd $(git rev-parse --show-toplevel) && make check test
+   # Run the full automated suite — mirror what phases list under `**Automated**`
+   cd $(git rev-parse --show-toplevel) && make build && make check && make test && make test_e2e
    ```
 
 ## Validation Process
@@ -55,6 +55,14 @@ If starting fresh or need more context:
 
 ### Step 2: Systematic Validation
 
+**Reference integrity (do this once, before per-phase validation):**
+
+The new plan template requires every code reference to include `file:line`. Validate those anchors still resolve:
+
+- Extract every `` `path:line` `` citation from `## Current State`, each phase's `### Changes`, and `## References`
+- Confirm each file exists and the cited line is still a plausible anchor for the described change (line drift of ±10 is fine; a vanished symbol is not)
+- Flag any anchor that's become stale — the plan may need iterating before validation can finish
+
 For each phase in the plan:
 
 1. **Check completion status**:
@@ -62,13 +70,14 @@ For each phase in the plan:
    - Verify the actual code matches claimed completion
 
 2. **Run automated verification**:
-   - Execute each command from "Automated Verification"
-   - Document pass/fail status
+   - Execute every command listed under the phase's `### Success` → `**Automated**` checklist
+   - Document pass/fail status per command
    - If failures, investigate root cause
 
 3. **Assess manual criteria**:
-   - List what needs manual testing
-   - Provide clear steps for user verification
+   - Walk every item under the phase's `### Success` → `**Manual**` checklist
+   - Tick items you've personally verified; leave the rest unchecked with a note on what's still needed
+   - If an item invokes `/design_review` (required for UI phases), run it on the branch and include its verdict in the validation report — a phase with UI changes is not validated until `/design_review` is clean
 
 4. **Think deeply about edge cases**:
    - Were error conditions handled?
@@ -98,8 +107,10 @@ Create comprehensive validation summary:
 
 ### Automated Verification Results
 ✓ Build passes: `make build`
-✓ Tests pass: `make test`
-✗ Linting issues: `make lint` (3 warnings)
+✓ Lint + typecheck: `make check`
+✓ Unit tests: `make test`
+✗ E2E: `make test_e2e` (1 failing spec — see below)
+✓ Design review: `/design_review` clean (UI phases only)
 
 ### Code Review Findings
 

@@ -52,7 +52,7 @@ Produce a complete, actionable plan at `thoughts/plans/YYYY-MM-DD-ENG-XXXX-descr
 ## Rules
 
 - Tests ship in the phase that changes behaviour, not a trailing appendix.
-- Automated criteria use `make` targets (`make check`, `make test`, `make test_e2e`).
+- Automated criteria use `make` targets (`make check`, `make test`, `make build`, `make test_e2e`).
 - UI phases add `/design_review` as a manual step.
 - Refactors include characterization tests before the behaviour change.
 - Every reference to existing code includes `file:line`.

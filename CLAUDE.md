@@ -33,6 +33,7 @@ The dev server runs via Vercel Portless - no port.
 
 Always use this two-step process:
 
+
 1. `yarn db:generate` — generate a migration SQL file in `drizzle/`
 2. `yarn db:migrate` — apply pending migrations and record them in `__drizzle_migrations`
 

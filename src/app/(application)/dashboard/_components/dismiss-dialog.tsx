@@ -11,17 +11,25 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import type { DraftRowData } from "./draft-row";
-import { useDismissAction } from "./use-queue-actions";
+import type { useDismissAction } from "./use-queue-actions";
+
+type DismissMutation = ReturnType<typeof useDismissAction>;
 
 interface DismissDialogProps {
   row: DraftRowData;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  mutate: DismissMutation["mutate"];
+  isPending: DismissMutation["isPending"];
 }
 
-export function DismissDialog({ row, open, onOpenChange }: DismissDialogProps) {
-  const dismiss = useDismissAction();
-
+export function DismissDialog({
+  row,
+  open,
+  onOpenChange,
+  mutate,
+  isPending,
+}: DismissDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
@@ -46,15 +54,12 @@ export function DismissDialog({ row, open, onOpenChange }: DismissDialogProps) {
               variant="destructive"
               size="md"
               data-testid={`dismiss-confirm-${row.id}`}
-              disabled={dismiss.isPending}
+              disabled={isPending}
               onClick={() =>
-                dismiss.mutate(
-                  { id: row.id },
-                  { onSuccess: () => onOpenChange(false) },
-                )
+                mutate({ id: row.id }, { onSuccess: () => onOpenChange(false) })
               }
             >
-              {dismiss.isPending ? "Dismissing…" : "Dismiss"}
+              {isPending ? "Dismissing…" : "Dismiss"}
             </Button>
           </div>
         </DialogPopup>

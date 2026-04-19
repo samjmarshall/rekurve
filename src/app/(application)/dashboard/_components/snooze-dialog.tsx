@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/Button";
 import {
   Dialog,
@@ -43,6 +43,7 @@ export function SnoozeDialog({
 }: SnoozeDialogProps) {
   const [value, setValue] = useState<string>(defaultValue);
   const [error, setError] = useState<string | null>(null);
+  const datetimeRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -75,6 +76,7 @@ export function SnoozeDialog({
       <DialogPortal>
         <DialogBackdrop />
         <DialogPopup
+          initialFocus={datetimeRef}
           data-testid={`snooze-dialog-${row.id}`}
           className="flex flex-col gap-4 p-6"
         >
@@ -113,6 +115,7 @@ export function SnoozeDialog({
           </div>
 
           <input
+            ref={datetimeRef}
             type="datetime-local"
             value={value}
             min={minValue}

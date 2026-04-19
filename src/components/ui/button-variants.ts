@@ -10,9 +10,9 @@ export const buttonVariants = cva(
         secondary:
           "border-neutral-500 border-b-3 bg-neutral-800 text-white shadow focus-visible:ring-secondary/50 dark:border-neutral-800 dark:bg-neutral-950",
         outline:
-          "border-1 border-primary/30 border-b-3 text-primary hover:border-primary/50 hover:bg-primary/5 focus-visible:ring-primary/30",
+          "border-1 border-primary/30 border-b-3 text-primary-readable hover:border-primary/50 hover:bg-primary/5 focus-visible:ring-primary/30",
         ghost:
-          "text-primary hover:bg-primary/10 hover:text-primary/90 focus-visible:ring-primary/30",
+          "text-primary-readable hover:bg-primary/10 hover:text-primary-readable/90 focus-visible:ring-primary/30",
         destructive:
           "border-destructive border-b-3 bg-white text-destructive shadow hover:bg-destructive/5 focus-visible:ring-destructive/50 dark:bg-neutral-700",
         "ghost-destructive":

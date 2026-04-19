@@ -94,6 +94,8 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
         row={row}
         open={dismissOpen}
         onOpenChange={setDismissOpen}
+        mutate={dismiss.mutate}
+        isPending={dismiss.isPending}
       />
     </>
   );

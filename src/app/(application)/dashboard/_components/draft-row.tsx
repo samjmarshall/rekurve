@@ -19,13 +19,17 @@ export function DraftRow({ row }: { row: DraftRowData }) {
   return (
     <article
       data-testid={`queue-row-${row.id}`}
+      aria-labelledby={`queue-row-name-${row.id}`}
       className="rounded-lg border bg-card p-4 shadow-xs"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-1 items-center gap-2">
-          <p className="truncate font-medium text-sm">
+          <h2
+            id={`queue-row-name-${row.id}`}
+            className="truncate font-medium text-sm"
+          >
             {row.lead.firstName} {row.lead.lastName}
-          </p>
+          </h2>
           <Badge
             variant={meta.badgeVariant}
             data-testid={`queue-row-score-${row.id}`}
@@ -42,6 +46,7 @@ export function DraftRow({ row }: { row: DraftRowData }) {
         </div>
         <ChannelIcon
           size={16}
+          role="img"
           aria-label={channelLabel}
           className="mt-0.5 shrink-0 text-muted-foreground"
         />
@@ -52,6 +57,7 @@ export function DraftRow({ row }: { row: DraftRowData }) {
       ) : null}
 
       <p
+        id={`queue-row-body-${row.id}`}
         data-testid={`queue-row-body-${row.id}`}
         className={cn(
           "mt-2 whitespace-pre-wrap text-sm",
@@ -64,7 +70,9 @@ export function DraftRow({ row }: { row: DraftRowData }) {
         type="button"
         onClick={() => setExpanded((v) => !v)}
         data-testid={`queue-row-toggle-${row.id}`}
-        className="mt-1 text-muted-foreground text-xs hover:text-foreground"
+        aria-expanded={expanded}
+        aria-controls={`queue-row-body-${row.id}`}
+        className="mt-1 inline-flex min-h-11 items-center text-muted-foreground text-xs hover:text-foreground"
       >
         {expanded ? "Show less" : "Show more"}
       </button>
@@ -73,7 +81,7 @@ export function DraftRow({ row }: { row: DraftRowData }) {
         <details className="mt-3">
           <summary
             data-testid={`queue-row-reasoning-${row.id}`}
-            className="cursor-pointer select-none text-muted-foreground text-xs hover:text-foreground"
+            className="cursor-pointer select-none rounded-sm text-muted-foreground text-xs hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
           >
             Why this message?
           </summary>

@@ -13,8 +13,11 @@ export function validateSnoozeTime(
   if (Number.isNaN(parsed.getTime())) {
     return { ok: false, error: "Pick a valid date and time." };
   }
-  if (parsed.getTime() <= now.getTime()) {
-    return { ok: false, error: "Snooze time must be in the future." };
+  if (parsed.getTime() < now.getTime() + MIN_BUFFER_MS) {
+    return {
+      ok: false,
+      error: "Snooze time must be at least 15 minutes from now.",
+    };
   }
   return { ok: true, date: parsed };
 }

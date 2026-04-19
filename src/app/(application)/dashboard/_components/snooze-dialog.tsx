@@ -18,22 +18,31 @@ import {
   validateSnoozeTime,
 } from "../_lib/snooze";
 import type { DraftRowData } from "./draft-row";
-import { useSnoozeAction } from "./use-queue-actions";
+import type { useSnoozeAction } from "./use-queue-actions";
+
+type SnoozeMutation = ReturnType<typeof useSnoozeAction>;
 
 interface SnoozeDialogProps {
   row: DraftRowData;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  mutate: SnoozeMutation["mutate"];
+  isPending: SnoozeMutation["isPending"];
 }
 
 function defaultValue(): string {
   return toLocalInputValue(new Date(Date.now() + ONE_DAY_MS));
 }
 
-export function SnoozeDialog({ row, open, onOpenChange }: SnoozeDialogProps) {
+export function SnoozeDialog({
+  row,
+  open,
+  onOpenChange,
+  mutate,
+  isPending,
+}: SnoozeDialogProps) {
   const [value, setValue] = useState<string>(defaultValue);
   const [error, setError] = useState<string | null>(null);
-  const snooze = useSnoozeAction();
 
   useEffect(() => {
     if (open) {
@@ -55,7 +64,7 @@ export function SnoozeDialog({ row, open, onOpenChange }: SnoozeDialogProps) {
       return;
     }
     setError(null);
-    snooze.mutate(
+    mutate(
       { id: row.id, snoozedUntil: result.date },
       { onSuccess: () => onOpenChange(false) },
     );
@@ -69,7 +78,9 @@ export function SnoozeDialog({ row, open, onOpenChange }: SnoozeDialogProps) {
           data-testid={`snooze-dialog-${row.id}`}
           className="flex flex-col gap-4 p-6"
         >
-          <DialogTitle>Snooze draft</DialogTitle>
+          <DialogTitle>
+            Snooze draft for {row.lead.firstName} {row.lead.lastName}
+          </DialogTitle>
 
           <div className="flex flex-wrap gap-2">
             <Button
@@ -125,10 +136,10 @@ export function SnoozeDialog({ row, open, onOpenChange }: SnoozeDialogProps) {
               variant="primary"
               size="md"
               data-testid={`snooze-save-${row.id}`}
-              disabled={snooze.isPending}
+              disabled={isPending}
               onClick={handleSave}
             >
-              {snooze.isPending ? "Snoozing…" : "Snooze"}
+              {isPending ? "Snoozing…" : "Snooze"}
             </Button>
           </div>
         </DialogPopup>

@@ -13,6 +13,10 @@ export const buttonVariants = cva(
           "border-1 border-primary/30 border-b-3 text-primary hover:border-primary/50 hover:bg-primary/5 focus-visible:ring-primary/30",
         ghost:
           "text-primary hover:bg-primary/10 hover:text-primary/90 focus-visible:ring-primary/30",
+        destructive:
+          "border-destructive border-b-3 bg-white text-destructive shadow hover:bg-destructive/5 focus-visible:ring-destructive/50 dark:bg-neutral-700",
+        "ghost-destructive":
+          "text-destructive hover:bg-destructive/10 hover:text-destructive/90 focus-visible:ring-destructive/30",
       },
       size: {
         sm: "px-2 py-1 text-xs",

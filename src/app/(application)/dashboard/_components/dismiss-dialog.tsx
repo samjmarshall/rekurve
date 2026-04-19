@@ -31,7 +31,9 @@ export function DismissDialog({ row, open, onOpenChange }: DismissDialogProps) {
           className="flex flex-col gap-4 p-6"
         >
           <div className="flex flex-col gap-1">
-            <DialogTitle>Dismiss this draft?</DialogTitle>
+            <DialogTitle>
+              Dismiss draft for {row.lead.firstName} {row.lead.lastName}?
+            </DialogTitle>
             <DialogDescription>
               It won&apos;t be sent. You can always draft a fresh message later.
             </DialogDescription>
@@ -41,7 +43,7 @@ export function DismissDialog({ row, open, onOpenChange }: DismissDialogProps) {
               Cancel
             </DialogClose>
             <Button
-              variant="primary"
+              variant="destructive"
               size="md"
               data-testid={`dismiss-confirm-${row.id}`}
               disabled={dismiss.isPending}

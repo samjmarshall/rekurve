@@ -7,7 +7,12 @@ import { DismissDialog } from "./dismiss-dialog";
 import type { DraftRowData } from "./draft-row";
 import { EditDialog } from "./edit-dialog";
 import { SnoozeDialog } from "./snooze-dialog";
-import { useApproveAction, useDismissAction } from "./use-queue-actions";
+import {
+  useApproveAction,
+  useDismissAction,
+  useEditAndApproveAction,
+  useSnoozeAction,
+} from "./use-queue-actions";
 
 export function DraftActionBar({ row }: { row: DraftRowData }) {
   const [editOpen, setEditOpen] = useState(false);
@@ -16,8 +21,14 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
 
   const approve = useApproveAction();
   const dismiss = useDismissAction();
+  const editAndApprove = useEditAndApproveAction();
+  const snooze = useSnoozeAction();
 
-  const isPending = approve.isPending || dismiss.isPending;
+  const isPending =
+    approve.isPending ||
+    dismiss.isPending ||
+    editAndApprove.isPending ||
+    snooze.isPending;
 
   return (
     <>
@@ -54,7 +65,7 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
         </Button>
         <Button
           data-testid={`queue-dismiss-${row.id}`}
-          variant="ghost"
+          variant="ghost-destructive"
           size="md"
           disabled={isPending}
           onClick={() => setDismissOpen(true)}
@@ -64,8 +75,21 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
         </Button>
       </div>
 
-      <EditDialog row={row} open={editOpen} onOpenChange={setEditOpen} />
-      <SnoozeDialog row={row} open={snoozeOpen} onOpenChange={setSnoozeOpen} />
+      <EditDialog
+        row={row}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        mutate={editAndApprove.mutate}
+        isPending={editAndApprove.isPending}
+        error={editAndApprove.error}
+      />
+      <SnoozeDialog
+        row={row}
+        open={snoozeOpen}
+        onOpenChange={setSnoozeOpen}
+        mutate={snooze.mutate}
+        isPending={snooze.isPending}
+      />
       <DismissDialog
         row={row}
         open={dismissOpen}

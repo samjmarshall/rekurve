@@ -72,3 +72,4 @@ yarn-error.log*
 # claude local settings (machine-specific)
 .claude/settings.local.json
 .claude/skills.log
+.claude/scheduled_tasks.lock

@@ -1,7 +1,7 @@
 "use client";
 
 import { Mail, MessageSquare } from "lucide-react";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { STAGE_META } from "~/app/(application)/pipeline/_lib/stage-meta";
 import { Badge } from "~/components/ui/Badge";
 import { cn } from "~/lib/utils";
@@ -12,7 +12,24 @@ export type DraftRowData = RouterOutputs["messages"]["listPending"][number];
 
 export function DraftRow({ row }: { row: DraftRowData }) {
   const [expanded, setExpanded] = useState(false);
+  const [canExpand, setCanExpand] = useState(false);
+  const bodyRef = useRef<HTMLParagraphElement>(null);
   const meta = STAGE_META[row.lead.leadStage];
+
+  useLayoutEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const measure = () => {
+      // Only measure against the clamped form. When expanded the toggle stays
+      // visible regardless so the user can collapse.
+      if (expanded) return;
+      setCanExpand(el.scrollHeight > el.clientHeight + 1);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [expanded]);
   const ChannelIcon = row.channel === "sms" ? MessageSquare : Mail;
   const channelLabel = row.channel === "sms" ? "SMS" : "Email";
 
@@ -57,6 +74,7 @@ export function DraftRow({ row }: { row: DraftRowData }) {
       ) : null}
 
       <p
+        ref={bodyRef}
         id={`queue-row-body-${row.id}`}
         data-testid={`queue-row-body-${row.id}`}
         className={cn(
@@ -66,16 +84,18 @@ export function DraftRow({ row }: { row: DraftRowData }) {
       >
         {row.body}
       </p>
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        data-testid={`queue-row-toggle-${row.id}`}
-        aria-expanded={expanded}
-        aria-controls={`queue-row-body-${row.id}`}
-        className="mt-1 inline-flex min-h-11 items-center text-muted-foreground text-xs hover:text-foreground"
-      >
-        {expanded ? "Show less" : "Show more"}
-      </button>
+      {canExpand ? (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          data-testid={`queue-row-toggle-${row.id}`}
+          aria-expanded={expanded}
+          aria-controls={`queue-row-body-${row.id}`}
+          className="mt-1 inline-flex min-h-11 items-center text-muted-foreground text-xs hover:text-foreground"
+        >
+          {expanded ? "Show less" : "Show more"}
+        </button>
+      ) : null}
 
       {row.aiReasoning ? (
         <details className="mt-3">

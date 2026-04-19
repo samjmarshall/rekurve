@@ -139,9 +139,9 @@ test.describe("Dashboard Shell — Empty States", () => {
   }) => {
     await withAuth(context, session, baseURL!);
     await page.goto("/dashboard");
-    await expect(page.getByText("No pending actions")).toBeVisible();
+    await expect(page.getByText("You're all caught up")).toBeVisible();
     await expect(
-      page.getByText("AI-drafted messages will appear here"),
+      page.getByText("We'll let you know when new follow-ups are ready"),
     ).toBeVisible();
   });
 

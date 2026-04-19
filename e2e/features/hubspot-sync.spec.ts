@@ -2,15 +2,14 @@ import { expect, test } from "@playwright/test";
 import { LeadFormSection } from "../pages/sections/lead-form.section";
 import {
   createTestSession,
-  deleteTestLeads,
   deleteTestSession,
   type TestSession,
   uniquePhone,
 } from "../utils/auth-helper";
 import {
   archiveTestContact,
+  cleanupTestLeadsByPhone,
   createTestContact,
-  deleteTestContacts,
   findContactByEmail,
   getLeadHubSpotId,
   updateTestContact,
@@ -20,8 +19,11 @@ import {
 import { getSessionCookie } from "../utils/session-cookie";
 
 // Tests in this file mutate the shared HubSpot account and DB. Run them
-// sequentially within a single worker so beforeAll/afterAll cleanup runs
-// once per describe — preventing workers from wiping each other's data.
+// sequentially within a single worker to limit HubSpot API contention.
+// Cleanup is phone-scoped (per afterAll) rather than a blanket sweep so it
+// does not race with concurrent tests on other spec files that also use the
+// `Pipeline`/`E2E`/`Quick`/etc. first-name markers — globalTeardown handles
+// any residue at run end.
 //
 // Timeout is doubled because each test does 2-3 HubSpot API roundtrips and
 // the local dev server is heavily contended by parallel workers in dev.
@@ -34,17 +36,22 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
   );
 
   let session: TestSession;
+  const phones: string[] = [];
+  const seededContactIds: string[] = [];
 
   test.beforeAll(async () => {
     session = await createTestSession();
-    // Clean up any leftover test contacts from previous runs
-    await deleteTestContacts();
-    await deleteTestLeads();
   });
 
   test.afterAll(async () => {
-    await deleteTestContacts();
-    await deleteTestLeads();
+    await cleanupTestLeadsByPhone(phones);
+    for (const id of seededContactIds) {
+      try {
+        await archiveTestContact(id);
+      } catch {
+        // Already archived — ignore
+      }
+    }
     await deleteTestSession(session.userId);
   });
 
@@ -58,6 +65,7 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
     const uniqueId = Date.now().toString(36);
     const testEmail = `e2e-${uniqueId}@test.rekurve.dev`;
     const testPhone = uniquePhone();
+    phones.push(testPhone);
 
     await page.goto("/leads/new");
     const form = new LeadFormSection(page);
@@ -128,6 +136,7 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
     const testEmail = `e2e-${uniqueId}@test.rekurve.dev`;
     const seedPhone = uniquePhone();
     const formPhone = uniquePhone();
+    phones.push(seedPhone, formPhone);
 
     // Seed: create a contact in HubSpot first
     const seeded = await createTestContact({
@@ -136,6 +145,7 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
       email: testEmail,
       phone: seedPhone,
     });
+    seededContactIds.push(seeded.id);
 
     // Create a lead in the app with the same email
     await page.goto("/leads/new");
@@ -183,16 +193,14 @@ test.describe("HubSpot Inbound Sync — E2E", () => {
   );
 
   let session: TestSession;
+  const phones: string[] = [];
 
   test.beforeAll(async () => {
     session = await createTestSession();
-    await deleteTestContacts();
-    await deleteTestLeads();
   });
 
   test.afterAll(async () => {
-    await deleteTestContacts();
-    await deleteTestLeads();
+    await cleanupTestLeadsByPhone(phones);
     await deleteTestSession(session.userId);
   });
 
@@ -207,6 +215,8 @@ test.describe("HubSpot Inbound Sync — E2E", () => {
 
     const uniqueId = Date.now().toString(36);
     const testEmail = `e2e-${uniqueId}@test.rekurve.dev`;
+    const testPhone = uniquePhone();
+    phones.push(testPhone);
 
     // Step 1: Create a lead via the app (establishes the HubSpot link)
     await page.goto("/leads/new");
@@ -214,7 +224,7 @@ test.describe("HubSpot Inbound Sync — E2E", () => {
     await form.fillStep1({
       firstName: "Inbound",
       lastName: `Phone ${uniqueId}`,
-      phone: uniquePhone(),
+      phone: testPhone,
       email: testEmail,
     });
     await form.clickNext();
@@ -230,10 +240,12 @@ test.describe("HubSpot Inbound Sync — E2E", () => {
     expect(hubspotId).not.toBeNull();
 
     // Step 3: Update the contact's phone in HubSpot directly
-    await updateTestContact(hubspotId!, { phone: "0499999999" });
+    const updatedPhone = "0499999999";
+    phones.push(updatedPhone);
+    await updateTestContact(hubspotId!, { phone: updatedPhone });
 
     // Step 4: Wait for the webhook to update the local lead
-    await waitForLeadField(testEmail, "phone", "0499999999");
+    await waitForLeadField(testEmail, "phone", updatedPhone);
   });
 
   test("deleting a contact in HubSpot removes the local lead", async ({
@@ -247,6 +259,8 @@ test.describe("HubSpot Inbound Sync — E2E", () => {
 
     const uniqueId = Date.now().toString(36);
     const testEmail = `e2e-${uniqueId}@test.rekurve.dev`;
+    const testPhone = uniquePhone();
+    phones.push(testPhone);
 
     // Step 1: Create a lead via the app
     await page.goto("/leads/new");
@@ -254,7 +268,7 @@ test.describe("HubSpot Inbound Sync — E2E", () => {
     await form.fillStep1({
       firstName: "Inbound",
       lastName: `Delete ${uniqueId}`,
-      phone: uniquePhone(),
+      phone: testPhone,
       email: testEmail,
     });
     await form.clickNext();

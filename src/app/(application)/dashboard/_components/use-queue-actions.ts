@@ -5,14 +5,23 @@ import { useToastManager } from "~/components/ui/toast";
 import { type RouterOutputs, useTRPC } from "~/trpc/react";
 
 type ListPending = RouterOutputs["messages"]["listPending"];
+type ListPendingRow = ListPending[number];
 
 interface OptimisticContext {
-  previous: ListPending | undefined;
+  row: ListPendingRow | undefined;
+}
+
+// Mirror listPending's ORDER BY priority DESC, createdAt ASC so rolled-back
+// rows slot back into the correct position without waiting for invalidate.
+function comparePriority(a: ListPendingRow, b: ListPendingRow): number {
+  if (a.priority !== b.priority) return b.priority - a.priority;
+  return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
 }
 
 /**
- * Remove a row optimistically from the cached listPending query and restore it
- * on error. Shared across every queue action.
+ * Remove a row optimistically from the cached listPending query and restore
+ * just that row on error. Sibling rows removed concurrently by other in-flight
+ * mutations are preserved.
  */
 function useOptimisticRemove() {
   const trpc = useTRPC();
@@ -22,16 +31,21 @@ function useOptimisticRemove() {
   return {
     async snapshot(id: string): Promise<OptimisticContext> {
       await queryClient.cancelQueries({ queryKey });
-      const previous = queryClient.getQueryData<ListPending>(queryKey);
+      const current = queryClient.getQueryData<ListPending>(queryKey);
+      const row = current?.find((r) => r.id === id);
       queryClient.setQueryData<ListPending>(queryKey, (old) =>
         old ? old.filter((r) => r.id !== id) : old,
       );
-      return { previous };
+      return { row };
     },
     restore(context: OptimisticContext | undefined) {
-      if (context?.previous) {
-        queryClient.setQueryData(queryKey, context.previous);
-      }
+      const row = context?.row;
+      if (!row) return;
+      queryClient.setQueryData<ListPending>(queryKey, (old) => {
+        if (!old) return [row];
+        if (old.some((r) => r.id === row.id)) return old;
+        return [...old, row].sort(comparePriority);
+      });
     },
     invalidate() {
       return queryClient.invalidateQueries({ queryKey });
@@ -52,10 +66,9 @@ export function useApproveAction() {
   return useMutation(
     trpc.messages.approve.mutationOptions({
       onMutate: ({ id }) => optimistic.snapshot(id),
-      onSuccess: (data) => {
-        toast.add({
-          title: `Sent via ${data.channel === "sms" ? "SMS" : "email"}`,
-        });
+      onSuccess: () => {
+        // Revert to "Sent via …" when dispatch lands (#129/#130)
+        toast.add({ title: "Approved — will send shortly" });
       },
       onError: (err, _vars, context) => {
         optimistic.restore(context as OptimisticContext | undefined);
@@ -106,9 +119,10 @@ export function useEditAndApproveAction() {
   return useMutation(
     trpc.messages.editAndApprove.mutationOptions({
       onMutate: ({ id }) => optimistic.snapshot(id),
-      onSuccess: (data) => {
+      onSuccess: () => {
+        // Revert to "Sent via …" when dispatch lands (#129/#130)
         toast.add({
-          title: `Sent via ${data.channel === "sms" ? "SMS" : "email"}`,
+          title: "Approved — will send shortly",
           description: "Your edits were saved.",
         });
       },

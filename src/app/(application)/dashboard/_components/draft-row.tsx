@@ -1,7 +1,7 @@
 "use client";
 
 import { Mail, MessageSquare } from "lucide-react";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { STAGE_META } from "~/app/(application)/pipeline/_lib/stage-meta";
 import { Badge } from "~/components/ui/Badge";
 import { cn } from "~/lib/utils";
@@ -12,7 +12,25 @@ export type DraftRowData = RouterOutputs["messages"]["listPending"][number];
 
 export function DraftRow({ row }: { row: DraftRowData }) {
   const [expanded, setExpanded] = useState(false);
+  const [canExpand, setCanExpand] = useState(false);
+  const bodyRef = useRef<HTMLParagraphElement>(null);
   const meta = STAGE_META[row.lead.leadStage];
+
+  useLayoutEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    // canExpand reflects whether the clamped form overflows. Toggle visibility
+    // is driven by render logic (expanded || canExpand), not by this measure.
+    const measure = () => {
+      setCanExpand(el.scrollHeight > el.clientHeight + 1);
+    };
+    measure();
+    // Observe the <p> itself: text reflow inside this element is what changes
+    // overflow. Sibling mutations (e.g. the optional subject <p>) don't affect it.
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const ChannelIcon = row.channel === "sms" ? MessageSquare : Mail;
   const channelLabel = row.channel === "sms" ? "SMS" : "Email";
 
@@ -57,6 +75,7 @@ export function DraftRow({ row }: { row: DraftRowData }) {
       ) : null}
 
       <p
+        ref={bodyRef}
         id={`queue-row-body-${row.id}`}
         data-testid={`queue-row-body-${row.id}`}
         className={cn(
@@ -66,16 +85,23 @@ export function DraftRow({ row }: { row: DraftRowData }) {
       >
         {row.body}
       </p>
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        data-testid={`queue-row-toggle-${row.id}`}
-        aria-expanded={expanded}
-        aria-controls={`queue-row-body-${row.id}`}
-        className="mt-1 inline-flex min-h-11 items-center text-muted-foreground text-xs hover:text-foreground"
-      >
-        {expanded ? "Show less" : "Show more"}
-      </button>
+      {expanded || canExpand ? (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          data-testid={`queue-row-toggle-${row.id}`}
+          aria-expanded={expanded}
+          aria-controls={`queue-row-body-${row.id}`}
+          aria-label={
+            expanded
+              ? `Show less of message for ${row.lead.firstName} ${row.lead.lastName}`
+              : `Show more of message for ${row.lead.firstName} ${row.lead.lastName}`
+          }
+          className="mt-1 inline-flex min-h-11 min-w-11 items-center text-muted-foreground text-xs hover:text-foreground"
+        >
+          {expanded ? "Show less" : "Show more"}
+        </button>
+      ) : null}
 
       {row.aiReasoning ? (
         <details className="mt-3">

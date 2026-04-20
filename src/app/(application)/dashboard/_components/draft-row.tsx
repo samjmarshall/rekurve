@@ -19,17 +19,18 @@ export function DraftRow({ row }: { row: DraftRowData }) {
   useLayoutEffect(() => {
     const el = bodyRef.current;
     if (!el) return;
+    // canExpand reflects whether the clamped form overflows. Toggle visibility
+    // is driven by render logic (expanded || canExpand), not by this measure.
     const measure = () => {
-      // Only measure against the clamped form. When expanded the toggle stays
-      // visible regardless so the user can collapse.
-      if (expanded) return;
       setCanExpand(el.scrollHeight > el.clientHeight + 1);
     };
     measure();
+    // Observe the <p> itself: text reflow inside this element is what changes
+    // overflow. Sibling mutations (e.g. the optional subject <p>) don't affect it.
     const observer = new ResizeObserver(measure);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [expanded]);
+  }, []);
   const ChannelIcon = row.channel === "sms" ? MessageSquare : Mail;
   const channelLabel = row.channel === "sms" ? "SMS" : "Email";
 
@@ -84,14 +85,19 @@ export function DraftRow({ row }: { row: DraftRowData }) {
       >
         {row.body}
       </p>
-      {canExpand ? (
+      {expanded || canExpand ? (
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
           data-testid={`queue-row-toggle-${row.id}`}
           aria-expanded={expanded}
           aria-controls={`queue-row-body-${row.id}`}
-          className="mt-1 inline-flex min-h-11 items-center text-muted-foreground text-xs hover:text-foreground"
+          aria-label={
+            expanded
+              ? `Show less of message for ${row.lead.firstName} ${row.lead.lastName}`
+              : `Show more of message for ${row.lead.firstName} ${row.lead.lastName}`
+          }
+          className="mt-1 inline-flex min-h-11 min-w-11 items-center text-muted-foreground text-xs hover:text-foreground"
         >
           {expanded ? "Show less" : "Show more"}
         </button>

@@ -33,7 +33,6 @@ The dev server runs via Vercel Portless - no port.
 
 Always use this two-step process:
 
-
 1. `yarn db:generate` — generate a migration SQL file in `drizzle/`
 2. `yarn db:migrate` — apply pending migrations and record them in `__drizzle_migrations`
 
@@ -53,4 +52,4 @@ Use the `frontend-design` skill when implementing UI components, pages, or layou
 
 ### Verification
 
-Delegate make-target verification (`make build`, `make check`, `make test`, `make test_e2e`) to the `codebase-verification` sub-agent. It isolates verbose build/test output from the main context and returns a compact pass/fail result.
+**NEVER run `make build`, `make check`, `make test`, or `make test_e2e` directly via Bash.** Always use **@agent-codebase-verification**! This applies to both proactive post-code-change verification *and* explicit user requests ("run make test", "run the e2e suite"). The agent isolates verbose build/test output from the main context and returns a compact pass/fail result.

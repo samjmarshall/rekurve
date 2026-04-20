@@ -31,12 +31,15 @@ export const messageEditAndApproveSchema = z.object({
     .max(1600, "Message body cannot exceed 1600 characters"),
 });
 
-// snooze — id + future snoozedUntil (coerced from ISO string)
+// snooze — id + snoozedUntil at least MIN_SNOOZE_BUFFER_MS in the future
+export const MIN_SNOOZE_BUFFER_MS = 15 * 60 * 1000;
 export const messageSnoozeSchema = z.object({
   id: z.string().uuid(),
-  snoozedUntil: z.coerce.date().refine((date) => date > new Date(), {
-    message: "snoozedUntil must be a future date",
-  }),
+  snoozedUntil: z.coerce
+    .date()
+    .refine((date) => date.getTime() >= Date.now() + MIN_SNOOZE_BUFFER_MS, {
+      message: "Snooze time must be at least 15 minutes from now.",
+    }),
 });
 
 export type MessageApprove = z.infer<typeof messageApproveSchema>;

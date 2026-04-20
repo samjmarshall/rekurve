@@ -95,6 +95,9 @@ export async function deleteTestLeads(): Promise<void> {
   await sql()`
     DELETE FROM "leads"
     WHERE email LIKE 'e2e-%@test.rekurve.dev'
-       OR first_name IN ('Quick', 'E2E', 'FHOG', 'Nav', 'QC', 'Count', 'Pipeline')
+       OR first_name IN (
+         'Approve', 'Count', 'Dismiss', 'E2E', 'Edit', 'FHOG',
+         'Nav', 'Order', 'Pipeline', 'QC', 'Quick', 'Snooze'
+       )
   `;
 }

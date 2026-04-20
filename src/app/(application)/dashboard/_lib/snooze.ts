@@ -8,12 +8,13 @@ export type SnoozeValidation =
 export function validateSnoozeTime(
   value: string,
   now: Date = new Date(),
+  minBufferMs: number = MIN_BUFFER_MS,
 ): SnoozeValidation {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
     return { ok: false, error: "Pick a valid date and time." };
   }
-  if (parsed.getTime() < now.getTime() + MIN_BUFFER_MS) {
+  if (parsed.getTime() < now.getTime() + minBufferMs) {
     return {
       ok: false,
       error: "Snooze time must be at least 15 minutes from now.",

@@ -28,4 +28,22 @@ describe("validateEditBody", () => {
     const result = validateEditBody("Hey, following up on the Springfield lot");
     expect(result).toEqual({ empty: false, tooLong: false, valid: true });
   });
+
+  test("trailing newline does not push a max-length body over the cap", () => {
+    const result = validateEditBody(`${"x".repeat(MAX_BODY)}\n`);
+    expect(result.tooLong).toBe(false);
+    expect(result.valid).toBe(true);
+  });
+
+  test("leading whitespace does not push a max-length body over the cap", () => {
+    const result = validateEditBody(`${" ".repeat(50)}${"x".repeat(MAX_BODY)}`);
+    expect(result.tooLong).toBe(false);
+    expect(result.valid).toBe(true);
+  });
+
+  test("body of length max+1 with no whitespace is still too long", () => {
+    const result = validateEditBody("x".repeat(MAX_BODY + 1));
+    expect(result.tooLong).toBe(true);
+    expect(result.valid).toBe(false);
+  });
 });

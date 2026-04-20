@@ -10,7 +10,8 @@ export function validateEditBody(
   body: string,
   max: number = MAX_BODY,
 ): EditBodyValidation {
-  const empty = body.trim().length === 0;
-  const tooLong = body.length > max;
+  const trimmed = body.trim();
+  const empty = trimmed.length === 0;
+  const tooLong = trimmed.length > max;
   return { empty, tooLong, valid: !empty && !tooLong };
 }

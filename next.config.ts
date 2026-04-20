@@ -57,8 +57,7 @@ const config: NextConfig = {
             // next/font/google self-hosts fonts — no runtime requests to fonts.gstatic.com
             `img-src 'self'${isPreview ? " https://vercel.live https://vercel.com data:" : ""};`,
             "manifest-src 'self';",
-            // 'unsafe-eval' is only required by webpack HMR in development; safe to remove in production
-            // but Next.js injects it unconditionally — monitor if removing causes build errors
+            // 'unsafe-eval' is required by webpack HMR in development only.
             `script-src 'self'${isDev ? " 'unsafe-eval'" : ""};`,
             // 'unsafe-inline' required by Next.js App Router inline hydration scripts and JSON-LD <script> tags
             // Nonces via middleware would eliminate this but require significant infrastructure changes

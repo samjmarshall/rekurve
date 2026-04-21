@@ -15,6 +15,13 @@
       "when": 1775646482485,
       "tag": "0001_boring_giant_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776736181971,
+      "tag": "0002_stormy_salo",
+      "breakpoints": true
     }
   ]
 }

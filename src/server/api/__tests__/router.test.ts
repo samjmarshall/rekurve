@@ -16,9 +16,15 @@ beforeEach(() => {
     },
   }));
 
-  // Mock db — routers don't query the DB yet (stubs)
+  // Mock db — minimal shape for the stub queries below
   rs.doMock("~/server/db", () => ({
-    db: {},
+    db: {
+      query: {
+        nurtureSequences: {
+          findMany: rs.fn().mockResolvedValue([]),
+        },
+      },
+    },
   }));
 
   // Default: unauthenticated (null session)
@@ -59,8 +65,8 @@ describe("tRPC — Authenticated", () => {
   const stubs = [
     { name: "lots.getAll", call: (c: Caller) => c.lots.getAll(), expected: [] },
     {
-      name: "nurture.getActive",
-      call: (c: Caller) => c.nurture.getActive(),
+      name: "nurture.listActive",
+      call: (c: Caller) => c.nurture.listActive(),
       expected: [],
     },
     {

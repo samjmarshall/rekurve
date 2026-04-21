@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "nurture_active_one_per_lead_uidx" ON "nurture_sequences" USING btree ("lead_id") WHERE status = 'active';

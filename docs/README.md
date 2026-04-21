@@ -81,6 +81,15 @@ graph LR
 
 ### Environment Setup
 
+Vercel is the source of truth for env vars. Link the project once per clone, then pull when you need a fresh local secrets file:
+
+```bash
+make vercel_link   # one-time: links .vercel/project.json (gitignored)
+make env_pull      # writes .env.local from the Vercel "development" environment
+```
+
+**Fallback (no Vercel access):** Copy and fill in manually:
+
 ```bash
 cp .env.example .env
 # Fill in the values below
@@ -127,6 +136,10 @@ All commands go through the `Makefile`. Prefer `make` targets over raw `yarn`/`n
 | `make db_branch_delete` | Delete current branch's Neon DB branch |
 | `make db_branch_delete_all` | Delete all `local/*` Neon branches |
 | `make db_branch_status` | List all local Neon branches |
+| `make hubspot_setup` | Run HubSpot setup script |
+| `make vercel_link` | Link local project to Vercel (one-time per clone) |
+| `make env_pull` | Pull development env vars from Vercel into `.env.local` |
+| `make env_pull_preview` | Pull preview env vars from Vercel for the current branch |
 | `make release` | Semantic release via `auto shipit` |
 | `make clean` | Remove `.next`, `node_modules`, caches |
 
@@ -184,6 +197,38 @@ When you switch git branches locally, a Neon database branch named `local/{branc
 - `make db_branch_status` — list all local branches
 
 **Opting out**: If `NEON_API_KEY` is not set, the hook silently skips. Developers who don't need isolated databases can continue using their existing connection strings.
+
+### Vercel Environment Management
+
+Vercel is the source of truth for all env vars. Use the Vercel CLI (installed as a devDependency — available via `yarn vercel`) to manage them without touching the dashboard.
+
+**One-time setup per clone:**
+
+```bash
+make vercel_link   # writes .vercel/project.json (gitignored)
+make env_pull      # writes .env.local from the Vercel "development" environment
+```
+
+**Managing secrets:**
+
+```bash
+# Add a secret (prompts for value — no shell history leak)
+yarn vercel env add NAME production --sensitive
+# Repeat for preview and development as needed
+
+yarn vercel env rm NAME production    # remove
+yarn vercel env ls                    # list all
+
+# Per-branch preview override
+yarn vercel env add NAME preview <branch>
+```
+
+Use `--sensitive` for `CRON_SECRET`, `BETTER_AUTH_SECRET`, `HUBSPOT_*`, `ANTHROPIC_API_KEY`, `RESEND_API_KEY` — hides the value in the dashboard after creation.
+
+**Never:**
+- `vercel deploy` from a dev machine — Git integration drives deploys so preview/prod URLs stay traceable to commits.
+- `vercel pull` into `.env` — always target `.env.local` (pull overwrites the file).
+- Commit `.vercel/` — already in `.gitignore`.
 
 ### Deployment Flow
 

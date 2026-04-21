@@ -51,6 +51,15 @@ db_branch_status:
 hubspot_setup:
 	yarn tsx scripts/hubspot/setup.ts
 
+vercel_link:
+	yarn vercel link
+
+env_pull:
+	yarn vercel env pull .env.local
+
+env_pull_preview:
+	yarn vercel pull --environment=preview --git-branch=$$(git rev-parse --abbrev-ref HEAD)
+
 release:
 	yarn release
 

@@ -97,7 +97,7 @@ export async function deleteTestLeads(): Promise<void> {
     WHERE email LIKE 'e2e-%@test.rekurve.dev'
        OR first_name IN (
          'Approve', 'Count', 'Dismiss', 'E2E', 'Edit', 'FHOG',
-         'Nav', 'Order', 'Pipeline', 'QC', 'Quick', 'Snooze'
+         'Nav', 'Nurture', 'Order', 'Pipeline', 'QC', 'Quick', 'Snooze'
        )
   `;
 }

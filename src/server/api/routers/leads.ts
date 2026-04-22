@@ -15,6 +15,7 @@ import {
   PROPERTY_MAP,
   updateContact as updateHubSpotContact,
 } from "~/server/hubspot";
+import { startOrUpdateSequence } from "~/server/nurture/scheduler";
 import type { ScoreMetadata } from "~/server/scoring";
 import { qualifyAndScore } from "~/server/scoring";
 
@@ -135,7 +136,19 @@ export const leadsRouter = createTRPCRouter({
       }
 
       // 4. Score synchronously so the response reflects the final score/stage
-      return await scoreLead(ctx.db, lead, lead.hubspotContactId);
+      const scored = await scoreLead(ctx.db, lead, lead.hubspotContactId);
+
+      // 5. Auto-start nurture sequence (non-blocking — nurture failure must not block lead create)
+      await startOrUpdateSequence(ctx.db, scored.id, scored.leadStage).catch(
+        (err) => {
+          console.error(
+            `[leads.create] nurture sequence start failed for lead ${scored.id}:`,
+            err,
+          );
+        },
+      );
+
+      return scored;
     }),
 
   getById: protectedProcedure
@@ -249,7 +262,20 @@ export const leadsRouter = createTRPCRouter({
         SCORING_FIELDS.has(k),
       );
       if (hasQualificationChange) {
-        return await scoreLead(ctx.db, updated, updated.hubspotContactId);
+        const scored = await scoreLead(
+          ctx.db,
+          updated,
+          updated.hubspotContactId,
+        );
+        await startOrUpdateSequence(ctx.db, scored.id, scored.leadStage).catch(
+          (err) => {
+            console.error(
+              `[leads.update] nurture sequence update failed for lead ${scored.id}:`,
+              err,
+            );
+          },
+        );
+        return scored;
       }
 
       return updated;

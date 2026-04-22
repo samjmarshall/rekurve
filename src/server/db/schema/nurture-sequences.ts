@@ -1,4 +1,11 @@
-import { index, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import {
+  index,
+  pgTable,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 import { sequenceStatusEnum, sequenceTypeEnum } from "./enums";
 import { leads } from "./leads";
@@ -22,5 +29,8 @@ export const nurtureSequences = pgTable(
   },
   (table) => [
     index("nurture_sequences_lead_status_idx").on(table.leadId, table.status),
+    uniqueIndex("nurture_active_one_per_lead_uidx")
+      .on(table.leadId)
+      .where(sql`status = 'active'`),
   ],
 );

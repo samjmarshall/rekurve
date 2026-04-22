@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
+import { makeLead } from "~/server/ai/__tests__/fixtures";
+import type { DraftFn } from "~/server/ai/stub";
 
 const CRON_SECRET = "test-secret-at-least-16-chars";
 
@@ -72,5 +74,33 @@ describe("GET /api/cron/nurture-scheduler", () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as { drafted: number; failed: number };
     expect(body).toEqual({ drafted: 0, failed: 0 });
+  });
+
+  test("passes a draftFn to runSchedulerTick when x-ai-stub: 1 is set", async () => {
+    let capturedDraftFn: DraftFn | undefined;
+    const { runSchedulerTick } = await import("~/server/nurture/scheduler");
+    (runSchedulerTick as ReturnType<typeof rs.fn>).mockImplementation(
+      async (_db: unknown, draftFn: DraftFn | undefined) => {
+        capturedDraftFn = draftFn;
+        return { drafted: 1, failed: 0 };
+      },
+    );
+
+    const GET = await getHandler();
+    const req = new Request("http://localhost/api/cron/nurture-scheduler", {
+      headers: {
+        Authorization: `Bearer ${CRON_SECRET}`,
+        "x-ai-stub": "1",
+      },
+    });
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    expect(capturedDraftFn).toBeDefined();
+
+    const output = await capturedDraftFn!({
+      lead: makeLead({ phone: "0412345678" }),
+    });
+    expect(output.body).toMatch(/^\[ai-stub\]/);
   });
 });

@@ -25,16 +25,20 @@ export async function seedLead(overrides: {
   lastName: string;
   leadScore?: number;
   leadStage?: "unqualified" | "nurture" | "warm" | "hot";
+  phone?: string | null;
+  email?: string | null;
 }): Promise<SeededLead> {
   const id = randomUUID();
   await sql()`
-    INSERT INTO "leads" (id, first_name, last_name, lead_score, lead_stage)
+    INSERT INTO "leads" (id, first_name, last_name, lead_score, lead_stage, phone, email)
     VALUES (
       ${id},
       ${overrides.firstName},
       ${overrides.lastName},
       ${overrides.leadScore ?? 0},
-      ${overrides.leadStage ?? "unqualified"}
+      ${overrides.leadStage ?? "unqualified"},
+      ${overrides.phone ?? null},
+      ${overrides.email ?? null}
     )
   `;
   return { id, firstName: overrides.firstName, lastName: overrides.lastName };

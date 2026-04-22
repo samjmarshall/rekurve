@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { env } from "~/env";
+import { resolveDraftFn } from "~/server/ai/stub";
 import { db } from "~/server/db";
 import { runSchedulerTick } from "~/server/nurture/scheduler";
 
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const result = await runSchedulerTick(db);
+  const draftFn = resolveDraftFn(request);
+  const result = await runSchedulerTick(db, draftFn);
   return NextResponse.json(result);
 }

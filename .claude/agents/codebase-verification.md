@@ -2,7 +2,7 @@
 name: codebase-verification
 description: Use PROACTIVELY after any code changes to run verification via make targets (build, check, test, test_e2e). Delegates verbose build/test output to isolate it from the main context window. Returns a one-line success or a structured failure with the extracted error block. Invoke with a prompt naming the make targets to run, in order.
 tools: Bash
-color: blue
+color: green
 model: haiku
 ---
 

@@ -102,6 +102,10 @@ beforeEach(() => {
     }),
   }));
 
+  rs.doMock("~/server/nurture/scheduler", () => ({
+    startOrUpdateSequence: rs.fn().mockResolvedValue(undefined),
+  }));
+
   rs.doMock("~/server/hubspot", () => ({
     findExistingContact: rs.fn().mockResolvedValue(null),
     createContact: rs.fn().mockResolvedValue({
@@ -894,6 +898,68 @@ describe("leads.getByStage", () => {
 
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.anything() }),
+    );
+  });
+});
+
+// --- leads.create — nurture auto-start ---
+
+describe("leads.create — nurture auto-start", () => {
+  test("calls startOrUpdateSequence with post-scoring stage after create", async () => {
+    const returning = rs.fn().mockResolvedValue([mockLead]);
+    const onConflictDoUpdate = rs.fn().mockReturnValue({ returning });
+    const values = rs.fn().mockReturnValue({ onConflictDoUpdate });
+    (mockDb.insert as ReturnType<typeof rs.fn>).mockReturnValue({ values });
+
+    const { startOrUpdateSequence } = await import(
+      "~/server/nurture/scheduler"
+    );
+
+    const caller = await getCaller();
+    await caller.leads.create({ firstName: "John", lastName: "Smith" });
+
+    expect(startOrUpdateSequence).toHaveBeenCalledWith(
+      expect.anything(),
+      mockLead.id,
+      mockLead.leadStage,
+    );
+  });
+});
+
+// --- leads.update — nurture auto-start ---
+
+describe("leads.update — nurture auto-start", () => {
+  test("calls startOrUpdateSequence when a qualification field changes", async () => {
+    (
+      mockDb.query as { leads: { findFirst: ReturnType<typeof rs.fn> } }
+    ).leads.findFirst.mockResolvedValue({ hubspotContactId: null });
+
+    const updatedLead = {
+      ...mockLead,
+      constructionTimeline: "ready_now" as const,
+    };
+    const returning = rs
+      .fn()
+      .mockResolvedValueOnce([updatedLead])
+      .mockResolvedValueOnce([{ ...updatedLead, leadScore: 20 }]);
+    const where = rs.fn().mockReturnValue({ returning });
+    const set = rs.fn().mockReturnValue({ where });
+    (mockDb.update as ReturnType<typeof rs.fn>).mockReturnValue({ set });
+
+    const { startOrUpdateSequence } = await import(
+      "~/server/nurture/scheduler"
+    );
+
+    const caller = await getCaller();
+    await caller.leads.update({
+      id: mockLead.id,
+      constructionTimeline: "ready_now",
+    });
+
+    expect(startOrUpdateSequence).toHaveBeenCalledWith(
+      expect.anything(),
+      mockLead.id,
+      expect.any(String),
     );
   });
 });

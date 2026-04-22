@@ -38,6 +38,16 @@ Always use this two-step process:
 
 ---
 
+## Vercel CLI
+
+Vercel is the source of truth for env vars — never hand-edit `.env.local`, pull from Vercel instead.
+
+**One-time setup per clone:** `make vercel_link` → `make env_pull`
+
+Use `--sensitive` when adding `CRON_SECRET`, `BETTER_AUTH_SECRET`, `HUBSPOT_*`, `ANTHROPIC_API_KEY`, `RESEND_API_KEY` to Vercel.
+
+---
+
 ## E2E Testing
 
 **_BEFORE marking e2e test changes complete:_** Audit every locator in every method you modified or called. If any uses `getByRole()`, `getByText()`, `getByLabel()`, or CSS selectors instead of `getByTestId()`, check the source component — if it already has a `data-testid`, switch to it; if not, add one to the source, then kill any Next.js server and build and start to verify. This is a **blocking gate** — do not check off e2e test task items until this audit is done.

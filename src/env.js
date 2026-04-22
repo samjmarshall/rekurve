@@ -28,6 +28,7 @@ export const env = createEnv({
     HUBSPOT_ACCESS_TOKEN: z.string().min(1),
     HUBSPOT_CLIENT_SECRET: z.string().min(1),
     ANTHROPIC_API_KEY: z.string().min(1),
+    CRON_SECRET: z.string().min(16),
     ROBOTS_TXT: z.string().default("Disallow"),
   },
 
@@ -59,6 +60,7 @@ export const env = createEnv({
     HUBSPOT_ACCESS_TOKEN: process.env.HUBSPOT_ACCESS_TOKEN,
     HUBSPOT_CLIENT_SECRET: process.env.HUBSPOT_CLIENT_SECRET,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+    CRON_SECRET: process.env.CRON_SECRET,
     ROBOTS_TXT: process.env.ROBOTS_TXT,
   },
   /**

@@ -43,7 +43,7 @@ export default defineConfig({
   webServer: isCI
     ? undefined
     : {
-        command: "rm -rf .next/ && yarn preview",
+        command: "rm -rf .next/ && yarn db:migrate && yarn preview",
         url: baseURL,
         timeout: 120_000,
         reuseExistingServer: true,

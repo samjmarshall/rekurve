@@ -1,6 +1,8 @@
 ---
 description: Interactive design refinement using Socratic method. Use when creating or developing, before writing code or implementation plans - refines rough ideas into fully-formed designs through collaborative questioning, alternative exploration, and incremental validation. Don't use during clear 'mechanical' processes
 skills: writing-clearly-and-concisely
+model: opus
+effort: max
 ---
 # Brainstorming Ideas Into Designs
 
@@ -19,7 +21,7 @@ Start by understanding the current project context, then ask questions one at a 
    - **@agent-codebase-pattern-finder** - To find similar features we can model after
    - **@agent-thoughts-locator** - To find any research, plans, or decisions about this area
    - **@agent-thoughts-analyzer** - To extract key insights from the most relevant documents
-- **ALWAYS use @agent-web-search-researcher** for web research - NEVER call WebSearch or WebFetch directly. The agent handles documentation, articles, blog posts, and any external web content.
+- **ALWAYS use @agent-web-lookup or @agent-web-research** for web research - NEVER call WebSearch or WebFetch directly. Use `web-lookup` for single-fact queries (haiku, fast); use `web-research` for multi-source synthesis or conflict resolution (opus, deep).
 
 **Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs

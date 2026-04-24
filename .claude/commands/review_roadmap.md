@@ -1,5 +1,7 @@
 ---
 description: Review and prioritize GitHub Project issues for PMF alignment
+model: opus
+effort: max
 ---
 
 # Roadmap Review

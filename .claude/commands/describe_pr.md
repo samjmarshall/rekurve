@@ -1,4 +1,5 @@
 ---
+model: sonnet
 skills: writing-clearly-and-concisely
 ---
 # Generate PR Description

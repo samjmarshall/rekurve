@@ -76,6 +76,7 @@ For each phase in the plan:
    - Execute every command listed under the phase's `### Success` → `**Automated**` checklist
    - Document pass/fail status per command
    - If failures, investigate root cause
+   - If an E2E spec fails, re-run just that spec once via `@agent-codebase-verification` before starting root-cause analysis. Only treat the failure as a real regression if it fails twice in a row. First-run flakes on parallel specs are a recurring pattern.
 
 3. **Assess manual criteria**:
    - Walk every item under the phase's `### Success` → `**Manual**` checklist

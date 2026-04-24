@@ -2,8 +2,8 @@
 
 Mock at **system boundaries** only:
 
-- External APIs (payment, email, HubSpot, Claude API, etc.)
-- Databases (sometimes — prefer test DB / Neon branch)
+- External APIs (payment providers, email providers, LLM APIs, third-party CRMs, etc.)
+- Databases (sometimes — prefer a real test database or ephemeral branch)
 - Time/randomness
 - File system (sometimes)
 

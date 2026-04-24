@@ -1,5 +1,7 @@
 ---
 skills: writing-clearly-and-concisely, tdd
+model: opus
+effort: max
 ---
 # Implementation Plan
 

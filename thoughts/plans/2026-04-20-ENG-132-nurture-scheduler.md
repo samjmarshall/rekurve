@@ -101,13 +101,13 @@ Two vertical slices. **Slice 1** builds the cadence logic, state transitions, an
 - [x] `make build` passes
 
 **Manual**
-- [ ] Create a new lead via the UI with qualification data that lands in the `nurture` stage. In the DB, confirm exactly one `nurture_sequences` row exists for that lead with `sequenceType='nurture'`, `status='active'`, `nextStepAt` ≈ now + 14 days.
+- [x] Create a new lead via the UI with qualification data that lands in the `nurture` stage. In the DB, confirm exactly one `nurture_sequences` row exists for that lead with `sequenceType='nurture'`, `status='active'`, `nextStepAt` ≈ now + 14 days. _(covered by `e2e/features/nurture-scheduler.spec.ts` Test 1)_
 - [ ] Update the same lead's qualification to land in `warm`. Confirm the existing row's `sequenceType` becomes `warm_progression` and `nextStepAt` becomes ≈ now + 7 days (no new row).
 - [ ] Update the lead again to land in `hot`. Confirm the row's `status` becomes `completed` and `nextStepAt` is null/ignored.
-- [ ] Start a fresh `nurture`-stage lead, `POST /api/dev/nurture/advance` with that sequence id, then `GET /api/cron/nurture-scheduler` with the `Authorization: Bearer ${CRON_SECRET}` header. Confirm: (a) a new `message_queue` row with `status='pending'` for that lead, (b) sequence's `nextStepAt` advanced by 14 days, (c) row visible in the action queue view at `/dashboard`.
+- [x] Start a fresh `nurture`-stage lead, `POST /api/dev/nurture/advance` with that sequence id, then `GET /api/cron/nurture-scheduler` with the `Authorization: Bearer ${CRON_SECRET}` header. Confirm: (a) a new `message_queue` row with `status='pending'` for that lead, (b) sequence's `nextStepAt` advanced by 14 days, (c) row visible in the action queue view at `/dashboard`. _(covered by `nurture-scheduler.spec.ts` Tests 2–3; uses direct DB seed with past `nextStepAt` instead of the production-gated advance route)_
 - [ ] Pause the sequence via `nurture.pauseSequence`; re-run `/api/cron/nurture-scheduler`; confirm no new draft inserted.
 - [ ] Resume; confirm `nextStepAt` is set to ≈ now + 14 days; re-run cron; confirm new draft.
-- [ ] Hit `/api/cron/nurture-scheduler` with no Authorization header → 401. With wrong bearer → 401. With correct bearer but no due sequences → 200 with `{ drafted: 0, failed: 0 }`.
+- [x] Hit `/api/cron/nurture-scheduler` with no Authorization header → 401. With wrong bearer → 401. With correct bearer but no due sequences → 200 with `{ drafted: 0, failed: 0 }`. _(covered by `route.test.ts` unit tests)_
 
 ## References
 - Ticket: https://github.com/samjmarshall/rekurve/issues/132

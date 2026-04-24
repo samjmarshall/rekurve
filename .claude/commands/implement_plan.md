@@ -1,3 +1,7 @@
+---
+skills: tdd
+model: sonnet
+---
 # Implement Plan
 
 You are tasked with implementing an approved technical plan from `thoughts/plans/`. These plans contain phases with specific changes and success criteria.
@@ -10,9 +14,20 @@ When given a plan path:
 - **Read files fully** - never use limit/offset parameters, you need complete context
 - Think deeply about how the pieces fit together
 - Create a todo list mirroring the plan's phases and per-phase `### Changes` entries
-- Start implementing if you understand what needs to be done
+- Run the Pre-flight risk scan (next section) before writing code.
 
 If no plan path provided, ask for one.
+
+## Pre-flight: Risks & Gotchas
+
+Before writing code, scan the plan for these risks and state findings in a short block:
+
+1. **Schema changes** — name each migration step. Never use schema-push shortcuts that bypass the migrations log.
+2. **CI trigger scope** — for any workflow change, state the trigger. `repository_dispatch`, `schedule`, and `workflow_dispatch` run from the default branch; changes on a feature branch take no effect until merged.
+3. **Env vars** — list new variables and where to set them (local + deployment).
+4. **Test data** — identify external records the plan creates and confirm each spec cleans them up in `afterAll`.
+
+Wait for approval before editing files. If the plan has zero risks, say so and proceed.
 
 ## Implementation Philosophy
 

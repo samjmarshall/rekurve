@@ -106,9 +106,6 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 [ ] No speculative features added
 ```
 
-## Rekurve-specific notes
+## Project conventions
 
-- Unit tests use **Rstest** (`make test`). See `rstest-best-practices` skill for config.
-- Integration tests hit real Neon branches; never mock the database (per `feedback_hubspot_source_of_truth` memory — we got burned by mock/prod divergence).
-- E2E tests use **Playwright** (`make test_e2e`). Don't TDD E2E — they're too slow for the tracer-bullet loop.
-- Use `make test` (not `yarn test`) per project convention.
+Check this project's `CLAUDE.md` for the test-runner commands, DB-mocking policy, and E2E conventions before starting a cycle. See [e2e-cleanup.md](e2e-cleanup.md) for per-spec cleanup patterns when specs create external records.

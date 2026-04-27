@@ -603,16 +603,10 @@ describe("messages.approve — email channel", () => {
     }
   });
 
-  test("re-throws dispatch error; status update was already written before dispatch", async () => {
+  test("dispatch fails → status update is never called", async () => {
     (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
       emailMessage,
     );
-    const approved = {
-      ...emailMessage,
-      status: "approved" as const,
-      approvedAt: new Date(),
-    };
-    mockUpdateReturning(approved);
     mockDispatchEmail.mockRejectedValue(
       new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Graph 503" }),
     );
@@ -623,8 +617,28 @@ describe("messages.approve — email channel", () => {
       expect.unreachable("Should have thrown");
     } catch (e) {
       expect((e as TRPCError).code).toBe("INTERNAL_SERVER_ERROR");
-      expect(mockDb.update).toHaveBeenCalled();
+      expect(mockDb.update).not.toHaveBeenCalled();
     }
+  });
+
+  test("dispatch succeeds → status update runs after dispatch", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    const approved = {
+      ...emailMessage,
+      status: "approved" as const,
+      approvedAt: new Date(),
+    };
+    mockUpdateReturning(approved);
+
+    const caller = await getCaller();
+    await caller.messages.approve({ id: MSG_ID });
+
+    const dispatchOrder = mockDispatchEmail.mock.invocationCallOrder[0]!;
+    const updateOrder = (mockDb.update as ReturnType<typeof rs.fn>).mock
+      .invocationCallOrder[0]!;
+    expect(dispatchOrder).toBeLessThan(updateOrder);
   });
 
   test("sms channel: status flips, dispatch is not called", async () => {
@@ -689,5 +703,46 @@ describe("messages.editAndApprove — email channel", () => {
       expect((e as TRPCError).code).toBe("PRECONDITION_FAILED");
       expect(mockDispatchEmail).not.toHaveBeenCalled();
     }
+  });
+
+  test("dispatch failure → body and originalBody are not written", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    mockDispatchEmail.mockRejectedValue(
+      new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Graph 503" }),
+    );
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.editAndApprove({ id: MSG_ID, body: "Rewritten" });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect((e as TRPCError).code).toBe("INTERNAL_SERVER_ERROR");
+      expect(mockDb.update).not.toHaveBeenCalled();
+    }
+  });
+
+  test("dispatches with input.body, not the existing row body", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    const edited = {
+      ...emailMessage,
+      status: "edited_and_approved" as const,
+      body: "Rewritten",
+      originalBody: emailMessage.body,
+      approvedAt: new Date(),
+    };
+    mockUpdateReturning(edited);
+
+    const caller = await getCaller();
+    await caller.messages.editAndApprove({ id: MSG_ID, body: "Rewritten" });
+
+    expect(mockDispatchEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.objectContaining({ body: "Rewritten" }),
+      }),
+    );
   });
 });

@@ -85,9 +85,10 @@ export async function getMessageStatus(id: string): Promise<{
   body: string;
   original_body: string | null;
   snoozed_until: string | null;
+  approved_at: string | null;
 } | null> {
   const rows = await sql()`
-    SELECT status, body, original_body, snoozed_until
+    SELECT status, body, original_body, snoozed_until, approved_at
     FROM "message_queue"
     WHERE id = ${id}
     LIMIT 1

@@ -10,6 +10,7 @@ import {
   cleanupLeads,
   cleanupMessages,
   getConversationsForLead,
+  getMessageStatus,
   seedEmailQueueItem,
   seedMsGraphTokens,
 } from "../utils/messages-helper";
@@ -130,5 +131,68 @@ test.describe("Email Dispatch — E2E", () => {
     expect(convs.length).toBeGreaterThan(0);
     expect(convs[0]!.direction).toBe("outbound");
     expect(convs[0]!.delivery_method).toBe("email");
+  });
+
+  test("approve fails when MS Graph token is invalid; row stays pending and is retryable", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const item = await seedEmailQueueItem({
+      firstName: "FailPath",
+      lastName: `E2E-${uniqueSuffix}`,
+      email: `e2e-fail-${uniqueSuffix}@test.rekurve.dev`,
+      hubspotContactId: `hs-fail-${uniqueSuffix}`,
+      subject: `E2E Fail Test ${uniqueSuffix}`,
+      body: `Hello from E2E fail test ${uniqueSuffix}`,
+    });
+    leadIds.push(item.leadId);
+    messageIds.push(item.messageId);
+
+    // Seed an invalid token — token row exists so checkEmailPreconditions passes,
+    // but the Graph call itself will fail with a 401.
+    await seedMsGraphTokens(session.userId, {
+      accessToken: "invalid-token-for-failure-path",
+    });
+
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+    await page.goto("/dashboard");
+    const queue = new ActionQueueSection(page);
+
+    await expect(queue.row(item.messageId)).toBeVisible();
+    await queue.approveButton(item.messageId).click();
+
+    // Error toast should surface
+    await expect(
+      page
+        .getByTestId("app-toast")
+        .filter({ hasText: /Failed to send email/i }),
+    ).toBeVisible();
+
+    // Row must remain visible — dispatch failure left it pending
+    await expect(queue.row(item.messageId)).toBeVisible();
+
+    // DB state: status still pending, approvedAt null
+    const dbState = await getMessageStatus(item.messageId);
+    expect(dbState?.status).toBe("pending");
+    expect(dbState?.approved_at).toBeNull();
+
+    // Recovery path: overwrite with a real token and re-approve
+    test.skip(
+      !process.env.MS_GRAPH_TEST_ACCESS_TOKEN,
+      "Recovery path requires MS_GRAPH_TEST_ACCESS_TOKEN",
+    );
+
+    await seedMsGraphTokens(session.userId, {
+      accessToken: process.env.MS_GRAPH_TEST_ACCESS_TOKEN!,
+    });
+
+    await queue.approveButton(item.messageId).click();
+
+    await expect(queue.row(item.messageId)).toBeHidden();
+    await expect(
+      page.getByTestId("app-toast").filter({ hasText: /Sent via email/i }),
+    ).toBeVisible();
   });
 });

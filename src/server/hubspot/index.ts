@@ -9,6 +9,11 @@ export {
   updateContact,
 } from "./contacts";
 export {
+  type EmailEngagement,
+  findContactIdForEmail,
+  getEmailEngagement,
+} from "./emails";
+export {
   ALL_PROPERTIES,
   coerceFromHubSpot,
   fromHubSpotProperties,

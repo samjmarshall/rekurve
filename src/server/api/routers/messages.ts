@@ -145,6 +145,7 @@ export const messagesRouter = createTRPCRouter({
 
       if (message.channel === "email") {
         await checkEmailPreconditions(ctx.db, ctx.session.user.id, lead);
+        await dispatchEmail({ db: ctx.db, ctx, message, lead });
       }
 
       const [updated] = await ctx.db
@@ -152,10 +153,6 @@ export const messagesRouter = createTRPCRouter({
         .set({ status: "approved", approvedAt: new Date() })
         .where(eq(messageQueue.id, input.id))
         .returning();
-
-      if (updated!.channel === "email") {
-        await dispatchEmail({ db: ctx.db, ctx, message: updated!, lead });
-      }
 
       return updated!;
     }),
@@ -171,6 +168,12 @@ export const messagesRouter = createTRPCRouter({
 
       if (existing.channel === "email") {
         await checkEmailPreconditions(ctx.db, ctx.session.user.id, lead);
+        await dispatchEmail({
+          db: ctx.db,
+          ctx,
+          message: { ...existing, body: input.body },
+          lead,
+        });
       }
 
       const [updated] = await ctx.db
@@ -183,10 +186,6 @@ export const messagesRouter = createTRPCRouter({
         })
         .where(eq(messageQueue.id, input.id))
         .returning();
-
-      if (updated!.channel === "email") {
-        await dispatchEmail({ db: ctx.db, ctx, message: updated!, lead });
-      }
 
       return updated!;
     }),

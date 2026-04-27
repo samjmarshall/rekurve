@@ -27,10 +27,11 @@ export async function seedLead(overrides: {
   leadStage?: "unqualified" | "nurture" | "warm" | "hot";
   phone?: string | null;
   email?: string | null;
+  hubspotContactId?: string | null;
 }): Promise<SeededLead> {
   const id = randomUUID();
   await sql()`
-    INSERT INTO "leads" (id, first_name, last_name, lead_score, lead_stage, phone, email)
+    INSERT INTO "leads" (id, first_name, last_name, lead_score, lead_stage, phone, email, hubspot_contact_id)
     VALUES (
       ${id},
       ${overrides.firstName},
@@ -38,7 +39,8 @@ export async function seedLead(overrides: {
       ${overrides.leadScore ?? 0},
       ${overrides.leadStage ?? "unqualified"},
       ${overrides.phone ?? null},
-      ${overrides.email ?? null}
+      ${overrides.email ?? null},
+      ${overrides.hubspotContactId ?? null}
     )
   `;
   return { id, firstName: overrides.firstName, lastName: overrides.lastName };
@@ -101,4 +103,138 @@ export async function cleanupMessages(ids: string[]): Promise<void> {
 export async function cleanupLeads(ids: string[]): Promise<void> {
   if (ids.length === 0) return;
   await sql()`DELETE FROM "leads" WHERE id = ANY(${ids}::uuid[])`;
+}
+
+export interface SeededConversation {
+  id: string;
+  leadId: string;
+}
+
+export async function seedConversation(args: {
+  leadId: string;
+  messageQueueId?: string | null;
+  channel?: "sms" | "email";
+  direction?: "inbound" | "outbound";
+  deliveryMethod?: "sms" | "email" | null;
+  subject?: string | null;
+  body: string;
+  hubspotActivityId?: string | null;
+}): Promise<SeededConversation> {
+  const id = randomUUID();
+  await sql()`
+    INSERT INTO "conversations"
+      (id, lead_id, message_queue_id, channel, direction, delivery_method, subject, body, hubspot_activity_id)
+    VALUES (
+      ${id},
+      ${args.leadId},
+      ${args.messageQueueId ?? null},
+      ${args.channel ?? "email"},
+      ${args.direction ?? "outbound"},
+      ${args.deliveryMethod ?? "email"},
+      ${args.subject ?? null},
+      ${args.body},
+      ${args.hubspotActivityId ?? null}
+    )
+  `;
+  return { id, leadId: args.leadId };
+}
+
+export async function getConversation(id: string): Promise<{
+  id: string;
+  direction: string;
+  delivery_method: string | null;
+  hubspot_activity_id: string | null;
+  subject: string | null;
+} | null> {
+  const rows = await sql()`
+    SELECT id, direction, delivery_method, hubspot_activity_id, subject
+    FROM "conversations"
+    WHERE id = ${id}
+    LIMIT 1
+  `;
+  return rows.length > 0 ? (rows[0] as never) : null;
+}
+
+export async function getConversationsForLead(leadId: string): Promise<
+  Array<{
+    id: string;
+    direction: string;
+    delivery_method: string | null;
+    hubspot_activity_id: string | null;
+    subject: string | null;
+    created_at: string;
+  }>
+> {
+  const rows = await sql()`
+    SELECT id, direction, delivery_method, hubspot_activity_id, subject, created_at
+    FROM "conversations"
+    WHERE lead_id = ${leadId}
+    ORDER BY created_at DESC
+  `;
+  return rows as never;
+}
+
+export async function cleanupConversationsForLead(
+  leadId: string,
+): Promise<void> {
+  await sql()`DELETE FROM "conversations" WHERE lead_id = ${leadId}`;
+}
+
+export async function seedMsGraphTokens(
+  userId: string,
+  opts: {
+    accessToken: string;
+    refreshToken?: string;
+    microsoftUserId?: string;
+    email?: string;
+  },
+): Promise<void> {
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+  await sql()`
+    INSERT INTO "ms_graph_tokens"
+      (user_id, access_token, refresh_token, expires_at, microsoft_user_id, email)
+    VALUES (
+      ${userId},
+      ${opts.accessToken},
+      ${opts.refreshToken ?? "e2e-refresh-placeholder"},
+      ${expiresAt},
+      ${opts.microsoftUserId ?? "e2e-ms-user-id"},
+      ${opts.email ?? "e2e@placeholder.local"}
+    )
+    ON CONFLICT (user_id) DO UPDATE
+      SET access_token = EXCLUDED.access_token,
+          refresh_token = EXCLUDED.refresh_token,
+          expires_at = EXCLUDED.expires_at,
+          updated_at = NOW()
+  `;
+}
+
+export interface SeededEmailItem {
+  leadId: string;
+  messageId: string;
+}
+
+export async function seedEmailQueueItem(args: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  hubspotContactId: string;
+  subject: string;
+  body: string;
+  priority?: number;
+}): Promise<SeededEmailItem> {
+  const lead = await seedLead({
+    firstName: args.firstName,
+    lastName: args.lastName,
+    email: args.email,
+    hubspotContactId: args.hubspotContactId,
+  });
+  const msg = await seedPendingMessage({
+    leadId: lead.id,
+    channel: "email",
+    subject: args.subject,
+    body: args.body,
+    priority: args.priority ?? 80,
+  });
+  return { leadId: lead.id, messageId: msg.id };
 }

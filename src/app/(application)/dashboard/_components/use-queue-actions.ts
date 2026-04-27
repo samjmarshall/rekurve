@@ -58,6 +58,34 @@ function errorMessage(err: unknown): string {
   return "Something went wrong. Please try again.";
 }
 
+// Sentinel that matches the server-side PRECONDITION_FAILED message for a
+// disconnected Microsoft account. Used to show an actionable "Connect" toast.
+const MS_NOT_CONNECTED_MSG = "Connect your Microsoft account to send emails.";
+
+type ToastAdd = ReturnType<typeof useToastManager>["add"];
+type ToastOptions = Parameters<ToastAdd>[0];
+
+function buildErrorToast(err: unknown, defaultTitle: string): ToastOptions {
+  const msg = errorMessage(err);
+  const isNotConnected = msg === MS_NOT_CONNECTED_MSG;
+  return {
+    type: "error",
+    title: isNotConnected ? "Microsoft account not connected" : defaultTitle,
+    description: isNotConnected
+      ? "Connect your account to send emails from Outlook."
+      : msg,
+    timeout: 20_000,
+    ...(isNotConnected && {
+      actionProps: {
+        children: "Connect",
+        onClick() {
+          window.location.href = "/api/auth/ms-graph/start";
+        },
+      },
+    }),
+  };
+}
+
 export function useApproveAction() {
   const trpc = useTRPC();
   const toast = useToastManager();
@@ -66,17 +94,17 @@ export function useApproveAction() {
   return useMutation(
     trpc.messages.approve.mutationOptions({
       onMutate: ({ id }) => optimistic.snapshot(id),
-      onSuccess: () => {
-        // Revert to "Sent via …" when dispatch lands (#129/#130)
-        toast.add({ title: "Approved — will send shortly" });
+      onSuccess: (data) => {
+        if (data.channel === "email") {
+          toast.add({ title: "Sent via email" });
+        } else {
+          // SMS dispatch lands in #129
+          toast.add({ title: "Approved" });
+        }
       },
       onError: (err, _vars, context) => {
         optimistic.restore(context as OptimisticContext | undefined);
-        toast.add({
-          type: "error",
-          title: "Approve failed",
-          description: errorMessage(err),
-        });
+        toast.add(buildErrorToast(err, "Approve failed"));
       },
       onSettled: () => {
         void optimistic.invalidate();
@@ -102,6 +130,7 @@ export function useDismissAction() {
           type: "error",
           title: "Dismiss failed",
           description: errorMessage(err),
+          timeout: 20_000,
         });
       },
       onSettled: () => {
@@ -119,20 +148,23 @@ export function useEditAndApproveAction() {
   return useMutation(
     trpc.messages.editAndApprove.mutationOptions({
       onMutate: ({ id }) => optimistic.snapshot(id),
-      onSuccess: () => {
-        // Revert to "Sent via …" when dispatch lands (#129/#130)
-        toast.add({
-          title: "Approved — will send shortly",
-          description: "Your edits were saved.",
-        });
+      onSuccess: (data) => {
+        if (data.channel === "email") {
+          toast.add({
+            title: "Sent via email",
+            description: "Your edits were saved.",
+          });
+        } else {
+          // SMS dispatch lands in #129
+          toast.add({
+            title: "Approved",
+            description: "Your edits were saved.",
+          });
+        }
       },
       onError: (err, _vars, context) => {
         optimistic.restore(context as OptimisticContext | undefined);
-        toast.add({
-          type: "error",
-          title: "Edit failed",
-          description: errorMessage(err),
-        });
+        toast.add(buildErrorToast(err, "Edit failed"));
       },
       onSettled: () => {
         void optimistic.invalidate();
@@ -161,6 +193,7 @@ export function useSnoozeAction() {
           type: "error",
           title: "Snooze failed",
           description: errorMessage(err),
+          timeout: 20_000,
         });
       },
       onSettled: () => {

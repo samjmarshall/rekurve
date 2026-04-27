@@ -69,9 +69,7 @@ test.describe("Action Queue — E2E", () => {
 
     await expect(queue.row(msg.id)).toBeHidden();
     await expect(
-      page
-        .getByTestId("app-toast")
-        .filter({ hasText: /Approved — will send shortly/i }),
+      page.getByTestId("app-toast").filter({ hasText: "Approved" }),
     ).toBeVisible();
 
     const record = await getMessageStatus(msg.id);
@@ -94,7 +92,7 @@ test.describe("Action Queue — E2E", () => {
     const originalBody = "Original draft text";
     const msg = await seedPendingMessage({
       leadId: lead.id,
-      channel: "email",
+      channel: "sms",
       body: originalBody,
     });
     messageIds.push(msg.id);

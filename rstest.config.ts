@@ -1,8 +1,10 @@
+import { pluginReact } from "@rsbuild/plugin-react";
 import { defineConfig } from "@rstest/core";
 
 export default defineConfig({
-  include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
+  include: ["src/**/*.test.ts", "src/**/*.test.tsx", "scripts/**/*.test.ts"],
   testEnvironment: "node",
+  plugins: [pluginReact()],
   restoreMocks: true,
   coverage: {
     enabled: false,

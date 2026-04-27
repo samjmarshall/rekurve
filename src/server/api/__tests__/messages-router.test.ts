@@ -23,16 +23,34 @@ const baseMessage = {
   createdAt: new Date("2026-04-10T00:00:00Z"),
 };
 
+const baseLead = {
+  id: LEAD_ID,
+  hubspotContactId: "hs-123",
+  firstName: "Jane",
+  lastName: "Doe",
+  email: "jane@example.com",
+  phone: "0400000000",
+  leadScore: 50,
+  leadStage: "warm" as const,
+};
+
 let mockDb: Record<string, unknown>;
+let mockDispatchEmail: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
+
+  mockDispatchEmail = rs.fn().mockResolvedValue({ conversationId: "conv-123" });
 
   rs.doMock("~/env", () => ({
     env: {
       DATABASE_URL: "postgres://mock",
       HUBSPOT_ACCESS_TOKEN: "mock",
       HUBSPOT_CLIENT_SECRET: "mock",
+      HUBSPOT_BCC_ADDRESS: "bcc@bcc.hubspot.com",
+      MS_GRAPH_CLIENT_ID: "test-id",
+      MS_GRAPH_CLIENT_SECRET: "test-secret",
+      MS_GRAPH_REDIRECT_URI: "https://www.localhost/api/auth/ms-graph/callback",
     },
   }));
 
@@ -43,12 +61,18 @@ beforeEach(() => {
     }),
   }));
 
+  rs.doMock("~/server/dispatch/email-dispatch", () => ({
+    dispatchEmail: mockDispatchEmail,
+  }));
+
   mockDb = {
     update: rs.fn(),
     select: rs.fn(),
     query: {
-      messageQueue: {
-        findFirst: rs.fn(),
+      messageQueue: { findFirst: rs.fn() },
+      leads: { findFirst: rs.fn().mockResolvedValue(baseLead) },
+      msGraphTokens: {
+        findFirst: rs.fn().mockResolvedValue({ userId: "test-user-id" }),
       },
     },
   };
@@ -481,5 +505,244 @@ describe("messages.dismiss", () => {
     } catch (e) {
       expect((e as TRPCError).code).toBe("BAD_REQUEST");
     }
+  });
+});
+
+// --- email channel dispatch ---
+
+type MockQuery = {
+  messageQueue: { findFirst: ReturnType<typeof rs.fn> };
+  leads: { findFirst: ReturnType<typeof rs.fn> };
+  msGraphTokens: { findFirst: ReturnType<typeof rs.fn> };
+};
+
+const emailMessage = {
+  ...baseMessage,
+  channel: "email" as const,
+  subject: "Hello",
+};
+
+describe("messages.approve — email channel", () => {
+  test("happy path: dispatches and returns approved row", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    const approved = {
+      ...emailMessage,
+      status: "approved" as const,
+      approvedAt: new Date(),
+    };
+    mockUpdateReturning(approved);
+
+    const caller = await getCaller();
+    const result = await caller.messages.approve({ id: MSG_ID });
+
+    expect(result.status).toBe("approved");
+    expect(mockDispatchEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ lead: baseLead }),
+    );
+  });
+
+  test("throws PRECONDITION_FAILED and skips dispatch when lead has no hubspotContactId", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    (mockDb.query as MockQuery).leads.findFirst.mockResolvedValue({
+      ...baseLead,
+      hubspotContactId: null,
+    });
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.approve({ id: MSG_ID });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect(e).toBeInstanceOf(TRPCError);
+      expect((e as TRPCError).code).toBe("PRECONDITION_FAILED");
+      expect(mockDispatchEmail).not.toHaveBeenCalled();
+    }
+  });
+
+  test("throws PRECONDITION_FAILED and skips dispatch when lead has no email", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    (mockDb.query as MockQuery).leads.findFirst.mockResolvedValue({
+      ...baseLead,
+      email: null,
+    });
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.approve({ id: MSG_ID });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect((e as TRPCError).code).toBe("PRECONDITION_FAILED");
+      expect(mockDispatchEmail).not.toHaveBeenCalled();
+    }
+  });
+
+  test("throws PRECONDITION_FAILED with connect message when Microsoft account not connected", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    (mockDb.query as MockQuery).msGraphTokens.findFirst.mockResolvedValue(
+      undefined,
+    );
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.approve({ id: MSG_ID });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect((e as TRPCError).code).toBe("PRECONDITION_FAILED");
+      expect((e as TRPCError).message).toBe(
+        "Connect your Microsoft account to send emails.",
+      );
+      expect(mockDispatchEmail).not.toHaveBeenCalled();
+    }
+  });
+
+  test("dispatch fails → status update is never called", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    mockDispatchEmail.mockRejectedValue(
+      new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Graph 503" }),
+    );
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.approve({ id: MSG_ID });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect((e as TRPCError).code).toBe("INTERNAL_SERVER_ERROR");
+      expect(mockDb.update).not.toHaveBeenCalled();
+    }
+  });
+
+  test("dispatch succeeds → status update runs after dispatch", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    const approved = {
+      ...emailMessage,
+      status: "approved" as const,
+      approvedAt: new Date(),
+    };
+    mockUpdateReturning(approved);
+
+    const caller = await getCaller();
+    await caller.messages.approve({ id: MSG_ID });
+
+    const dispatchOrder = mockDispatchEmail.mock.invocationCallOrder[0]!;
+    const updateOrder = (mockDb.update as ReturnType<typeof rs.fn>).mock
+      .invocationCallOrder[0]!;
+    expect(dispatchOrder).toBeLessThan(updateOrder);
+  });
+
+  test("sms channel: status flips, dispatch is not called", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      baseMessage,
+    );
+    const approved = {
+      ...baseMessage,
+      status: "approved" as const,
+      approvedAt: new Date(),
+    };
+    mockUpdateReturning(approved);
+
+    const caller = await getCaller();
+    const result = await caller.messages.approve({ id: MSG_ID });
+
+    expect(result.status).toBe("approved");
+    expect(mockDispatchEmail).not.toHaveBeenCalled();
+  });
+});
+
+describe("messages.editAndApprove — email channel", () => {
+  test("happy path: dispatches and returns edited_and_approved row", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    const edited = {
+      ...emailMessage,
+      status: "edited_and_approved" as const,
+      body: "Rewritten",
+      originalBody: emailMessage.body,
+      approvedAt: new Date(),
+    };
+    mockUpdateReturning(edited);
+
+    const caller = await getCaller();
+    const result = await caller.messages.editAndApprove({
+      id: MSG_ID,
+      body: "Rewritten",
+    });
+
+    expect(result.status).toBe("edited_and_approved");
+    expect(mockDispatchEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ lead: baseLead }),
+    );
+  });
+
+  test("throws PRECONDITION_FAILED when lead has no email", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    (mockDb.query as MockQuery).leads.findFirst.mockResolvedValue({
+      ...baseLead,
+      email: null,
+    });
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.editAndApprove({ id: MSG_ID, body: "Rewritten" });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect((e as TRPCError).code).toBe("PRECONDITION_FAILED");
+      expect(mockDispatchEmail).not.toHaveBeenCalled();
+    }
+  });
+
+  test("dispatch failure → body and originalBody are not written", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    mockDispatchEmail.mockRejectedValue(
+      new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Graph 503" }),
+    );
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.editAndApprove({ id: MSG_ID, body: "Rewritten" });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect((e as TRPCError).code).toBe("INTERNAL_SERVER_ERROR");
+      expect(mockDb.update).not.toHaveBeenCalled();
+    }
+  });
+
+  test("dispatches with input.body, not the existing row body", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      emailMessage,
+    );
+    const edited = {
+      ...emailMessage,
+      status: "edited_and_approved" as const,
+      body: "Rewritten",
+      originalBody: emailMessage.body,
+      approvedAt: new Date(),
+    };
+    mockUpdateReturning(edited);
+
+    const caller = await getCaller();
+    await caller.messages.editAndApprove({ id: MSG_ID, body: "Rewritten" });
+
+    expect(mockDispatchEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.objectContaining({ body: "Rewritten" }),
+      }),
+    );
   });
 });

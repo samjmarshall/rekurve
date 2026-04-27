@@ -2,14 +2,22 @@ import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 
 let mockIsValid: ReturnType<typeof rs.fn>;
 let mockGetContact: ReturnType<typeof rs.fn>;
+let mockGetEmailEngagement: ReturnType<typeof rs.fn>;
+let mockFindContactIdForEmail: ReturnType<typeof rs.fn>;
 let mockInsert: ReturnType<typeof rs.fn>;
 let mockUpdate: ReturnType<typeof rs.fn>;
 let mockDbDelete: ReturnType<typeof rs.fn>;
+let mockLeadsFindFirst: ReturnType<typeof rs.fn>;
+let mockConversationsFindFirst: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
 
   mockIsValid = rs.fn();
+  mockGetEmailEngagement = rs.fn();
+  mockFindContactIdForEmail = rs.fn();
+  mockLeadsFindFirst = rs.fn();
+  mockConversationsFindFirst = rs.fn();
 
   rs.doMock("~/env", () => ({
     env: {
@@ -24,6 +32,8 @@ beforeEach(() => {
   mockGetContact = rs.fn();
   rs.doMock("~/server/hubspot", () => ({
     getContact: mockGetContact,
+    getEmailEngagement: mockGetEmailEngagement,
+    findContactIdForEmail: mockFindContactIdForEmail,
     toAppField: rs.fn((prop: string) => {
       const map: Record<string, string> = {
         firstname: "firstName",
@@ -57,11 +67,23 @@ beforeEach(() => {
       insert: mockInsert,
       update: mockUpdate,
       delete: mockDbDelete,
+      query: {
+        leads: { findFirst: mockLeadsFindFirst },
+        conversations: { findFirst: mockConversationsFindFirst },
+      },
     },
   }));
 
   rs.doMock("~/server/db/schema", () => ({
     leads: { hubspotContactId: "hubspot_contact_id" },
+    conversations: {
+      leadId: "lead_id",
+      deliveryMethod: "delivery_method",
+      direction: "direction",
+      hubspotActivityId: "hubspot_activity_id",
+      createdAt: "created_at",
+      subject: "subject",
+    },
   }));
 });
 
@@ -270,5 +292,133 @@ describe("Webhook event processing", () => {
     // Should return 200 even though first event failed
     expect(response.status).toBe(200);
     expect(mockGetContact).toHaveBeenCalledTimes(2);
+  });
+});
+
+const EMAIL_CREATION_EVENT = {
+  subscriptionType: "object.creation",
+  objectTypeId: "0-49",
+  objectId: 999,
+  eventId: 10,
+  occurredAt: Date.now(),
+  attemptNumber: 0,
+};
+
+const OUTBOUND_ENGAGEMENT = {
+  id: "999",
+  subject: "Following up",
+  direction: "EMAIL",
+  timestamp: new Date("2026-04-25T10:00:00Z"),
+  toEmail: "lead@example.com",
+};
+
+describe("object.creation (EMAIL) webhook events", () => {
+  test("outbound email with matching conversation → sets hubspotActivityId", async () => {
+    mockIsValid.mockReturnValue(true);
+    mockGetEmailEngagement.mockResolvedValue(OUTBOUND_ENGAGEMENT);
+    mockFindContactIdForEmail.mockResolvedValue("hs-contact-123");
+    mockLeadsFindFirst.mockResolvedValue({
+      id: "lead-uuid-1",
+      hubspotContactId: "hs-contact-123",
+    });
+    mockConversationsFindFirst.mockResolvedValue({
+      id: "conv-uuid-1",
+      hubspotActivityId: null,
+    });
+
+    const { POST } = await import("../route");
+    const response = await POST(
+      makeRequest({
+        body: JSON.stringify([EMAIL_CREATION_EVENT]),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockGetEmailEngagement).toHaveBeenCalledWith("999");
+    expect(mockFindContactIdForEmail).toHaveBeenCalledWith("999");
+    expect(mockLeadsFindFirst).toHaveBeenCalled();
+    expect(mockConversationsFindFirst).toHaveBeenCalled();
+    expect(mockUpdate).toHaveBeenCalled();
+  });
+
+  test("inbound email (INCOMING_EMAIL direction) → no DB writes", async () => {
+    mockIsValid.mockReturnValue(true);
+    mockGetEmailEngagement.mockResolvedValue({
+      ...OUTBOUND_ENGAGEMENT,
+      direction: "INCOMING_EMAIL",
+    });
+
+    const { POST } = await import("../route");
+    const response = await POST(
+      makeRequest({
+        body: JSON.stringify([EMAIL_CREATION_EVENT]),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockLeadsFindFirst).not.toHaveBeenCalled();
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  test("unknown hubspotContactId (no lead row) → no DB writes", async () => {
+    mockIsValid.mockReturnValue(true);
+    mockGetEmailEngagement.mockResolvedValue(OUTBOUND_ENGAGEMENT);
+    mockFindContactIdForEmail.mockResolvedValue("hs-contact-unknown");
+    mockLeadsFindFirst.mockResolvedValue(null);
+
+    const { POST } = await import("../route");
+    const response = await POST(
+      makeRequest({
+        body: JSON.stringify([EMAIL_CREATION_EVENT]),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockConversationsFindFirst).not.toHaveBeenCalled();
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  test("no matching conversations row → no DB write, returns 200", async () => {
+    mockIsValid.mockReturnValue(true);
+    mockGetEmailEngagement.mockResolvedValue(OUTBOUND_ENGAGEMENT);
+    mockFindContactIdForEmail.mockResolvedValue("hs-contact-123");
+    mockLeadsFindFirst.mockResolvedValue({
+      id: "lead-uuid-1",
+      hubspotContactId: "hs-contact-123",
+    });
+    mockConversationsFindFirst.mockResolvedValue(null);
+
+    const { POST } = await import("../route");
+    const response = await POST(
+      makeRequest({
+        body: JSON.stringify([EMAIL_CREATION_EVENT]),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  test("conversation already has hubspotActivityId (idempotency) → findFirst returns null, no overwrite", async () => {
+    mockIsValid.mockReturnValue(true);
+    mockGetEmailEngagement.mockResolvedValue(OUTBOUND_ENGAGEMENT);
+    mockFindContactIdForEmail.mockResolvedValue("hs-contact-123");
+    mockLeadsFindFirst.mockResolvedValue({
+      id: "lead-uuid-1",
+      hubspotContactId: "hs-contact-123",
+    });
+    // Filter includes isNull(hubspotActivityId), so already-reconciled rows
+    // won't be returned by findFirst — simulate that here:
+    mockConversationsFindFirst.mockResolvedValue(null);
+
+    const { POST } = await import("../route");
+    const response = await POST(
+      makeRequest({
+        body: JSON.stringify([EMAIL_CREATION_EVENT]),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockUpdate).not.toHaveBeenCalled();
   });
 });

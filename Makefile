@@ -30,8 +30,8 @@ audit:
 db_generate: install
 	yarn db:generate
 
-db_push: install
-	yarn db:push
+db_migrate: install
+	yarn db:migrate
 
 db_studio: install
 	yarn db:studio

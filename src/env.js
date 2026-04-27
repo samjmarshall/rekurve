@@ -27,9 +27,13 @@ export const env = createEnv({
     RESEND_API_KEY: z.string().min(1),
     HUBSPOT_ACCESS_TOKEN: z.string().min(1),
     HUBSPOT_CLIENT_SECRET: z.string().min(1),
+    HUBSPOT_BCC_ADDRESS: z.string().min(1),
     ANTHROPIC_API_KEY: z.string().min(1),
     CRON_SECRET: z.string().min(16),
     ROBOTS_TXT: z.string().default("Disallow"),
+    MS_GRAPH_CLIENT_ID: z.string().min(1),
+    MS_GRAPH_CLIENT_SECRET: z.string().min(1),
+    MS_GRAPH_REDIRECT_URI: z.url(),
   },
 
   /**
@@ -59,9 +63,13 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     HUBSPOT_ACCESS_TOKEN: process.env.HUBSPOT_ACCESS_TOKEN,
     HUBSPOT_CLIENT_SECRET: process.env.HUBSPOT_CLIENT_SECRET,
+    HUBSPOT_BCC_ADDRESS: process.env.HUBSPOT_BCC_ADDRESS,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     CRON_SECRET: process.env.CRON_SECRET,
     ROBOTS_TXT: process.env.ROBOTS_TXT,
+    MS_GRAPH_CLIENT_ID: process.env.MS_GRAPH_CLIENT_ID,
+    MS_GRAPH_CLIENT_SECRET: process.env.MS_GRAPH_CLIENT_SECRET,
+    MS_GRAPH_REDIRECT_URI: process.env.MS_GRAPH_REDIRECT_URI,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

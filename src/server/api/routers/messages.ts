@@ -7,7 +7,8 @@ import {
   messageSnoozeSchema,
 } from "~/server/api/schemas/messages";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { leads, messageQueue } from "~/server/db/schema";
+import { leads, messageQueue, msGraphTokens } from "~/server/db/schema";
+import { dispatchEmail } from "~/server/dispatch/email-dispatch";
 
 /**
  * Fetch a message_queue row and assert its status permits a user action.
@@ -32,6 +33,60 @@ async function loadActionable(
     });
   }
   return row;
+}
+
+/**
+ * Like loadActionable, but also returns the joined lead row.
+ * Used by approve/editAndApprove which need lead context for dispatch.
+ */
+async function loadActionableWithLead(
+  db: typeof import("~/server/db").db,
+  id: string,
+  action: "approve" | "edit",
+): Promise<{
+  message: typeof messageQueue.$inferSelect;
+  lead: typeof leads.$inferSelect;
+}> {
+  const message = await loadActionable(db, id, action);
+  const lead = await db.query.leads.findFirst({
+    where: eq(leads.id, message.leadId),
+  });
+  if (!lead) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Lead not found" });
+  }
+  return { message, lead };
+}
+
+/**
+ * Check all email dispatch preconditions before the status write so that
+ * failures leave the queue row at its current status rather than approved.
+ */
+async function checkEmailPreconditions(
+  db: typeof import("~/server/db").db,
+  userId: string,
+  lead: typeof leads.$inferSelect,
+): Promise<void> {
+  if (!lead.hubspotContactId) {
+    throw new TRPCError({
+      code: "PRECONDITION_FAILED",
+      message: "This lead isn't synced with HubSpot yet. Contact support.",
+    });
+  }
+  if (!lead.email) {
+    throw new TRPCError({
+      code: "PRECONDITION_FAILED",
+      message: "This lead has no email address.",
+    });
+  }
+  const token = await db.query.msGraphTokens.findFirst({
+    where: eq(msGraphTokens.userId, userId),
+  });
+  if (!token) {
+    throw new TRPCError({
+      code: "PRECONDITION_FAILED",
+      message: "Connect your Microsoft account to send emails.",
+    });
+  }
 }
 
 export const messagesRouter = createTRPCRouter({
@@ -82,31 +137,57 @@ export const messagesRouter = createTRPCRouter({
   approve: protectedProcedure
     .input(messageApproveSchema)
     .mutation(async ({ ctx, input }) => {
-      await loadActionable(ctx.db, input.id, "approve");
+      const { message, lead } = await loadActionableWithLead(
+        ctx.db,
+        input.id,
+        "approve",
+      );
+
+      if (message.channel === "email") {
+        await checkEmailPreconditions(ctx.db, ctx.session.user.id, lead);
+      }
+
       const [updated] = await ctx.db
         .update(messageQueue)
         .set({ status: "approved", approvedAt: new Date() })
         .where(eq(messageQueue.id, input.id))
         .returning();
+
+      if (updated!.channel === "email") {
+        await dispatchEmail({ db: ctx.db, ctx, message: updated!, lead });
+      }
+
       return updated!;
     }),
 
   editAndApprove: protectedProcedure
     .input(messageEditAndApproveSchema)
     .mutation(async ({ ctx, input }) => {
-      const existing = await loadActionable(ctx.db, input.id, "edit");
+      const { message: existing, lead } = await loadActionableWithLead(
+        ctx.db,
+        input.id,
+        "edit",
+      );
+
+      if (existing.channel === "email") {
+        await checkEmailPreconditions(ctx.db, ctx.session.user.id, lead);
+      }
+
       const [updated] = await ctx.db
         .update(messageQueue)
         .set({
           status: "edited_and_approved",
           body: input.body,
-          // Preserve the first-ever draft. If the row was already edited, keep
-          // the original; otherwise snapshot the current body.
           originalBody: existing.originalBody ?? existing.body,
           approvedAt: new Date(),
         })
         .where(eq(messageQueue.id, input.id))
         .returning();
+
+      if (updated!.channel === "email") {
+        await dispatchEmail({ db: ctx.db, ctx, message: updated!, lead });
+      }
+
       return updated!;
     }),
 

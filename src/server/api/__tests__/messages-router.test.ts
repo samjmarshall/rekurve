@@ -23,7 +23,21 @@ const baseMessage = {
   createdAt: new Date("2026-04-10T00:00:00Z"),
 };
 
+const emailMessage = {
+  ...baseMessage,
+  channel: "email" as const,
+  subject: "Follow-up on your enquiry",
+};
+
+const baseLead = {
+  id: LEAD_ID,
+  email: "lead@example.com",
+  firstName: "Jane",
+  lastName: "Doe",
+};
+
 let mockDb: Record<string, unknown>;
+let mockDispatchEmail: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
@@ -50,10 +64,18 @@ beforeEach(() => {
       messageQueue: {
         findFirst: rs.fn(),
       },
+      leads: {
+        findFirst: rs.fn(),
+      },
     },
   };
 
   rs.doMock("~/server/db", () => ({ db: mockDb }));
+
+  mockDispatchEmail = rs.fn().mockResolvedValue(undefined);
+  rs.doMock("~/server/dispatch/email-dispatch", () => ({
+    dispatchEmail: mockDispatchEmail,
+  }));
 });
 
 async function getCaller(): Promise<Caller> {
@@ -243,6 +265,86 @@ describe("messages.approve", () => {
   });
 });
 
+// --- messages.approve + email dispatch ---
+
+describe("messages.approve (email channel)", () => {
+  function mockLeadQuery(lead: unknown) {
+    (
+      mockDb.query as {
+        messageQueue: { findFirst: ReturnType<typeof rs.fn> };
+        leads: { findFirst: ReturnType<typeof rs.fn> };
+      }
+    ).leads.findFirst.mockResolvedValue(lead);
+  }
+
+  test("dispatches email BEFORE status flip and sets sentAt on success", async () => {
+    (
+      mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
+    ).messageQueue.findFirst.mockResolvedValue(emailMessage);
+    mockLeadQuery(baseLead);
+
+    const approved = {
+      ...emailMessage,
+      status: "approved" as const,
+      approvedAt: new Date(),
+      sentAt: new Date(),
+    };
+    const { set } = mockUpdateReturning(approved);
+
+    const caller = await getCaller();
+    const result = await caller.messages.approve({ id: MSG_ID });
+
+    expect(mockDispatchEmail).toHaveBeenCalledTimes(1);
+    expect(result.status).toBe("approved");
+    expect(set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: "approved",
+        approvedAt: expect.any(Date),
+        sentAt: expect.any(Date),
+      }),
+    );
+  });
+
+  test("dispatch throws → status update never runs, row stays non-terminal", async () => {
+    (
+      mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
+    ).messageQueue.findFirst.mockResolvedValue(emailMessage);
+    mockLeadQuery(baseLead);
+
+    mockDispatchEmail.mockRejectedValue(
+      new Error("Graph API 401 Unauthorized"),
+    );
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.approve({ id: MSG_ID });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect(e).toBeInstanceOf(Error);
+    }
+
+    // The DB update should never have been called
+    expect(mockDb.update).not.toHaveBeenCalled();
+  });
+
+  test("sms channel does not call dispatch", async () => {
+    (
+      mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
+    ).messageQueue.findFirst.mockResolvedValue(baseMessage);
+
+    mockUpdateReturning({
+      ...baseMessage,
+      status: "approved",
+      approvedAt: new Date(),
+    });
+
+    const caller = await getCaller();
+    await caller.messages.approve({ id: MSG_ID });
+
+    expect(mockDispatchEmail).not.toHaveBeenCalled();
+  });
+});
+
 // --- messages.editAndApprove ---
 
 describe("messages.editAndApprove", () => {
@@ -324,6 +426,78 @@ describe("messages.editAndApprove", () => {
     } catch (e) {
       expect((e as TRPCError).code).toBe("BAD_REQUEST");
     }
+  });
+});
+
+// --- messages.editAndApprove + email dispatch ---
+
+describe("messages.editAndApprove (email channel)", () => {
+  function mockLeadQuery(lead: unknown) {
+    (
+      mockDb.query as {
+        messageQueue: { findFirst: ReturnType<typeof rs.fn> };
+        leads: { findFirst: ReturnType<typeof rs.fn> };
+      }
+    ).leads.findFirst.mockResolvedValue(lead);
+  }
+
+  test("dispatches email with edited body BEFORE status flip", async () => {
+    (
+      mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
+    ).messageQueue.findFirst.mockResolvedValue(emailMessage);
+    mockLeadQuery(baseLead);
+
+    const edited = {
+      ...emailMessage,
+      status: "edited_and_approved" as const,
+      body: "Edited body",
+      originalBody: emailMessage.body,
+      approvedAt: new Date(),
+      sentAt: new Date(),
+    };
+    const { set } = mockUpdateReturning(edited);
+
+    const caller = await getCaller();
+    const result = await caller.messages.editAndApprove({
+      id: MSG_ID,
+      body: "Edited body",
+    });
+
+    expect(mockDispatchEmail).toHaveBeenCalledTimes(1);
+    expect(mockDispatchEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.objectContaining({ body: "Edited body" }),
+      }),
+    );
+    expect(result.status).toBe("edited_and_approved");
+    expect(set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: "edited_and_approved",
+        sentAt: expect.any(Date),
+      }),
+    );
+  });
+
+  test("dispatch throws → status update never runs, row stays non-terminal", async () => {
+    (
+      mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
+    ).messageQueue.findFirst.mockResolvedValue(emailMessage);
+    mockLeadQuery(baseLead);
+
+    mockDispatchEmail.mockRejectedValue(new Error("Network failure"));
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.editAndApprove({
+        id: MSG_ID,
+        body: "Edited body",
+      });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect(e).toBeInstanceOf(Error);
+    }
+
+    expect(mockDb.update).not.toHaveBeenCalled();
   });
 });
 

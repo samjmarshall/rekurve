@@ -8,6 +8,7 @@ import {
 } from "~/server/api/schemas/messages";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { leads, messageQueue } from "~/server/db/schema";
+import { dispatchEmail } from "~/server/dispatch/email-dispatch";
 
 /**
  * Fetch a message_queue row and assert its status permits a user action.
@@ -82,10 +83,32 @@ export const messagesRouter = createTRPCRouter({
   approve: protectedProcedure
     .input(messageApproveSchema)
     .mutation(async ({ ctx, input }) => {
-      await loadActionable(ctx.db, input.id, "approve");
+      const row = await loadActionable(ctx.db, input.id, "approve");
+
+      // Email dispatch runs BEFORE the status flip so that any failure
+      // (token, network, API) leaves the row in its current state and the
+      // user can retry from the pending list.
+      if (row.channel === "email") {
+        const lead = await ctx.db.query.leads.findFirst({
+          where: eq(leads.id, row.leadId),
+        });
+        if (!lead) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Lead not found",
+          });
+        }
+        await dispatchEmail({ message: row, lead });
+      }
+
+      const now = new Date();
       const [updated] = await ctx.db
         .update(messageQueue)
-        .set({ status: "approved", approvedAt: new Date() })
+        .set({
+          status: "approved",
+          approvedAt: now,
+          ...(row.channel === "email" ? { sentAt: now } : {}),
+        })
         .where(eq(messageQueue.id, input.id))
         .returning();
       return updated!;
@@ -95,6 +118,26 @@ export const messagesRouter = createTRPCRouter({
     .input(messageEditAndApproveSchema)
     .mutation(async ({ ctx, input }) => {
       const existing = await loadActionable(ctx.db, input.id, "edit");
+
+      // Email dispatch runs BEFORE the status flip — see approve for rationale.
+      if (existing.channel === "email") {
+        const lead = await ctx.db.query.leads.findFirst({
+          where: eq(leads.id, existing.leadId),
+        });
+        if (!lead) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Lead not found",
+          });
+        }
+        // Dispatch with the *edited* body so the recipient sees what the user approved.
+        await dispatchEmail({
+          message: { ...existing, body: input.body },
+          lead,
+        });
+      }
+
+      const now = new Date();
       const [updated] = await ctx.db
         .update(messageQueue)
         .set({
@@ -103,7 +146,8 @@ export const messagesRouter = createTRPCRouter({
           // Preserve the first-ever draft. If the row was already edited, keep
           // the original; otherwise snapshot the current body.
           originalBody: existing.originalBody ?? existing.body,
-          approvedAt: new Date(),
+          approvedAt: now,
+          ...(existing.channel === "email" ? { sentAt: now } : {}),
         })
         .where(eq(messageQueue.id, input.id))
         .returning();

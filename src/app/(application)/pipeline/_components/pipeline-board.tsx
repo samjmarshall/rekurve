@@ -70,7 +70,7 @@ export function PipelineBoard() {
   return (
     <div className="flex min-w-0 flex-1 flex-col">
       <header className="flex items-center justify-between border-b px-4 py-3">
-        <h1 className="font-semibold text-lg">Pipeline</h1>
+        <h1 className="font-semibold text-xl">Pipeline</h1>
         <Link
           href="/leads/new"
           className={buttonVariants({ variant: "primary", size: "md" })}

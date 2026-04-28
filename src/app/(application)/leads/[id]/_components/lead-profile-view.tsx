@@ -82,7 +82,7 @@ export function LeadProfileView({ id }: { id: string }) {
           <div className="flex flex-col gap-6">
             <h2 className="sr-only">Gaps & History</h2>
             <QualificationGaps lead={lead} />
-            <ConversationHistory />
+            <ConversationHistory leadId={lead.id} />
           </div>
         </div>
       )}

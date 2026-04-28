@@ -107,9 +107,9 @@ export async function archiveTestContact(hubspotId: string): Promise<void> {
 /**
  * Known first-name markers used by E2E tests. Every e2e test that creates a
  * lead without a `test.rekurve.dev` email MUST use one of these as firstName
- * so the sweeper can find it. Keep in sync with deleteTestLeads().
+ * so the sweeper can find it.
  */
-const TEST_FIRST_NAMES = [
+export const TEST_FIRST_NAMES = [
   "Approve",
   "Count",
   "Dismiss",
@@ -146,10 +146,7 @@ export async function deleteTestContacts(): Promise<void> {
     const rows = await sql()`
       SELECT hubspot_contact_id FROM "leads"
       WHERE (email LIKE 'e2e-%@test.rekurve.dev'
-         OR first_name IN (
-           'Approve', 'Count', 'Dismiss', 'E2E', 'Edit', 'FHOG',
-           'Nav', 'Order', 'Pipeline', 'QC', 'Quick', 'Snooze'
-         ))
+         OR first_name = ANY(${TEST_FIRST_NAMES}))
         AND hubspot_contact_id IS NOT NULL
     `;
     for (const row of rows) {

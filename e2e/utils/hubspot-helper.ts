@@ -160,42 +160,61 @@ export async function deleteTestContacts(): Promise<void> {
     }
   }
 
-  // Phase 2: search-based fallback for orphaned contacts
-  const response = await hubspot().crm.contacts.searchApi.doSearch({
-    filterGroups: [
-      {
-        filters: [
-          {
-            propertyName: "email",
-            operator: FilterOperatorEnum.ContainsToken,
-            value: "test.rekurve.dev",
-          },
-        ],
-      },
-      {
-        filters: [
-          {
-            propertyName: "firstname",
-            operator: FilterOperatorEnum.In,
-            values: TEST_FIRST_NAMES,
-          },
-        ],
-      },
-    ],
-    properties: ["email"],
-    limit: 100,
-    after: "0",
-    sorts: [],
-  });
+  // Phase 2: search-based fallback for orphaned contacts — paginate to exhaustion
+  const phase2FilterGroups = [
+    {
+      filters: [
+        {
+          propertyName: "email",
+          operator: FilterOperatorEnum.ContainsToken,
+          value: "test.rekurve.dev",
+        },
+      ],
+    },
+    {
+      filters: [
+        {
+          propertyName: "firstname",
+          operator: FilterOperatorEnum.In,
+          values: TEST_FIRST_NAMES,
+        },
+      ],
+    },
+  ];
 
-  for (const contact of response.results) {
-    if (archived.has(contact.id)) continue;
-    try {
-      await hubspot().crm.contacts.basicApi.archive(contact.id);
-    } catch {
-      // Already deleted — ignore
+  let after: string | undefined = "0";
+  let pageCount = 0;
+  const MAX_PAGES = 50;
+
+  do {
+    const response = await hubspot().crm.contacts.searchApi.doSearch({
+      filterGroups: phase2FilterGroups,
+      properties: ["email"],
+      limit: 100,
+      after,
+      sorts: [],
+    });
+
+    for (const contact of response.results) {
+      if (archived.has(contact.id)) continue;
+      try {
+        await hubspot().crm.contacts.basicApi.archive(contact.id);
+      } catch {
+        // Already deleted — ignore
+      }
     }
-  }
+
+    after = (response.paging as { next?: { after?: string } } | undefined)?.next
+      ?.after;
+    pageCount++;
+
+    if (pageCount >= MAX_PAGES && after !== undefined) {
+      console.warn(
+        `[deleteTestContacts] Phase 2 hit the ${MAX_PAGES}-page cap; some orphaned contacts may remain.`,
+      );
+      break;
+    }
+  } while (after !== undefined);
 }
 
 /**

@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "@rstest/core";
+import { beforeEach, describe, expect, it, rs } from "@rstest/core";
 
 import { TEST_FIRST_NAMES } from "./hubspot-helper";
 
@@ -72,5 +72,68 @@ describe("cleanup-whitelist", () => {
     }
 
     expect(uncovered).toEqual([]);
+  });
+});
+
+describe("deleteTestContacts Phase 2 pagination", () => {
+  let mockDoSearch: ReturnType<typeof rs.fn>;
+  let mockArchive: ReturnType<typeof rs.fn>;
+
+  beforeEach(() => {
+    rs.resetModules();
+
+    mockDoSearch = rs.fn();
+    mockArchive = rs.fn().mockResolvedValue(undefined);
+
+    rs.doMock("@hubspot/api-client", () => ({
+      Client: class {
+        crm = {
+          contacts: {
+            searchApi: { doSearch: mockDoSearch },
+            basicApi: { archive: mockArchive },
+          },
+        };
+      },
+    }));
+
+    rs.doMock("@neondatabase/serverless", () => ({
+      neon: () => () => Promise.resolve([]),
+    }));
+  });
+
+  it("paginates through all pages and archives all 250 contacts", async () => {
+    const makeContacts = (start: number, count: number) =>
+      Array.from({ length: count }, (_, i) => ({ id: `contact-${start + i}` }));
+
+    mockDoSearch
+      .mockResolvedValueOnce({
+        results: makeContacts(0, 100),
+        paging: { next: { after: "100" } },
+      })
+      .mockResolvedValueOnce({
+        results: makeContacts(100, 100),
+        paging: { next: { after: "200" } },
+      })
+      .mockResolvedValueOnce({
+        results: makeContacts(200, 50),
+      });
+
+    const { deleteTestContacts } = await import("./hubspot-helper");
+    await deleteTestContacts();
+
+    expect(mockDoSearch).toHaveBeenCalledTimes(3);
+    expect(mockArchive).toHaveBeenCalledTimes(250);
+  });
+
+  it("stops after a single page when there is no next cursor", async () => {
+    mockDoSearch.mockResolvedValueOnce({
+      results: [{ id: "only-1" }, { id: "only-2" }],
+    });
+
+    const { deleteTestContacts } = await import("./hubspot-helper");
+    await deleteTestContacts();
+
+    expect(mockDoSearch).toHaveBeenCalledTimes(1);
+    expect(mockArchive).toHaveBeenCalledTimes(2);
   });
 });

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Badge } from "~/components/ui/Badge";
+import { formatLastContact } from "~/lib/format-relative-time";
 import type { RouterOutputs } from "~/trpc/react";
-import { formatLastContact } from "../_lib/format-last-contact";
 import { STAGE_META } from "../_lib/stage-meta";
 import { extractTopGap } from "../_lib/top-gap";
 

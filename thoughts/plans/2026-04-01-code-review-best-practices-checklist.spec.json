@@ -1,0 +1,505 @@
+{
+  "version": 1,
+  "plan": "thoughts/plans/2026-04-01-code-review-best-practices-checklist.md",
+  "title": "Code Review Checklist: Next.js, React & Composition Best Practices",
+  "sections": [
+    {
+      "id": "p1.1.1",
+      "title": "Prevent Waterfall Chains",
+      "tasks": [
+        "Review all async server components for sequential await chains",
+        "Check API route handlers (src/app/api/) for sequential operations",
+        "Files to check",
+        "Expected finding: No real waterfalls currently — getSession() is React.cache()-wrapped. Note as compliant"
+      ],
+      "files": [
+        "src/app/(application)/layout.tsx",
+        "src/app/(application)/settings/page.tsx",
+        "src/app/(login)/layout.tsx",
+        "src/app/api/trpc/[trpc]/route.ts",
+        "src/app/api/dev/session/route.ts",
+        "src/app/api/health/route.ts"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.1.2",
+      "title": "Parallelize Independent Operations",
+      "tasks": [
+        "Search for multiple sequential await calls that could use Promise.all()",
+        "Check tRPC context creation (src/server/api/trpc.ts) for parallel opportunities",
+        "Expected finding: Minimal async operations currently. Note as compliant"
+      ],
+      "files": [
+        "src/server/api/trpc.ts"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.1.3",
+      "title": "Strategic Suspense Boundaries",
+      "tasks": [
+        "Identify async server components that block full page render",
+        "Files to check",
+        "Expected finding: No Suspense boundaries exist. Recommend adding them as a future task but don't implement in this review"
+      ],
+      "files": [
+        "src/app/(application)/layout.tsx",
+        "src/app/(application)/settings/page.tsx"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.2.1",
+      "title": "Authenticate Server Actions Like API Routes",
+      "tasks": [
+        "Search for \"use server\" directives",
+        "Expected finding: No Server Actions in codebase. tRPC protectedProcedure handles auth. Compliant (N/A)"
+      ],
+      "files": [],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.2.2",
+      "title": "Avoid Duplicate Serialization in RSC Props",
+      "tasks": [
+        "Check server components passing data to client components for duplicated objects",
+        "Files to check",
+        "Expected finding: Minimal RSC to client data transfer currently. Note observations"
+      ],
+      "files": [
+        "src/app/(application)/layout.tsx",
+        "src/app/(website)/page.tsx"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.2.3",
+      "title": "Minimize Serialization at RSC Boundaries",
+      "tasks": [
+        "Check what props server components pass to client components",
+        "Verify only necessary fields are passed (not entire objects)",
+        "Files to check: Same as 2.2 above"
+      ],
+      "files": [
+        "src/app/(application)/layout.tsx",
+        "src/app/(website)/page.tsx"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.2.4",
+      "title": "Parallel Data Fetching with Component Composition",
+      "tasks": [
+        "Check if sibling server components could fetch data in parallel",
+        "Expected finding: Most pages are stubs with no data fetching. Note as future consideration"
+      ],
+      "files": [],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.2.5",
+      "title": "Per-Request Deduplication with React.cache()",
+      "tasks": [
+        "Verify React.cache() usage is correct",
+        "Check for inline object arguments that break caching",
+        "Files to check",
+        "Expected finding: Both usages are correct"
+      ],
+      "files": [
+        "src/lib/session.ts",
+        "src/trpc/server.tsx"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.2.6",
+      "title": "Use after() for Non-Blocking Operations",
+      "tasks": [
+        "Identify logging, analytics, or side effects in API routes that could use after()",
+        "Files to check",
+        "Expected finding: console.log in timing middleware could use after(). Low priority"
+      ],
+      "files": [
+        "src/app/api/trpc/[trpc]/route.ts",
+        "src/server/api/trpc.ts"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.3.1",
+      "title": "Avoid Barrel File Imports",
+      "tasks": [
+        "Audit all barrel files and their consumers",
+        "Barrel files found",
+        "Check if any barrel files are imported in client bundles unnecessarily",
+        "Expected finding: Barrel files are minimal and mostly server-side. Low risk"
+      ],
+      "files": [
+        "src/server/db/schema/index.ts",
+        "src/hooks/index.ts",
+        "src/types/index.ts",
+        "src/app/(website)/_components/stats/index.ts"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.3.2",
+      "title": "Server vs. Client Component Decision",
+      "tasks": [
+        "Review all \"use client\" components — are any unnecessarily client-side?",
+        "Key files to audit",
+        "Expected finding: Several UI components are marked \"use client\" but use no client features. Removing the directive would reduce client bundle"
+      ],
+      "files": [
+        "src/components/ui/Badge.tsx",
+        "src/components/ui/Card.tsx",
+        "src/components/ui/separator.tsx",
+        "src/components/ui/label.tsx"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.verify",
+      "title": "Phase 1 Verification",
+      "tasks": [
+        "make check passes (lint + typecheck)",
+        "make build succeeds",
+        "Audit report written with findings per rule",
+        "Each finding categorized as: Compliant, Recommendation, or Issue",
+        "No regressions in page functionality"
+      ],
+      "files": [],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.cat1",
+      "title": "Eliminating Waterfalls",
+      "tasks": [
+        "1.1 Defer await: Check async functions for early-return optimization opportunities",
+        "1.2 Dependency-based parallelization: Check for partial-dependency async chains",
+        "1.3 API route waterfalls: Audit src/app/api/ route handlers",
+        "1.4 Promise.all(): Search for sequential independent awaits",
+        "1.5 Suspense boundaries: Already covered in Phase 1 — cross-reference"
+      ],
+      "files": [],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.cat2",
+      "title": "Bundle Size Optimization",
+      "tasks": [
+        "2.1 Barrel imports: Already covered in Phase 1 — cross-reference",
+        "2.2 Conditional module loading: Check for feature-gated heavy imports",
+        "2.3 Defer third-party libraries: Audit PostHog, tsparticles, framer-motion loading",
+        "2.4 Dynamic imports: Check for heavy components that should use next/dynamic",
+        "Implement next/dynamic for tsparticles/sparkles component",
+        "2.5 Preload on intent: Check navigation patterns for preload opportunities"
+      ],
+      "files": [
+        "src/providers/AnalyticsProvider.tsx",
+        "src/components/ui/sparkles.tsx",
+        "src/components/ui/compare.tsx",
+        "src/app/(website)/_components/sections/BookingForm.tsx"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.cat3",
+      "title": "Server-Side Performance",
+      "tasks": [
+        "3.1 Auth in server actions: N/A — no server actions",
+        "3.2 Duplicate serialization: Cross-reference Phase 1 finding",
+        "3.3 LRU caching: Check for expensive repeated computations across requests",
+        "3.4 Minimize serialization: Cross-reference Phase 1 finding",
+        "3.5 Parallel data fetching: Cross-reference Phase 1 finding",
+        "3.6 React.cache(): Cross-reference Phase 1 finding",
+        "3.7 after(): Cross-reference Phase 1 finding"
+      ],
+      "files": [],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.cat4",
+      "title": "Client-Side Data Fetching",
+      "tasks": [
+        "4.1 Event listener deduplication: Audit global event listeners",
+        "4.2 Passive event listeners: Check scroll/touch handlers",
+        "4.3 SWR deduplication: N/A — using TanStack Query via tRPC",
+        "4.4 localStorage schema versioning: Check for any localStorage usage"
+      ],
+      "files": [
+        "src/hooks/use-mobile.ts",
+        "src/hooks/useMediaQuery.ts",
+        "src/app/(website)/_components/mode-toggle.tsx",
+        "src/components/ui/compare.tsx"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.cat5",
+      "title": "Re-render Optimization",
+      "tasks": [
+        "5.1 Derived state during render: Check for useEffect that derives state",
+        "5.2 Defer state reads: Check for state subscriptions only used in callbacks",
+        "5.3 Simple useMemo: Check for useMemo wrapping trivial expressions",
+        "5.4 Default non-primitive props: Check memoized components for inline default objects",
+        "5.5 Extract to memoized components: Verify React.memo usage is appropriate",
+        "5.6 Narrow effect dependencies: Check useEffect dependency arrays for objects",
+        "5.7 Interaction logic in event handlers: Check for effects that should be event handlers",
+        "5.8 Subscribe to derived state: Check for components subscribing to raw state then deriving",
+        "5.9 Functional setState: Check for setState calls that could be functional",
+        "5.10 Lazy state init: Check useState calls with expensive initial values",
+        "5.11 useTransition: Check loading states that could use useTransition",
+        "5.12 useRef for transient values: Check for frequently-updating state that doesn't need re-renders"
+      ],
+      "files": [
+        "src/app/(website)/_components/mode-toggle.tsx",
+        "src/app/(website)/_components/shimmer-text.tsx",
+        "src/components/ui/compare.tsx",
+        "src/components/ui/glowing-effect.tsx",
+        "src/app/(login)/login/page.tsx",
+        "src/app/(application)/settings/_components/sign-out-button.tsx"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.cat6",
+      "title": "Rendering Performance",
+      "tasks": [
+        "6.1 SVG animation: Check SVG animations wrap a div, not the SVG",
+        "6.2 content-visibility: Check for long scrollable lists",
+        "6.3 Hoist static JSX: Check for static JSX recreated every render",
+        "6.4 SVG precision: Check inline SVG coordinate precision",
+        "6.5 Hydration mismatch prevention: Check for client-only rendering patterns",
+        "6.6 Suppress hydration mismatches: Check suppressHydrationWarning usage",
+        "6.7 Activity component: N/A — React 19 experimental",
+        "6.8 Explicit conditional rendering: Check for && rendering with falsy gotchas (0, \"\")",
+        "6.9 useTransition over manual loading: Cross-reference with 5.11"
+      ],
+      "files": [
+        "src/icons/bento-icons.tsx",
+        "src/icons/illustrations.tsx",
+        "src/icons/card-icons.tsx",
+        "src/icons/general.tsx",
+        "src/hooks/use-mobile.ts",
+        "src/app/(website)/layout.tsx"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.cat7",
+      "title": "JavaScript Performance",
+      "tasks": [
+        "7.1 Layout thrashing: Check for interleaved DOM reads/writes",
+        "7.2 Index maps: Check for repeated array lookups",
+        "7.3-7.12: Quick scan for low-hanging fruit across utility functions"
+      ],
+      "files": [],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.cat8",
+      "title": "Advanced Patterns",
+      "tasks": [
+        "8.1 Init once: Check for initialization in effects that should be module-level",
+        "8.2 Event handler refs: Check for handlers recreated causing effect re-runs",
+        "8.3 useEffectEvent: Note as future consideration (React 19 experimental)"
+      ],
+      "files": [
+        "src/providers/AnalyticsProvider.tsx"
+      ],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.verify",
+      "title": "Phase 2 Verification",
+      "tasks": [
+        "make check passes",
+        "make build succeeds",
+        "Audit report written with findings per category",
+        "Bundle size compared before/after dynamic imports",
+        "Animation behavior unchanged after motion import standardization",
+        "No regressions in interactive components (compare slider, sparkles, etc.)"
+      ],
+      "files": [],
+      "verify": ["make check", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "p3.1.1",
+      "title": "Avoid Boolean Prop Proliferation",
+      "tasks": [
+        "Audit components for boolean props that control rendering variants",
+        "Files to check",
+        "Assessment: Compare component has boolean props but they're feature flags with defaults, not variant selectors. This is acceptable per the rule",
+        "Document which components are compliant vs need refactoring"
+      ],
+      "files": [
+        "src/components/ui/compare.tsx",
+        "src/components/ui/sparkles.tsx",
+        "src/app/(website)/_components/navbar.tsx"
+      ],
+      "verify": ["make check", "make build", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "p3.1.2",
+      "title": "Use Compound Components",
+      "tasks": [
+        "Review existing compound component patterns",
+        "Already using compound pattern",
+        "Potential candidates for compound pattern: None currently — components are appropriately simple for current scope",
+        "Note: Card uses structural composition (no shared context) which is appropriate for its use case"
+      ],
+      "files": [],
+      "verify": ["make check", "make build", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "p3.2.1",
+      "title": "Decouple State Management from UI",
+      "tasks": [
+        "Check if any UI components are tightly coupled to specific state implementations",
+        "Files to check",
+        "Assessment: Login page has state trapped in component but it's a single-use page, not a reusable component. Acceptable for current scope"
+      ],
+      "files": [
+        "src/app/(login)/login/page.tsx",
+        "src/app/(website)/_components/sections/BookingForm.tsx",
+        "src/app/(website)/_components/navbar.tsx"
+      ],
+      "verify": ["make check", "make build", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "p3.2.2",
+      "title": "Generic Context Interfaces",
+      "tasks": [
+        "Check existing context providers for generic interfaces",
+        "Files to check",
+        "Assessment: No custom contexts with state/actions/meta pattern needed yet"
+      ],
+      "files": [
+        "src/providers/ThemeProvider.tsx",
+        "src/providers/AnalyticsProvider.tsx",
+        "src/trpc/react.tsx"
+      ],
+      "verify": ["make check", "make build", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "p3.2.3",
+      "title": "Lift State into Provider Components",
+      "tasks": [
+        "Check for state trapped inside components that siblings need access to",
+        "Assessment: No current cases where state needs to be shared between siblings beyond what's already handled by props or context"
+      ],
+      "files": [],
+      "verify": ["make check", "make build", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "p3.3.1",
+      "title": "Create Explicit Component Variants",
+      "tasks": [
+        "Check for components using boolean modes instead of explicit variants",
+        "Files to check",
+        "Assessment: Components already use enum variants via CVA. Compliant"
+      ],
+      "files": [
+        "src/components/ui/compare.tsx",
+        "src/components/ui/Button.tsx",
+        "src/components/ui/Badge.tsx"
+      ],
+      "verify": ["make check", "make build", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "p3.3.2",
+      "title": "Prefer Children Over Render Props",
+      "tasks": [
+        "Search for renderX prop patterns",
+        "Files to check",
+        "Assessment: No custom render prop patterns. Base UI's render prop is acceptable per the rule's exception for data-passing scenarios"
+      ],
+      "files": [
+        "src/components/ui/select.tsx"
+      ],
+      "verify": ["make check", "make build", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "p3.4.1",
+      "title": "Remove forwardRef (React 19)",
+      "tasks": [
+        "Audit all forwardRef usage — React 19 supports ref as a regular prop",
+        "Files using forwardRef",
+        "Change: Convert from forwardRef pattern to direct ref prop",
+        "Note: Only convert components we own. Skip third-party wrappers (Accordion, Select, InputOTP use Base UI primitives)"
+      ],
+      "files": [
+        "src/components/ui/Button.tsx",
+        "src/components/ui/Card.tsx",
+        "src/components/ui/input.tsx",
+        "src/components/ui/textarea.tsx",
+        "src/components/ui/label.tsx",
+        "src/components/ui/checkbox.tsx",
+        "src/components/ui/separator.tsx"
+      ],
+      "verify": ["make check", "make build", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "p3.4.2",
+      "title": "Replace useContext with use()",
+      "tasks": [
+        "Search for useContext usage",
+        "Files",
+        "Change: Replace with React.use(OTPInputContext) (if context is from our code, not library internals)",
+        "Note: If OTPInputContext is exported from input-otp library, check compatibility first"
+      ],
+      "files": [
+        "src/components/ui/input-otp.tsx"
+      ],
+      "verify": ["make check", "make build", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "p3.verify",
+      "title": "Phase 3 Verification",
+      "tasks": [
+        "make check passes",
+        "make build succeeds",
+        "make test_e2e passes (forwardRef removal could affect component behavior)",
+        "All components accepting ref still work correctly",
+        "Form inputs (login OTP, booking form) still function",
+        "No TypeScript errors from ref prop changes",
+        "Card, Button, Input components render correctly"
+      ],
+      "files": [],
+      "verify": ["make check", "make build", "make test_e2e"],
+      "state": "pending"
+    }
+  ]
+}

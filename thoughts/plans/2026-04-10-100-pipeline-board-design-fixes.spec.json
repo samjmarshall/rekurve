@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "plan": "thoughts/plans/2026-04-10-100-pipeline-board-design-fixes.md",
+  "title": "Pipeline Board — Design Review Fixes Implementation Plan",
+  "sections": [
+    {
+      "id": "p1.auto",
+      "title": "Phase 1: Automated Verification",
+      "tasks": [
+        "`make check` passes (Biome + tsc)",
+        "`make test` passes — new `empty-state.test.ts` suite green (8 cases)",
+        "No regressions in existing `_lib/__tests__/*.test.ts` suites or the leads-router tests"
+      ],
+      "files": [],
+      "verify": ["make check", "make test"],
+      "state": "pending"
+    },
+    {
+      "id": "p1.manual",
+      "title": "Phase 1: Manual Verification",
+      "tasks": [
+        "At 1280×800, the right-edge scroll shadow is visible until scrolled to the end of the board; Hot column is reachable",
+        "At 1440×900 and 1920×1080, the right-edge shadow is hidden if all four columns fit",
+        "At 768×1024, swiping horizontally triggers snap-scroll between columns",
+        "Visit `/pipeline?estate=sovereign` (no matching leads) — see per-column \"No {stage} leads\" messages, NOT the \"Add your first lead\" CTA",
+        "Visit `/pipeline` on a fresh user with zero leads — see the \"No leads yet / Add your first lead\" CTA",
+        "Nurture badges in light mode have a visible orange-tinted background pill (matches Warm/Hot structure)",
+        "Dark mode unchanged for the `brand` badge"
+      ],
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.auto",
+      "title": "Phase 2: Automated Verification",
+      "tasks": [
+        "`make check` passes (Biome + tsc — including the new sentinel guard type)",
+        "`make test` passes — no regressions in existing suites",
+        "Existing E2E test `quick-capture lead appears in the Unqualified column with score 0` still passes (the `0` literal is still rendered, only `null` falls through to `—`)"
+      ],
+      "files": [],
+      "verify": ["make check", "make test"],
+      "state": "pending"
+    },
+    {
+      "id": "p2.manual",
+      "title": "Phase 2: Manual Verification",
+      "tasks": [
+        "At 1280×800 light mode: each column has a visible 2px coloured left border (gray → orange → amber → coral)",
+        "At 1280×800 dark mode: column accent borders are visible against the dark card background",
+        "Hovering a card produces a clear border-color change AND subtle shadow lift",
+        "Tab to the timeline select with the keyboard, then with VoiceOver active — announces \"Construction timeline, combobox, Any timeline\"",
+        "Tab through the stage checkboxes with VoiceOver — announces \"Visible stages, group, 4 items\" (or equivalent NVDA wording)",
+        "At 768×1024: filter bar fits in two rows max (text/select group on row 1, stage checkboxes on row 2)",
+        "Page title \"Pipeline\" is visibly larger than the column titles",
+        "Column count pills use proportional spacing (tabular-nums) rather than monospace",
+        "A lead with `null` score (briefly visible after creation, before scoring) shows `—` in the badge instead of `0`",
+        "`/design_review` re-run shows all twelve issues resolved"
+      ],
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    }
+  ]
+}

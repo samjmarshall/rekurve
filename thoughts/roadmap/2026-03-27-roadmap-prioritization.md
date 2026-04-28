@@ -83,10 +83,10 @@ Epic files: `thoughts/epics/2026-03-27-epic-*.md`
 |------|-------|-------|-------|-----------------|
 | **1** | Mar 31 - Apr 4 | Foundation | 5-10 | Auth flow works, all tables exist, HubSpot connected |
 | **2** | Apr 7 - Apr 11 | Lead Management + AI | 5-10 | Lead entry forms, AI scoring, pipeline board |
-| **3** | Apr 14 - Apr 18 | HITL Queue + Nurture | 5-10 | Message queue, approve/send flow, Twilio + email |
+| **3** | Apr 14 - Apr 18 | HITL Queue + Nurture | 5-10 | Message queue, approve flow, Twilio relay to consultant + email |
 | **4** | Apr 21 - Apr 25 | Lot Matcher + Polish | 5-10 | Lot matching, reverse matching, mobile polish |
 
-**Prep task:** Set up Twilio account and phone number during Weeks 1-2 so it's ready for Epic 3.
+**Prep task:** Set up Twilio account during Weeks 1-2 so it's ready for Epic 3. No AU phone number purchase required for MVP — Twilio's default sender works since the only recipient is the consultant's own phone (single fixed number). A dedicated number is only needed if/when we revisit direct-to-lead SMS, which the consultant-relay model defers indefinitely (superseded by ADR-001).
 
 ### Key Milestones
 
@@ -94,7 +94,7 @@ Epic files: `thoughts/epics/2026-03-27-epic-*.md`
 |------|-----------|------------|
 | Apr 4 | Foundation live | Login works, empty dashboard, HubSpot syncs |
 | Apr 11 | Leads working | Enter lead, AI scores it, pipeline board shows stages |
-| Apr 18 | Messages flowing | AI drafts, consultant approves, SMS/email sent |
+| Apr 18 | Messages flowing | AI drafts, consultant approves; SMS draft relays to consultant's phone for manual forward, email sends to lead |
 | Apr 25 | MVP complete | Lot matching works, mobile-ready, ready for live pilot |
 
 ---
@@ -237,7 +237,7 @@ Prep tasks to unblock development (not GitHub issues — just do them):
 | Neon Postgres | Week 1 (Mar 31) | Provision via Vercel integration, get `DATABASE_URL` |
 | HubSpot API | Week 1 (Mar 31) | Get `HUBSPOT_ACCESS_TOKEN` from consultant's account |
 | Claude API | Week 2 (Apr 7) | Provision key for AI scoring, set `ANTHROPIC_API_KEY` |
-| Twilio | Week 3 (Apr 14) | Create account, buy AU phone number, get SID + auth token |
+| Twilio | Week 3 (Apr 14) | Create account, get SID + auth token. No AU number purchase needed — only recipient is the consultant's phone (`TWILIO_CONSULTANT_NUMBER`); Twilio's default trial/messaging-service sender is sufficient. |
 | `BETTER_AUTH_SECRET` | Week 1 (Mar 31) | Generate with `openssl rand -base64 32` |
 
 ---

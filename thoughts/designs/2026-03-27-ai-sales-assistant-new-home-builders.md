@@ -179,18 +179,26 @@ Every time the consultant modifies a draft before approving, the system logs the
 
 If a lead replies with something complex (objection, detailed question, emotional response), the AI flags it as "consultant-only" rather than attempting a draft.
 
-### iMessage Integration & Manual Takeover
+### SMS Delivery — Consultant Relay (MVP)
 
-> **Decision pending:** See [ADR-001](../../docs/architecture-decisions/adr001-imessage-integration-for-sales-automation.md) (In Progress)
+> **Future-state decision pending:** See [ADR-001](../../docs/adr/adr001-imessage-integration-for-sales-automation.md) (In Progress) for the planned iMessage device-bridge integration that will replace this relay model.
 
-Text messages are sent from the consultant's personal phone number via a device-bridge iMessage service (leading option: Texting Blue). This means:
+For MVP, the system does **not** send SMS to the lead directly. When the consultant approves an SMS draft, Twilio sends the drafted message body to the **consultant's own phone number**. The consultant then copies the message and sends it to the lead from their personal Messages app.
 
-- **Outbound**: When the consultant approves a message in the queue, it's sent as an iMessage from their number. The lead sees the same number they already have from the display home visit.
-- **Inbound**: Lead replies arrive via webhook into the `conversations` table AND natively in the consultant's Messages app.
-- **Manual takeover**: If a reply needs immediate human attention, the consultant opens their iPhone Messages app and responds directly — same thread, same number, zero context switch. The webhook captures their manual reply, keeping the conversation log and AI context in sync.
-- **Fallback**: If the consultant's device is offline or the recipient doesn't have iMessage, the system falls back to Twilio SMS from a dedicated number (fallback strategy TBD per ADR-001).
+- **Outbound**: On approve, Twilio delivers the draft body to the consultant's phone (a single fixed number — the consultant). The lead receives the message from the consultant's personal number, in their existing iMessage thread, exactly as if it had been hand-typed.
+- **Logging**: We log the outbound `conversations` row immediately on approve, on the assumption that the consultant relays the draft as-is. The risk of "approved but never sent" is judged low at pilot scale and will be addressed structurally by the iMessage integration (ADR-001) rather than a manual confirm step.
+- **Inbound**: Lead replies land in the consultant's Messages app, not the system. Inbound capture is deferred until ADR-001 lands. The consultant pastes important replies into a lead note manually if they want them on record.
+- **No carrier-to-lead path**: This intentionally sidesteps A2P/10DLC compliance, sender-trust issues from a Twilio shortcode, and the need to provision a per-consultant Twilio number for outbound-to-lead.
 
-The `message_queue.channel` enum remains `sms | email`. iMessage vs SMS is a delivery-layer concern tracked in `conversations.delivery_method`.
+The `message_queue.channel` enum remains `sms | email`. The `conversations.delivery_method` enum remains, with SMS rows recorded as `sms` (intent) — the actual hop from consultant to lead happens off-system. Once ADR-001 ships, iMessage delivery becomes a system-tracked hop and `delivery_method=imessage` will be populated.
+
+### Why Consultant Relay First
+
+This relay is a deliberate stepping stone to the iMessage end-state in ADR-001:
+
+- The consultant's phone is already the source-of-truth for SMS history with leads. Routing drafts through it now matches the long-term shape, just with a manual paste step.
+- It eliminates the need for a Twilio sender number that the lead would not recognise.
+- When ADR-001 ships, the only thing that changes for the lead is that the paste step disappears — the conversation continues in the same thread on the same number.
 
 ---
 
@@ -319,8 +327,8 @@ Serverless Postgres on Neon, integrates natively with Vercel. Drizzle ORM for ty
 
 - **Claude API** — server-side AI functions (scoring, drafting, matching)
 - **HubSpot CRM API** — contact sync, email sending, deal tracking
-- **iMessage via device-bridge service** — primary text messaging channel, sends from the consultant's personal phone number. Enables seamless manual takeover from native Messages app. See [ADR-001](../../docs/architecture-decisions/adr001-imessage-integration-for-sales-automation.md) (In Progress).
-- **Twilio** — SMS fallback if iMessage delivery fails (device offline, non-iMessage recipient). Retention as fallback vs removal TBD per ADR-001.
+- **Twilio** — relays approved SMS drafts to the **consultant's** phone for manual forward to the lead (MVP). Single fixed recipient number. No A2P/10DLC consumer path required.
+- **iMessage via device-bridge service** — future replacement for the consultant-relay step, sending directly from the consultant's personal phone number. See [ADR-001](../../docs/adr/adr001-imessage-integration-for-sales-automation.md) (In Progress).
 - **Vercel** — deployment, Neon Postgres
 
 ---
@@ -422,7 +430,7 @@ No separate users table for the pilot. NextAuth user record covers auth identity
 
 - Message queue: AI drafts follow-up messages based on lead stage and gaps
 - Action queue view: prioritised list with approve/edit/snooze/dismiss
-- Twilio SMS integration: sends on approval
+- Twilio SMS integration: relays approved SMS drafts to the consultant's phone for manual forward to the lead
 - HubSpot email integration: sends on approval, logs activity
 - Basic nurture: AI generates next-step recommendations and queues drafts on schedule
 - Conversation log: all sent/received messages on lead profile

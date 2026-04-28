@@ -7,8 +7,11 @@ MAX_TURNS=30
 MAX_BUDGET="5.00"        # Only enforced in api mode
 IMPLEMENT_MODEL="sonnet"
 VALIDATE_MODEL="opus"
+FIX_MODEL="sonnet"
 IMPLEMENT_PROMPT=".claude/prompts/ralph-implement.md"
 VALIDATE_PROMPT=".claude/prompts/ralph-validate.md"
+FIX_PROMPT=".claude/prompts/ralph-fix.md"
+MAX_FIX_RETRIES=3
 GRANULARITY="section"    # "section" or "checkbox"
 NO_DEVSERVER=false
 NO_NEON=false
@@ -27,10 +30,13 @@ Options:
   --billing MODE           "max" (subscription, default) or "api" (API key, metered)
   --max-turns N            Max Claude agent turns per session (default: 30)
   --max-budget USD         Max USD per session, api mode only (default: 5.00)
-  --implement-model MODEL  Claude model for implement phase (default: haiku)
-  --validate-model MODEL   Claude model for validate phase (default: sonnet)
+  --implement-model MODEL  Claude model for implement phase (default: sonnet)
+  --validate-model MODEL   Claude model for validate phase (default: opus)
+  --fix-model MODEL        Claude model for verify-fix phase (default: sonnet)
   --implement-prompt PATH  Override implement prompt (default: .claude/prompts/ralph-implement.md)
   --validate-prompt PATH   Override validate prompt (default: .claude/prompts/ralph-validate.md)
+  --fix-prompt PATH        Override fix prompt (default: .claude/prompts/ralph-fix.md)
+  --max-fix-retries N      Max fix-claude attempts after a verify failure (default: 3)
   --granularity MODE       "section" or "checkbox" (default: section)
   --no-devserver           Skip dev server (yarn dev) for plans without e2e/UI
   --no-neon                Skip Neon branch even if migrations detected
@@ -60,8 +66,11 @@ while [[ $# -gt 0 ]]; do
     --max-budget)    MAX_BUDGET="$2"; shift 2 ;;
     --implement-model) IMPLEMENT_MODEL="$2"; shift 2 ;;
     --validate-model)  VALIDATE_MODEL="$2"; shift 2 ;;
+    --fix-model)       FIX_MODEL="$2"; shift 2 ;;
     --implement-prompt) IMPLEMENT_PROMPT="$2"; shift 2 ;;
     --validate-prompt)  VALIDATE_PROMPT="$2"; shift 2 ;;
+    --fix-prompt)       FIX_PROMPT="$2"; shift 2 ;;
+    --max-fix-retries)  MAX_FIX_RETRIES="$2"; shift 2 ;;
     --granularity)   GRANULARITY="$2"; shift 2 ;;
     --no-devserver)  NO_DEVSERVER=true; shift ;;
     --no-neon)       NO_NEON=true; shift ;;
@@ -121,7 +130,9 @@ METRICS_FILE="$METRICS_DIR/${PLAN_SLUG}-$(date +%Y-%m-%d).jsonl"
 # Resolve prompt paths to absolute (they may not be committed/in worktree)
 IMPLEMENT_PROMPT="$REPO_ROOT/$IMPLEMENT_PROMPT"
 VALIDATE_PROMPT="$REPO_ROOT/$VALIDATE_PROMPT"
+FIX_PROMPT="$REPO_ROOT/$FIX_PROMPT"
 DESCRIBE_PR_PROMPT="$REPO_ROOT/.claude/prompts/ralph-describe-pr.md"
+FAILURES_DIR="$REPO_ROOT/.ralph/failures"
 
 log "Plan: $PLAN_PATH"
 log "Spec: $SPEC_PATH"
@@ -432,6 +443,9 @@ sanity_gate() {
 
 IMPLEMENT_TOOLS='Read,Edit,Write,Grep,Glob,Bash(make\ *),Bash(git\ diff*),Bash(git\ status*)'
 VALIDATE_TOOLS='Read,Edit,Grep,Glob,Bash(make\ *),Bash(git\ diff*),Bash(git\ status*),Bash(git\ add\ *),Bash(git\ commit\ *),Bash(git\ check-ignore\ *),Bash(git\ log\ *)'
+# Fix phase: implement-shaped tools when fix runs after implement (no commit), validate-shaped when fix runs after validate (must commit a follow-up).
+FIX_TOOLS_IMPLEMENT='Read,Edit,Write,Grep,Glob,Bash(make\ *),Bash(yarn\ *),Bash(git\ diff*),Bash(git\ status*),Bash(git\ log\ *)'
+FIX_TOOLS_VALIDATE='Read,Edit,Write,Grep,Glob,Bash(make\ *),Bash(yarn\ *),Bash(git\ diff*),Bash(git\ status*),Bash(git\ log\ *),Bash(git\ add\ *),Bash(git\ commit\ *),Bash(git\ check-ignore\ *)'
 
 LAST_EXIT_CODE=0
 LAST_DURATION_MS=0
@@ -502,11 +516,201 @@ run_claude() {
   LAST_OUTPUT="$output"
 }
 
+# Invoke a fix-claude after a verify command failed.
+# The fix prompt receives the failing command + tail of output, and is allowed
+# to read, edit, run make, and (only after validate) commit a follow-up.
+#
+# Usage: run_fix_claude <phase> <section_id> <section_title> <failed_cmd> <failed_output>
+# <phase> is the phase whose verify just failed: "implement" or "validate".
+run_fix_claude() {
+  local phase="$1"
+  local section_id="$2"
+  local section_title="$3"
+  local failed_cmd="$4"
+  local failed_output="$5"
+  local tools
+
+  if [[ "$phase" == "implement" ]]; then
+    tools="$FIX_TOOLS_IMPLEMENT"
+  else
+    tools="$FIX_TOOLS_VALIDATE"
+  fi
+
+  # Trim output to last ~50KB to keep the prompt within reasonable bounds.
+  local trimmed
+  trimmed=$(printf '%s' "$failed_output" | tail -c 50000)
+
+  local prompt_text
+  prompt_text=$(jq -nr \
+    --arg id "$section_id" \
+    --arg title "$section_title" \
+    --arg phase "$phase" \
+    --arg cmd "$failed_cmd" \
+    --arg out "$trimmed" \
+    --arg plan "$PLAN_PATH" \
+    '"Fix verify failure for section \($id): \($title)\n\nPlan: \($plan)\nUpstream phase: \($phase) (already \( if $phase == "validate" then "committed — make a NEW [ralph] verify-fix commit on top" else "ran but did NOT commit — do not commit, the validate phase will pick up your fix" end ))\n\nFailing command: \($cmd)\n\nOutput (tail, 50KB max):\n\n\($out)\n\nDiagnose the root cause, patch the source, and re-run the failing command to confirm green. Stay scoped — no refactoring, no unrelated tests. Follow the rules in the appended system prompt for commit semantics."')
+
+  local start_time
+  start_time=$(date +%s000)
+
+  local budget_flags=""
+  if [[ "$BILLING" == "api" ]]; then
+    budget_flags="--max-budget-usd $MAX_BUDGET"
+  fi
+
+  local env_prefix=""
+  if [[ "$BILLING" == "max" ]]; then
+    env_prefix="env -u ANTHROPIC_API_KEY"
+  fi
+
+  local output exit_code=0
+  output=$(cd "$WORKTREE_DIR" && $env_prefix claude -p \
+    "$prompt_text" \
+    --append-system-prompt-file "$FIX_PROMPT" \
+    --output-format json \
+    --max-turns "$MAX_TURNS" \
+    $budget_flags \
+    --model "$FIX_MODEL" \
+    --allowedTools "$tools" \
+    --permission-mode "bypassPermissions" \
+    2>&1) || exit_code=$?
+
+  local end_time
+  end_time=$(date +%s000)
+  local duration_ms=$((end_time - start_time))
+
+  LAST_EXIT_CODE=$exit_code
+  LAST_DURATION_MS=$duration_ms
+  LAST_OUTPUT="$output"
+
+  # Non-fatal if fix-claude itself errored — the outer loop re-runs verify and
+  # decides based on whether the command now passes. A genuine rate-limit/quota
+  # error still surfaces via the verify failing on the next iteration.
+  if [[ $exit_code -ne 0 ]]; then
+    if echo "$output" | grep -qiE 'rate.limit|quota|capacity|too many requests|429'; then
+      err "Max plan quota exhausted during fix phase — wait for your rolling window to reset"
+      err "Re-run ralph when quota is available; it will resume from this section"
+      exit 1
+    fi
+    err "Fix-claude exited non-zero ($exit_code) — re-running verify anyway"
+  fi
+}
+
+# Persist a structured failure record so the next ralph run (or a human) can
+# pick up where the fix loop gave up. Sidecar lives outside the spec to keep
+# the spec schema clean.
+persist_failure_context() {
+  local section_id="$1"
+  local phase="$2"
+  local failed_cmd="$3"
+  local failed_output="$4"
+
+  mkdir -p "$FAILURES_DIR"
+  local sidecar="$FAILURES_DIR/${PLAN_SLUG}-section-${section_id}.json"
+  local trimmed
+  trimmed=$(printf '%s' "$failed_output" | tail -c 50000)
+
+  jq -n \
+    --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    --arg plan "$PLAN_PATH" \
+    --arg section "$section_id" \
+    --arg phase "$phase" \
+    --arg cmd "$failed_cmd" \
+    --arg out "$trimmed" \
+    --argjson retries "$MAX_FIX_RETRIES" \
+    '{
+      timestamp: $ts,
+      plan: $plan,
+      section: $section,
+      phase: $phase,
+      command: $cmd,
+      output_tail: $out,
+      retries_exhausted: $retries
+    }' > "$sidecar"
+
+  log "Wrote failure sidecar: $sidecar"
+}
+
+# Run all verify commands for a section. On the first failure, invoke
+# fix-claude with the failing command + captured output, then re-run all
+# verify commands from the start. Cap retries; on exhaustion, persist the
+# failure context and return 1 so the outer loop bails.
+#
+# Usage: run_verify_with_fix <phase> <section_id> <section_title>
+run_verify_with_fix() {
+  local phase="$1"
+  local section_id="$2"
+  local section_title="$3"
+  local worktree_spec="$WORKTREE_DIR/$SPEC_PATH"
+
+  # Snapshot verify commands into an array (jq-stream into a here-doc would
+  # break on commands containing '<' or '>'; arrays are safer).
+  local verify_cmds=()
+  while IFS= read -r cmd; do
+    [[ -z "$cmd" ]] && continue
+    verify_cmds+=("$cmd")
+  done < <(jq -r --arg id "$section_id" '
+    .sections[] | select(.id == $id) | .verify[]
+  ' "$worktree_spec")
+
+  if [[ ${#verify_cmds[@]} -eq 0 ]]; then
+    return 0
+  fi
+
+  local attempt=0
+  while true; do
+    local failed_cmd="" failed_output=""
+    local all_passed=true
+    local cmd
+    for cmd in "${verify_cmds[@]}"; do
+      log "Verify: $cmd"
+      local out_file
+      out_file=$(mktemp)
+      local rc=0
+      # Stream live output AND capture to file via tee. PIPESTATUS preserves
+      # the original command's exit code despite the pipe to tee. We bracket
+      # with `set +e`/`set -e` so a verify failure stays in the loop instead
+      # of exiting the script — `|| true` would clobber PIPESTATUS.
+      set +e
+      ( cd "$WORKTREE_DIR" && eval "$cmd" ) 2>&1 | tee "$out_file"
+      rc=${PIPESTATUS[0]}
+      set -e
+      if [[ $rc -ne 0 ]]; then
+        failed_cmd="$cmd"
+        failed_output=$(cat "$out_file")
+        rm -f "$out_file"
+        all_passed=false
+        err "Verify command failed: $cmd (exit $rc)"
+        break
+      fi
+      rm -f "$out_file"
+    done
+
+    if $all_passed; then
+      return 0
+    fi
+
+    attempt=$((attempt + 1))
+    if [[ $attempt -gt $MAX_FIX_RETRIES ]]; then
+      err "Fix attempts exhausted ($MAX_FIX_RETRIES) for section $section_id"
+      persist_failure_context "$section_id" "$phase" "$failed_cmd" "$failed_output"
+      return 1
+    fi
+
+    log "Fix attempt $attempt/$MAX_FIX_RETRIES — invoking fix-claude for: $failed_cmd"
+    run_fix_claude "$phase" "$section_id" "$section_title" "$failed_cmd" "$failed_output"
+    record_metrics "fix" "$section_id" "$section_title"
+    # Loop continues — re-run all verify commands from the start. A fix to one
+    # may have broken an earlier one; safer than an incremental re-run.
+  done
+}
+
 # ── Success Detection ─────────────────────────────────────
 
 check_success() {
   local phase="$1"
   local section_id="$2"
+  local section_title="${3:-}"
   local output="$LAST_OUTPUT"
   local exit_code=$LAST_EXIT_CODE
   local worktree_spec="$WORKTREE_DIR/$SPEC_PATH"
@@ -537,18 +741,13 @@ check_success() {
     return 1
   fi
 
-  # Layer 3 — Run verify commands from spec
-  local verify_cmd
-  while IFS= read -r verify_cmd; do
-    if [[ -z "$verify_cmd" ]]; then continue; fi
-    log "Verify: $verify_cmd"
-    if ! (cd "$WORKTREE_DIR" && eval "$verify_cmd"); then
-      err "Verify command failed: $verify_cmd"
-      return 1
-    fi
-  done < <(jq -r --arg id "$section_id" '
-    .sections[] | select(.id == $id) | .verify[]
-  ' "$worktree_spec")
+  # Layer 3 — Run verify commands from spec, with fix-claude retry on failure.
+  # On first verify failure, fix-claude is invoked with the failing command
+  # and its output. After it patches (and commits, if running post-validate),
+  # all verify commands re-run from the start. Capped at MAX_FIX_RETRIES.
+  if ! run_verify_with_fix "$phase" "$section_id" "$section_title"; then
+    return 1
+  fi
 
   return 0
 }
@@ -581,6 +780,13 @@ record_metrics() {
     subtype="crash"
   fi
 
+  local phase_model
+  case "$phase" in
+    implement) phase_model="$IMPLEMENT_MODEL" ;;
+    fix)       phase_model="$FIX_MODEL" ;;
+    *)         phase_model="$VALIDATE_MODEL" ;;
+  esac
+
   # Append JSONL record
   jq -nc \
     --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -597,7 +803,7 @@ record_metrics() {
     --argjson dur "$duration_ms" \
     --argjson dur_api "$duration_api" \
     --argjson turns "$num_turns" \
-    --arg model "$(if [[ "$phase" == "implement" ]]; then echo "$IMPLEMENT_MODEL"; else echo "$VALIDATE_MODEL"; fi)" \
+    --arg model "$phase_model" \
     --argjson max_turns "$MAX_TURNS" \
     --argjson max_budget "$MAX_BUDGET" \
     --arg commit_sha "$LAST_COMMIT_SHA" \
@@ -763,7 +969,7 @@ while true; do
     run_claude "implement" "$SECTION_ID" "$SECTION_TITLE"
     record_metrics "implement" "$SECTION_ID" "$SECTION_TITLE"
 
-    if ! check_success "implement" "$SECTION_ID"; then
+    if ! check_success "implement" "$SECTION_ID" "$SECTION_TITLE"; then
       err "Implement failed for section $SECTION_ID"
       LOOP_FAILED=true
       break
@@ -778,7 +984,7 @@ while true; do
   LAST_COMMIT_SHA=""
   run_claude "validate" "$SECTION_ID" "$SECTION_TITLE"
 
-  if ! check_success "validate" "$SECTION_ID"; then
+  if ! check_success "validate" "$SECTION_ID" "$SECTION_TITLE"; then
     record_metrics "validate" "$SECTION_ID" "$SECTION_TITLE"
     err "Validate failed for section $SECTION_ID"
     LOOP_FAILED=true

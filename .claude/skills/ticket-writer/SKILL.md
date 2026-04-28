@@ -66,21 +66,21 @@ Walk through essential components systematically. **Challenge ambiguity actively
 
 Actively identify and push back on:
 
-**🚩 Vague language:**
+**Vague language:**
 - "Make it work properly" → What specific behavior defines "works"?
 - "Improve performance" → What's the target metric?
 - "User-friendly interface" → What specific usability criteria?
 
-**🚩 Missing context:**
+**Missing context:**
 - Who is affected? How many users?
 - What's the business impact?
 - Why now vs. later?
 
-**🚩 Size issues:**
+**Size issues:**
 - Can this be completed in 1-2 days? If not, break it down.
 - Is this too small (<30 minutes)? Combine with related work.
 
-**🚩 Untestable criteria:**
+**Untestable criteria:**
 - How will QA know it's done?
 - What are the pass/fail conditions?
 - Are success criteria measurable?
@@ -89,8 +89,8 @@ Actively identify and push back on:
 
 Present draft tickets and explicitly ask:
 - "Is criterion X specific enough, or should we add detail?"
-- "The acceptance criteria seem testable, but criterion 3 might be ambiguous—should we break it down?"
-- "I notice we haven't specified [edge case]—should we add that?"
+- "The acceptance criteria seem testable, but criterion 3 might be ambiguous-should we break it down?"
+- "I notice we haven't specified [edge case]-should we add that?"
 
 Continue refining until passing the **"Ready for Development" test**: A developer unfamiliar with the context could complete it without asking clarifying questions.
 
@@ -113,10 +113,10 @@ Acceptance criteria are THE MOST IMPORTANT part of any ticket. Push for clarity.
 
 Every ticket should carry one of two tags in its body, right under the title:
 
-- **AFK** (Away From Keyboard) — a Claude Code agent can implement and merge this without human interaction. All decisions are resolved; acceptance criteria are testable; scope is clear.
-- **HITL** (Human In The Loop) — requires human judgment during implementation: architectural decision, design review, UX trade-off, or security call.
+- **AFK** (Away From Keyboard) - a Claude Code agent can implement and merge this without human interaction. All decisions are resolved; acceptance criteria are testable; scope is clear.
+- **HITL** (Human In The Loop) - requires human judgment during implementation: architectural decision, design review, UX trade-off, or security call.
 
-Prefer AFK where possible. If a ticket is HITL, note *why* in one line (e.g. "HITL — needs design review before shipping", "HITL — schema trade-off needs product input").
+Prefer AFK where possible. If a ticket is HITL, note *why* in one line (e.g. "HITL - needs design review before shipping", "HITL - schema trade-off needs product input").
 
 For GitHub, this goes in the issue body, not as a label. Format:
 
@@ -124,7 +124,7 @@ For GitHub, this goes in the issue body, not as a label. Format:
 
     or
 
-    **Work-readiness:** HITL — <reason>
+    **Work-readiness:** HITL - <reason>
 
 When breaking an epic down, mark each child ticket. A well-decomposed epic is mostly AFK with a few HITL tickets gating the rest.
 
@@ -152,12 +152,11 @@ When breaking an epic down, mark each child ticket. A well-decomposed epic is mo
 ### Challenge Weak Criteria
 
 If you see these, push back:
-
-❌ "Feature works properly" → What specific behavior defines "works"?  
-❌ "Users are happy with it" → What measurable user behavior?  
-❌ "No bugs" → What's the definition of acceptable quality?  
-❌ "Looks good" → What are the specific visual requirements?  
-❌ "Performs well" → What's the performance target?
+- "Feature works properly" → What specific behavior defines "works"?  
+- "Users are happy with it" → What measurable user behavior?  
+- "No bugs" → What's the definition of acceptable quality?  
+- "Looks good" → What are the specific visual requirements?  
+- "Performs well" → What's the performance target?
 
 ### Format Options
 
@@ -217,7 +216,7 @@ Then I should receive a reset email within 2 minutes
 
 ### Linear
 
-**Philosophy**: "Write issues, not user stories"—be direct for simple tasks.
+**Philosophy**: "Write issues, not user stories"-be direct for simple tasks.
 
 **Key fields**: Status, Priority, Estimate, Labels, Project, Cycle, Team
 
@@ -232,7 +231,7 @@ Then I should receive a reset email within 2 minutes
 
 ### GitHub Issues
 
-**Philosophy**: Issues are the foundation of GitHub project management—lightweight, markdown-based, and deeply integrated with code.
+**Philosophy**: Issues are the foundation of GitHub project management-lightweight, markdown-based, and deeply integrated with code.
 
 **Key fields**: Title, Body (markdown), Labels, Assignees, Projects, Milestones, Linked PRs
 
@@ -263,30 +262,30 @@ Then I should receive a reset email within 2 minutes
 
 **On epic breakdowns, linking is part of creation.** Once the breakdown plan is approved, create issues and wire relationships in the same turn. Don't ask about linking separately.
 
-**Parent/child (sub-issues)** — REST API:
+**Parent/child (sub-issues)** - REST API:
 
 ```bash
 # Fetch the REST numeric id (not the GraphQL node_id):
 CHILD_ID=$(gh api /repos/OWNER/REPO/issues/<CHILD_NUM> --jq .id)
 
-# Link — -F for integer, not -f:
+# Link - -F for integer, not -f:
 gh api -X POST /repos/OWNER/REPO/issues/<PARENT_NUM>/sub_issues \
   -F "sub_issue_id=$CHILD_ID"
 ```
 
 Gotchas:
-- `sub_issue_id` must be an integer — `-F`, not `-f`. Strings get `422 "not of type integer"`.
+- `sub_issue_id` must be an integer - `-F`, not `-f`. Strings get `422 "not of type integer"`.
 - Use the REST numeric `.id`, not the GraphQL `node_id`.
 - Shows as sub-issue progress on the parent (e.g. "3/10").
 
-**Blocked-by / blocks** — no native typed field on classic issues. Use body-text sections; they render as cross-references and surface in Projects views:
+**Blocked-by / blocks** - no native typed field on classic issues. Use body-text sections; they render as cross-references and surface in Projects views:
 
 ```markdown
 ## Blocked by
-- #<N> — <short reason>
+- #<N> - <short reason>
 
 ## Blocks
-- #<N> — <short reason>
+- #<N> - <short reason>
 ```
 
 Bake these into the body **at creation time**. Create issues **in dependency order** so each body can reference numbers above it.
@@ -301,7 +300,7 @@ Bake these into the body **at creation time**. Create issues **in dependency ord
 6. Add every child to the project, capture the item id.
 7. Set project fields via one aliased GraphQL mutation per item.
 
-Stop to confirm only if the plan changes — never for mechanics.
+Stop to confirm only if the plan changes - never for mechanics.
 
 #### GitHub Projects Integration
 
@@ -425,22 +424,14 @@ Before finalizing:
 ## Common Anti-Patterns
 
 Watch for and challenge:
-
-🚩 **Vague titles**: "Login issue" → "Fix login button unresponsive after autofill on Safari iOS 17"
-
-🚩 **Missing "why"**: Just describing what without business context
-
-🚩 **Implementation in stories**: "localStorage implemented" → "preferences persist across sessions"
-
-🚩 **Unmeasurable criteria**: "Make it work properly" → "Page loads in <2 seconds"
-
-🚩 **Tickets too large**: "Build authentication system" → Break into signup, login, email confirmation (each 1-2 days)
-
-🚩 **No visual evidence** (bugs): Text only → Screenshot with annotation or video
-
-🚩 **No reproduction steps** (bugs): "App crashes sometimes" → Detailed numbered steps
-
-🚩 **Assuming knowledge**: Using undefined acronyms → Define terms, link discussions
+- **Vague titles**: "Login issue" → "Fix login button unresponsive after autofill on Safari iOS 17"
+- **Missing "why"**: Just describing what without business context
+- **Implementation in stories**: "localStorage implemented" → "preferences persist across sessions"
+- **Unmeasurable criteria**: "Make it work properly" → "Page loads in <2 seconds"
+- **Tickets too large**: "Build authentication system" → Break into signup, login, email confirmation (each 1-2 days)
+- **No visual evidence** (bugs): Text only → Screenshot with annotation or video
+- **No reproduction steps** (bugs): "App crashes sometimes" → Detailed numbered steps
+- **Assuming knowledge**: Using undefined acronyms → Define terms, link discussions
 
 ---
 
@@ -469,10 +460,10 @@ Watch for and challenge:
 Once you answer these, I'll help you craft a detailed ticket with proper acceptance criteria, technical considerations, and all context your team needs."
 
 This approach:
-- ✅ Asks clarifying questions before diving in
-- ✅ Identifies ambiguities early
-- ✅ Demonstrates thoroughness
-- ✅ Sets expectations for collaboration
+- Asks clarifying questions before diving in
+- Identifies ambiguities early
+- Demonstrates thoroughness
+- Sets expectations for collaboration
 
 ---
 
@@ -513,7 +504,7 @@ When MCP servers are available, the ticket-writer skill can directly create, upd
 1. **Gather requirements** through questioning
 2. **Draft ticket content** collaboratively
 3. **Review with user** for completeness
-4. **Create + link + populate in one turn**: After plan approval, create tickets, wire sub-issue relationships, add to the project, and set fields — one turn, no re-confirmation. Linking and field assignment are part of "create".
+4. **Create + link + populate in one turn**: After plan approval, create tickets, wire sub-issue relationships, add to the project, and set fields - one turn, no re-confirmation. Linking and field assignment are part of "create".
 5. **If no MCP / CLI available**: Provide formatted markdown for manual entry.
 
 ### Benefits of MCP Integration

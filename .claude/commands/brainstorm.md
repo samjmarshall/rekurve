@@ -49,7 +49,7 @@ Start by understanding the current project context, then ask questions one at a 
 - Edit any existing source files
 - Proceed to implementation planning
 
-The user will use `/create_plan` separately to create an implementation plan.
+The user will use either `/write_ticet` separately to create tickets for more complex designs or or `/create_plan` to create an implementation plan for simple designs.
 
 ## Key Principles
 

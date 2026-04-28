@@ -222,6 +222,7 @@ test.describe("Lead Profile — E2E", () => {
 
     // 1. Create an unqualified lead via quick capture
     const phone = uniquePhone();
+    phones.push(phone);
     const uniqueId = Date.now().toString(36);
     const lastName = `Edit ${uniqueId}`;
 

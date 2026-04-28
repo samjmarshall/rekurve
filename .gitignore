@@ -67,7 +67,6 @@ yarn-error.log*
 # Ralph loop runtime
 /.worktrees/
 /.ralph/
-*.spec.json
 
 # claude local settings (machine-specific)
 .claude/settings.local.json

@@ -12,7 +12,7 @@ graph TD
     NextJS --> Website["(website) — marketing pages"]
     NextJS --> Application["(application) — authenticated app"]
     NextJS --> Login["(login) — auth flows"]
-    NextJS --> API["/api — webhooks, auth"]
+    NextJS --> API["/api — webhooks, auth, cron"]
 
     Application --> tRPC_Server["tRPC Server (direct call)"]
     Browser -->|HTTP batch stream| tRPC_Client["tRPC Client"]
@@ -26,7 +26,12 @@ graph TD
     BetterAuth --> Drizzle
 
     NextJS --> HubSpot[HubSpot API]
+    NextJS --> Anthropic["Anthropic API — Claude (drafting, nurture)"]
+    NextJS --> MSGraph["Microsoft Graph — /me/sendMail (Outlook)"]
     NextJS --> PostHog[PostHog — analytics]
+
+    Cron["Vercel Cron — daily nurture tick"] -->|CRON_SECRET| API
+    HubSpot -.->|webhook| API
 
     GitHub[GitHub Actions] -->|CI/CD| Vercel
 ```
@@ -36,7 +41,7 @@ graph TD
 ```mermaid
 graph LR
     subgraph Hosting
-        Vercel["Vercel — hosting, edge, previews"]
+        Vercel["Vercel — hosting, edge, previews, cron"]
     end
 
     subgraph Database
@@ -44,8 +49,10 @@ graph LR
     end
 
     subgraph Integrations
-        HubSpot["HubSpot — CRM, contact sync, webhooks"]
+        HubSpot["HubSpot — CRM, contact sync, webhooks, BCC reconciliation"]
         Resend["Resend — transactional email (OTP)"]
+        Anthropic["Anthropic — Claude API (drafting + nurture)"]
+        MSGraph["Microsoft Graph — Outlook /me/sendMail"]
         PostHog["PostHog — analytics, session recording, errors"]
     end
 
@@ -57,9 +64,31 @@ graph LR
     Vercel --> Neon
     Vercel --> HubSpot
     Vercel --> Resend
+    Vercel --> Anthropic
+    Vercel --> MSGraph
     Vercel --> PostHog
     GitHub --> Vercel
 ```
+
+### Feature reference
+
+Per-feature deep dives — what each shipped feature does today and where it lives in code — live in [`docs/feature/`](feature/README.md). These are living, present-tense docs. Run `/document-feature {slug}` from the repo root to add or refresh one.
+
+### Decision records
+
+Point-in-time architecture decisions — why we chose X over Y — live in [`docs/adr/`](adr/). ADRs are not living documents: each one is a snapshot of a decision and the alternatives considered at the time. Use the templates ([simple](adr/adr000-template-simple.md), [in-depth](adr/adr000-template-in-depth.md)) when adding a new one.
+
+| ADR | Decision |
+|-----|----------|
+| [001](adr/adr001-imessage-integration-for-sales-automation.md) | iMessage integration for sales automation |
+| [002](adr/adr002-layout-level-auth-gates-over-middleware.md) | Layout-level auth gates instead of `middleware.ts` |
+| [003](adr/adr003-hubspot-source-of-truth-for-contacts.md) | HubSpot is the source of truth for contact data |
+| [004](adr/adr004-webhook-swallow-and-always-200.md) | HubSpot webhook handler swallows per-event errors and always returns 200 |
+| [005](adr/adr005-deterministic-lead-scoring.md) | Lead scoring is deterministic (no LLM) |
+| [006](adr/adr006-lead-mutations-return-post-scoring-row.md) | Lead mutations return the post-scoring authoritative row |
+| [007](adr/adr007-outlook-send-with-hubspot-bcc-reconciliation.md) | Outlook send with HubSpot BCC reconciliation |
+| [008](adr/adr008-nurture-auto-start-is-best-effort.md) | Nurture auto-start failures are swallowed on the lead write path |
+| [009](adr/adr009-nurture-advances-on-draft-failure.md) | Nurture scheduler advances `nextStepAt` even when `draftMessage` throws |
 
 ## Prerequisites
 
@@ -104,6 +133,12 @@ cp .env.example .env
 | `RESEND_API_KEY` | Email | Resend API key for OTP delivery |
 | `HUBSPOT_ACCESS_TOKEN` | HubSpot | Private app access token |
 | `HUBSPOT_CLIENT_SECRET` | HubSpot | Private app client secret (webhook validation) |
+| `HUBSPOT_BCC_ADDRESS` | HubSpot | Portal-specific `bcc-NNNNN@bcc.hubspot.com` for outbound email reconciliation |
+| `ANTHROPIC_API_KEY` | AI | Claude API key — used by message drafting and nurture scheduler |
+| `CRON_SECRET` | Cron | Shared secret (≥16 chars) — gates `/api/cron/*` routes from Vercel Cron |
+| `MS_GRAPH_CLIENT_ID` | Outlook | Microsoft Graph app client ID (Outlook send-on-behalf) |
+| `MS_GRAPH_CLIENT_SECRET` | Outlook | Microsoft Graph app client secret |
+| `MS_GRAPH_REDIRECT_URI` | Outlook | OAuth redirect URI for Microsoft Graph consent flow |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Analytics | PostHog project API key |
 | `NEXT_PUBLIC_POSTHOG_HOST` | Analytics | PostHog ingest host (reverse-proxied) |
 | `POSTHOG_ERROR_TRACKING_API_KEY` | Analytics | PostHog error tracking key |
@@ -129,8 +164,8 @@ All commands go through the `Makefile`. Prefer `make` targets over raw `yarn`/`n
 | `make test_coverage` | Unit tests with Istanbul coverage |
 | `make test_e2e` | Run Playwright E2E tests |
 | `make audit` | NPM security audit (production deps) |
-| `make db_generate` | Generate Drizzle migration files |
-| `make db_push` | Push schema to database |
+| `make db_generate` | Generate a Drizzle migration SQL file in `drizzle/` |
+| `make db_migrate` | Apply pending migrations and record them in `__drizzle_migrations` |
 | `make db_studio` | Open Drizzle Studio GUI |
 | `make db_branch` | Create/switch Neon DB branch for current git branch |
 | `make db_branch_delete` | Delete current branch's Neon DB branch |

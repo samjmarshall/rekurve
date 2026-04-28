@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { z } from "zod";
 import { Button } from "~/components/ui/Button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
@@ -12,6 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "~/components/ui/select";
+import type { constructionTimelineSchema } from "~/server/api/schemas/leads";
 import {
   buildPipelineSearchParams,
   parseFiltersFromSearchParams,
@@ -19,8 +21,23 @@ import {
 } from "../_lib/filters";
 import { type LeadStage, STAGE_META, STAGE_ORDER } from "../_lib/stage-meta";
 
+/**
+ * Sentinel value for "no timeline filter applied" inside the Radix Select.
+ * Radix Select does not allow null/undefined as item values, so we need a
+ * string that cannot collide with any real constructionTimeline enum value.
+ * The compile-time guard below fails typecheck if a future enum value ever
+ * starts with `__`, forcing us to pick a new sentinel.
+ */
+const ANY_TIMELINE = "__any__" as const;
+
+type RealTimeline = z.infer<typeof constructionTimelineSchema>;
+// If this errors, ANY_TIMELINE collides with a real enum value — rename it.
+type _SentinelGuard = RealTimeline extends `__${string}` ? never : true;
+const _sentinelOk: _SentinelGuard = true;
+void _sentinelOk;
+
 const TIMELINE_OPTIONS = [
-  { value: "__any__", label: "Any timeline" },
+  { value: ANY_TIMELINE, label: "Any timeline" },
   { value: "ready_now", label: "Ready now" },
   { value: "3_6_months", label: "3–6 months" },
   { value: "12_months_plus", label: "12 months+" },
@@ -44,7 +61,7 @@ export function PipelineFilters() {
   const currentEstate = filters?.preferredEstate ?? "";
   const currentFhog = filters?.fhogEligible ?? null;
   const currentTimeline: TimelineValue =
-    filters?.constructionTimeline ?? "__any__";
+    filters?.constructionTimeline ?? ANY_TIMELINE;
 
   // Local state for the debounced estate text input.
   const [estate, setEstate] = useState<string>(currentEstate);
@@ -72,7 +89,7 @@ export function PipelineFilters() {
           fhogEligible:
             next.fhogEligible !== undefined ? next.fhogEligible : currentFhog,
           constructionTimeline:
-            resolvedTimeline === "__any__" ? null : resolvedTimeline,
+            resolvedTimeline === ANY_TIMELINE ? null : resolvedTimeline,
         },
         visibleStages: next.visibleStages ?? visibleStages,
       });
@@ -148,6 +165,7 @@ export function PipelineFilters() {
         <SelectTrigger
           className="h-9 min-w-[10rem]"
           data-testid="filter-timeline"
+          aria-label="Construction timeline"
         >
           <span className="flex flex-1 text-left" data-slot="select-value">
             {TIMELINE_OPTIONS.find((o) => o.value === currentTimeline)?.label ??
@@ -163,7 +181,8 @@ export function PipelineFilters() {
         </SelectContent>
       </Select>
 
-      <div className="flex items-center gap-3">
+      <fieldset className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <legend className="sr-only">Visible stages</legend>
         {STAGE_ORDER.map((stage) => (
           // biome-ignore lint/a11y/noLabelWithoutControl: label wraps Checkbox (Radix input) as its control
           <label
@@ -180,7 +199,7 @@ export function PipelineFilters() {
             {STAGE_META[stage].label}
           </label>
         ))}
-      </div>
+      </fieldset>
 
       {hasActiveFilter && (
         <Button

@@ -740,6 +740,6 @@ The `drizzle/` directory contains migration files and should be committed (it's 
 - Parent Epic: #85
 - Design doc: `thoughts/designs/2026-03-27-ai-sales-assistant-new-home-builders.md`
 - Enquiry form: `docs/sales/Display-Client-Enquiry-Form-v1.2.md`
-- ADR-001 (iMessage/delivery_method): `docs/architecture-decisions/adr001-imessage-integration-for-sales-automation.md`
+- ADR-001 (iMessage/delivery_method): `docs/adr/adr001-imessage-integration-for-sales-automation.md`
 - better-auth Drizzle adapter schema: https://www.better-auth.com/docs/adapters/drizzle
 - Drizzle + Neon setup: https://orm.drizzle.team/docs/get-started/neon-new

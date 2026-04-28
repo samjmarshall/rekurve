@@ -1,0 +1,1159 @@
+{
+  "version": 2,
+  "plan": "thoughts/plans/2026-04-09-fix-posthog-e2e-tests.md",
+  "title": "Fix PostHog E2E Tests Implementation Plan",
+  "tasks": [
+    {
+      "id": "1.1.1",
+      "title": "Add test-mode branch to PostHog init (1/6)",
+      "task": "Open `src/instrumentation-client.ts` and add a `declare global { interface Window { __E2E_MODE__?: boolean; } }` block after the existing imports",
+      "files": ["src/instrumentation-client.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.1.2",
+      "title": "Add test-mode branch to PostHog init (2/6)",
+      "task": "Add the line `const isE2E = typeof window !== \"undefined\" && window.__E2E_MODE__ === true;` after the global declaration",
+      "files": ["src/instrumentation-client.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.1.3",
+      "title": "Add test-mode branch to PostHog init (3/6)",
+      "task": "Inside the existing `posthog.init()` options object, add a conditional spread placeholder: `...(isE2E && { }),`",
+      "files": ["src/instrumentation-client.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.1.4",
+      "title": "Add test-mode branch to PostHog init (4/6)",
+      "task": "Inside the conditional spread object, add the key `request_batching: false`",
+      "files": ["src/instrumentation-client.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.1.5",
+      "title": "Add test-mode branch to PostHog init (5/6)",
+      "task": "Inside the same conditional spread object, add the key `disable_session_recording: true`",
+      "files": ["src/instrumentation-client.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.1.6",
+      "title": "Add test-mode branch to PostHog init (6/6)",
+      "task": "Add an inline comment directly above the conditional spread explaining: \"Playwright E2E mode: disable batching so captures fire immediately and can be intercepted by AnalyticsHelper. Session recording is disabled to avoid test traffic leaking to the real PostHog project.\"",
+      "files": ["src/instrumentation-client.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.2.1",
+      "title": "Inject flag in analytics fixture (1/4)",
+      "task": "Open `e2e/fixtures/test.ts` and locate the `analytics` fixture body at lines 15-20",
+      "files": ["e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.2.2",
+      "title": "Inject flag in analytics fixture (2/4)",
+      "task": "Before the `const analytics = new AnalyticsHelper(page)` line, add an `await page.addInitScript(() => { ... });` call",
+      "files": ["e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.2.3",
+      "title": "Inject flag in analytics fixture (3/4)",
+      "task": "Inside the `addInitScript` callback, set `(window as Window & { __E2E_MODE__?: boolean }).__E2E_MODE__ = true`",
+      "files": ["e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.2.4",
+      "title": "Inject flag in analytics fixture (4/4)",
+      "task": "Add a comment directly above the `addInitScript` call explaining it must run before any page script so the next `goto()` injects the flag into the fresh document where `instrumentation-client.ts` will read it",
+      "files": ["e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.3.1",
+      "title": "Smoke test (1/8)",
+      "task": "At `e2e/features/cta-tracking.spec.ts:1`, change `import { test } from \"../fixtures/test\";` to `import { expect, test } from \"../fixtures/test\";`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.3.2",
+      "title": "Smoke test (2/8)",
+      "task": "Inside the `CTA Click Tracking` describe block, add a new `test(\"[phase 1 smoke] hero primary CTA emits cta_clicked\", async ({ homePage, analytics }) => { ... });`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.3.3",
+      "title": "Smoke test (3/8)",
+      "task": "Inside the smoke test body, call `await homePage.hero.clickPrimaryCta();`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.3.4",
+      "title": "Smoke test (4/8)",
+      "task": "Inside the smoke test body, call `const event = await analytics.waitForEvent(\"cta_clicked\", 5000);`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.3.5",
+      "title": "Smoke test (5/8)",
+      "task": "Assert `expect(event).not.toBeNull();`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.3.6",
+      "title": "Smoke test (6/8)",
+      "task": "Assert `expect(event?.properties.location).toBe(\"hero_primary\");`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.3.7",
+      "title": "Smoke test (7/8)",
+      "task": "Add an inline comment inside the smoke test noting it is a temporary Phase 1 scaffold using `waitForEvent` (not the sync fluent API) and will be replaced in Phase 2",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.3.8",
+      "title": "Smoke test (8/8)",
+      "task": "Leave the top-of-file \"PostHog batches events\" JSDoc comment untouched (Phase 3 removes it)",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.4.1",
+      "title": "Phase 1 automated verification (1/3)",
+      "task": "`make check` passes (typecheck + lint)",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.4.2",
+      "title": "Phase 1 automated verification (2/3)",
+      "task": "`yarn test:e2e --project=desktop -g \"\\[phase 1 smoke\\] hero primary CTA\"` passes on 3 consecutive runs",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.4.3",
+      "title": "Phase 1 automated verification (3/3)",
+      "task": "The HTML report shows 1 captured `cta_clicked` event with `location: \"hero_primary\"`",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.5.1",
+      "title": "Phase 1 manual verification (1/2)",
+      "task": "Open devtools on a production page and confirm `window.__E2E_MODE__` is `undefined` (i.e., the flag is truly test-only and not leaking)",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "1.5.2",
+      "title": "Phase 1 manual verification (2/2)",
+      "task": "In the same session, run `window.__E2E_MODE__ = true; location.reload()` and confirm PostHog still works but network traffic shows one request per event instead of batched payloads (use Network tab filter `/rk/`)",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.1",
+      "title": "Promote toBeFired to async with polling (1/23)",
+      "task": "Change the `toBeFired()` signature at `e2e/utils/analytics-helper.ts:233` from `toBeFired(): void` to `async toBeFired(timeoutMs = 5000): Promise<void>`",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.2",
+      "title": "Promote toBeFired to async with polling (2/23)",
+      "task": "Inside `toBeFired`, record `const startedAt = Date.now();` as the first line",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.3",
+      "title": "Promote toBeFired to async with polling (3/23)",
+      "task": "Wrap the existing match logic in a `while (Date.now() - startedAt < timeoutMs) { ... }` polling loop",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.4",
+      "title": "Promote toBeFired to async with polling (4/23)",
+      "task": "Inside the loop, filter `this.events` into `const matchingEvents = this.events.filter((e) => e.event === this.eventName);`",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.5",
+      "title": "Promote toBeFired to async with polling (5/23)",
+      "task": "Inside the loop, if `matchingEvents.length > 0 && this.propertyMatchers.length === 0`, `return` immediately (success path, no property matchers)",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.6",
+      "title": "Promote toBeFired to async with polling (6/23)",
+      "task": "Inside the loop, if `matchingEvents.length > 0` and there ARE property matchers, use `matchingEvents.find((event) => this.propertyMatchers.every(({ key, matcher }) => matcher(event.properties[key])))` and `return` when a fully-matching event is found",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.7",
+      "title": "Promote toBeFired to async with polling (7/23)",
+      "task": "At the end of each loop iteration, `await new Promise((r) => setTimeout(r, 50));` to yield control",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.8",
+      "title": "Promote toBeFired to async with polling (8/23)",
+      "task": "After the loop (timeout branch), re-compute `matchingEvents` from the current `this.events` so the failure message reflects the final state",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.9",
+      "title": "Promote toBeFired to async with polling (9/23)",
+      "task": "Raise the existing `expect(matchingEvents.length, ...).toBeGreaterThan(0)` assertion with a message referencing `this.eventName`, `timeoutMs`, and the captured event names",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.10",
+      "title": "Promote toBeFired to async with polling (10/23)",
+      "task": "Build a `conditions` string by joining `this.propertyMatchers.map((m) => m.description)` with `\", \"`",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.11",
+      "title": "Promote toBeFired to async with polling (11/23)",
+      "task": "Build an `actualProps` string by joining `matchingEvents.map((e) => JSON.stringify(e.properties))` with newlines",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.12",
+      "title": "Promote toBeFired to async with polling (12/23)",
+      "task": "Throw a final `Error` with message `\"Expected '${this.eventName}' with [${conditions}] within ${timeoutMs}ms, but no matching event found.\\nActual '${this.eventName}' events:\\n${actualProps}\"`",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.13",
+      "title": "Promote toBeFired to async with polling (13/23)",
+      "task": "Change the `toBeFiredTimes()` signature at `e2e/utils/analytics-helper.ts:269` from `toBeFiredTimes(count: number): void` to `async toBeFiredTimes(count: number, timeoutMs = 5000): Promise<void>`",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.14",
+      "title": "Promote toBeFired to async with polling (14/23)",
+      "task": "Inside `toBeFiredTimes`, record `const startedAt = Date.now();` as the first line",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.15",
+      "title": "Promote toBeFired to async with polling (15/23)",
+      "task": "Wrap the existing match logic in a `while (Date.now() - startedAt < timeoutMs) { ... }` polling loop",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.16",
+      "title": "Promote toBeFired to async with polling (16/23)",
+      "task": "Inside the loop, compute `const matching = this.events.filter((e) => { if (e.event !== this.eventName) return false; if (this.propertyMatchers.length === 0) return true; return this.propertyMatchers.every(({ key, matcher }) => matcher(e.properties[key])); });`",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.17",
+      "title": "Promote toBeFired to async with polling (17/23)",
+      "task": "Inside the loop, if `matching.length === count`, `return` immediately (success)",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.18",
+      "title": "Promote toBeFired to async with polling (18/23)",
+      "task": "Inside the loop, if `matching.length > count`, `break` to fail fast on overshoot",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.19",
+      "title": "Promote toBeFired to async with polling (19/23)",
+      "task": "At the end of each loop iteration, `await new Promise((r) => setTimeout(r, 50));`",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.20",
+      "title": "Promote toBeFired to async with polling (20/23)",
+      "task": "After the loop (timeout or overshoot branch), re-compute `matching` from the current `this.events`",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.21",
+      "title": "Promote toBeFired to async with polling (21/23)",
+      "task": "Raise `expect(matching).toHaveLength(count);` so Playwright surfaces its rich length-diff failure",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.22",
+      "title": "Promote toBeFired to async with polling (22/23)",
+      "task": "Verify `expectNoEvent` at `e2e/utils/analytics-helper.ts:161` remains sync — do NOT add `async` or `await` (per \"What We're NOT Doing\")",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.1.23",
+      "title": "Promote toBeFired to async with polling (23/23)",
+      "task": "Verify `waitForEvent` at `e2e/utils/analytics-helper.ts:138-153` is NOT touched — it already polls correctly and is used as-is by the Phase 1 smoke test",
+      "files": ["e2e/utils/analytics-helper.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.2.1",
+      "title": "Replace Phase 1 smoke test (1/5)",
+      "task": "In `e2e/features/cta-tracking.spec.ts`, delete the entire `[phase 1 smoke] hero primary CTA emits cta_clicked` test added in Phase 1",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.2.2",
+      "title": "Replace Phase 1 smoke test (2/5)",
+      "task": "Add a new `test(\"[phase 2 smoke] hero primary CTA fluent assertion\", async ({ homePage, analytics }) => { ... });` in its place, inside the `CTA Click Tracking` describe block",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.2.3",
+      "title": "Replace Phase 1 smoke test (3/5)",
+      "task": "Inside the new smoke test body, call `await homePage.hero.clickPrimaryCta();`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.2.4",
+      "title": "Replace Phase 1 smoke test (4/5)",
+      "task": "Inside the new smoke test body, await the fluent chain: `await analytics.expectEvent(\"cta_clicked\").withProperty(\"location\", \"hero_primary\").toBeFired();`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.2.5",
+      "title": "Replace Phase 1 smoke test (5/5)",
+      "task": "Add an inline comment noting this smoke test will be deleted in Phase 3 once the real unskipped tests cover the same plumbing",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.3.1",
+      "title": "Phase 2 automated verification (1/3)",
+      "task": "`make check` passes",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.3.2",
+      "title": "Phase 2 automated verification (2/3)",
+      "task": "`yarn test:e2e --project=desktop -g \"\\[phase 2 smoke\\] hero primary CTA fluent assertion\"` passes on 10 consecutive runs (stability check — polling should make this non-flaky)",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.3.3",
+      "title": "Phase 2 automated verification (3/3)",
+      "task": "Intentionally break the app instrumentation (temporarily rename `cta_clicked` to `cta_clicked_xxx` in `src/lib/posthog.ts:177`) and confirm the test fails with the polling timeout message within ~5s, not hanging. Revert the rename before moving on.",
+      "files": ["src/lib/posthog.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "2.4.1",
+      "title": "Phase 2 manual verification (1/1)",
+      "task": "Error message on failure lists both the expected event + conditions AND the actual captured events — useful when debugging real failures",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.1",
+      "title": "Unskip cta-tracking.spec.ts (1/15)",
+      "task": "Delete the top-of-file JSDoc comment block at `e2e/features/cta-tracking.spec.ts:3-51` (\"CTA CLICK TRACKING TESTS - ALL ANALYTICS TESTS MARKED AS FIXME…\")",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.2",
+      "title": "Unskip cta-tracking.spec.ts (2/15)",
+      "task": "Delete the `[phase 2 smoke] hero primary CTA fluent assertion` test — the unfixme'd \"hero primary CTA tracks click event\" now covers the same plumbing",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.3",
+      "title": "Unskip cta-tracking.spec.ts (3/15)",
+      "task": "Change `test.fixme(\"hero primary CTA tracks click event\", …)` at line 57 to `test(\"hero primary CTA tracks click event\", …)`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.4",
+      "title": "Unskip cta-tracking.spec.ts (4/15)",
+      "task": "Change `test.fixme(\"hero secondary CTA tracks click event\", …)` at line 69 to `test(\"hero secondary CTA tracks click event\", …)`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.5",
+      "title": "Unskip cta-tracking.spec.ts (5/15)",
+      "task": "Change `test.fixme(\"navbar desktop CTA tracks click event\", …)` at line 81 to `test(\"navbar desktop CTA tracks click event\", …)`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.6",
+      "title": "Unskip cta-tracking.spec.ts (6/15)",
+      "task": "Change `test.fixme(\"pricing tier CTAs track click events\", …)` at line 93 to `test(\"pricing tier CTAs track click events\", …)`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.7",
+      "title": "Unskip cta-tracking.spec.ts (7/15)",
+      "task": "Change `test.fixme(\"final CTA section tracks click event\", …)` at line 119 to `test(\"final CTA section tracks click event\", …)`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.8",
+      "title": "Unskip cta-tracking.spec.ts (8/15)",
+      "task": "Change `test.fixme(\"FAQ bottom CTA tracks click event\", …)` at line 132 to `test(\"FAQ bottom CTA tracks click event\", …)`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.9",
+      "title": "Unskip cta-tracking.spec.ts (9/15)",
+      "task": "Prefix the `.toBeFired()` call inside \"hero primary CTA tracks click event\" with `await`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.10",
+      "title": "Unskip cta-tracking.spec.ts (10/15)",
+      "task": "Prefix the `.toBeFired()` call inside \"hero secondary CTA tracks click event\" with `await`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.11",
+      "title": "Unskip cta-tracking.spec.ts (11/15)",
+      "task": "Prefix the `.toBeFired()` call inside \"navbar desktop CTA tracks click event\" with `await`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.12",
+      "title": "Unskip cta-tracking.spec.ts (12/15)",
+      "task": "Prefix the first `.toBeFired()` call (pricing_foundation, before `analytics.clearEvents()`) inside \"pricing tier CTAs track click events\" with `await`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.13",
+      "title": "Unskip cta-tracking.spec.ts (13/15)",
+      "task": "Prefix the second `.toBeFired()` call (pricing_growth, after `analytics.clearEvents()`) inside \"pricing tier CTAs track click events\" with `await`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.14",
+      "title": "Unskip cta-tracking.spec.ts (14/15)",
+      "task": "Prefix the `.toBeFired()` call inside \"final CTA section tracks click event\" with `await`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.1.15",
+      "title": "Unskip cta-tracking.spec.ts (15/15)",
+      "task": "Prefix the `.toBeFired()` call inside \"FAQ bottom CTA tracks click event\" with `await`",
+      "files": ["e2e/features/cta-tracking.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.2.1",
+      "title": "Unskip booking-form.spec.ts (1/9)",
+      "task": "Delete the mid-file JSDoc comment block at `e2e/features/booking-form.spec.ts:177-203` (\"ANALYTICS TESTS - ALL MARKED AS FIXME…\") — note this is mid-file, not top-of-file, because two other describe blocks precede it",
+      "files": ["e2e/features/booking-form.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.2.2",
+      "title": "Unskip booking-form.spec.ts (2/9)",
+      "task": "Change `test.fixme(\"form interaction fires form_started event\", …)` at line 210 to `test(\"form interaction fires form_started event\", …)`",
+      "files": ["e2e/features/booking-form.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.2.3",
+      "title": "Unskip booking-form.spec.ts (3/9)",
+      "task": "Change `test.fixme(\"step completion fires step_completed event\", …)` at line 219 to `test(\"step completion fires step_completed event\", …)`",
+      "files": ["e2e/features/booking-form.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.2.4",
+      "title": "Unskip booking-form.spec.ts (4/9)",
+      "task": "Change `test.fixme(\"lead identification happens after step 1\", …)` at line 235 to `test(\"lead identification happens after step 1\", …)`",
+      "files": ["e2e/features/booking-form.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.2.5",
+      "title": "Unskip booking-form.spec.ts (5/9)",
+      "task": "Change `test.fixme(\"successful submission fires form_submitted event\", …)` at line 311 to `test(\"successful submission fires form_submitted event\", …)`",
+      "files": ["e2e/features/booking-form.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.2.6",
+      "title": "Unskip booking-form.spec.ts (6/9)",
+      "task": "Prefix the `.toBeFired()` call inside \"form interaction fires form_started event\" with `await`",
+      "files": ["e2e/features/booking-form.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.2.7",
+      "title": "Unskip booking-form.spec.ts (7/9)",
+      "task": "Prefix the `.toBeFired()` call inside \"step completion fires step_completed event\" with `await`",
+      "files": ["e2e/features/booking-form.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.2.8",
+      "title": "Unskip booking-form.spec.ts (8/9)",
+      "task": "Prefix the `.toBeFired()` call inside \"lead identification happens after step 1\" with `await`",
+      "files": ["e2e/features/booking-form.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.2.9",
+      "title": "Unskip booking-form.spec.ts (9/9)",
+      "task": "Prefix the `.toBeFired()` call inside \"successful submission fires form_submitted event\" with `await`",
+      "files": ["e2e/features/booking-form.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.3.1",
+      "title": "Unskip login.spec.ts (1/6)",
+      "task": "Delete the pre-describe JSDoc comment block at `e2e/features/login.spec.ts:256-263` (\"POSTHOG EVENT TESTS — MARKED AS FIXME…\")",
+      "files": ["e2e/features/login.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.3.2",
+      "title": "Unskip login.spec.ts (2/6)",
+      "task": "Delete the describe-level `test.fixme(true, \"PostHog events are batched…\")` call at lines 265-268 that currently blocks the entire \"Login Page — PostHog Events\" describe",
+      "files": ["e2e/features/login.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.3.3",
+      "title": "Unskip login.spec.ts (3/6)",
+      "task": "Prefix the `.toBeFired()` call inside \"fires login_otp_requested on email submit\" (starts at line 270) with `await`",
+      "files": ["e2e/features/login.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.3.4",
+      "title": "Unskip login.spec.ts (4/6)",
+      "task": "Prefix the `.toBeFired()` call inside \"fires login_success on successful OTP verify\" (starts at line 289) with `await`",
+      "files": ["e2e/features/login.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.3.5",
+      "title": "Unskip login.spec.ts (5/6)",
+      "task": "Verify the `analytics.expectNoEvent(\"login_success\")` call at line 329 remains **sync** (do NOT add `await`) — `expectNoEvent` stays sync per \"What We're NOT Doing\"",
+      "files": ["e2e/features/login.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.3.6",
+      "title": "Unskip login.spec.ts (6/6)",
+      "task": "Leave all `loginPage.page.waitForTimeout(500)` calls in this file untouched — they are belt-and-braces on top of polling and genuinely needed for the sync `expectNoEvent` assertion",
+      "files": ["e2e/features/login.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.4.1",
+      "title": "Unskip faq-interactions.spec.ts (1/6)",
+      "task": "Delete the inline JSDoc comment at `e2e/features/faq-interactions.spec.ts:88-90` (\"ANALYTICS TEST - See booking-form.spec.ts…\")",
+      "files": ["e2e/features/faq-interactions.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.4.2",
+      "title": "Unskip faq-interactions.spec.ts (2/6)",
+      "task": "Delete the inline JSDoc comment at `e2e/features/faq-interactions.spec.ts:110-112` (\"ANALYTICS TEST - See booking-form.spec.ts…\")",
+      "files": ["e2e/features/faq-interactions.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.4.3",
+      "title": "Unskip faq-interactions.spec.ts (3/6)",
+      "task": "Change `test.fixme(\"search tracks analytics event after debounce\", …)` at line 91 to `test(\"search tracks analytics event after debounce\", …)`",
+      "files": ["e2e/features/faq-interactions.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.4.4",
+      "title": "Unskip faq-interactions.spec.ts (4/6)",
+      "task": "Change `test.fixme(\"expanding FAQ tracks analytics event\", …)` at line 113 to `test(\"expanding FAQ tracks analytics event\", …)`",
+      "files": ["e2e/features/faq-interactions.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.4.5",
+      "title": "Unskip faq-interactions.spec.ts (5/6)",
+      "task": "Prefix the `.toBeFired()` call inside \"search tracks analytics event after debounce\" with `await`",
+      "files": ["e2e/features/faq-interactions.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.4.6",
+      "title": "Unskip faq-interactions.spec.ts (6/6)",
+      "task": "Prefix the `.toBeFired()` call inside \"expanding FAQ tracks analytics event\" with `await`",
+      "files": ["e2e/features/faq-interactions.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.5.1",
+      "title": "Unskip form-abandonment.spec.ts (1/6)",
+      "task": "Delete the top-of-file JSDoc comment block at `e2e/journeys/form-abandonment.spec.ts:4-10` (\"ANALYTICS TESTS - ALL MARKED AS FIXME…\")",
+      "files": ["e2e/journeys/form-abandonment.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.5.2",
+      "title": "Unskip form-abandonment.spec.ts (2/6)",
+      "task": "Change `test.fixme(\"abandonment tracked when leaving after step 1\", …)` at line 12 to `test(\"abandonment tracked when leaving after step 1\", …)`",
+      "files": ["e2e/journeys/form-abandonment.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.5.3",
+      "title": "Unskip form-abandonment.spec.ts (3/6)",
+      "task": "Change `test.fixme(\"partial lead data is captured at each step\", …)` at line 40 to `test(\"partial lead data is captured at each step\", …)`",
+      "files": ["e2e/journeys/form-abandonment.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.5.4",
+      "title": "Unskip form-abandonment.spec.ts (4/6)",
+      "task": "Prefix the `analytics.expectEvent(\"form_step_completed\").withProperty(\"step\", 1).toBeFired()` call inside \"abandonment tracked when leaving after step 1\" with `await`",
+      "files": ["e2e/journeys/form-abandonment.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.5.5",
+      "title": "Unskip form-abandonment.spec.ts (5/6)",
+      "task": "Prefix the `analytics.expectEvent(\"lead_identified\").toBeFired()` call inside \"partial lead data is captured at each step\" with `await`",
+      "files": ["e2e/journeys/form-abandonment.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.5.6",
+      "title": "Unskip form-abandonment.spec.ts (6/6)",
+      "task": "Prefix the `analytics.expectEvent(\"form_step_completed\").withProperty(\"step\", 2).toBeFired()` call inside \"partial lead data is captured at each step\" with `await`",
+      "files": ["e2e/journeys/form-abandonment.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.6.1",
+      "title": "Unskip lead-conversion.spec.ts (1/9)",
+      "task": "Delete the pre-test JSDoc comment block at `e2e/journeys/lead-conversion.spec.ts:5-20` (\"ANALYTICS TEST - MARKED AS FIXME…\")",
+      "files": ["e2e/journeys/lead-conversion.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.6.2",
+      "title": "Unskip lead-conversion.spec.ts (2/9)",
+      "task": "Delete the pre-test JSDoc comment block at `e2e/journeys/lead-conversion.spec.ts:116-121` (\"ANALYTICS TEST - MARKED AS FIXME…\")",
+      "files": ["e2e/journeys/lead-conversion.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.6.3",
+      "title": "Unskip lead-conversion.spec.ts (3/9)",
+      "task": "Change `test.fixme(\"complete journey from landing to form submission with analytics\", …)` at line 21 to `test(\"complete journey from landing to form submission with analytics\", …)`",
+      "files": ["e2e/journeys/lead-conversion.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.6.4",
+      "title": "Unskip lead-conversion.spec.ts (4/9)",
+      "task": "Change `test.fixme(\"UTM parameters are tracked\", …)` at line 122 to `test(\"UTM parameters are tracked\", …)`",
+      "files": ["e2e/journeys/lead-conversion.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.6.5",
+      "title": "Unskip lead-conversion.spec.ts (5/9)",
+      "task": "Prefix the `analytics.expectEvent(\"cta_clicked\").withProperty(\"location\", \"hero_primary\").toBeFired()` call with `await`",
+      "files": ["e2e/journeys/lead-conversion.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.6.6",
+      "title": "Unskip lead-conversion.spec.ts (6/9)",
+      "task": "Prefix the `analytics.expectEvent(\"booking_form_started\").toBeFired()` call with `await`",
+      "files": ["e2e/journeys/lead-conversion.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.6.7",
+      "title": "Unskip lead-conversion.spec.ts (7/9)",
+      "task": "Prefix the `analytics.expectEvent(\"form_step_completed\").withProperty(\"step\", 1).toBeFired()` call with `await`",
+      "files": ["e2e/journeys/lead-conversion.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.6.8",
+      "title": "Unskip lead-conversion.spec.ts (8/9)",
+      "task": "Prefix the `analytics.expectEvent(\"booking_form_submitted\").withPropertyPresent(\"lead_email\").toBeFired()` call with `await`",
+      "files": ["e2e/journeys/lead-conversion.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.6.9",
+      "title": "Unskip lead-conversion.spec.ts (9/9)",
+      "task": "Prefix the `analytics.expectEvent(\"utm_captured\").withProperty(\"utm_source\", \"google\").toBeFired()` call with `await`",
+      "files": ["e2e/journeys/lead-conversion.spec.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.7.1",
+      "title": "Phase 3 automated verification (1/4)",
+      "task": "`make check` passes (typecheck — note: biome 2.4.9's `noFloatingPromises` rule is in nursery and NOT enabled in this project's `biome.json`, and TypeScript `strict` doesn't catch unawaited promises either. Static analysis will NOT catch a missed `await` on `.toBeFired()` — the checks below are the real safety net.)",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.7.2",
+      "title": "Phase 3 automated verification (2/4)",
+      "task": "Grep confirms zero `test.fixme` calls remain in the 6 analytics spec files: `rg \"test\\.fixme\" e2e/features/cta-tracking.spec.ts e2e/features/booking-form.spec.ts e2e/features/login.spec.ts e2e/features/faq-interactions.spec.ts e2e/journeys/form-abandonment.spec.ts e2e/journeys/lead-conversion.spec.ts` returns nothing",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.7.3",
+      "title": "Phase 3 automated verification (3/4)",
+      "task": "Grep confirms every `.toBeFired(` or `.toBeFiredTimes(` call is preceded by `await`: `rg --multiline --multiline-dotall \"^\\s*analytics\\b(?:(?!await).)*?\\.toBeFired\" e2e/features e2e/journeys` returns nothing",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "3.7.4",
+      "title": "Phase 3 automated verification (4/4)",
+      "task": "`make test_e2e` shows ≥ 200 passed (up from 145), ≤ 55 skipped (down from 111), 0 failed on the first run. If a test silently passed due to a missed `await` on an assertion, Playwright's unhandled-rejection handler surfaces it as a failure here — rerun after fixing.",
+      "files": [],
+      "verify": ["make check", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "3.8.1",
+      "title": "Phase 3 manual verification (1/1)",
+      "task": "Spot-check HTML report: click into 2-3 of the newly-passing tests and confirm the \"events captured\" count matches expectations (e.g., the `pricing tier CTAs` test should show both `pricing_foundation` and `pricing_growth` captures)",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.1.1",
+      "title": "Run full suite and collect failures (1/5)",
+      "task": "Confirm the working tree is clean (no unrelated diffs that could skew failures)",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.1.2",
+      "title": "Run full suite and collect failures (2/5)",
+      "task": "Run `make test_e2e` end-to-end against a clean worktree",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.1.3",
+      "title": "Run full suite and collect failures (3/5)",
+      "task": "Capture the JSON reporter output to a scratch file (e.g. `/tmp/posthog-triage.json`) for parsing",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.1.4",
+      "title": "Run full suite and collect failures (4/5)",
+      "task": "Parse the JSON into a list of `(test title, source file, error message)` tuples for the failures",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.1.5",
+      "title": "Run full suite and collect failures (5/5)",
+      "task": "Save the parsed failure list to a scratch file for use during triage",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.1",
+      "title": "Triage failures (1/17)",
+      "task": "For each failure in the parsed list, label it `property-mismatch`, `event-never-fires`, or `safeCapture-race`",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.2",
+      "title": "Triage failures (2/17)",
+      "task": "Note any failure that doesn't fit cleanly into one of those three buckets — surface it before continuing",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.3",
+      "title": "Triage failures (3/17)",
+      "task": "For each property-mismatch failure, open `src/lib/posthog.ts` and locate the `trackX()` call site that emits the event",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.4",
+      "title": "Triage failures (4/17)",
+      "task": "Compare the test's `withProperty(...)` keys/values against the app's actual capture payload and identify which side diverges",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.5",
+      "title": "Triage failures (5/17)",
+      "task": "Decide per failure whether to fix the test or the app — prefer fixing the test when the app shape is a deliberate schema, prefer fixing the app when it's a clear oversight",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.6",
+      "title": "Triage failures (6/17)",
+      "task": "Apply the chosen fix",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.7",
+      "title": "Triage failures (7/17)",
+      "task": "Re-run just that single test (e.g. `yarn test:e2e -g \"<test title>\"`) to confirm it passes",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.8",
+      "title": "Triage failures (8/17)",
+      "task": "For each \"event never fires\" failure, identify the user action in the test that should have triggered the event",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.9",
+      "title": "Triage failures (9/17)",
+      "task": "Trace that user action back to the corresponding handler in the app source",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.10",
+      "title": "Triage failures (10/17)",
+      "task": "Verify the handler calls the expected `trackX()` function from `src/lib/posthog.ts`",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.11",
+      "title": "Triage failures (11/17)",
+      "task": "If the `trackX()` call site is missing, add it",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.12",
+      "title": "Triage failures (12/17)",
+      "task": "Re-run that single test to confirm it passes",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.13",
+      "title": "Triage failures (13/17)",
+      "task": "For each suspected `safeCapture` race, look for `[PostHog] Not ready, event queued` in the test's page console output to confirm the diagnosis",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.14",
+      "title": "Triage failures (14/17)",
+      "task": "If confirmed, add a `waitForPostHogReady()` helper to `e2e/fixtures/test.ts` that calls `await page.waitForFunction(() => (window as any).posthog?.__loaded === true, { timeout: 5000 })`",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.15",
+      "title": "Triage failures (15/17)",
+      "task": "Export `waitForPostHogReady` (or expose it through the analytics fixture API) so tests can call it",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.16",
+      "title": "Triage failures (16/17)",
+      "task": "Call `waitForPostHogReady()` at the top of each test that hit the race",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.2.17",
+      "title": "Triage failures (17/17)",
+      "task": "Re-run each affected test to confirm it passes",
+      "files": ["src/lib/posthog.ts", "e2e/fixtures/test.ts"],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.3.1",
+      "title": "Handle out-of-scope app gaps (1/5)",
+      "task": "For each failure that requires non-trivial app-side instrumentation, draft a GitHub issue title and body describing the failing test, the missing event/property, and the proposed fix",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.3.2",
+      "title": "Handle out-of-scope app gaps (2/5)",
+      "task": "File the follow-up issues via `gh issue create`, capturing the returned issue numbers",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.3.3",
+      "title": "Handle out-of-scope app gaps (3/5)",
+      "task": "For each filed issue, re-apply `test.fixme(\"TODO: #<issue-number> — app-side instrumentation missing\")` on the corresponding test (only — leave all other newly-unskipped tests untouched)",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.3.4",
+      "title": "Handle out-of-scope app gaps (4/5)",
+      "task": "After re-applying the targeted fixmes, re-run `make test_e2e` and confirm 0 failures (the deferred tests now skip, the rest pass)",
+      "files": [],
+      "verify": ["make check", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "4.3.5",
+      "title": "Handle out-of-scope app gaps (5/5)",
+      "task": "Run `make check` one more time to confirm typecheck and lint still pass with the targeted fixmes in place",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.4.1",
+      "title": "Phase 4 automated verification (1/3)",
+      "task": "`make test_e2e` reports 0 failed across all 3 viewport projects",
+      "files": [],
+      "verify": ["make check", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "4.4.2",
+      "title": "Phase 4 automated verification (2/3)",
+      "task": "Passed count is ≥ 200 (allowing for 2-3 Phase 4 follow-up fixmes if genuinely blocked on app work)",
+      "files": [],
+      "verify": ["make check", "make test_e2e"],
+      "state": "pending"
+    },
+    {
+      "id": "4.4.3",
+      "title": "Phase 4 automated verification (3/3)",
+      "task": "`make check` still passes",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.5.1",
+      "title": "Phase 4 manual verification (1/3)",
+      "task": "Visual inspection of the HTML report shows the formerly-skipped tests now in the \"passed\" column",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.5.2",
+      "title": "Phase 4 manual verification (2/3)",
+      "task": "Spot check one newly-passing test in each file to confirm the assertions are meaningful (not just passing because the capture array is empty and `expectNoEvent` is being used)",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    },
+    {
+      "id": "4.5.3",
+      "title": "Phase 4 manual verification (3/3)",
+      "task": "Open the PostHog project in the browser and confirm the test run did NOT create a flood of session recordings (validates that `disable_session_recording: true` kicked in)",
+      "files": [],
+      "verify": ["make check"],
+      "state": "pending"
+    }
+  ]
+}

@@ -26,7 +26,7 @@ export const STAGE_META: Record<
   nurture: {
     label: "Nurture",
     badgeVariant: "brand",
-    accentBorderClass: "border-l-primary",
+    accentBorderClass: "border-l-accent-blue",
   },
   warm: {
     label: "Warm",

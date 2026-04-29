@@ -98,8 +98,10 @@ export function useApproveAction() {
         if (data.channel === "email") {
           toast.add({ title: "Sent via email" });
         } else {
-          // SMS dispatch lands in #129
-          toast.add({ title: "Approved" });
+          toast.add({
+            title: "Sent to your phone",
+            description: "Forward it to the lead from Messages.",
+          });
         }
       },
       onError: (err, _vars, context) => {
@@ -155,10 +157,9 @@ export function useEditAndApproveAction() {
             description: "Your edits were saved.",
           });
         } else {
-          // SMS dispatch lands in #129
           toast.add({
-            title: "Approved",
-            description: "Your edits were saved.",
+            title: "Sent to your phone",
+            description: "Forward it to the lead from Messages.",
           });
         }
       },

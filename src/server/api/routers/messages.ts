@@ -9,6 +9,7 @@ import {
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { leads, messageQueue, msGraphTokens } from "~/server/db/schema";
 import { dispatchEmail } from "~/server/dispatch/email-dispatch";
+import { dispatchSms } from "~/server/dispatch/sms-dispatch";
 
 /**
  * Fetch a message_queue row and assert its status permits a user action.
@@ -146,6 +147,8 @@ export const messagesRouter = createTRPCRouter({
       if (message.channel === "email") {
         await checkEmailPreconditions(ctx.db, ctx.session.user.id, lead);
         await dispatchEmail({ db: ctx.db, ctx, message, lead });
+      } else if (message.channel === "sms") {
+        await dispatchSms({ db: ctx.db, message });
       }
 
       const [updated] = await ctx.db
@@ -173,6 +176,11 @@ export const messagesRouter = createTRPCRouter({
           ctx,
           message: { ...existing, body: input.body },
           lead,
+        });
+      } else if (existing.channel === "sms") {
+        await dispatchSms({
+          db: ctx.db,
+          message: { ...existing, body: input.body },
         });
       }
 

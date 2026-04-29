@@ -5,6 +5,7 @@ const isCI = process.env.CI === "true";
 
 export default defineConfig({
   testDir: "./e2e",
+  testMatch: "**/*.spec.ts",
   globalTeardown: "./e2e/utils/global-teardown.ts",
   timeout: 45_000,
   expect: { timeout: 5_000 },

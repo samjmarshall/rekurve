@@ -203,20 +203,24 @@ test.describe("Leads CRUD — E2E", () => {
     await page.goto("/dashboard");
     const quickCapture = new QuickCaptureSection(page);
     await quickCapture.open();
+    const phoneUnqualified = uniquePhone();
+    phones.push(phoneUnqualified);
     await quickCapture.fill({
       firstName: "Pipeline",
       lastName: `Unqualified ${uniqueId}`,
-      phone: uniquePhone(),
+      phone: phoneUnqualified,
     });
     await quickCapture.submit();
     await quickCapture.expectSuccessToast(`Pipeline Unqualified ${uniqueId}`);
 
     await page.goto("/leads/new");
     const form = new LeadFormSection(page);
+    const phoneHot = uniquePhone();
+    phones.push(phoneHot);
     await form.fillStep1({
       firstName: "Pipeline",
       lastName: `Hot ${uniqueId}`,
-      phone: uniquePhone(),
+      phone: phoneHot,
       email: `e2e-${uniqueId}-hot@test.rekurve.dev`,
     });
     await form.clickNext();
@@ -258,10 +262,12 @@ test.describe("Leads CRUD — E2E", () => {
     await page.goto("/dashboard");
     const quickCapture = new QuickCaptureSection(page);
     await quickCapture.open();
+    const phone = uniquePhone();
+    phones.push(phone);
     await quickCapture.fill({
       firstName: "QC",
       lastName: `Capture ${uniqueId}`,
-      phone: uniquePhone(),
+      phone,
     });
     await quickCapture.submit();
     await quickCapture.expectSuccessToast(`QC Capture ${uniqueId}`);
@@ -291,10 +297,12 @@ test.describe("Leads CRUD — E2E", () => {
     await page.goto("/dashboard");
     const quickCapture = new QuickCaptureSection(page);
     await quickCapture.open();
+    const phone = uniquePhone();
+    phones.push(phone);
     await quickCapture.fill({
       firstName: "Nav",
       lastName: `Test ${uniqueId}`,
-      phone: uniquePhone(),
+      phone,
     });
     await quickCapture.submit();
     await quickCapture.expectSuccessToast(`Nav Test ${uniqueId}`);
@@ -324,10 +332,12 @@ test.describe("Leads CRUD — E2E", () => {
     await page.goto("/dashboard");
     const quickCapture = new QuickCaptureSection(page);
     await quickCapture.open();
+    const phone = uniquePhone();
+    phones.push(phone);
     await quickCapture.fill({
       firstName: "Count",
       lastName: `Update ${uniqueId}`,
-      phone: uniquePhone(),
+      phone,
     });
     await quickCapture.submit();
     await quickCapture.expectSuccessToast(`Count Update ${uniqueId}`);
@@ -354,10 +364,12 @@ test.describe("Leads CRUD — E2E", () => {
     const form = new LeadFormSection(page);
 
     await page.goto("/leads/new");
+    const phoneBuyer = uniquePhone();
+    phones.push(phoneBuyer);
     await form.fillStep1({
       firstName: "FHOG",
       lastName: `Buyer ${uniqueId}`,
-      phone: uniquePhone(),
+      phone: phoneBuyer,
       email: `e2e-${uniqueId}-fhog-buyer@test.rekurve.dev`,
     });
     await form.clickNext();
@@ -368,10 +380,12 @@ test.describe("Leads CRUD — E2E", () => {
     await form.expectSuccess(`FHOG Buyer ${uniqueId}`);
 
     await page.goto("/leads/new");
+    const phoneInvestor = uniquePhone();
+    phones.push(phoneInvestor);
     await form.fillStep1({
       firstName: "FHOG",
       lastName: `Investor ${uniqueId}`,
-      phone: uniquePhone(),
+      phone: phoneInvestor,
       email: `e2e-${uniqueId}-fhog-investor@test.rekurve.dev`,
     });
     await form.clickNext();

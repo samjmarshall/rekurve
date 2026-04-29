@@ -9,7 +9,7 @@ jobs:
   verify:
     name: Verify (${{ github.event.client_payload.environment }})
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     permissions:
       contents: read
       actions: read
@@ -153,3 +153,29 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 30
+
+  # Override the commit status when verify is cancelled (e.g. timeout).
+  # The Vercel post-status action reports `success` on cancellation, which
+  # masks failures on the PR. This job runs after verify completes and
+  # overwrites the commit status with `failure` so PR checks reflect reality.
+  override-cancelled-status:
+    name: Mark cancelled run as failed
+    needs: verify
+    if: ${{ always() && needs.verify.result == 'cancelled' }}
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - name: Post failure commit status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.client_payload.git.sha }}
+          REPO: ${{ github.repository }}
+          TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh api -X POST \
+            "repos/$REPO/statuses/$SHA" \
+            -f state=failure \
+            -f context="Post-Deploy Verification" \
+            -f description="Job cancelled (likely timeout)" \
+            -f target_url="$TARGET_URL"

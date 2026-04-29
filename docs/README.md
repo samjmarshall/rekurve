@@ -1,4 +1,14 @@
-# Rekurve — Developer Guide
+# Rekurve
+
+AI sales assistant for new home builders.
+
+## Getting started
+
+```bash
+make install     # install deps
+make env_pull    # pull env vars from Vercel (run make vercel_link first on a new clone)
+make start       # dev server at https://www.localhost
+```
 
 ## Architecture
 
@@ -12,7 +22,7 @@ graph TD
     NextJS --> Website["(website) — marketing pages"]
     NextJS --> Application["(application) — authenticated app"]
     NextJS --> Login["(login) — auth flows"]
-    NextJS --> API["/api — webhooks, auth"]
+    NextJS --> API["/api — webhooks, auth, cron"]
 
     Application --> tRPC_Server["tRPC Server (direct call)"]
     Browser -->|HTTP batch stream| tRPC_Client["tRPC Client"]
@@ -26,7 +36,12 @@ graph TD
     BetterAuth --> Drizzle
 
     NextJS --> HubSpot[HubSpot API]
+    NextJS --> Anthropic["Anthropic API — Claude (drafting, nurture)"]
+    NextJS --> MSGraph["Microsoft Graph — /me/sendMail (Outlook)"]
     NextJS --> PostHog[PostHog — analytics]
+
+    Cron["Vercel Cron — daily nurture tick"] -->|CRON_SECRET| API
+    HubSpot -.->|webhook| API
 
     GitHub[GitHub Actions] -->|CI/CD| Vercel
 ```
@@ -36,7 +51,7 @@ graph TD
 ```mermaid
 graph LR
     subgraph Hosting
-        Vercel["Vercel — hosting, edge, previews"]
+        Vercel["Vercel — hosting, edge, previews, cron"]
     end
 
     subgraph Database
@@ -44,8 +59,10 @@ graph LR
     end
 
     subgraph Integrations
-        HubSpot["HubSpot — CRM, contact sync, webhooks"]
+        HubSpot["HubSpot — CRM, contact sync, webhooks, BCC reconciliation"]
         Resend["Resend — transactional email (OTP)"]
+        Anthropic["Anthropic — Claude API (drafting + nurture)"]
+        MSGraph["Microsoft Graph — Outlook /me/sendMail"]
         PostHog["PostHog — analytics, session recording, errors"]
     end
 
@@ -57,9 +74,31 @@ graph LR
     Vercel --> Neon
     Vercel --> HubSpot
     Vercel --> Resend
+    Vercel --> Anthropic
+    Vercel --> MSGraph
     Vercel --> PostHog
     GitHub --> Vercel
 ```
+
+### Feature reference
+
+Per-feature deep dives — what each shipped feature does today and where it lives in code — live in [`docs/feature/`](feature/README.md). These are living, present-tense docs. Run `/document-feature {slug}` from the repo root to add or refresh one.
+
+### Decision records
+
+Point-in-time architecture decisions — why we chose X over Y — live in [`docs/adr/`](adr/). ADRs are not living documents: each one is a snapshot of a decision and the alternatives considered at the time. Use the templates ([simple](adr/adr000-template-simple.md), [in-depth](adr/adr000-template-in-depth.md)) when adding a new one.
+
+| ADR | Decision |
+|-----|----------|
+| [001](adr/adr001-imessage-integration-for-sales-automation.md) | iMessage integration for sales automation |
+| [002](adr/adr002-layout-level-auth-gates-over-middleware.md) | Layout-level auth gates instead of `middleware.ts` |
+| [003](adr/adr003-hubspot-source-of-truth-for-contacts.md) | HubSpot is the source of truth for contact data |
+| [004](adr/adr004-webhook-swallow-and-always-200.md) | HubSpot webhook handler swallows per-event errors and always returns 200 |
+| [005](adr/adr005-deterministic-lead-scoring.md) | Lead scoring is deterministic (no LLM) |
+| [006](adr/adr006-lead-mutations-return-post-scoring-row.md) | Lead mutations return the post-scoring authoritative row |
+| [007](adr/adr007-outlook-send-with-hubspot-bcc-reconciliation.md) | Outlook send with HubSpot BCC reconciliation |
+| [008](adr/adr008-nurture-auto-start-is-best-effort.md) | Nurture auto-start failures are swallowed on the lead write path |
+| [009](adr/adr009-nurture-advances-on-draft-failure.md) | Nurture scheduler advances `nextStepAt` even when `draftMessage` throws |
 
 ## Prerequisites
 
@@ -104,6 +143,12 @@ cp .env.example .env
 | `RESEND_API_KEY` | Email | Resend API key for OTP delivery |
 | `HUBSPOT_ACCESS_TOKEN` | HubSpot | Private app access token |
 | `HUBSPOT_CLIENT_SECRET` | HubSpot | Private app client secret (webhook validation) |
+| `HUBSPOT_BCC_ADDRESS` | HubSpot | Portal-specific `bcc-NNNNN@bcc.hubspot.com` for outbound email reconciliation |
+| `ANTHROPIC_API_KEY` | AI | Claude API key — used by message drafting and nurture scheduler |
+| `CRON_SECRET` | Cron | Shared secret (≥16 chars) — gates `/api/cron/*` routes from Vercel Cron |
+| `MS_GRAPH_CLIENT_ID` | Outlook | Microsoft Graph app client ID (Outlook send-on-behalf) |
+| `MS_GRAPH_CLIENT_SECRET` | Outlook | Microsoft Graph app client secret |
+| `MS_GRAPH_REDIRECT_URI` | Outlook | OAuth redirect URI for Microsoft Graph consent flow |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Analytics | PostHog project API key |
 | `NEXT_PUBLIC_POSTHOG_HOST` | Analytics | PostHog ingest host (reverse-proxied) |
 | `POSTHOG_ERROR_TRACKING_API_KEY` | Analytics | PostHog error tracking key |
@@ -129,8 +174,8 @@ All commands go through the `Makefile`. Prefer `make` targets over raw `yarn`/`n
 | `make test_coverage` | Unit tests with Istanbul coverage |
 | `make test_e2e` | Run Playwright E2E tests |
 | `make audit` | NPM security audit (production deps) |
-| `make db_generate` | Generate Drizzle migration files |
-| `make db_push` | Push schema to database |
+| `make db_generate` | Generate a Drizzle migration SQL file in `drizzle/` |
+| `make db_migrate` | Apply pending migrations and record them in `__drizzle_migrations` |
 | `make db_studio` | Open Drizzle Studio GUI |
 | `make db_branch` | Create/switch Neon DB branch for current git branch |
 | `make db_branch_delete` | Delete current branch's Neon DB branch |
@@ -142,6 +187,60 @@ All commands go through the `Makefile`. Prefer `make` targets over raw `yarn`/`n
 | `make env_pull_preview` | Pull preview env vars from Vercel for the current branch |
 | `make release` | Semantic release via `auto shipit` |
 | `make clean` | Remove `.next`, `node_modules`, caches |
+
+## Integrations
+
+### Microsoft Graph setup
+
+Email dispatch routes through each consultant's Microsoft 365 mailbox via the Microsoft Graph API. This requires a multi-tenant Azure AD app registration.
+
+#### Azure AD app registration
+
+1. Go to [portal.azure.com](https://portal.azure.com) → Azure Active Directory → App registrations → New registration
+2. Set **Supported account types** to `Accounts in any organizational directory (Any Azure AD directory - Multitenant)`
+3. Add a Redirect URI: `https://www.localhost/api/auth/ms-graph/callback` (Web platform)
+4. Under **Certificates & secrets**, create a client secret
+5. Under **API permissions**, add delegated permissions: `Mail.Send`, `User.Read`, `offline_access`
+
+#### Environment variables
+
+Add these to Vercel (use `--sensitive` for secrets):
+
+```bash
+vercel env add MS_GRAPH_CLIENT_ID
+vercel env add MS_GRAPH_CLIENT_SECRET   # --sensitive
+vercel env add MS_GRAPH_REDIRECT_URI    # e.g. https://www.localhost/api/auth/ms-graph/callback
+vercel env add HUBSPOT_BCC_ADDRESS      # e.g. 12345678@bcc.hubspot.com (from HubSpot Settings → Integrations → Email)
+```
+
+#### Connecting a consultant's mailbox
+
+Navigate to `/api/auth/ms-graph/start` while logged in. This redirects to Microsoft's OAuth consent screen. After consent, the user lands at `/dashboard?ms_connected=1` and email dispatch is enabled.
+
+The connect banner on the dashboard also appears when no token row exists for the current user.
+
+#### E2E testing with a real mailbox
+
+Set `MS_GRAPH_TEST_ACCESS_TOKEN` in your local `.env.local` (not committed, not pushed to Vercel) to a valid Graph access token for a test mailbox. The `email-dispatch.spec.ts` E2E spec uses this token to seed the `ms_graph_tokens` table for the test user.
+
+### HubSpot integrations
+
+#### Webhook subscriptions
+
+The webhook endpoint at `/api/hubspot/webhook` handles:
+
+| Subscription type | Behaviour |
+|---|---|
+| `contact.creation` | Upserts local lead from HubSpot contact |
+| `contact.propertyChange` | Syncs mapped property changes to local lead |
+| `contact.deletion` | Deletes local lead |
+| `email.creation` | Reconciles `conversations.hubspotActivityId` for outbound emails sent via Graph + BCC |
+
+To add the `email.creation` subscription: HubSpot Settings → Integrations → Private Apps → your app → Webhooks → Add subscription → `email.creation`.
+
+#### BCC ingestion address
+
+`HUBSPOT_BCC_ADDRESS` is your portal-specific BCC address (format: `<portalId>@bcc.hubspot.com`). Find it in HubSpot Settings → Integrations → Email → BCC address. Every outbound email sent via Graph includes this address in BCC so HubSpot auto-ingests it as an email engagement on the contact's timeline.
 
 ## CI/CD Pipeline
 

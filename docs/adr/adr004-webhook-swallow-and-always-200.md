@@ -1,0 +1,18 @@
+# HubSpot webhook handler swallows per-event errors and always returns 200
+
+**Status:** accepted
+
+The HubSpot webhook handler at `POST /api/hubspot/webhook` validates the v3 signature and 5-minute timestamp window, then loops over the events array with a per-event try/catch. Per-event failures are logged with `[HubSpot Webhook] Failed to process …` and the next event proceeds; the response is always 200 OK once the signature passes. We accept silent loss of an individual event in exchange for never returning a 5xx that would trigger HubSpot's retry pipeline against the entire batch. The rule binds the handler, not just the contact-sync subset — every subscription type the route dispatches (`contact.creation`, `contact.propertyChange`, `contact.deletion`, `object.creation` for emails, and any future addition) is covered.
+
+## Considered options
+
+- **Return 5xx on event-handler failure → let HubSpot retry the whole batch.** Rejected because HubSpot's retry policy resends the entire batch, not just the failed event. A single poison event would re-execute the side effects of the *successful* events repeatedly until the poison was fixed manually. Idempotent handlers reduce the damage but don't make the duplication free; in practice this means flooded logs and amplified DB load during incidents.
+- **Per-event retry queue with a dead-letter table.** Rejected for pilot. Building a durable queue plus DLQ plus replay tooling is a multi-day commitment whose value is bounded by HubSpot's actual delivery reliability — which we have no evidence is bad. Revisit if the `[HubSpot Webhook] Failed to process …` log shows real loss.
+- **Throw and accept the retry storm.** Rejected as the worst of both: silent loss *and* duplicated work on every retry. Documented only because someone reading the catch-and-log pattern might "fix" it to throw; we want to stop that fix at code review.
+
+## Consequences
+
+- **A failed event is silently lost. The only signal is a console log.** No retry, no queue, no alert. If HubSpot delivery becomes unreliable or a handler bug ships, divergence accumulates and the next operator notices via a customer report, not a metric. Mitigation lives outside this ADR (logging dashboards, future alerts on `[HubSpot Webhook] Failed to process …`).
+- **Idempotency is a hard requirement of every event handler.** Because retries don't exist, the handler must be safe to receive the same event twice — HubSpot does occasionally re-deliver after network partitions. All current handlers satisfy this: `contact.creation` upserts on `hubspot_contact_id`, `contact.propertyChange` writes a single field by primary key, `contact.deletion` is a `DELETE WHERE` no-op on missing rows, `object.creation` for emails reconciles via an `isNull(hubspotActivityId)` guard. New handlers must continue this pattern; throwing on a "duplicate" event is a bug, not a defence.
+- **Adding a new subscription type means consciously copying the try/catch dispatch shape.** A handler that throws breaks the contract and re-introduces retry storms. The current `route.ts` structure makes this mistake easy to spot in review (one switch arm per type, one try/catch outside the switch), but there is no compile-time enforcement.
+- **Signature and timestamp validation are the only hard rejections.** This is the explicit boundary of the always-200 rule. A request that fails the v3 signature check or arrives outside the 5-minute window returns 401; everything past that gate is best-effort. Future hardening (e.g. payload schema validation) has to decide which side of the gate it sits on — pre-gate failures must remain 4xx, post-gate failures must remain 200.

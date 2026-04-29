@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "plan": "thoughts/plans/2026-04-28-e2e-test-data-cleanup.md",
+  "title": "E2E Test Data Cleanup Implementation Plan",
+  "sections": [
+    {
+      "id": "1",
+      "title": "Phase 1: Unify the firstname whitelist",
+      "tasks": [
+        "`make check` passes",
+        "`make test` passes (new whitelist parity test passes)",
+        "`make build` passes",
+        "Search `e2e/utils/auth-helper.ts` and `e2e/utils/hubspot-helper.ts` for hard-coded firstname arrays — only one definition remains (`TEST_FIRST_NAMES` in `hubspot-helper.ts`).",
+        "Diff the two SQL statements — both reference the same parameter binding."
+      ],
+      "files": [
+        "e2e/utils/auth-helper.ts",
+        "e2e/utils/hubspot-helper.ts",
+        "e2e/utils/cleanup-whitelist.test.ts"
+      ],
+      "verify": ["make check", "make test", "make build"],
+      "state": "pending"
+    },
+    {
+      "id": "2",
+      "title": "Phase 2: Paginate Phase 2 search to drain backlog",
+      "tasks": [
+        "`make check` passes",
+        "`make test` passes (pagination test passes)",
+        "Run the full E2E suite locally with the existing backlog present. After teardown, query HubSpot via `searchApi.doSearch` with the same filterGroups manually — count is 0 (or below 100 if a fresh run created new test data that subsequent runs will catch).",
+        "Tail the global teardown logs — no warning about hitting the page cap."
+      ],
+      "files": [
+        "e2e/utils/hubspot-helper.ts",
+        "e2e/utils/cleanup-whitelist.test.ts"
+      ],
+      "verify": ["make check", "make test"],
+      "state": "pending"
+    },
+    {
+      "id": "3",
+      "title": "Phase 3: Close per-spec `afterAll` gaps",
+      "tasks": [
+        "`make check` passes",
+        "`make test` passes (coverage test passes — every `uniquePhone` paired with `phones.push`)",
+        "`make test_e2e` passes (no regression in the four touched specs)",
+        "`make build` passes",
+        "Run the full E2E suite locally on a clean DB + clean HubSpot. After the run completes (and after global teardown): `SELECT count(*) FROM leads WHERE first_name IN (TEST_FIRST_NAMES) OR email LIKE 'e2e-%@test.rekurve.dev'` → 0. HubSpot search by `firstname IN TEST_FIRST_NAMES` → 0 results.",
+        "Force-fail one test mid-spec (throw before `afterAll` runs naturally) — confirm `afterAll` still fires and cleans up that test's phone.",
+        "Run only `e2e/features/nurture-scheduler.spec.ts` — confirm the `Nurture AutoStart` HubSpot contact is archived within seconds of `afterAll`, not minutes (no search-index dependency)."
+      ],
+      "files": [
+        "e2e/features/leads-crud.spec.ts",
+        "e2e/features/nurture-scheduler.spec.ts",
+        "e2e/utils/cleanup-coverage.test.ts"
+      ],
+      "verify": ["make check", "make test", "make test_e2e", "make build"],
+      "state": "pending"
+    }
+  ]
+}

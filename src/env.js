@@ -36,12 +36,17 @@ export const env = createEnv({
     MS_GRAPH_REDIRECT_URI: z.url(),
     TWILIO_ACCOUNT_SID: z
       .string()
-      .regex(/^AC[a-f0-9]{32}$/, "Must be an AC-prefixed Twilio Account SID"),
-    TWILIO_AUTH_TOKEN: z.string().min(1),
+      .regex(/^AC[a-f0-9]{32}$/, "Must be an AC-prefixed Twilio Account SID")
+      .optional(),
+    TWILIO_AUTH_TOKEN: z.string().min(1).optional(),
     TWILIO_FROM_NUMBER: z
       .string()
-      .regex(/^\+\d{8,15}$/, "Must be E.164 (e.g. +14155551234)"),
-    TWILIO_CONSULTANT_NUMBER: z.string().regex(/^\+\d{8,15}$/, "Must be E.164"),
+      .regex(/^\+\d{8,15}$/, "Must be E.164 (e.g. +14155551234)")
+      .optional(),
+    TWILIO_CONSULTANT_NUMBER: z
+      .string()
+      .regex(/^\+\d{8,15}$/, "Must be E.164")
+      .optional(),
   },
 
   /**

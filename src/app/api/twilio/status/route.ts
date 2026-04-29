@@ -17,6 +17,13 @@ export async function POST(request: Request) {
     params[key] = String(value);
   });
 
+  if (!env.TWILIO_AUTH_TOKEN) {
+    return NextResponse.json(
+      { error: "Twilio not configured" },
+      { status: 403 },
+    );
+  }
+
   const isValid = validateRequest(
     env.TWILIO_AUTH_TOKEN,
     signature,

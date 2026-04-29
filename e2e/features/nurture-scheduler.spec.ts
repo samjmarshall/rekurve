@@ -6,6 +6,7 @@ import {
   type TestSession,
   uniquePhone,
 } from "../utils/auth-helper";
+import { cleanupTestLeadsByPhone } from "../utils/hubspot-helper";
 import { getLeadIdByPhone } from "../utils/leads-helper";
 import {
   cleanupLeads,
@@ -26,6 +27,7 @@ test.describe("Nurture scheduler", () => {
   test.skip(!process.env.CRON_SECRET, "CRON_SECRET required");
 
   let session: TestSession;
+  const phones: string[] = [];
   const leadIds: string[] = [];
   const sequenceIds: string[] = [];
   const messageIds: string[] = [];
@@ -37,6 +39,7 @@ test.describe("Nurture scheduler", () => {
   test.afterAll(async () => {
     await cleanupMessages(messageIds);
     await cleanupSequences(sequenceIds);
+    await cleanupTestLeadsByPhone(phones);
     await cleanupLeads(leadIds);
     await deleteTestSession(session.userId);
   });
@@ -49,6 +52,7 @@ test.describe("Nurture scheduler", () => {
     await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     const phone = uniquePhone();
+    phones.push(phone);
     const email = `e2e-${randomUUID()}@test.rekurve.dev`;
 
     await page.goto("/leads/new");

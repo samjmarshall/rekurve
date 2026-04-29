@@ -43,7 +43,9 @@ export function QueueList() {
   return (
     <div className="flex min-w-0 flex-1 flex-col">
       <header className="flex items-center justify-between border-b px-4 py-3">
-        <h1 className="font-semibold text-xl">Action Queue</h1>
+        <h1 data-testid="queue-heading" className="font-semibold text-xl">
+          Action Queue
+        </h1>
         <span
           data-testid="queue-count"
           aria-live="polite"

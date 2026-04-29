@@ -34,9 +34,10 @@ function computeTwilioSignature(
   return createHmac("sha1", authToken).update(str, "utf8").digest("base64");
 }
 
+const hasTwilioAuthToken = !!process.env.TWILIO_AUTH_TOKEN;
 const hasTwilioCredentials =
-  !!process.env.TWILIO_AUTH_TOKEN &&
-  !process.env.TWILIO_AUTH_TOKEN.startsWith("placeholder");
+  hasTwilioAuthToken &&
+  !process.env.TWILIO_AUTH_TOKEN!.startsWith("placeholder");
 
 test.describe("SMS Dispatch — E2E", () => {
   test.skip(
@@ -71,6 +72,11 @@ test.describe("SMS Dispatch — E2E", () => {
     request,
     baseURL,
   }) => {
+    test.skip(
+      !hasTwilioAuthToken,
+      "Requires TWILIO_AUTH_TOKEN for webhook signature computation — set a placeholder value if needed",
+    );
+
     const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
     const lead = await seedLead({

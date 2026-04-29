@@ -1,7 +1,6 @@
 ---
 name: commit
 description: git commit code changes with clear messages
-model: haiku
 skills: writing-clearly-and-concisely
 ---
 # Commit Changes

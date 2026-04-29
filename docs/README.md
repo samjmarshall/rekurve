@@ -38,6 +38,7 @@ graph TD
     NextJS --> HubSpot[HubSpot API]
     NextJS --> Anthropic["Anthropic API — Claude (drafting, nurture)"]
     NextJS --> MSGraph["Microsoft Graph — /me/sendMail (Outlook)"]
+    NextJS --> Twilio["Twilio — SMS relay to consultant"]
     NextJS --> PostHog[PostHog — analytics]
 
     Cron["Vercel Cron — daily nurture tick"] -->|CRON_SECRET| API
@@ -63,6 +64,7 @@ graph LR
         Resend["Resend — transactional email (OTP)"]
         Anthropic["Anthropic — Claude API (drafting + nurture)"]
         MSGraph["Microsoft Graph — Outlook /me/sendMail"]
+        Twilio["Twilio — SMS relay to consultant (relay-to-consultant model)"]
         PostHog["PostHog — analytics, session recording, errors"]
     end
 
@@ -76,6 +78,7 @@ graph LR
     Vercel --> Resend
     Vercel --> Anthropic
     Vercel --> MSGraph
+    Vercel --> Twilio
     Vercel --> PostHog
     GitHub --> Vercel
 ```
@@ -149,6 +152,10 @@ cp .env.example .env
 | `MS_GRAPH_CLIENT_ID` | Outlook | Microsoft Graph app client ID (Outlook send-on-behalf) |
 | `MS_GRAPH_CLIENT_SECRET` | Outlook | Microsoft Graph app client secret |
 | `MS_GRAPH_REDIRECT_URI` | Outlook | OAuth redirect URI for Microsoft Graph consent flow |
+| `TWILIO_ACCOUNT_SID` | SMS | Twilio Account SID (`AC…`) |
+| `TWILIO_AUTH_TOKEN` | SMS | Twilio Auth Token (sensitive — mark `--sensitive` in Vercel) |
+| `TWILIO_FROM_NUMBER` | SMS | E.164 Twilio sending number (e.g. `+14155551234`) |
+| `TWILIO_CONSULTANT_NUMBER` | SMS | E.164 consultant phone number that receives relayed drafts |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Analytics | PostHog project API key |
 | `NEXT_PUBLIC_POSTHOG_HOST` | Analytics | PostHog ingest host (reverse-proxied) |
 | `POSTHOG_ERROR_TRACKING_API_KEY` | Analytics | PostHog error tracking key |
@@ -222,6 +229,33 @@ The connect banner on the dashboard also appears when no token row exists for th
 #### E2E testing with a real mailbox
 
 Set `MS_GRAPH_TEST_ACCESS_TOKEN` in your local `.env.local` (not committed, not pushed to Vercel) to a valid Graph access token for a test mailbox. The `email-dispatch.spec.ts` E2E spec uses this token to seed the `ms_graph_tokens` table for the test user.
+
+### Twilio SMS setup
+
+Approved SMS drafts are relayed to the consultant's personal phone via Twilio. The consultant forwards the message from the native Messages app. **Drafts are never sent directly to leads** — only to `TWILIO_CONSULTANT_NUMBER`. This sidesteps A2P/10DLC consumer registration and keeps data forward-compatible with ADR-001 (iMessage device-bridge) which will replace the manual-forward step.
+
+#### Environment variables
+
+Add these to Vercel (use `--sensitive` for the auth token):
+
+```bash
+vercel env add TWILIO_ACCOUNT_SID                # e.g. ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+vercel env add TWILIO_AUTH_TOKEN --sensitive      # Twilio Auth Token
+vercel env add TWILIO_FROM_NUMBER                 # E.164, e.g. +14155551234
+vercel env add TWILIO_CONSULTANT_NUMBER           # E.164, the consultant's phone
+```
+
+#### Status callback
+
+Twilio posts delivery status updates (queued → sent → delivered / failed) to:
+
+```
+<deployment-url>/api/twilio/status
+```
+
+Configure this URL in the Twilio Console → Phone Numbers → Manage → Active Numbers → select your number → Messaging → A message comes in → Status Callback. Set it for both Preview and Production deployment URLs.
+
+The route validates `X-Twilio-Signature` using the SDK. Unsigned requests return 403.
 
 ### HubSpot integrations
 
@@ -413,7 +447,7 @@ These commands are invoked inside [Claude Code](https://claude.ai/code) via slas
 | `/plan-to-ralph-spec <path>` | Convert markdown plan to `.spec.json` for Ralph | Before running `ralph.sh` — produces the JSON spec Ralph reads |
 | `/commit` | Structured conventional commit | Ready to commit (follows repo conventions) |
 | `/design_review` | Visual/accessibility/brand review via Playwright | After UI/UX changes, before committing |
-| `/describe_pr` | Generate PR description from diff + template | Before opening a PR |
+| `/pull-request` | Create or update a PR — generates title (create) and description from diff + template | Before opening or updating a PR |
 
 ### Automated: Ralph Loop
 
@@ -474,7 +508,7 @@ Step-by-step for human developers and AI agents:
 4. **Check locally** — `make check` + `make test`
 5. **Review UI** — Run `/design_review` if you touched anything visual
 6. **Commit** — Use `/commit` for conventional commit messages
-7. **Push + PR** — Push branch, use `/describe_pr` to generate the PR description
+7. **Push + PR** — Use `/pull-request` to push (if needed) and create the PR with a generated description
 8. **CI** — Quality Control workflow runs automatically on PR
 9. **Preview** — Vercel deploys a preview, post-deploy runs migrations + E2E
 10. **Merge** — Review + merge → Release workflow creates a tag

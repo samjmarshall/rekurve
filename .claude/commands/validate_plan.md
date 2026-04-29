@@ -88,6 +88,9 @@ For each phase in the plan:
    - Are there missing validations?
    - Could the implementation break existing functionality?
 
+5. **Update inline docs**:
+   - Update **`docs/README.md`** when the plan adds an env var, integration, scheduled job, or Make target. Skip otherwise.
+
 ### Step 3: Update Associated Issue
 
 If the plan's `## References` links to an issue or ticket, sync your verification results back to it.
@@ -179,7 +182,9 @@ Recommended workflow:
 1. `/implement_plan` - Execute the implementation
 2. `/commit` - Create atomic commits for changes
 3. `/validate_plan` - Verify implementation correctness
-4. `/describe_pr` - Generate PR description
+4. `/document_feature {slug}` - Run for user-visible features (new route, flow, or integration). Take `{slug}` from the ticket title. Skip for infra, refactors, bug fixes, or test-only changes.
+5. `/domain_model` - Run when the plan adds or restructures a domain concept or entity boundary. Skip otherwise.
+6. `/pull_request` - Generate a PR
 
 The validation works best after commits are made, as it can analyze the git history to understand what was implemented.
 

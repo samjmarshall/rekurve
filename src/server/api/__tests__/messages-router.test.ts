@@ -36,11 +36,13 @@ const baseLead = {
 
 let mockDb: Record<string, unknown>;
 let mockDispatchEmail: ReturnType<typeof rs.fn>;
+let mockDispatchSms: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
 
   mockDispatchEmail = rs.fn().mockResolvedValue({ conversationId: "conv-123" });
+  mockDispatchSms = rs.fn().mockResolvedValue({ conversationId: "conv-456" });
 
   rs.doMock("~/env", () => ({
     env: {
@@ -51,6 +53,11 @@ beforeEach(() => {
       MS_GRAPH_CLIENT_ID: "test-id",
       MS_GRAPH_CLIENT_SECRET: "test-secret",
       MS_GRAPH_REDIRECT_URI: "https://www.localhost/api/auth/ms-graph/callback",
+      BETTER_AUTH_URL: "https://www.localhost",
+      TWILIO_ACCOUNT_SID: "ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      TWILIO_AUTH_TOKEN: "test-auth-token",
+      TWILIO_FROM_NUMBER: "+14155551234",
+      TWILIO_CONSULTANT_NUMBER: "+61400000000",
     },
   }));
 
@@ -63,6 +70,10 @@ beforeEach(() => {
 
   rs.doMock("~/server/dispatch/email-dispatch", () => ({
     dispatchEmail: mockDispatchEmail,
+  }));
+
+  rs.doMock("~/server/dispatch/sms-dispatch", () => ({
+    dispatchSms: mockDispatchSms,
   }));
 
   mockDb = {
@@ -641,7 +652,7 @@ describe("messages.approve — email channel", () => {
     expect(dispatchOrder).toBeLessThan(updateOrder);
   });
 
-  test("sms channel: status flips, dispatch is not called", async () => {
+  test("sms channel: dispatch runs, then status flips", async () => {
     (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
       baseMessage,
     );
@@ -656,7 +667,86 @@ describe("messages.approve — email channel", () => {
     const result = await caller.messages.approve({ id: MSG_ID });
 
     expect(result.status).toBe("approved");
-    expect(mockDispatchEmail).not.toHaveBeenCalled();
+    expect(mockDispatchSms).toHaveBeenCalledOnce();
+    expect(mockDispatchSms).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.objectContaining({
+          id: MSG_ID,
+          body: "Original draft body",
+        }),
+      }),
+    );
+    const dispatchOrder = mockDispatchSms.mock.invocationCallOrder[0]!;
+    const updateOrder = (mockDb.update as ReturnType<typeof rs.fn>).mock
+      .invocationCallOrder[0]!;
+    expect(dispatchOrder).toBeLessThan(updateOrder);
+  });
+
+  test("sms channel: dispatch failure leaves row pending; status update is not called", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      baseMessage,
+    );
+    mockDispatchSms.mockRejectedValue(
+      new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to send SMS. Please try again.",
+      }),
+    );
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.approve({ id: MSG_ID });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect((e as TRPCError).code).toBe("INTERNAL_SERVER_ERROR");
+      expect(mockDb.update).not.toHaveBeenCalled();
+    }
+  });
+});
+
+describe("messages.editAndApprove — sms channel", () => {
+  test("dispatches with input.body, not the existing row body", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      baseMessage,
+    );
+    const edited = {
+      ...baseMessage,
+      status: "edited_and_approved" as const,
+      body: "Edited body",
+      originalBody: baseMessage.body,
+      approvedAt: new Date(),
+    };
+    mockUpdateReturning(edited);
+
+    const caller = await getCaller();
+    await caller.messages.editAndApprove({ id: MSG_ID, body: "Edited body" });
+
+    expect(mockDispatchSms).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.objectContaining({ body: "Edited body" }),
+      }),
+    );
+  });
+
+  test("dispatch failure → body and originalBody are not written", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      baseMessage,
+    );
+    mockDispatchSms.mockRejectedValue(
+      new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to send SMS. Please try again.",
+      }),
+    );
+
+    const caller = await getCaller();
+    try {
+      await caller.messages.editAndApprove({ id: MSG_ID, body: "Edited body" });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect((e as TRPCError).code).toBe("INTERNAL_SERVER_ERROR");
+      expect(mockDb.update).not.toHaveBeenCalled();
+    }
   });
 });
 

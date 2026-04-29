@@ -14,6 +14,10 @@ import {
 } from "../utils/messages-helper";
 import { getSessionCookie } from "../utils/session-cookie";
 
+const hasTwilioCredentials =
+  !!process.env.TWILIO_AUTH_TOKEN &&
+  !process.env.TWILIO_AUTH_TOKEN.startsWith("placeholder");
+
 test.describe("Action Queue — E2E", () => {
   test.skip(
     !process.env.DATABASE_URL,
@@ -43,6 +47,11 @@ test.describe("Action Queue — E2E", () => {
     page,
     baseURL,
   }) => {
+    test.skip(
+      !hasTwilioCredentials,
+      "Requires real Twilio credentials — set TWILIO_AUTH_TOKEN to a non-placeholder value",
+    );
+
     await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     const lead = await seedLead({
@@ -69,7 +78,7 @@ test.describe("Action Queue — E2E", () => {
 
     await expect(queue.row(msg.id)).toBeHidden();
     await expect(
-      page.getByTestId("app-toast").filter({ hasText: "Approved" }),
+      page.getByTestId("app-toast").filter({ hasText: "Sent to your phone" }),
     ).toBeVisible();
 
     const record = await getMessageStatus(msg.id);
@@ -81,6 +90,11 @@ test.describe("Action Queue — E2E", () => {
     page,
     baseURL,
   }) => {
+    test.skip(
+      !hasTwilioCredentials,
+      "Requires real Twilio credentials — set TWILIO_AUTH_TOKEN to a non-placeholder value",
+    );
+
     await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     const lead = await seedLead({
@@ -109,7 +123,9 @@ test.describe("Action Queue — E2E", () => {
     await expect(queue.row(msg.id)).toBeHidden();
     // Wait for the success toast before reading the DB. The optimistic update
     // hides the row instantly, but the mutation is still in flight.
-    await expect(page.getByText(/Your edits were saved/i)).toBeVisible();
+    await expect(
+      page.getByTestId("app-toast").filter({ hasText: "Sent to your phone" }),
+    ).toBeVisible();
 
     const record = await getMessageStatus(msg.id);
     expect(record?.status).toBe("edited_and_approved");

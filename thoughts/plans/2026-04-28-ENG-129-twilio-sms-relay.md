@@ -77,8 +77,8 @@ Three phases. Phase 1 establishes the Twilio integration in isolation (env vars,
 ### Success
 
 **Automated**
-- [ ] `make check` passes (typecheck + lint).
-- [ ] `make test` passes; new tests under `src/server/twilio/__tests__/` all green.
+- [x] `make check` passes (typecheck + lint).
+- [x] `make test` passes; new tests under `src/server/twilio/__tests__/` all green.
 - [ ] `make build` passes.
 
 **Manual**
@@ -128,10 +128,10 @@ Three phases. Phase 1 establishes the Twilio integration in isolation (env vars,
 ### Success
 
 **Automated**
-- [ ] `make check` passes.
-- [ ] `make test` passes; inverted unit test plus new dispatch + router tests all green.
-- [ ] `make build` passes.
-- [ ] `make db_generate` produced exactly one new migration with two `ADD COLUMN` statements + the new index; `make db_migrate` applied cleanly against a Neon dev branch.
+- [x] `make check` passes.
+- [x] `make test` passes; inverted unit test plus new dispatch + router tests all green.
+- [x] `make build` passes.
+- [x] `make db_generate` produced exactly one new migration with two `ADD COLUMN` statements + the new index; `make db_migrate` applied cleanly against a Neon dev branch.
 
 **Manual**
 - [ ] Seed an `sms` queue row via `seedPendingMessage({ leadId, channel: "sms", body: "ENG-129 dispatch test" })` (`e2e/utils/messages-helper.ts:57-81`); approve via the dashboard. SMS arrives on `TWILIO_CONSULTANT_NUMBER` with the exact body, no prefix/footer. `SELECT twilio_message_sid, delivery_status, body FROM conversations WHERE message_queue_id = '<id>'` shows the SID populated and `body` matching. `SELECT status, sent_at FROM message_queue WHERE id = '<id>'` shows `status='approved'`, `sent_at` not null.
@@ -178,9 +178,9 @@ Three phases. Phase 1 establishes the Twilio integration in isolation (env vars,
 ### Success
 
 **Automated**
-- [ ] `make check` passes.
-- [ ] `make test` passes; the six route tests + the dispatch tests + the inverted router tests are all green.
-- [ ] `make build` passes.
+- [x] `make check` passes.
+- [x] `make test` passes; the six route tests + the dispatch tests + the inverted router tests are all green.
+- [x] `make build` passes.
 - [ ] `make test_e2e` passes including `e2e/features/sms-dispatch.spec.ts`. SMS-mocked happy path, failure-path, and signature-rejection cases all green; cleanup leaves no orphan rows.
 
 **Manual**

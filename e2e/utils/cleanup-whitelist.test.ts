@@ -52,6 +52,10 @@ describe("cleanup-whitelist", () => {
       "Inbound", // hubspot-sync.spec.ts — tracked by phone
       "EmailDispatch", // email-dispatch.spec.ts — seedLead, no HubSpot sync
       "FailPath", // email-dispatch.spec.ts — seedLead, no HubSpot sync
+      "StatusCb", // sms-dispatch.spec.ts — seedLead, no HubSpot sync
+      "StatusCbBadSig", // sms-dispatch.spec.ts — seedLead, no HubSpot sync
+      "SmsFailPath", // sms-dispatch.spec.ts — seedLead, no HubSpot sync
+      "SmsHappyPath", // sms-dispatch.spec.ts — seedLead, no HubSpot sync
       "Persist", // leads-crud.spec.ts — form persistence test, never submitted
       "Bad", // leads-crud.spec.ts — validation test, submission blocked by error
       "Conv", // lead-profile.spec.ts (conversation history) — seedLead, no HubSpot sync

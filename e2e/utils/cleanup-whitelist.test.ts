@@ -54,6 +54,7 @@ describe("cleanup-whitelist", () => {
       "FailPath", // email-dispatch.spec.ts — seedLead, no HubSpot sync
       "Persist", // leads-crud.spec.ts — form persistence test, never submitted
       "Bad", // leads-crud.spec.ts — validation test, submission blocked by error
+      "Conv", // lead-profile.spec.ts (conversation history) — seedLead, no HubSpot sync
     ]);
 
     const specFiles = readdirSync(specsDir).filter((f) =>

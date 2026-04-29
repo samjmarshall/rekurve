@@ -12,6 +12,8 @@ Help turn ideas into fully formed designs and specs through natural collaborativ
 
 Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design in small sections (200-300 words), checking after each section whether it looks right so far.
 
+Interview me relentlessly about every aspect of this design until we reach a shared understanding.Walk down each branch of the design tree, resolving dependencies between decisions one-by-one.
+
 ## The Process
 
 **Understanding the idea:**
@@ -22,6 +24,7 @@ Start by understanding the current project context, then ask questions one at a 
    - **@agent-thoughts-locator** - To find any research, plans, or decisions about this area
    - **@agent-thoughts-analyzer** - To extract key insights from the most relevant documents
 - **ALWAYS use @agent-web-lookup or @agent-web-research** for web research - NEVER call WebSearch or WebFetch directly. Use `web-lookup` for single-fact queries (haiku, fast); use `web-research` for multi-source synthesis or conflict resolution (opus, deep).
+- **If a question can be answered by exploring the codebase, explore instead of asking.**
 
 **Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs
@@ -53,7 +56,9 @@ The user will use either `/write_ticket` separately to create tickets for more c
 
 ## Key Principles
 
+- **Relentless interviewing** - Walk every branch of the decision tree until shared understanding is reached; resolve dependencies between decisions one-by-one
 - **One question at a time** - Don't overwhelm with multiple questions
+- **Recommend an answer** - For each question, provide your recommended answer with reasoning
 - **Multiple choice preferred** - Easier to answer than open-ended when possible
 - **YAGNI ruthlessly** - Remove unnecessary features from all designs
 - **Explore alternatives** - Always propose 2-3 approaches before settling

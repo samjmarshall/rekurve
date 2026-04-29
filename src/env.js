@@ -34,6 +34,19 @@ export const env = createEnv({
     MS_GRAPH_CLIENT_ID: z.string().min(1),
     MS_GRAPH_CLIENT_SECRET: z.string().min(1),
     MS_GRAPH_REDIRECT_URI: z.url(),
+    TWILIO_ACCOUNT_SID: z
+      .string()
+      .regex(/^AC[a-f0-9]{32}$/, "Must be an AC-prefixed Twilio Account SID")
+      .optional(),
+    TWILIO_AUTH_TOKEN: z.string().min(1).optional(),
+    TWILIO_FROM_NUMBER: z
+      .string()
+      .regex(/^\+\d{8,15}$/, "Must be E.164 (e.g. +14155551234)")
+      .optional(),
+    TWILIO_CONSULTANT_NUMBER: z
+      .string()
+      .regex(/^\+\d{8,15}$/, "Must be E.164")
+      .optional(),
   },
 
   /**
@@ -70,6 +83,10 @@ export const env = createEnv({
     MS_GRAPH_CLIENT_ID: process.env.MS_GRAPH_CLIENT_ID,
     MS_GRAPH_CLIENT_SECRET: process.env.MS_GRAPH_CLIENT_SECRET,
     MS_GRAPH_REDIRECT_URI: process.env.MS_GRAPH_REDIRECT_URI,
+    TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
+    TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
+    TWILIO_FROM_NUMBER: process.env.TWILIO_FROM_NUMBER,
+    TWILIO_CONSULTANT_NUMBER: process.env.TWILIO_CONSULTANT_NUMBER,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

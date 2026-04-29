@@ -18,9 +18,14 @@ export const conversations = pgTable(
     subject: text("subject"),
     body: text("body").notNull(),
     hubspotActivityId: text("hubspot_activity_id"),
+    twilioMessageSid: text("twilio_message_sid"),
+    deliveryStatus: text("delivery_status"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
-  (table) => [index("conversations_lead_id_idx").on(table.leadId)],
+  (table) => [
+    index("conversations_lead_id_idx").on(table.leadId),
+    index("conversations_twilio_sid_idx").on(table.twilioMessageSid),
+  ],
 );

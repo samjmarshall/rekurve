@@ -120,6 +120,8 @@ export async function seedConversation(args: {
   subject?: string | null;
   body: string;
   hubspotActivityId?: string | null;
+  twilioMessageSid?: string | null;
+  deliveryStatus?: string | null;
   createdAt?: Date | string;
 }): Promise<SeededConversation> {
   const id = randomUUID();
@@ -129,7 +131,7 @@ export async function seedConversation(args: {
   if (createdAt) {
     await sql()`
       INSERT INTO "conversations"
-        (id, lead_id, message_queue_id, channel, direction, delivery_method, subject, body, hubspot_activity_id, created_at)
+        (id, lead_id, message_queue_id, channel, direction, delivery_method, subject, body, hubspot_activity_id, twilio_message_sid, delivery_status, created_at)
       VALUES (
         ${id},
         ${args.leadId},
@@ -140,13 +142,15 @@ export async function seedConversation(args: {
         ${args.subject ?? null},
         ${args.body},
         ${args.hubspotActivityId ?? null},
+        ${args.twilioMessageSid ?? null},
+        ${args.deliveryStatus ?? null},
         ${createdAt}
       )
     `;
   } else {
     await sql()`
       INSERT INTO "conversations"
-        (id, lead_id, message_queue_id, channel, direction, delivery_method, subject, body, hubspot_activity_id)
+        (id, lead_id, message_queue_id, channel, direction, delivery_method, subject, body, hubspot_activity_id, twilio_message_sid, delivery_status)
       VALUES (
         ${id},
         ${args.leadId},
@@ -156,7 +160,9 @@ export async function seedConversation(args: {
         ${args.deliveryMethod ?? "email"},
         ${args.subject ?? null},
         ${args.body},
-        ${args.hubspotActivityId ?? null}
+        ${args.hubspotActivityId ?? null},
+        ${args.twilioMessageSid ?? null},
+        ${args.deliveryStatus ?? null}
       )
     `;
   }
@@ -231,6 +237,25 @@ export async function getConversationsForLead(leadId: string): Promise<
     SELECT id, direction, delivery_method, hubspot_activity_id, subject, created_at
     FROM "conversations"
     WHERE lead_id = ${leadId}
+    ORDER BY created_at DESC
+  `;
+  return rows as never;
+}
+
+export async function getConversationsForMessage(
+  messageQueueId: string,
+): Promise<
+  Array<{
+    id: string;
+    twilio_message_sid: string | null;
+    delivery_status: string | null;
+    body: string;
+  }>
+> {
+  const rows = await sql()`
+    SELECT id, twilio_message_sid, delivery_status, body
+    FROM "conversations"
+    WHERE message_queue_id = ${messageQueueId}
     ORDER BY created_at DESC
   `;
   return rows as never;

@@ -132,16 +132,21 @@ test.describe("Dashboard Shell — Empty States", () => {
     await deleteTestSession(session.userId);
   });
 
-  test("/dashboard shows Action Queue empty state", async ({
+  test("/dashboard renders the Action Queue or empty state", async ({
     context,
     page,
     baseURL,
   }) => {
     await withAuth(context, session, baseURL!);
     await page.goto("/dashboard");
-    await expect(page.getByText("You're all caught up")).toBeVisible();
+    // The Action Queue is not user-scoped, so previously seeded data in the
+    // shared DB (including production) will render the list instead of the
+    // empty state. Assert the route renders either shape without error.
+    await expect(page.getByTestId("queue-heading")).toBeVisible();
     await expect(
-      page.getByText("We'll let you know when new follow-ups are ready"),
+      page
+        .locator('[data-testid="queue-empty"], [data-testid="queue-list"]')
+        .first(),
     ).toBeVisible();
   });
 

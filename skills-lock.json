@@ -13,6 +13,11 @@
       "skillPath": "domain-model/SKILL.md",
       "computedHash": "4d91ed2249dbf6f96f7aa5b9fca069c8a3837b6dea3c06620335efbc0f7971e3"
     },
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "784f0dbb7403b0f00324bce9a112f715342777a0daee7bbb7385f9c6f0a170ea"
+    },
     "rstest-best-practices": {
       "source": "rstackjs/agent-skills",
       "sourceType": "github",

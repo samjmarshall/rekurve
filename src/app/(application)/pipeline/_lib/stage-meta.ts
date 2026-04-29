@@ -11,10 +11,31 @@ export const STAGE_ORDER: readonly LeadStage[] = [
 
 export const STAGE_META: Record<
   LeadStage,
-  { label: string; badgeVariant: BadgeProps["variant"] }
+  {
+    label: string;
+    badgeVariant: BadgeProps["variant"];
+    /** Tailwind class for the column header's left-border accent. */
+    accentBorderClass: string;
+  }
 > = {
-  unqualified: { label: "Unqualified", badgeVariant: "outline" },
-  nurture: { label: "Nurture", badgeVariant: "brand" },
-  warm: { label: "Warm", badgeVariant: "amber" },
-  hot: { label: "Hot", badgeVariant: "coral" },
+  unqualified: {
+    label: "Unqualified",
+    badgeVariant: "outline",
+    accentBorderClass: "border-l-muted-foreground/40",
+  },
+  nurture: {
+    label: "Nurture",
+    badgeVariant: "brand",
+    accentBorderClass: "border-l-primary",
+  },
+  warm: {
+    label: "Warm",
+    badgeVariant: "amber",
+    accentBorderClass: "border-l-accent-amber",
+  },
+  hot: {
+    label: "Hot",
+    badgeVariant: "coral",
+    accentBorderClass: "border-l-accent-coral",
+  },
 };

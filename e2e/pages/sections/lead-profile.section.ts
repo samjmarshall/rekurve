@@ -31,6 +31,8 @@ export class LeadProfileSection {
   readonly gapsEmpty: Locator;
   readonly nextQuestion: Locator;
   readonly conversationHistory: Locator;
+  readonly conversationItems: Locator;
+  readonly conversationEmpty: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -61,6 +63,34 @@ export class LeadProfileSection {
     this.conversationHistory = page.locator(
       '[data-testid="lead-profile-conversation-history"]',
     );
+    this.conversationItems = page.locator(
+      '[data-testid^="lead-profile-conversation-item-"]',
+    );
+    this.conversationEmpty = page.locator(
+      '[data-testid="lead-profile-conversation-empty"]',
+    );
+  }
+
+  conversationItem(id: string): Locator {
+    return this.page.locator(
+      `[data-testid="lead-profile-conversation-item-${id}"]`,
+    );
+  }
+
+  editedPill(id: string): Locator {
+    return this.page.locator(
+      `[data-testid="lead-profile-conversation-edited-pill-${id}"]`,
+    );
+  }
+
+  conversationOriginal(id: string): Locator {
+    return this.page.locator(
+      `[data-testid="lead-profile-conversation-original-${id}"]`,
+    );
+  }
+
+  async expectConversationCount(n: number) {
+    await expect(this.conversationItems).toHaveCount(n);
   }
 
   factorRow(key: string): Locator {

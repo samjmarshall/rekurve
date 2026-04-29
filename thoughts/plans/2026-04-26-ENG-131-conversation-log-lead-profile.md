@@ -50,9 +50,9 @@ Build a thin standalone `conversationsRouter` with a single `list({ leadId })` q
 ### Success
 
 **Automated**
-- [ ] `make check` passes
-- [ ] `make test` passes (new characterization tests included)
-- [ ] `make build` passes
+- [x] `make check` passes
+- [x] `make test` passes (new characterization tests included)
+- [x] `make build` passes
 
 **Manual**
 - [ ] Pipeline page still renders relative timestamps unchanged at `/pipeline`.
@@ -87,9 +87,9 @@ Build a thin standalone `conversationsRouter` with a single `list({ leadId })` q
 ### Success
 
 **Automated**
-- [ ] `make check` passes
-- [ ] `make test` passes (`conversations-router.test.ts` green)
-- [ ] `make build` passes
+- [x] `make check` passes
+- [x] `make test` passes (`conversations-router.test.ts` green)
+- [x] `make build` passes
 
 **Manual**
 - [ ] tRPC client autocomplete shows `trpc.conversations.list` in IDE.
@@ -122,9 +122,9 @@ Build a thin standalone `conversationsRouter` with a single `list({ leadId })` q
 ### Success
 
 **Automated**
-- [ ] `make check` passes
-- [ ] `make test` passes (`conversation-display.test.ts` green)
-- [ ] `make build` passes
+- [x] `make check` passes
+- [x] `make test` passes (`conversation-display.test.ts` green)
+- [x] `make build` passes
 
 **Manual**
 - [ ] At `/leads/{id}` with seeded conversations: list renders newest-first with correct channel icons and direction alignment.
@@ -158,9 +158,9 @@ Build a thin standalone `conversationsRouter` with a single `list({ leadId })` q
 ### Success
 
 **Automated**
-- [ ] `make check` passes
-- [ ] `make test` passes
-- [ ] `make build` passes
+- [x] `make check` passes
+- [x] `make test` passes
+- [x] `make build` passes
 - [ ] `make test_e2e` passes (new specs included)
 
 **Manual**

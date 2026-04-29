@@ -10,6 +10,13 @@ import {
 } from "../utils/auth-helper";
 import { cleanupTestLeadsByPhone } from "../utils/hubspot-helper";
 import { getLeadIdByPhone } from "../utils/leads-helper";
+import {
+  cleanupConversations,
+  cleanupLeads,
+  seedConversation,
+  seedEditedQueueMessage,
+  seedLead,
+} from "../utils/messages-helper";
 import { getSessionCookie } from "../utils/session-cookie";
 
 test.describe("Lead Profile — E2E", () => {
@@ -280,5 +287,197 @@ test.describe("Lead Profile — E2E", () => {
     await profile.waitForLoaded();
     await profile.expectScore(85);
     await profile.expectStage("hot");
+  });
+});
+
+test.describe("Lead Profile — Conversation history", () => {
+  test.skip(
+    !process.env.DATABASE_URL,
+    "Requires direct DB access — skipped in CI",
+  );
+
+  let session: TestSession;
+  const leadIds: string[] = [];
+  const convIds: string[] = [];
+  test.beforeAll(async () => {
+    session = await createTestSession();
+  });
+
+  test.afterAll(async () => {
+    await cleanupConversations(convIds);
+    // message_queue rows cascade-delete when lead is deleted
+    await cleanupLeads(leadIds);
+    await deleteTestSession(session.userId);
+  });
+
+  test("empty state: no conversations shows empty copy", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const lead = await seedLead({
+      firstName: "Conv",
+      lastName: `Empty ${uniqueId}`,
+      phone: `+614${uniqueId.replace(/\D/g, "").slice(0, 8).padEnd(8, "0")}`,
+    });
+    leadIds.push(lead.id);
+
+    await page.goto(`/leads/${lead.id}`);
+    const profile = new LeadProfileSection(page);
+    await profile.waitForLoaded();
+
+    await expect(profile.conversationEmpty).toBeVisible();
+    await expect(profile.conversationEmpty).toContainText(
+      "No messages yet — drafts will appear in the action queue.",
+    );
+    await profile.expectConversationCount(0);
+  });
+
+  test("renders conversations newest-first with relative timestamps", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const lead = await seedLead({
+      firstName: "Conv",
+      lastName: `Order ${uniqueId}`,
+      phone: `+614${uniqueId.replace(/\D/g, "").slice(0, 8).padEnd(8, "0")}`,
+    });
+    leadIds.push(lead.id);
+
+    const now = Date.now();
+    const oldest = await seedConversation({
+      leadId: lead.id,
+      channel: "sms",
+      direction: "outbound",
+      body: "Oldest message",
+      createdAt: new Date(now - 2 * 60 * 60 * 1000),
+    });
+    const middle = await seedConversation({
+      leadId: lead.id,
+      channel: "sms",
+      direction: "outbound",
+      body: "Middle message",
+      createdAt: new Date(now - 30 * 60 * 1000),
+    });
+    const newest = await seedConversation({
+      leadId: lead.id,
+      channel: "sms",
+      direction: "outbound",
+      body: "Newest message",
+      createdAt: new Date(now - 5 * 60 * 1000),
+    });
+    convIds.push(oldest.id, middle.id, newest.id);
+
+    await page.goto(`/leads/${lead.id}`);
+    const profile = new LeadProfileSection(page);
+    await profile.waitForLoaded();
+
+    await profile.expectConversationCount(3);
+
+    // DOM order: newest first
+    const items = profile.conversationItems;
+    await expect(items.nth(0)).toContainText("Newest message");
+    await expect(items.nth(1)).toContainText("Middle message");
+    await expect(items.nth(2)).toContainText("Oldest message");
+
+    // Relative timestamps
+    await expect(items.nth(0)).toContainText("minute");
+    await expect(items.nth(2)).toContainText("hour");
+  });
+
+  test("edited pill toggles original draft inline", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const lead = await seedLead({
+      firstName: "Conv",
+      lastName: `Edited ${uniqueId}`,
+      phone: `+614${uniqueId.replace(/\D/g, "").slice(0, 8).padEnd(8, "0")}`,
+    });
+    leadIds.push(lead.id);
+
+    const queueMsg = await seedEditedQueueMessage({
+      leadId: lead.id,
+      channel: "email",
+      body: "Edited sent body",
+      originalBody: "Original AI draft",
+    });
+    const conv = await seedConversation({
+      leadId: lead.id,
+      channel: "email",
+      direction: "outbound",
+      body: "Edited sent body",
+      messageQueueId: queueMsg.id,
+    });
+    convIds.push(conv.id);
+
+    await page.goto(`/leads/${lead.id}`);
+    const profile = new LeadProfileSection(page);
+    await profile.waitForLoaded();
+
+    await expect(profile.editedPill(conv.id)).toBeVisible();
+    await expect(profile.conversationOriginal(conv.id)).not.toBeVisible();
+
+    await profile.editedPill(conv.id).click();
+    await expect(profile.conversationOriginal(conv.id)).toBeVisible();
+    await expect(profile.conversationOriginal(conv.id)).toContainText(
+      "Original AI draft",
+    );
+
+    await profile.editedPill(conv.id).click();
+    await expect(profile.conversationOriginal(conv.id)).not.toBeVisible();
+  });
+
+  test("email subject renders on email rows, not on sms rows", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const lead = await seedLead({
+      firstName: "Conv",
+      lastName: `Subject ${uniqueId}`,
+      phone: `+614${uniqueId.replace(/\D/g, "").slice(0, 8).padEnd(8, "0")}`,
+    });
+    leadIds.push(lead.id);
+
+    const emailConv = await seedConversation({
+      leadId: lead.id,
+      channel: "email",
+      direction: "outbound",
+      subject: "Welcome to Creation Homes",
+      body: "Email body text",
+    });
+    const smsConv = await seedConversation({
+      leadId: lead.id,
+      channel: "sms",
+      direction: "outbound",
+      body: "SMS body text",
+    });
+    convIds.push(emailConv.id, smsConv.id);
+
+    await page.goto(`/leads/${lead.id}`);
+    const profile = new LeadProfileSection(page);
+    await profile.waitForLoaded();
+
+    await expect(profile.conversationItem(emailConv.id)).toContainText(
+      "Welcome to Creation Homes",
+    );
+    await expect(profile.conversationItem(smsConv.id)).not.toContainText(
+      "Welcome to Creation Homes",
+    );
   });
 });

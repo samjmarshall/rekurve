@@ -122,26 +122,89 @@ export async function seedConversation(args: {
   hubspotActivityId?: string | null;
   twilioMessageSid?: string | null;
   deliveryStatus?: string | null;
+  createdAt?: Date | string;
 }): Promise<SeededConversation> {
   const id = randomUUID();
+  const createdAt = args.createdAt
+    ? new Date(args.createdAt).toISOString()
+    : null;
+  if (createdAt) {
+    await sql()`
+      INSERT INTO "conversations"
+        (id, lead_id, message_queue_id, channel, direction, delivery_method, subject, body, hubspot_activity_id, twilio_message_sid, delivery_status, created_at)
+      VALUES (
+        ${id},
+        ${args.leadId},
+        ${args.messageQueueId ?? null},
+        ${args.channel ?? "email"},
+        ${args.direction ?? "outbound"},
+        ${args.deliveryMethod ?? "email"},
+        ${args.subject ?? null},
+        ${args.body},
+        ${args.hubspotActivityId ?? null},
+        ${args.twilioMessageSid ?? null},
+        ${args.deliveryStatus ?? null},
+        ${createdAt}
+      )
+    `;
+  } else {
+    await sql()`
+      INSERT INTO "conversations"
+        (id, lead_id, message_queue_id, channel, direction, delivery_method, subject, body, hubspot_activity_id, twilio_message_sid, delivery_status)
+      VALUES (
+        ${id},
+        ${args.leadId},
+        ${args.messageQueueId ?? null},
+        ${args.channel ?? "email"},
+        ${args.direction ?? "outbound"},
+        ${args.deliveryMethod ?? "email"},
+        ${args.subject ?? null},
+        ${args.body},
+        ${args.hubspotActivityId ?? null},
+        ${args.twilioMessageSid ?? null},
+        ${args.deliveryStatus ?? null}
+      )
+    `;
+  }
+  return { id, leadId: args.leadId };
+}
+
+export interface SeededQueueMessage {
+  id: string;
+  leadId: string;
+}
+
+/**
+ * Inserts a message_queue row whose original_body differs from body, simulating
+ * an AI draft that was edited before send. Returns the row id for linking to a
+ * conversation via messageQueueId.
+ */
+export async function seedEditedQueueMessage(args: {
+  leadId: string;
+  channel?: "sms" | "email";
+  body: string;
+  originalBody: string;
+}): Promise<SeededQueueMessage> {
+  const id = randomUUID();
   await sql()`
-    INSERT INTO "conversations"
-      (id, lead_id, message_queue_id, channel, direction, delivery_method, subject, body, hubspot_activity_id, twilio_message_sid, delivery_status)
+    INSERT INTO "message_queue"
+      (id, lead_id, channel, body, original_body, status, priority)
     VALUES (
       ${id},
       ${args.leadId},
-      ${args.messageQueueId ?? null},
       ${args.channel ?? "email"},
-      ${args.direction ?? "outbound"},
-      ${args.deliveryMethod ?? "email"},
-      ${args.subject ?? null},
       ${args.body},
-      ${args.hubspotActivityId ?? null},
-      ${args.twilioMessageSid ?? null},
-      ${args.deliveryStatus ?? null}
+      ${args.originalBody},
+      'edited_and_approved',
+      0
     )
   `;
   return { id, leadId: args.leadId };
+}
+
+export async function cleanupConversations(ids: string[]): Promise<void> {
+  if (ids.length === 0) return;
+  await sql()`DELETE FROM "conversations" WHERE id = ANY(${ids}::uuid[])`;
 }
 
 export async function getConversation(id: string): Promise<{

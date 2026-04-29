@@ -12,13 +12,13 @@ export function StageColumn({ stage, leads }: StageColumnProps) {
     <section
       data-testid={`pipeline-column-${stage}`}
       aria-label={`${meta.label} leads`}
-      className="flex w-[calc(100vw-2rem)] shrink-0 snap-center flex-col rounded-lg border bg-card md:w-80"
+      className={`flex w-[calc(100vw-2rem)] shrink-0 snap-center flex-col rounded-lg border border-l-2 bg-card md:w-80 ${meta.accentBorderClass}`}
     >
       <header className="flex items-center justify-between border-b px-4 py-3">
         <h2 className="font-semibold text-base">{meta.label}</h2>
         <span
           data-testid={`pipeline-column-count-${stage}`}
-          className="rounded-full bg-secondary px-2 py-0.5 font-mono text-muted-foreground text-xs"
+          className="rounded-full bg-secondary px-2 py-0.5 text-muted-foreground text-xs tabular-nums"
         >
           {leads.length}
         </span>

@@ -3,6 +3,8 @@ import { neon } from "@neondatabase/serverless";
 
 import "dotenv/config";
 
+import { TEST_FIRST_NAMES } from "./hubspot-helper";
+
 // Lazy — only initialized when createTestSession/deleteTestSession are called,
 // so the module can be safely imported even when DATABASE_URL is not set (CI).
 let _sql: ReturnType<typeof neon> | undefined;
@@ -88,16 +90,12 @@ export function uniquePhone(): string {
 /**
  * Delete leads created by E2E tests. Two patterns:
  *   - Full-form tests: email matches `e2e-%@test.rekurve.dev`
- *   - All other tests: first_name in the known test marker list.
- *     Keep in sync with TEST_FIRST_NAMES in hubspot-helper.ts.
+ *   - All other tests: first_name in TEST_FIRST_NAMES (hubspot-helper.ts).
  */
 export async function deleteTestLeads(): Promise<void> {
   await sql()`
     DELETE FROM "leads"
     WHERE email LIKE 'e2e-%@test.rekurve.dev'
-       OR first_name IN (
-         'Approve', 'Count', 'Dismiss', 'E2E', 'Edit', 'FHOG',
-         'Nav', 'Nurture', 'Order', 'Pipeline', 'QC', 'Quick', 'Snooze'
-       )
+       OR first_name = ANY(${TEST_FIRST_NAMES})
   `;
 }

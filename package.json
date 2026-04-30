@@ -100,7 +100,7 @@
     "drizzle-kit": "^0.31.10",
     "husky": "^9.1.7",
     "pako": "^2.1.0",
-    "portless": "^0.9.4",
+    "portless": "^0.12.0",
     "postcss": "^8.5.3",
     "postgres": "^3.4.8",
     "shadcn": "latest",

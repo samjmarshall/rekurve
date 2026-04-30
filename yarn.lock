@@ -10766,12 +10766,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"portless@npm:^0.9.4":
-  version: 0.9.4
-  resolution: "portless@npm:0.9.4"
+"portless@npm:^0.12.0":
+  version: 0.12.0
+  resolution: "portless@npm:0.12.0"
   bin:
     portless: dist/cli.js
-  checksum: 45af8fc757b758b7cec0419c14787de8b4216d49623c86dded161dd1d740832735b30bdc7694278466370b5d55d5c6ce2a94b573436179b78234a4d4960bcc6f
+  checksum: ff31f6f7849531fd37489cc8cd182ba63def58f2eee6e63462b6d28de85c6906634ca88f712c6013296323fa933b05840e1f2b17cc1ed50a696a170030ec617c
   conditions: (os=darwin | os=linux | os=win32)
   languageName: node
   linkType: hard
@@ -13541,7 +13541,7 @@ shadcn@latest:
     next: 16.2.3
     next-themes: 0.4.6
     pako: ^2.1.0
-    portless: ^0.9.4
+    portless: ^0.12.0
     postcss: ^8.5.3
     postgres: ^3.4.8
     posthog-js: 1.372.5

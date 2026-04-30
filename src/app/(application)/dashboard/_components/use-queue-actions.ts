@@ -1,8 +1,11 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import posthog from "posthog-js";
+import { useRef } from "react";
 import { useToastManager } from "~/components/ui/toast";
 import { type RouterOutputs, useTRPC } from "~/trpc/react";
+import { canUseNativeShare, shareNative, useSmsShare } from "./use-sms-share";
 
 type ListPending = RouterOutputs["messages"]["listPending"];
 type ListPendingRow = ListPending[number];
@@ -86,22 +89,34 @@ function buildErrorToast(err: unknown, defaultTitle: string): ToastOptions {
   };
 }
 
+export type SmsShareState = {
+  isDrawerOpen: boolean;
+  pendingBody: string;
+  pendingMessageId: string;
+  onApproveDrawer: () => void;
+  onCancelDrawer: () => void;
+};
+
 export function useApproveAction() {
   const trpc = useTRPC();
   const toast = useToastManager();
   const optimistic = useOptimisticRemove();
+  const {
+    isDrawerOpen,
+    openDrawer,
+    closeDrawer,
+    pendingBody,
+    pendingMessageId,
+  } = useSmsShare();
 
-  return useMutation(
+  const approve = useMutation(
     trpc.messages.approve.mutationOptions({
       onMutate: ({ id }) => optimistic.snapshot(id),
       onSuccess: (data) => {
         if (data.channel === "email") {
           toast.add({ title: "Sent via email" });
         } else {
-          toast.add({
-            title: "Sent to your phone",
-            description: "Forward it to the lead from Messages.",
-          });
+          toast.add({ title: "Draft approved" });
         }
       },
       onError: (err, _vars, context) => {
@@ -113,6 +128,44 @@ export function useApproveAction() {
       },
     }),
   );
+
+  const handleApprove = (row: ListPendingRow) => {
+    if (
+      row.channel === "sms" &&
+      !posthog.isFeatureEnabled("sms-twilio-dispatch")
+    ) {
+      if (canUseNativeShare(row.body)) {
+        shareNative(row.body, row.id)
+          .then(() => approve.mutate({ id: row.id, skipDispatch: true }))
+          .catch(() => {});
+      } else {
+        openDrawer(row.body, row.id);
+      }
+    } else {
+      approve.mutate({ id: row.id });
+    }
+  };
+
+  const onApproveDrawer = () => {
+    approve.mutate({ id: pendingMessageId, skipDispatch: true });
+    closeDrawer();
+  };
+
+  const onCancelDrawer = () => {
+    closeDrawer();
+  };
+
+  return {
+    ...approve,
+    handleApprove,
+    smsShareState: {
+      isDrawerOpen,
+      pendingBody,
+      pendingMessageId,
+      onApproveDrawer,
+      onCancelDrawer,
+    } satisfies SmsShareState,
+  };
 }
 
 export function useDismissAction() {
@@ -146,8 +199,16 @@ export function useEditAndApproveAction() {
   const trpc = useTRPC();
   const toast = useToastManager();
   const optimistic = useOptimisticRemove();
+  const {
+    isDrawerOpen,
+    openDrawer,
+    closeDrawer,
+    pendingBody,
+    pendingMessageId,
+  } = useSmsShare();
+  const pendingEditRef = useRef<{ id: string; body: string } | null>(null);
 
-  return useMutation(
+  const editAndApprove = useMutation(
     trpc.messages.editAndApprove.mutationOptions({
       onMutate: ({ id }) => optimistic.snapshot(id),
       onSuccess: (data) => {
@@ -157,10 +218,7 @@ export function useEditAndApproveAction() {
             description: "Your edits were saved.",
           });
         } else {
-          toast.add({
-            title: "Sent to your phone",
-            description: "Forward it to the lead from Messages.",
-          });
+          toast.add({ title: "Draft approved" });
         }
       },
       onError: (err, _vars, context) => {
@@ -172,6 +230,51 @@ export function useEditAndApproveAction() {
       },
     }),
   );
+
+  // For SMS + flag OFF, replaces the direct mutate call in the edit dialog.
+  // Assumes this is only called for SMS channel rows (caller's responsibility).
+  const editAndShareApprove = (id: string, editedBody: string) => {
+    if (!posthog.isFeatureEnabled("sms-twilio-dispatch")) {
+      if (canUseNativeShare(editedBody)) {
+        shareNative(editedBody, id)
+          .then(() =>
+            editAndApprove.mutate({ id, body: editedBody, skipDispatch: true }),
+          )
+          .catch(() => {});
+      } else {
+        pendingEditRef.current = { id, body: editedBody };
+        openDrawer(editedBody, id);
+      }
+    } else {
+      editAndApprove.mutate({ id, body: editedBody });
+    }
+  };
+
+  const onApproveDrawer = () => {
+    if (pendingEditRef.current) {
+      const { id, body } = pendingEditRef.current;
+      editAndApprove.mutate({ id, body, skipDispatch: true });
+      pendingEditRef.current = null;
+    }
+    closeDrawer();
+  };
+
+  const onCancelDrawer = () => {
+    pendingEditRef.current = null;
+    closeDrawer();
+  };
+
+  return {
+    ...editAndApprove,
+    editAndShareApprove,
+    smsShareState: {
+      isDrawerOpen,
+      pendingBody,
+      pendingMessageId,
+      onApproveDrawer,
+      onCancelDrawer,
+    } satisfies SmsShareState,
+  };
 }
 
 export function useSnoozeAction() {

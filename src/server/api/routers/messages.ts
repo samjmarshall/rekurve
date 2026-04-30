@@ -147,13 +147,19 @@ export const messagesRouter = createTRPCRouter({
       if (message.channel === "email") {
         await checkEmailPreconditions(ctx.db, ctx.session.user.id, lead);
         await dispatchEmail({ db: ctx.db, ctx, message, lead });
-      } else if (message.channel === "sms") {
+      } else if (message.channel === "sms" && !input.skipDispatch) {
         await dispatchSms({ db: ctx.db, message });
       }
 
       const [updated] = await ctx.db
         .update(messageQueue)
-        .set({ status: "approved", approvedAt: new Date() })
+        .set({
+          status: "approved",
+          approvedAt: new Date(),
+          ...(message.channel === "sms" && input.skipDispatch
+            ? { sentAt: new Date() }
+            : {}),
+        })
         .where(eq(messageQueue.id, input.id))
         .returning();
 
@@ -177,7 +183,7 @@ export const messagesRouter = createTRPCRouter({
           message: { ...existing, body: input.body },
           lead,
         });
-      } else if (existing.channel === "sms") {
+      } else if (existing.channel === "sms" && !input.skipDispatch) {
         await dispatchSms({
           db: ctx.db,
           message: { ...existing, body: input.body },
@@ -191,6 +197,9 @@ export const messagesRouter = createTRPCRouter({
           body: input.body,
           originalBody: existing.originalBody ?? existing.body,
           approvedAt: new Date(),
+          ...(existing.channel === "sms" && input.skipDispatch
+            ? { sentAt: new Date() }
+            : {}),
         })
         .where(eq(messageQueue.id, input.id))
         .returning();

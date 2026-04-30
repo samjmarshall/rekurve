@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/Button";
 import { DismissDialog } from "./dismiss-dialog";
 import type { DraftRowData } from "./draft-row";
 import { EditDialog } from "./edit-dialog";
+import { SmsShareDrawer } from "./sms-share-drawer";
 import { SnoozeDialog } from "./snooze-dialog";
 import {
   useApproveAction,
@@ -28,7 +29,24 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
     approve.isPending ||
     dismiss.isPending ||
     editAndApprove.isPending ||
-    snooze.isPending;
+    snooze.isPending ||
+    approve.smsShareState.isDrawerOpen ||
+    editAndApprove.smsShareState.isDrawerOpen;
+
+  // For SMS rows with flag OFF, route through the share flow.
+  // The cast is safe: behaviorally identical to mutate for the EditDialog consumer.
+  const editDialogMutate =
+    row.channel === "sms"
+      ? (((vars: { id: string; body: string }) => {
+          setEditOpen(false);
+          editAndApprove.editAndShareApprove(vars.id, vars.body);
+        }) as unknown as typeof editAndApprove.mutate)
+      : editAndApprove.mutate;
+
+  // Expose whichever SMS share drawer is currently active (approve or edit).
+  const smsShareState = approve.smsShareState.isDrawerOpen
+    ? approve.smsShareState
+    : editAndApprove.smsShareState;
 
   return (
     <>
@@ -38,7 +56,7 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
           variant="primary"
           size="md"
           disabled={isPending}
-          onClick={() => approve.mutate({ id: row.id })}
+          onClick={() => approve.handleApprove(row)}
         >
           <Check className="mr-1.5 size-4" />
           Approve
@@ -79,7 +97,7 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
         row={row}
         open={editOpen}
         onOpenChange={setEditOpen}
-        mutate={editAndApprove.mutate}
+        mutate={editDialogMutate}
         isPending={editAndApprove.isPending}
         error={editAndApprove.error}
       />
@@ -96,6 +114,13 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
         onOpenChange={setDismissOpen}
         mutate={dismiss.mutate}
         isPending={dismiss.isPending}
+      />
+      <SmsShareDrawer
+        open={smsShareState.isDrawerOpen}
+        body={smsShareState.pendingBody}
+        messageId={smsShareState.pendingMessageId}
+        onApprove={smsShareState.onApproveDrawer}
+        onCancel={smsShareState.onCancelDrawer}
       />
     </>
   );

@@ -175,21 +175,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-common@npm:14.16.1":
-  version: 14.16.1
-  resolution: "@azure/msal-common@npm:14.16.1"
-  checksum: 6c39754f5ac38bcc4c8f11a8254779bd5a76434e298367a3f59758c1ab93d5d88c093a386935e707e2a4c55e6d1394980f527b6f6aea0cfc6102cf01b79c74a3
+"@azure/msal-common@npm:16.5.2":
+  version: 16.5.2
+  resolution: "@azure/msal-common@npm:16.5.2"
+  checksum: ff34444bd2d8b9f7a3f9b6bfabeb6624f721761dd43c68bdc597c4fa61e78a22b4bee8a549465c42f27ba5f12bbc042cb4c10adda82b874654f60f3c9d43f6e2
   languageName: node
   linkType: hard
 
-"@azure/msal-node@npm:^2":
-  version: 2.16.3
-  resolution: "@azure/msal-node@npm:2.16.3"
+"@azure/msal-node@npm:^5.0.0":
+  version: 5.1.5
+  resolution: "@azure/msal-node@npm:5.1.5"
   dependencies:
-    "@azure/msal-common": 14.16.1
+    "@azure/msal-common": 16.5.2
     jsonwebtoken: ^9.0.0
-    uuid: ^8.3.0
-  checksum: a8e2b2054836105e1945bcc687b0366c1009afa2d43af805da563b454a4cdf6db02f16d72d43f3b9ff4bcc9a003b21b83fa8a7c4fb8eabb1351e523cfc50be0f
+  checksum: 5d17b0e9ea145de337f36df1b434ce06fb0a030cc259b2fb50cf6653df5842d38047079fe4f1997d1ee7bbc07f97f1e0e6c5bca3ecd7e374c85ea49b3e6bcaf8
   languageName: node
   linkType: hard
 
@@ -13177,15 +13176,6 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"uuid@npm:^8.3.0":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
-  languageName: node
-  linkType: hard
-
 "v8-compile-cache-lib@npm:^3.0.1":
   version: 3.0.1
   resolution: "v8-compile-cache-lib@npm:3.0.1"
@@ -13464,7 +13454,7 @@ shadcn@latest:
     "@auto-it/conventional-commits": ^11.3.6
     "@auto-it/git-tag": ^11.3.6
     "@auto-it/released": ^11.3.6
-    "@azure/msal-node": ^2
+    "@azure/msal-node": ^5.0.0
     "@base-ui/react": 1.4.1
     "@biomejs/biome": ^2.4.9
     "@hookform/resolvers": 5.2.2

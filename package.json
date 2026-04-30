@@ -43,7 +43,7 @@
     "@hookform/resolvers": "5.2.2",
     "@hubspot/api-client": "13.5.0",
     "@microsoft/microsoft-graph-client": "^3",
-    "@neondatabase/serverless": "1.0.2",
+    "@neondatabase/serverless": "1.1.0",
     "@posthog/nextjs-config": "1.6.0",
     "@t3-oss/env-nextjs": "0.13.0",
     "@tailwindcss/typography": "0.5.19",

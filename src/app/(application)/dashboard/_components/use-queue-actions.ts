@@ -93,6 +93,7 @@ export type SmsShareState = {
   isDrawerOpen: boolean;
   pendingBody: string;
   pendingMessageId: string;
+  pendingLeadName: string;
   onApproveDrawer: () => void;
   onCancelDrawer: () => void;
 };
@@ -107,6 +108,7 @@ export function useApproveAction() {
     closeDrawer,
     pendingBody,
     pendingMessageId,
+    pendingLeadName,
   } = useSmsShare();
 
   const approve = useMutation(
@@ -139,7 +141,7 @@ export function useApproveAction() {
           .then(() => approve.mutate({ id: row.id, skipDispatch: true }))
           .catch(() => {});
       } else {
-        openDrawer(row.body, row.id);
+        openDrawer(row.body, row.id, row.lead.firstName);
       }
     } else {
       approve.mutate({ id: row.id });
@@ -162,6 +164,7 @@ export function useApproveAction() {
       isDrawerOpen,
       pendingBody,
       pendingMessageId,
+      pendingLeadName,
       onApproveDrawer,
       onCancelDrawer,
     } satisfies SmsShareState,
@@ -205,6 +208,7 @@ export function useEditAndApproveAction() {
     closeDrawer,
     pendingBody,
     pendingMessageId,
+    pendingLeadName,
   } = useSmsShare();
   const pendingEditRef = useRef<{ id: string; body: string } | null>(null);
 
@@ -233,7 +237,11 @@ export function useEditAndApproveAction() {
 
   // For SMS + flag OFF, replaces the direct mutate call in the edit dialog.
   // Assumes this is only called for SMS channel rows (caller's responsibility).
-  const editAndShareApprove = (id: string, editedBody: string) => {
+  const editAndShareApprove = (
+    id: string,
+    editedBody: string,
+    leadFirstName: string,
+  ) => {
     if (!posthog.isFeatureEnabled("sms-twilio-dispatch")) {
       if (canUseNativeShare(editedBody)) {
         shareNative(editedBody, id)
@@ -243,7 +251,7 @@ export function useEditAndApproveAction() {
           .catch(() => {});
       } else {
         pendingEditRef.current = { id, body: editedBody };
-        openDrawer(editedBody, id);
+        openDrawer(editedBody, id, leadFirstName);
       }
     } else {
       editAndApprove.mutate({ id, body: editedBody });
@@ -271,6 +279,7 @@ export function useEditAndApproveAction() {
       isDrawerOpen,
       pendingBody,
       pendingMessageId,
+      pendingLeadName,
       onApproveDrawer,
       onCancelDrawer,
     } satisfies SmsShareState,

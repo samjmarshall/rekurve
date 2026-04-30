@@ -39,7 +39,11 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
     row.channel === "sms"
       ? (((vars: { id: string; body: string }) => {
           setEditOpen(false);
-          editAndApprove.editAndShareApprove(vars.id, vars.body);
+          editAndApprove.editAndShareApprove(
+            vars.id,
+            vars.body,
+            row.lead.firstName,
+          );
         }) as unknown as typeof editAndApprove.mutate)
       : editAndApprove.mutate;
 
@@ -119,6 +123,7 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
         open={smsShareState.isDrawerOpen}
         body={smsShareState.pendingBody}
         messageId={smsShareState.pendingMessageId}
+        leadName={smsShareState.pendingLeadName}
         onApprove={smsShareState.onApproveDrawer}
         onCancel={smsShareState.onCancelDrawer}
       />

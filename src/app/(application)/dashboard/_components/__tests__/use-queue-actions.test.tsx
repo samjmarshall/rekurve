@@ -51,12 +51,14 @@ beforeEach(() => {
   rs.doMock("../use-sms-share", () => ({
     canUseNativeShare: mockCanUseNativeShare,
     shareNative: mockShareNative,
+    canUseSmsLink: rs.fn().mockReturnValue(false),
     useSmsShare: rs.fn().mockReturnValue({
       isDrawerOpen: false,
       openDrawer: mockOpenDrawer,
       closeDrawer: mockCloseDrawer,
       pendingBody: "",
       pendingMessageId: "",
+      pendingLeadName: "",
     }),
   }));
 
@@ -172,7 +174,11 @@ describe("useApproveAction — handleApprove", () => {
 
     hook.handleApprove(smsRow);
 
-    expect(mockOpenDrawer).toHaveBeenCalledWith(smsRow.body, smsRow.id);
+    expect(mockOpenDrawer).toHaveBeenCalledWith(
+      smsRow.body,
+      smsRow.id,
+      smsRow.lead.firstName,
+    );
     expect(mockMutate).not.toHaveBeenCalled();
     expect(mockShareNative).not.toHaveBeenCalled();
   });
@@ -217,7 +223,7 @@ describe("useEditAndApproveAction — editAndShareApprove", () => {
     const { useEditAndApproveAction } = await import("../use-queue-actions");
     const hook = useEditAndApproveAction();
 
-    hook.editAndShareApprove(smsRow.id, "Edited body");
+    hook.editAndShareApprove(smsRow.id, "Edited body", smsRow.lead.firstName);
 
     expect(mockShareNative).toHaveBeenCalledWith("Edited body", smsRow.id);
 
@@ -237,9 +243,13 @@ describe("useEditAndApproveAction — editAndShareApprove", () => {
     const { useEditAndApproveAction } = await import("../use-queue-actions");
     const hook = useEditAndApproveAction();
 
-    hook.editAndShareApprove(smsRow.id, "Edited body");
+    hook.editAndShareApprove(smsRow.id, "Edited body", smsRow.lead.firstName);
 
-    expect(mockOpenDrawer).toHaveBeenCalledWith("Edited body", smsRow.id);
+    expect(mockOpenDrawer).toHaveBeenCalledWith(
+      "Edited body",
+      smsRow.id,
+      smsRow.lead.firstName,
+    );
     expect(mockMutate).not.toHaveBeenCalled();
 
     // Drawer onApprove triggers editAndApprove.mutate with body=editedBody, skipDispatch: true
@@ -259,7 +269,7 @@ describe("useEditAndApproveAction — editAndShareApprove", () => {
     const { useEditAndApproveAction } = await import("../use-queue-actions");
     const hook = useEditAndApproveAction();
 
-    hook.editAndShareApprove(smsRow.id, "Edited body");
+    hook.editAndShareApprove(smsRow.id, "Edited body", smsRow.lead.firstName);
 
     expect(mockMutate).toHaveBeenCalledWith({
       id: smsRow.id,

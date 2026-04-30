@@ -17,18 +17,30 @@ export async function shareNative(
   analytics.queue.smsShared({ method: "native_share", message_id: messageId });
 }
 
+export function canUseSmsLink(userAgent: string): boolean {
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(userAgent);
+  const isMac =
+    /Macintosh/i.test(userAgent) && !/iPhone|iPad|iPod/i.test(userAgent);
+  return isMobile || isMac;
+}
+
 export function useSmsShare() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [pendingBody, setPendingBody] = useState("");
   const [pendingMessageId, setPendingMessageId] = useState("");
+  const [pendingLeadName, setPendingLeadName] = useState("");
 
-  const openDrawer = (body: string, messageId: string) => {
+  const openDrawer = (body: string, messageId: string, leadName: string) => {
     setPendingBody(body);
     setPendingMessageId(messageId);
+    setPendingLeadName(leadName);
     setIsDrawerOpen(true);
   };
 
-  const closeDrawer = () => setIsDrawerOpen(false);
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+    setPendingLeadName("");
+  };
 
   return {
     canUseNativeShare,
@@ -38,5 +50,6 @@ export function useSmsShare() {
     closeDrawer,
     pendingBody,
     pendingMessageId,
+    pendingLeadName,
   };
 }

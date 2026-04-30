@@ -92,3 +92,70 @@ describe("shareNative", () => {
     expect(mockSmsShared).not.toHaveBeenCalled();
   });
 });
+
+describe("canUseSmsLink", () => {
+  test("returns true for macOS user agent", async () => {
+    const { canUseSmsLink } = await import("../use-sms-share");
+    const macUA =
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+    expect(canUseSmsLink(macUA)).toBe(true);
+  });
+
+  test("returns true for iOS user agent", async () => {
+    const { canUseSmsLink } = await import("../use-sms-share");
+    const iosUA =
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1";
+    expect(canUseSmsLink(iosUA)).toBe(true);
+  });
+
+  test("returns true for Android user agent", async () => {
+    const { canUseSmsLink } = await import("../use-sms-share");
+    const androidUA =
+      "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
+    expect(canUseSmsLink(androidUA)).toBe(true);
+  });
+
+  test("returns false for Windows Chrome user agent", async () => {
+    const { canUseSmsLink } = await import("../use-sms-share");
+    const windowsUA =
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+    expect(canUseSmsLink(windowsUA)).toBe(false);
+  });
+
+  test("returns false for Linux Chrome user agent", async () => {
+    const { canUseSmsLink } = await import("../use-sms-share");
+    const linuxUA =
+      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+    expect(canUseSmsLink(linuxUA)).toBe(false);
+  });
+});
+
+describe("useSmsShare — leadName", () => {
+  test("openDrawer stores leadName; closeDrawer clears it", async () => {
+    type Slot = { val: unknown; set: (v: unknown) => void };
+    const slots: Slot[] = [];
+
+    rs.doMock("react", () => ({
+      useState: rs.fn().mockImplementation((initial: unknown) => {
+        const slot: Slot = {
+          val: initial,
+          set: (v: unknown) => {
+            slot.val = v;
+          },
+        };
+        slots.push(slot);
+        return [slot.val, slot.set];
+      }),
+    }));
+
+    const { useSmsShare } = await import("../use-sms-share");
+    const hook = useSmsShare();
+
+    // State declaration order: isDrawerOpen(0), pendingBody(1), pendingMessageId(2), pendingLeadName(3)
+    hook.openDrawer("Hello", "msg-1", "Jane");
+    expect(slots[3]!.val).toBe("Jane");
+
+    hook.closeDrawer();
+    expect(slots[3]!.val).toBe("");
+  });
+});

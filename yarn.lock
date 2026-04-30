@@ -12,9 +12,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@anthropic-ai/sdk@npm:^0.88.0":
-  version: 0.88.0
-  resolution: "@anthropic-ai/sdk@npm:0.88.0"
+"@anthropic-ai/sdk@npm:^0.91.0":
+  version: 0.91.1
+  resolution: "@anthropic-ai/sdk@npm:0.91.1"
   dependencies:
     json-schema-to-ts: ^3.1.1
   peerDependencies:
@@ -24,7 +24,7 @@ __metadata:
       optional: true
   bin:
     anthropic-ai-sdk: bin/cli
-  checksum: 93af3d536ced26637bb4eb18c59b6f3b4b51bef84b19861466179a056283a525e24aad3f18c7485f5b1d3c22ca578c93736bbb649362cf2c5aedbaba932aa008
+  checksum: e38232c9bad55166a62621b8290c859321510ee42607012ab715d1dcc7e76ccebc95f99b1f331b6437d410c21e31f101ddeeee5cb97eba7b0b25ca1beea308da
   languageName: node
   linkType: hard
 
@@ -13485,7 +13485,7 @@ shadcn@latest:
   version: 0.0.0-use.local
   resolution: "www@workspace:."
   dependencies:
-    "@anthropic-ai/sdk": ^0.88.0
+    "@anthropic-ai/sdk": ^0.91.0
     "@auto-it/conventional-commits": ^11.3.6
     "@auto-it/git-tag": ^11.3.6
     "@auto-it/released": ^11.3.6

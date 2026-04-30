@@ -26,12 +26,15 @@ function findByTestId(element: unknown, testId: string): RElement | null {
 
 let mockSmsShared: ReturnType<typeof rs.fn>;
 let mockClipboardWrite: ReturnType<typeof rs.fn>;
+let mockToastAdd: ReturnType<typeof rs.fn>;
+let mockCanUseSmsLink: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
 
   mockSmsShared = rs.fn();
   mockClipboardWrite = rs.fn().mockResolvedValue(undefined);
+  mockToastAdd = rs.fn();
 
   rs.doMock("~/lib/posthog", () => ({
     analytics: {
@@ -39,6 +42,27 @@ beforeEach(() => {
         smsShared: mockSmsShared,
       },
     },
+  }));
+
+  rs.doMock("~/components/ui/toast", () => ({
+    useToastManager: () => ({ add: mockToastAdd }),
+  }));
+
+  rs.doMock("react", () => ({
+    useState: rs.fn().mockImplementation((initial: unknown) => {
+      const value =
+        typeof initial === "function" ? (initial as () => unknown)() : initial;
+      return [value, rs.fn()];
+    }),
+    useLayoutEffect: rs.fn(),
+    useRef: rs
+      .fn()
+      .mockImplementation((initial: unknown) => ({ current: initial })),
+  }));
+
+  mockCanUseSmsLink = rs.fn().mockReturnValue(false);
+  rs.doMock("../use-sms-share", () => ({
+    canUseSmsLink: mockCanUseSmsLink,
   }));
 
   Object.defineProperty(globalThis, "navigator", {
@@ -55,7 +79,9 @@ const defaultProps = {
 };
 
 describe("SmsShareDrawer", () => {
-  test("Copy button calls clipboard, captures clipboard analytics, and calls onApprove", async () => {
+  test("Copy button calls clipboard, captures clipboard analytics, and calls onApprove after 1200ms", async () => {
+    rs.useFakeTimers();
+
     const { SmsShareDrawer } = await import("../sms-share-drawer");
     const onApprove = rs.fn();
     const onCancel = rs.fn();
@@ -73,8 +99,12 @@ describe("SmsShareDrawer", () => {
 
     expect(mockClipboardWrite).toHaveBeenCalledWith(defaultProps.body);
 
-    // clipboard.writeText is async — flush the .then() before asserting onApprove
-    await new Promise((r) => setTimeout(r, 0));
+    // flush the clipboard .then() microtask
+    await Promise.resolve();
+
+    expect(onApprove).not.toHaveBeenCalled(); // 1200ms delay not elapsed yet
+
+    rs.advanceTimersByTime(1200);
 
     expect(mockSmsShared).toHaveBeenCalledWith({
       method: "clipboard",
@@ -82,9 +112,11 @@ describe("SmsShareDrawer", () => {
     });
     expect(onApprove).toHaveBeenCalledOnce();
     expect(onCancel).not.toHaveBeenCalled();
+
+    rs.useRealTimers();
   });
 
-  test("Copy button: clipboard failure leaves onApprove uncalled", async () => {
+  test("Copy button: clipboard failure calls toast.add with error and leaves onApprove uncalled", async () => {
     mockClipboardWrite.mockRejectedValue(
       new DOMException("Not allowed", "NotAllowedError"),
     );
@@ -106,6 +138,53 @@ describe("SmsShareDrawer", () => {
     expect(mockClipboardWrite).toHaveBeenCalledWith(defaultProps.body);
     expect(mockSmsShared).not.toHaveBeenCalled();
     expect(onApprove).not.toHaveBeenCalled();
+    expect(mockToastAdd).toHaveBeenCalledWith({
+      type: "error",
+      title: "Copy failed",
+      description: "Could not copy to clipboard. Try another option.",
+    });
+  });
+
+  test("title includes leadName when provided", async () => {
+    const { SmsShareDrawer } = await import("../sms-share-drawer");
+
+    const rendered = SmsShareDrawer({
+      ...defaultProps,
+      leadName: "Jane",
+      onApprove: rs.fn(),
+      onCancel: rs.fn(),
+    }) as React.ReactElement;
+
+    const title = findByTestId(rendered, "sms-share-title");
+    expect(title).not.toBeNull();
+    expect(title!.props.children).toBe("Send message to Jane");
+  });
+
+  test("title falls back to 'lead' when leadName omitted", async () => {
+    const { SmsShareDrawer } = await import("../sms-share-drawer");
+
+    const rendered = SmsShareDrawer({
+      ...defaultProps,
+      onApprove: rs.fn(),
+      onCancel: rs.fn(),
+    }) as React.ReactElement;
+
+    const title = findByTestId(rendered, "sms-share-title");
+    expect(title).not.toBeNull();
+    expect(title!.props.children).toBe("Send message to lead");
+  });
+
+  test("Cancel button renders with correct testid", async () => {
+    const { SmsShareDrawer } = await import("../sms-share-drawer");
+
+    const rendered = SmsShareDrawer({
+      ...defaultProps,
+      onApprove: rs.fn(),
+      onCancel: rs.fn(),
+    }) as React.ReactElement;
+
+    const cancelBtn = findByTestId(rendered, "sms-share-cancel");
+    expect(cancelBtn).not.toBeNull();
   });
 
   test("Messages link captures sms_link analytics and calls onApprove", async () => {
@@ -198,5 +277,17 @@ describe("SmsShareDrawer", () => {
     drawerProps.onOpenChange!(true);
 
     expect(onCancel).not.toHaveBeenCalled();
+  });
+
+  test("hideOnDesktop initialises from canUseSmsLink without useEffect", async () => {
+    const { SmsShareDrawer } = await import("../sms-share-drawer");
+
+    SmsShareDrawer({
+      ...defaultProps,
+      onApprove: rs.fn(),
+      onCancel: rs.fn(),
+    });
+
+    expect(mockCanUseSmsLink).toHaveBeenCalledOnce();
   });
 });

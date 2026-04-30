@@ -7283,29 +7283,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:12.23.24":
-  version: 12.23.24
-  resolution: "framer-motion@npm:12.23.24"
-  dependencies:
-    motion-dom: ^12.23.23
-    motion-utils: ^12.23.6
-    tslib: ^2.4.0
-  peerDependencies:
-    "@emotion/is-prop-valid": "*"
-    react: ^18.0.0 || ^19.0.0
-    react-dom: ^18.0.0 || ^19.0.0
-  peerDependenciesMeta:
-    "@emotion/is-prop-valid":
-      optional: true
-    react:
-      optional: true
-    react-dom:
-      optional: true
-  checksum: 8f1496ef846e3519c0f8aeaa2994ea5cb12264548e3e97aa33b7de95a4a2227e3e8d79fab17f36f722eafcbbe7cf1e020edd9d3288eda95b4c8d1b05126a8da3
-  languageName: node
-  linkType: hard
-
-"framer-motion@npm:^12.23.24":
+"framer-motion@npm:12.38.0, framer-motion@npm:^12.23.24":
   version: 12.38.0
   resolution: "framer-motion@npm:12.38.0"
   dependencies:
@@ -9508,7 +9486,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion-dom@npm:^12.23.23, motion-dom@npm:^12.38.0":
+"motion-dom@npm:^12.38.0":
   version: 12.38.0
   resolution: "motion-dom@npm:12.38.0"
   dependencies:
@@ -9517,7 +9495,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion-utils@npm:^12.23.6, motion-utils@npm:^12.36.0":
+"motion-utils@npm:^12.36.0":
   version: 12.36.0
   resolution: "motion-utils@npm:12.36.0"
   checksum: 61b61425101402ab879b7b4cdf9c940009937e18005ce7a52a3b679bde9c73594802188bc14d2b9d2885a6f70015a2cf9173f3f1c8da2a63bf4edaa503a143f1
@@ -13289,7 +13267,7 @@ shadcn@latest:
     clsx: 2.1.1
     drizzle-kit: ^0.31.10
     drizzle-orm: 0.45.2
-    framer-motion: 12.23.24
+    framer-motion: 12.38.0
     husky: ^9.1.7
     input-otp: 1.4.2
     lucide-react: 0.563.0

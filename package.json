@@ -37,7 +37,7 @@
     "release": "auto shipit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.88.0",
+    "@anthropic-ai/sdk": "^0.91.0",
     "@azure/msal-node": "^2",
     "@base-ui/react": "1.4.1",
     "@hookform/resolvers": "5.2.2",

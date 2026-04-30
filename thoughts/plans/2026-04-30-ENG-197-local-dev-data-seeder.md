@@ -79,9 +79,9 @@ Implementation strategy for the HubSpot mock: wrap each exported function in `sr
 
 **Manual**
 - [x] `yarn install` adds `@faker-js/faker` and lock-file diff is clean.
-- [ ] In a dev shell: `HUBSPOT_MOCK=true yarn dev`, edit a lead via `/leads/[id]`; terminal logs `[hubspot-mock] updateContact` and Network tab shows zero requests to `api.hubapi.com`.
-- [ ] In a dev shell: `NODE_ENV=production HUBSPOT_MOCK=true yarn start` throws on boot before serving traffic.
-- [ ] Manual import sanity: `yarn tsx -e "import('./src/server/db/seed/guards.ts')"` resolves without runtime error.
+- [x] In a dev shell: `HUBSPOT_MOCK=true yarn dev`, edit a lead via `/leads/[id]`; terminal logs `[hubspot-mock] updateContact` and Network tab shows zero requests to `api.hubapi.com`.
+- [x] In a dev shell: `NODE_ENV=production HUBSPOT_MOCK=true yarn start` throws on boot before serving traffic.
+- [x] Manual import sanity: `yarn tsx -e "import('./src/server/db/seed/guards.ts')"` resolves without runtime error.
 
 ## Phase 2: Fixtures and seed entry point
 
@@ -109,11 +109,11 @@ Implementation strategy for the HubSpot mock: wrap each exported function in `sr
 - [x] `make build` passes.
 
 **Manual**
-- [ ] `yarn seed:dev` against a fresh branch DB completes in under 10s and exits 0.
-- [ ] Two consecutive runs of `yarn seed:dev` produce identical row counts and (modulo `createdAt` relative-to-now drift) identical body content. Verify via `psql ... -c 'SELECT count(*) FROM leads, lots, lot_matches, conversations, message_queue, nurture_sequences'` between runs.
-- [ ] `/dashboard` renders the action queue with pending, snoozed, approved, and sent messages spread across multiple leads with varied priorities — no manual setup.
-- [ ] `/leads` renders 20 leads across stages.
-- [ ] Guard test: temporarily point `DATABASE_URL` at a non-`.neon.tech` host (or set `NEON_PROJECT_ID` to match the current URL's project) → `yarn seed:dev` exits 1 before any writes; verify with `psql` that pre-existing rows are intact.
+- [x] `yarn seed:dev` against a fresh branch DB completes in under 10s and exits 0.
+- [x] Two consecutive runs of `yarn seed:dev` produce identical row counts and (modulo `createdAt` relative-to-now drift) identical body content. Verify via `psql ... -c 'SELECT count(*) FROM leads, lots, lot_matches, conversations, message_queue, nurture_sequences'` between runs.
+- [x] `/dashboard` renders the action queue with pending, snoozed, approved, and sent messages spread across multiple leads with varied priorities — no manual setup.
+- [x] `/leads` renders 20 leads across stages.
+- [x] Guard test: temporarily point `DATABASE_URL` at a non-`.neon.tech` host (or set `NEON_PROJECT_ID` to match the current URL's project) → `yarn seed:dev` exits 1 before any writes; verify with `psql` that pre-existing rows are intact.
 - [ ] Smoke check: `HUBSPOT_MOCK=true yarn dev`, navigate seeded leads, click into a lead, edit a field — no `api.hubapi.com` calls in network log; `[hubspot-mock]` appears in server logs.
 
 ## Phase 3: `neon-branch.sh` integration and docs
@@ -137,9 +137,9 @@ Implementation strategy for the HubSpot mock: wrap each exported function in `sr
 - [x] `bash -n scripts/neon-branch.sh` reports no syntax errors
 
 **Manual**
-- [ ] `scripts/neon-branch.sh create test-seed-branch` runs migrations, seeds fixtures, and prints row counts. App boots (`yarn dev`), `/dashboard` shows populated action queue.
-- [ ] `scripts/neon-branch.sh create test-seed-branch --no-seed` runs migrations only; `/dashboard` action queue is empty until `yarn seed:dev` is run manually.
-- [ ] `scripts/neon-branch.sh delete test-seed-branch` cleans up.
+- [x] `scripts/neon-branch.sh create test-seed-branch` runs migrations, seeds fixtures, and prints row counts. App boots (`yarn dev`), `/dashboard` shows populated action queue.
+- [x] `scripts/neon-branch.sh create test-seed-branch --no-seed` runs migrations only; `/dashboard` action queue is empty until `yarn seed:dev` is run manually.
+- [x] `scripts/neon-branch.sh delete test-seed-branch` cleans up.
 
 ## References
 

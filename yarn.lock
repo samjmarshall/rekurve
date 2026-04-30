@@ -1656,6 +1656,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@faker-js/faker@npm:^9":
+  version: 9.9.0
+  resolution: "@faker-js/faker@npm:9.9.0"
+  checksum: bbc5b57c3b0f480d26dea9fc8e40a5c1bd4d2b0ad8c9d7d22ac4650d0d9f959469af4f2c443c34ff64b7a7d3b9135ce525eae2a1e5822b9223257e184036efd0
+  languageName: node
+  linkType: hard
+
 "@fastify/busboy@npm:^2.0.0":
   version: 2.1.1
   resolution: "@fastify/busboy@npm:2.1.1"
@@ -13856,6 +13863,7 @@ shadcn@latest:
     "@azure/msal-node": ^2
     "@base-ui/react": 1.4.1
     "@biomejs/biome": ^2.4.9
+    "@faker-js/faker": ^9
     "@hookform/resolvers": 5.2.2
     "@hubspot/api-client": 13.5.0
     "@microsoft/microsoft-graph-client": ^3

@@ -32,6 +32,7 @@
     "db:migrate": "drizzle-kit migrate",
     "test": "rstest run",
     "test:watch": "rstest watch",
+    "seed:dev": "tsx scripts/seed-dev.ts",
     "posthog:setup": "tsx scripts/posthog-setup.ts",
     "postinstall": "husky",
     "release": "auto shipit"
@@ -85,6 +86,7 @@
     "@auto-it/git-tag": "^11.3.6",
     "@auto-it/released": "^11.3.6",
     "@biomejs/biome": "^2.4.9",
+    "@faker-js/faker": "^9",
     "@opentelemetry/api": "^1.9.1",
     "@playwright/test": "^1.57.0",
     "@rsbuild/plugin-react": "^2.0.0",

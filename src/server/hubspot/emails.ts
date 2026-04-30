@@ -1,3 +1,4 @@
+import { env } from "~/env";
 import { hubspot } from "./client";
 
 const EMAIL_PROPERTIES = [
@@ -18,6 +19,10 @@ export interface EmailEngagement {
 export async function getEmailEngagement(
   emailId: string,
 ): Promise<EmailEngagement | null> {
+  if (env.HUBSPOT_MOCK === "true") {
+    console.log("[hubspot-mock] getEmailEngagement");
+    return null;
+  }
   try {
     const response = await hubspot.crm.objects.emails.basicApi.getById(
       emailId,
@@ -42,6 +47,10 @@ export async function getEmailEngagement(
 export async function findContactIdForEmail(
   emailId: string,
 ): Promise<string | null> {
+  if (env.HUBSPOT_MOCK === "true") {
+    console.log("[hubspot-mock] findContactIdForEmail");
+    return null;
+  }
   try {
     const response = await hubspot.crm.associations.v4.basicApi.getPage(
       "emails",

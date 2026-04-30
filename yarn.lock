@@ -471,7 +471,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.28.6":
+"@babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.29.2":
   version: 7.29.2
   resolution: "@babel/runtime@npm:7.29.2"
   checksum: d5548d1165de8995f8afc93a5694b8625409be16cd1f2250ac13e331335858ddac3cb9fd278e6c43956a130101a2203f09417938a1a96f9fb70f02b4b4172e1d
@@ -514,32 +514,37 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@base-ui/react@npm:1.3.0":
-  version: 1.3.0
-  resolution: "@base-ui/react@npm:1.3.0"
+"@base-ui/react@npm:1.4.1":
+  version: 1.4.1
+  resolution: "@base-ui/react@npm:1.4.1"
   dependencies:
-    "@babel/runtime": ^7.28.6
-    "@base-ui/utils": 0.2.6
+    "@babel/runtime": ^7.29.2
+    "@base-ui/utils": 0.2.8
     "@floating-ui/react-dom": ^2.1.8
     "@floating-ui/utils": ^0.2.11
-    tabbable: ^6.4.0
     use-sync-external-store: ^1.6.0
   peerDependencies:
+    "@date-fns/tz": ^1.2.0
     "@types/react": ^17 || ^18 || ^19
+    date-fns: ^4.0.0
     react: ^17 || ^18 || ^19
     react-dom: ^17 || ^18 || ^19
   peerDependenciesMeta:
+    "@date-fns/tz":
+      optional: true
     "@types/react":
       optional: true
-  checksum: c9f99003d0b42bab663cb12b5d1349ddf161816968d4a0f51b9d7aa64c9ee99619dfb328e14a0cfb44458cf931fc23b4e6c210a2cee2e79e666939c5ad6be0a2
+    date-fns:
+      optional: true
+  checksum: ec8f9ab946998244a40849228612792943efd86fe41bb48dab063a890f90b8fa7a16581e35ae098d8332f92757676085be9da94a3f56c32e17dc2fb4fc4934ef
   languageName: node
   linkType: hard
 
-"@base-ui/utils@npm:0.2.6":
-  version: 0.2.6
-  resolution: "@base-ui/utils@npm:0.2.6"
+"@base-ui/utils@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@base-ui/utils@npm:0.2.8"
   dependencies:
-    "@babel/runtime": ^7.28.6
+    "@babel/runtime": ^7.29.2
     "@floating-ui/utils": ^0.2.11
     reselect: ^5.1.1
     use-sync-external-store: ^1.6.0
@@ -550,7 +555,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 2d0cde7204d899f28931a466c74316f7b2aa1386f8267172cd98107a514ffdc98a7880ded519c7c5aecee5d766fd3cdcaef5110c05bf6bf1c090e4f7d22387a5
+  checksum: 52b3ec081fb7b3de6099466c4720d1ecba4e7b7f5e17e2c1a421ff4d87daa9a8121019e7f259b7b5110c7d70397851eac732f7d3dbcaab8c4c3e399317eca5ec
   languageName: node
   linkType: hard
 
@@ -12213,13 +12218,6 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"tabbable@npm:^6.4.0":
-  version: 6.4.0
-  resolution: "tabbable@npm:6.4.0"
-  checksum: 7084cba269ebbc7dcdeed5aca7f90c0a0fb59a295dd1e83703ab89cca5e6c53b78d02020e3d1065481984cd64bba7dd1ea3c0a48e92fdba83d586e6e86d62a74
-  languageName: node
-  linkType: hard
-
 "table-layout@npm:^1.0.2":
   version: 1.0.2
   resolution: "table-layout@npm:1.0.2"
@@ -13254,7 +13252,7 @@ shadcn@latest:
     "@auto-it/git-tag": ^11.3.6
     "@auto-it/released": ^11.3.6
     "@azure/msal-node": ^2
-    "@base-ui/react": 1.3.0
+    "@base-ui/react": 1.4.1
     "@biomejs/biome": ^2.4.9
     "@hookform/resolvers": 5.2.2
     "@hubspot/api-client": 13.5.0

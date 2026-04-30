@@ -3349,8 +3349,8 @@ __metadata:
   linkType: hard
 
 "@rstest/coverage-istanbul@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "@rstest/coverage-istanbul@npm:0.3.0"
+  version: 0.3.2
+  resolution: "@rstest/coverage-istanbul@npm:0.3.2"
   dependencies:
     istanbul-lib-coverage: ^3.2.2
     istanbul-lib-report: ^3.0.1
@@ -3358,8 +3358,8 @@ __metadata:
     istanbul-reports: ^3.2.0
     swc-plugin-coverage-instrument: 0.0.32
   peerDependencies:
-    "@rstest/core": ~0.9.0
-  checksum: 7a46d0599509aaacbc88b4f534c37718c5d76bfdd04569724638e9c49fb045c79641cb6bd99f716bd6900bcd66245ddf0258ff736122ab9f01a06211c590e4c4
+    "@rstest/core": ~0.9.8
+  checksum: aa2d3d140fa6abff1816e9402712711b7dd9c5209b3fa17f3f5786b47bb0fed19507381918bd059178e209ad16deccfe8ca4dd0a34ef266921c0a80daf731780
   languageName: node
   linkType: hard
 

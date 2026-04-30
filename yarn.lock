@@ -2228,13 +2228,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@neondatabase/serverless@npm:1.0.2":
-  version: 1.0.2
-  resolution: "@neondatabase/serverless@npm:1.0.2"
-  dependencies:
-    "@types/node": ^22.15.30
-    "@types/pg": ^8.8.0
-  checksum: 04430053eeb4306eadf644d5217636a23b01661d7c0e04f696325f40978f896e523a4f375fe54aa3128a0a2792ef6ae4f5e60dcede51f22d5e9f40300e0483a9
+"@neondatabase/serverless@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@neondatabase/serverless@npm:1.1.0"
+  checksum: 15fcae150fc5b1c6fb3da86a717c02587d49535b9ed1fe74b2f495c7392196a16c345a8f75e789a7637d2c1b4cda05e9a53a6c754849201888a6033af3cfcd6b
   languageName: node
   linkType: hard
 
@@ -4004,15 +4001,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.15.30":
-  version: 22.19.15
-  resolution: "@types/node@npm:22.19.15"
-  dependencies:
-    undici-types: ~6.21.0
-  checksum: 6e78cdb6cec95770432aceff75b349610b2a8c6e3b661fa6643afa199e49b2ada081546b74c79f3b1bd922fbf5e1b52f7714f6d9d8d275d2083578821328d33c
-  languageName: node
-  linkType: hard
-
 "@types/normalize-package-data@npm:^2.4.0":
   version: 2.4.4
   resolution: "@types/normalize-package-data@npm:2.4.4"
@@ -4031,17 +4019,6 @@ __metadata:
   version: 4.0.2
   resolution: "@types/parse-json@npm:4.0.2"
   checksum: 5bf62eec37c332ad10059252fc0dab7e7da730764869c980b0714777ad3d065e490627be9f40fc52f238ffa3ac4199b19de4127196910576c2fe34dd47c7a470
-  languageName: node
-  linkType: hard
-
-"@types/pg@npm:^8.8.0":
-  version: 8.20.0
-  resolution: "@types/pg@npm:8.20.0"
-  dependencies:
-    "@types/node": "*"
-    pg-protocol: "*"
-    pg-types: ^2.2.0
-  checksum: e3610a00e38d52a0b9069bda48a9a5746d198f0aaa72710898fe6c277777ca3ef5190725afa61f53adb4ddd624e48267133b691f4ae7076dbef5d83aa31c2cf0
   languageName: node
   linkType: hard
 
@@ -10464,33 +10441,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-int8@npm:1.0.1":
-  version: 1.0.1
-  resolution: "pg-int8@npm:1.0.1"
-  checksum: a1e3a05a69005ddb73e5f324b6b4e689868a447c5fa280b44cd4d04e6916a344ac289e0b8d2695d66e8e89a7fba023affb9e0e94778770ada5df43f003d664c9
-  languageName: node
-  linkType: hard
-
-"pg-protocol@npm:*":
-  version: 1.13.0
-  resolution: "pg-protocol@npm:1.13.0"
-  checksum: 93f3d82804b6471961f97a1747e8a793c89defb3266fcc5659d842f36e022b2f7ea574490fa4e23cf1c9acafadb77642d388d9140581f94e23e19a8699fcd6a0
-  languageName: node
-  linkType: hard
-
-"pg-types@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "pg-types@npm:2.2.0"
-  dependencies:
-    pg-int8: 1.0.1
-    postgres-array: ~2.0.0
-    postgres-bytea: ~1.0.0
-    postgres-date: ~1.0.4
-    postgres-interval: ^1.1.0
-  checksum: bf4ec3f594743442857fb3a8dfe5d2478a04c98f96a0a47365014557cbc0b4b0cee01462c79adca863b93befbf88f876299b75b72c665b5fb84a2c94fbd10316
-  languageName: node
-  linkType: hard
-
 "picocolors@npm:1.0.0":
   version: 1.0.0
   resolution: "picocolors@npm:1.0.0"
@@ -10637,36 +10587,6 @@ __metadata:
     picocolors: ^1.1.1
     source-map-js: ^1.2.1
   checksum: 118cbec9551c7107c7884a585b45d7cce1632159065c7f6e112bbb4c4811253e78d507e49082b36d9b89f36a02a611c5a8cd210548dead55795c20c4f37ab9e8
-  languageName: node
-  linkType: hard
-
-"postgres-array@npm:~2.0.0":
-  version: 2.0.0
-  resolution: "postgres-array@npm:2.0.0"
-  checksum: 0e1e659888147c5de579d229a2d95c0d83ebdbffc2b9396d890a123557708c3b758a0a97ed305ce7f58edfa961fa9f0bbcd1ea9f08b6e5df73322e683883c464
-  languageName: node
-  linkType: hard
-
-"postgres-bytea@npm:~1.0.0":
-  version: 1.0.1
-  resolution: "postgres-bytea@npm:1.0.1"
-  checksum: fc5fa49f59ac1f0eba841db55bd6b6c2232d1575d1734311e2097a2d5fd8b58e1239cbd64eeaf0b6752268fe7d2819e002bf90b0afd333be9f2b9d157d2cd7e7
-  languageName: node
-  linkType: hard
-
-"postgres-date@npm:~1.0.4":
-  version: 1.0.7
-  resolution: "postgres-date@npm:1.0.7"
-  checksum: 5745001d47e51cd767e46bcb1710649cd705d91a24d42fa661c454b6dcbb7353c066a5047983c90a626cd3bbfea9e626cc6fa84a35ec57e5bbb28b49f78e13ed
-  languageName: node
-  linkType: hard
-
-"postgres-interval@npm:^1.1.0":
-  version: 1.2.0
-  resolution: "postgres-interval@npm:1.2.0"
-  dependencies:
-    xtend: ^4.0.0
-  checksum: 746b71f93805ae33b03528e429dc624706d1f9b20ee81bf743263efb6a0cd79ae02a642a8a480dbc0f09547b4315ab7df6ce5ec0be77ed700bac42730f5c76b2
   languageName: node
   linkType: hard
 
@@ -13299,7 +13219,7 @@ shadcn@latest:
     "@hookform/resolvers": 5.2.2
     "@hubspot/api-client": 13.5.0
     "@microsoft/microsoft-graph-client": ^3
-    "@neondatabase/serverless": 1.0.2
+    "@neondatabase/serverless": 1.1.0
     "@opentelemetry/api": ^1.9.1
     "@playwright/test": ^1.57.0
     "@posthog/nextjs-config": 1.6.0
@@ -13387,7 +13307,7 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"xtend@npm:^4.0.0, xtend@npm:~4.0.1":
+"xtend@npm:~4.0.1":
   version: 4.0.2
   resolution: "xtend@npm:4.0.2"
   checksum: ac5dfa738b21f6e7f0dd6e65e1b3155036d68104e67e5d5d1bde74892e327d7e5636a076f625599dc394330a731861e87343ff184b0047fef1360a7ec0a5a36a

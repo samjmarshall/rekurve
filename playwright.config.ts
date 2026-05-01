@@ -6,18 +6,20 @@ const isCI = process.env.CI === "true";
 export default defineConfig({
   testDir: "./e2e",
   testMatch: "**/*.spec.ts",
-  globalTeardown: "./e2e/utils/global-teardown.ts",
+  globalTeardown:
+    process.env.E2E_SKIP_GLOBAL_TEARDOWN === "1"
+      ? undefined
+      : "./e2e/utils/global-teardown.ts",
   timeout: 45_000,
   expect: { timeout: 5_000 },
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
-  // 6 workers × 3 viewport projects overwhelms the local dev server (page.goto
-  // timeouts under load). 4 keeps parallelism while leaving headroom.
-  workers: isCI ? 1 : 4,
-  reporter: isCI
-    ? [["list"], ["html", { open: "never" }]]
-    : [["html", { open: "on-failure" }]],
+  // CI hits a deployed Vercel URL (no local-dev-server contention), so 2 workers
+  // per shard is safe: 8 shards × 2 = 16 concurrent, well within HubSpot's
+  // 100 req/sec app limit. Local dev server saturates at 4.
+  workers: isCI ? 2 : 4,
+  reporter: isCI ? [["list"], ["blob"]] : [["html", { open: "on-failure" }]],
 
   outputDir: "test-results/",
 

@@ -11070,10 +11070,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postal-mime@npm:2.7.3":
-  version: 2.7.3
-  resolution: "postal-mime@npm:2.7.3"
-  checksum: da7730d3452cdfa5d55d7ab6f73a5b214ce3464453f79549615aacd7bbddce614b6bf044409803a378fc5dc693a5d9699b5e5001baef7fd2b5c914a656536df7
+"postal-mime@npm:2.7.4":
+  version: 2.7.4
+  resolution: "postal-mime@npm:2.7.4"
+  checksum: a30e896a4b9b24f710c3ea2b1e340f3fee75743a9dc71cbccc365019e57a96c9f07ee9b276fc7832f5167ea7fbdeb817aab18ac70384691a128376960e8ae444
   languageName: node
   linkType: hard
 
@@ -11659,18 +11659,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resend@npm:6.9.4":
-  version: 6.9.4
-  resolution: "resend@npm:6.9.4"
+"resend@npm:6.12.2":
+  version: 6.12.2
+  resolution: "resend@npm:6.12.2"
   dependencies:
-    postal-mime: 2.7.3
-    svix: 1.86.0
+    postal-mime: 2.7.4
+    svix: 1.90.0
   peerDependencies:
     "@react-email/render": "*"
   peerDependenciesMeta:
     "@react-email/render":
       optional: true
-  checksum: 26980b5e271f8047ac0833b6cd032095b9b7971c8b78200e9a8465bf8866e64bf1d5e42dc1638cfe34392747c5e433b76a61cc7ffce7408f8f0c77fa608b1322
+  checksum: ba7ce0e087655b690b5d51dc6ccfdce58c49809032570c8ee2e9b119186a55ef4bb8dc9987d3b1883778ade48d861d77a32bc51e6560346673063bea7c948152
   languageName: node
   linkType: hard
 
@@ -12767,13 +12767,13 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"svix@npm:1.86.0":
-  version: 1.86.0
-  resolution: "svix@npm:1.86.0"
+"svix@npm:1.90.0":
+  version: 1.90.0
+  resolution: "svix@npm:1.90.0"
   dependencies:
     standardwebhooks: 1.0.0
     uuid: ^10.0.0
-  checksum: 06b7a8b5ea4b024473d17a7143142982ff06a294618320789d3430223ebee07edbe20cee7ed8b0fb9b2f2b6f5048d16bdfed84e909477694740867255d4d2f8d
+  checksum: 3fecb82831288937301c51be050d1da6194f8b89f22699ea3728d6f57c7008583e8f1dd36d203c716237254cd624c736b009d0e578e787f7494c05f2bce05b08
   languageName: node
   linkType: hard
 
@@ -13915,7 +13915,7 @@ shadcn@latest:
     react-fast-marquee: 1.6.5
     react-hook-form: 7.66.0
     react-rough-notation: 1.0.8
-    resend: 6.9.4
+    resend: 6.12.2
     server-only: 0.0.1
     shadcn: latest
     superjson: 2.2.6

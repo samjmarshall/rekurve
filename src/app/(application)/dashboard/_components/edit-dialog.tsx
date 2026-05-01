@@ -77,7 +77,7 @@ export function EditDialog({
             data-testid={`edit-body-${row.id}`}
             rows={6}
             aria-label="Message body"
-            aria-invalid={tooLong || !!zodError ? true : undefined}
+            aria-invalid={tooLong || zodError ? true : undefined}
             aria-describedby={describedBy || undefined}
           />
           <div className="flex items-center justify-between text-muted-foreground text-xs">

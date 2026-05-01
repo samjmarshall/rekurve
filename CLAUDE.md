@@ -36,6 +36,8 @@ Always use this two-step process:
 1. `make db_generate` — generate a migration SQL file in `drizzle/`
 2. `make db_migrate` — apply pending migrations and record them in `__drizzle_migrations`
 
+When schema changes touch tables seeded by `scripts/seed-dev.ts`, update the corresponding fixture in `src/server/db/seed/fixtures/*` in the same PR. The seeder is typesafe — a stale fixture will fail `make check` and `make build`.
+
 ---
 
 ## Vercel CLI

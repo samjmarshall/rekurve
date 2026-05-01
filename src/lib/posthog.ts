@@ -912,6 +912,21 @@ export const authTracking = {
 // Export consolidated analytics object
 // ============================================================================
 
+// ============================================================================
+// Queue Tracking
+// ============================================================================
+
+export type SmsShareMethod =
+  | "native_share"
+  | "clipboard"
+  | "sms_link"
+  | "mailto_link";
+
+const queueTracking = {
+  smsShared: (props: { method: SmsShareMethod; message_id: string }) =>
+    safeCapture("sms_draft_shared", props),
+};
+
 export const analytics = {
   auth: authTracking,
   cta: ctaTracking,
@@ -922,6 +937,7 @@ export const analytics = {
   link: linkTracking,
   session: sessionTracking,
   recording: recordingControl,
+  queue: queueTracking,
   utils: {
     getUTMParams,
     getReferrerInfo,

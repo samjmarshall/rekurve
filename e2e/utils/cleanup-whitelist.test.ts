@@ -56,6 +56,13 @@ describe("cleanup-whitelist", () => {
       "StatusCbBadSig", // sms-dispatch.spec.ts — seedLead, no HubSpot sync
       "SmsFailPath", // sms-dispatch.spec.ts — seedLead, no HubSpot sync
       "SmsHappyPath", // sms-dispatch.spec.ts — seedLead, no HubSpot sync
+      "SmsShareMobile", // sms-share.spec.ts — seedLead, no HubSpot sync
+      "SmsShareCancel", // sms-share.spec.ts — seedLead, no HubSpot sync
+      "SmsShareCopy", // sms-share.spec.ts — seedLead, no HubSpot sync
+      "SmsShareMessages", // sms-share.spec.ts — seedLead, no HubSpot sync
+      "SmsShareClose", // sms-share.spec.ts — seedLead, no HubSpot sync
+      "SmsEditMobile", // sms-share.spec.ts — seedLead, no HubSpot sync
+      "SmsFlagOn", // sms-share.spec.ts — seedLead, no HubSpot sync
       "Persist", // leads-crud.spec.ts — form persistence test, never submitted
       "Bad", // leads-crud.spec.ts — validation test, submission blocked by error
       "Conv", // lead-profile.spec.ts (conversation history) — seedLead, no HubSpot sync

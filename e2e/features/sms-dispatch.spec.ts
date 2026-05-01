@@ -196,6 +196,16 @@ test.describe("SMS Dispatch — E2E", () => {
       "Failure-path test only runs when TWILIO_AUTH_TOKEN is a placeholder (triggers the error)",
     );
 
+    // Force sms-twilio-dispatch flag ON so the Twilio path runs (not the share sheet).
+    await page.route(/\/rk\/decide/, async (route) => {
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          featureFlags: { "sms-twilio-dispatch": true },
+        }),
+      });
+    });
+
     await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -252,6 +262,16 @@ test.describe("SMS Dispatch — E2E", () => {
       "Requires real Twilio credentials — set TWILIO_AUTH_TOKEN",
     );
 
+    // Force sms-twilio-dispatch flag ON so the Twilio path runs (not the share sheet).
+    await page.route(/\/rk\/decide/, async (route) => {
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          featureFlags: { "sms-twilio-dispatch": true },
+        }),
+      });
+    });
+
     await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -278,7 +298,7 @@ test.describe("SMS Dispatch — E2E", () => {
 
     // Success toast
     await expect(
-      page.getByTestId("app-toast").filter({ hasText: "Sent to your phone" }),
+      page.getByTestId("app-toast").filter({ hasText: "Draft approved" }),
     ).toBeVisible();
 
     // Row leaves the queue

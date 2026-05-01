@@ -7844,7 +7844,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:12.38.0, framer-motion@npm:^12.23.24":
+"framer-motion@npm:12.38.0, framer-motion@npm:^12.38.0":
   version: 12.38.0
   resolution: "framer-motion@npm:12.38.0"
   dependencies:
@@ -10077,11 +10077,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion@npm:12.23.24":
-  version: 12.23.24
-  resolution: "motion@npm:12.23.24"
+"motion@npm:12.38.0":
+  version: 12.38.0
+  resolution: "motion@npm:12.38.0"
   dependencies:
-    framer-motion: ^12.23.24
+    framer-motion: ^12.38.0
     tslib: ^2.4.0
   peerDependencies:
     "@emotion/is-prop-valid": "*"
@@ -10094,7 +10094,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 4e7046f312b85adf96f64f91d67f6f6880bab2ff6e9cdd62cd3e888da8c2f52e14202eb4c095e246cf760a2080fef449115174f8f4f24b1618520501b53b8485
+  checksum: df2db5f958a205b4f31631d30d5699e09052a32444684574f5b896169c3c70cca28836961a7482172bb7c7db9291fa2cb46987ba77102ba220efc773928fd4c7
   languageName: node
   linkType: hard
 
@@ -13901,7 +13901,7 @@ shadcn@latest:
     husky: ^9.1.7
     input-otp: 1.4.2
     lucide-react: 0.577.0
-    motion: 12.23.24
+    motion: 12.38.0
     next: 16.2.3
     next-themes: 0.4.6
     pako: ^2.1.0

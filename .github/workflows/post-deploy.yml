@@ -6,22 +6,20 @@ on:
       - "vercel.deployment.ready"
 
 jobs:
-  verify:
-    name: Verify (${{ github.event.client_payload.environment }})
+  setup:
+    name: Setup (${{ github.event.client_payload.environment }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     permissions:
       contents: read
       actions: read
-      statuses: write
-      pull-requests: write
+    outputs:
+      db_url: ${{ steps.neon.outputs.db_url }}
+      db_url_unpooled: ${{ steps.neon.outputs.db_url_unpooled }}
+      branch_id: ${{ steps.neon.outputs.branch_id }}
+      pre_migrate_timestamp: ${{ steps.pre_migrate.outputs.timestamp }}
 
     steps:
-      - name: Report status to Vercel
-        uses: vercel/repository-dispatch/actions/status@v1
-        with:
-          name: "Post-Deploy Verification"
-
       - name: Checkout
         uses: vercel/repository-dispatch/actions/checkout@v1
 
@@ -30,13 +28,22 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Restore node_modules cache
+        id: modules-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
+
       - name: Yarn cache
+        if: steps.modules-cache.outputs.cache-hit != 'true'
         uses: actions/cache@v4
         with:
           path: .yarn/cache
           key: yarn-${{ hashFiles('yarn.lock') }}
 
       - name: Install dependencies
+        if: steps.modules-cache.outputs.cache-hit != 'true'
         run: make install
 
       - name: Resolve Neon branch database URL
@@ -105,37 +112,170 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: yarn playwright install-deps
 
+  shard:
+    name: Verify shard ${{ matrix.shard }}/8 (${{ github.event.client_payload.environment }})
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+
+    steps:
+      - name: Checkout
+        uses: vercel/repository-dispatch/actions/checkout@v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Restore node_modules cache
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
+          fail-on-cache-miss: true
+
+      - name: Restore Playwright browsers
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          fail-on-cache-miss: true
+
+      - name: Install Playwright system deps
+        run: yarn playwright install-deps
+
       - name: Run Playwright tests
-        id: e2e
         run: make test_e2e
         env:
+          PLAYWRIGHT_SHARD: ${{ matrix.shard }}/8
+          E2E_SKIP_GLOBAL_TEARDOWN: "1"
           VERCEL_URL: ${{ github.event.client_payload.url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
-          DATABASE_URL: ${{ steps.neon.outputs.db_url }}
+          DATABASE_URL: ${{ needs.setup.outputs.db_url }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          # HubSpot outbound sync tests run in any environment
           HUBSPOT_ACCESS_TOKEN: ${{ secrets.HUBSPOT_ACCESS_TOKEN }}
           # Inbound webhook tests only run on production — the HubSpot
           # webhook target URL is manually pinned to the production deployment
           HUBSPOT_WEBHOOK_ACTIVE: ${{ github.event.client_payload.environment == 'production' && '1' || '' }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
+      - name: Upload blob report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blob-report-${{ matrix.shard }}-${{ github.event.client_payload.environment }}
+          path: |
+            blob-report/
+            test-results/
+          retention-days: 30
+
+  summary:
+    name: Summary (${{ github.event.client_payload.environment }})
+    needs: shard
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+      statuses: write
+      pull-requests: write
+
+    steps:
+      - name: Report status to Vercel
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: "Post-Deploy Verification"
+
+      - name: Checkout
+        uses: vercel/repository-dispatch/actions/checkout@v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Restore node_modules cache
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*-${{ github.event.client_payload.environment }}
+          merge-multiple: true
+
+      - name: Merge blob reports into HTML
+        run: yarn playwright merge-reports --reporter html ./all-blob-reports
+
+      - name: Upload merged report
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.event.client_payload.environment }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Fail if any shard failed
+        if: ${{ contains(needs.shard.result, 'failure') || contains(needs.shard.result, 'cancelled') }}
+        run: exit 1
+
+  cleanup:
+    name: Cleanup (${{ github.event.client_payload.environment }})
+    needs: [setup, shard]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: vercel/repository-dispatch/actions/checkout@v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Restore node_modules cache
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
+
+      - name: Sweep test residue
+        if: needs.setup.outputs.db_url
+        env:
+          DATABASE_URL: ${{ needs.setup.outputs.db_url }}
+          HUBSPOT_ACCESS_TOKEN: ${{ secrets.HUBSPOT_ACCESS_TOKEN }}
+        run: yarn tsx -e "import('./e2e/utils/global-teardown.ts').then(m => m.default())"
+
       - name: Rollback migrations (preview — reset branch to parent)
-        if: failure() && steps.e2e.outcome == 'failure' && steps.neon.outputs.branch_id && github.event.client_payload.environment != 'production'
+        if: ${{ contains(needs.shard.result, 'failure') && needs.setup.outputs.branch_id != '' && github.event.client_payload.environment != 'production' }}
         uses: neondatabase/reset-branch-action@v1
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          branch: ${{ steps.neon.outputs.branch_id }}
+          branch: ${{ needs.setup.outputs.branch_id }}
           parent: true
           api_key: ${{ secrets.NEON_API_KEY }}
 
       - name: Rollback migrations (production — point-in-time restore)
-        if: failure() && steps.e2e.outcome == 'failure' && steps.neon.outputs.branch_id && github.event.client_payload.environment == 'production'
+        if: ${{ contains(needs.shard.result, 'failure') && needs.setup.outputs.branch_id != '' && github.event.client_payload.environment == 'production' }}
         env:
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
           NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
-          BRANCH_ID: ${{ steps.neon.outputs.branch_id }}
-          BEFORE_TS: ${{ steps.pre_migrate.outputs.timestamp }}
+          BRANCH_ID: ${{ needs.setup.outputs.branch_id }}
+          BEFORE_TS: ${{ needs.setup.outputs.pre_migrate_timestamp }}
         run: |
           curl -X POST \
             "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$BRANCH_ID/restore" \
@@ -144,24 +284,14 @@ jobs:
             -d "{\"source_branch_id\": \"$BRANCH_ID\", \"source_timestamp\": \"$BEFORE_TS\", \"preserve_under_name\": \"pre-migration-backup\"}"
           echo "::warning::Production database restored to pre-migration state ($BEFORE_TS)"
 
-      - name: Upload test report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report-${{ github.event.client_payload.environment }}
-          path: |
-            playwright-report/
-            test-results/
-          retention-days: 30
-
-  # Override the commit status when verify is cancelled (e.g. timeout).
+  # Override the commit status when any shard or the summary is cancelled (e.g. timeout).
   # The Vercel post-status action reports `success` on cancellation, which
-  # masks failures on the PR. This job runs after verify completes and
+  # masks failures on the PR. This job runs after shard+summary complete and
   # overwrites the commit status with `failure` so PR checks reflect reality.
   override-cancelled-status:
     name: Mark cancelled run as failed
-    needs: verify
-    if: ${{ always() && needs.verify.result == 'cancelled' }}
+    needs: [shard, summary]
+    if: ${{ always() && (contains(needs.shard.result, 'cancelled') || needs.summary.result == 'cancelled') }}
     runs-on: ubuntu-latest
     permissions:
       statuses: write

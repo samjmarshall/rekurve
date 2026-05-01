@@ -21,7 +21,7 @@ test_coverage:
 	yarn test --coverage
 
 test_e2e:
-	yarn test:e2e
+	yarn test:e2e $(if $(PLAYWRIGHT_SHARD),--shard=$(PLAYWRIGHT_SHARD),)
 
 # Security audit
 audit:

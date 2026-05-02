@@ -30,20 +30,20 @@ jobs:
         uses: vercel/repository-dispatch/actions/checkout@v1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
       - name: Restore node_modules cache
         id: modules-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
 
       - name: Yarn cache
         if: steps.modules-cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .yarn/cache
           key: yarn-${{ hashFiles('yarn.lock') }}
@@ -105,7 +105,7 @@ jobs:
 
       - name: Cache Playwright browsers
         id: playwright-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
@@ -142,19 +142,19 @@ jobs:
         uses: vercel/repository-dispatch/actions/checkout@v1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
       - name: Restore node_modules cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: node_modules
           key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
           fail-on-cache-miss: true
 
       - name: Restore Playwright browsers
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
@@ -206,12 +206,12 @@ jobs:
         uses: vercel/repository-dispatch/actions/checkout@v1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
       - name: Restore node_modules cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: node_modules
           key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
@@ -254,12 +254,12 @@ jobs:
         uses: vercel/repository-dispatch/actions/checkout@v1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
       - name: Restore node_modules cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: node_modules
           key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}

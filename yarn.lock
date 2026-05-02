@@ -2932,15 +2932,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/core@npm:1.6.0":
-  version: 1.6.0
-  resolution: "@posthog/core@npm:1.6.0"
-  dependencies:
-    cross-spawn: ^7.0.6
-  checksum: d0d9878b19f44187da015a8305750c7193f07e17b3052df03a8eab718660161a310d9c01e22be1181fbc67ed0ae8842e442e670a6aa0d9ac5f366337e052b42d
-  languageName: node
-  linkType: hard
-
 "@posthog/nextjs-config@npm:1.9.16":
   version: 1.9.16
   resolution: "@posthog/nextjs-config@npm:1.9.16"
@@ -11153,12 +11144,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"posthog-node@npm:5.14.0":
-  version: 5.14.0
-  resolution: "posthog-node@npm:5.14.0"
+"posthog-node@npm:5.33.0":
+  version: 5.33.0
+  resolution: "posthog-node@npm:5.33.0"
   dependencies:
-    "@posthog/core": 1.6.0
-  checksum: edfa3d3e8404f64827efceb7b2995107af791bff69b7e29002a3ece2670180b341ac74e22ce174f2b21962c83c687cd21b89ba16eb6e0493e7a2f6052a8beaeb
+    "@posthog/core": 1.28.0
+  peerDependencies:
+    rxjs: ^7.0.0
+  peerDependenciesMeta:
+    rxjs:
+      optional: true
+  checksum: 120d3ea7b2072342aa983537e0e812bfacb9c6fe3706a8eb8d8318641265b5f01e5c588348a958c9e054358dc0fa95cbb07fb47a2739e289038bb2e58878cb2e
   languageName: node
   linkType: hard
 
@@ -13919,7 +13915,7 @@ shadcn@latest:
     postcss: ^8.5.3
     postgres: ^3.4.8
     posthog-js: 1.372.5
-    posthog-node: 5.14.0
+    posthog-node: 5.33.0
     react: 19.2.4
     react-dom: 19.2.4
     react-fast-marquee: 1.6.5

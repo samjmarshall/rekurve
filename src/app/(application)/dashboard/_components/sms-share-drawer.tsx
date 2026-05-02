@@ -100,7 +100,7 @@ export function SmsShareDrawer({
     >
       <DrawerContent
         data-testid="sms-share-drawer"
-        className="md:right-auto md:left-1/2 md:w-full md:max-w-md md:-translate-x-1/2"
+        className="md:inset-x-0 md:mx-auto md:max-w-md"
       >
         <DrawerHeader>
           <DrawerTitle data-testid="sms-share-title">

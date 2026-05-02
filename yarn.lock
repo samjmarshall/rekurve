@@ -3978,41 +3978,41 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/client@npm:11.16.0":
-  version: 11.16.0
-  resolution: "@trpc/client@npm:11.16.0"
+"@trpc/client@npm:11.17.0":
+  version: 11.17.0
+  resolution: "@trpc/client@npm:11.17.0"
   peerDependencies:
-    "@trpc/server": 11.16.0
+    "@trpc/server": 11.17.0
     typescript: ">=5.7.2"
   bin:
     intent: bin/intent.js
-  checksum: 4b108720f4fb0e28ee5be52ba28c572d07bb90502abe5f58131b80661296059c5df0077d86d6a3b930eb36ba6b08c16e81523294e3c96646de62885a43c9c04c
+  checksum: de83e733be07aa1d92e261a78c5943aced98fdeb321d2ee77f86b33e9320f5e27e35d5ab5f73eb5aceb62127d6251ccf3544fdc4372a507fd3fa50ecbcb21cee
   languageName: node
   linkType: hard
 
-"@trpc/server@npm:11.16.0":
-  version: 11.16.0
-  resolution: "@trpc/server@npm:11.16.0"
+"@trpc/server@npm:11.17.0":
+  version: 11.17.0
+  resolution: "@trpc/server@npm:11.17.0"
   peerDependencies:
     typescript: ">=5.7.2"
   bin:
     intent: bin/intent.js
-  checksum: efe6edd3c1a3af097258d9c4942500aa397efa97cd269bc5c7e3a179dca2ba00e47871a1331d953d247c14400ffe6e029279806a22af23d94cd9d760a336dbf9
+  checksum: 1d9a11bd6b05d5769a813eff6bd8ab628c0765ac0541a593ded268e5227f3c3d903ea1df43e2ee7733213fe72f4680343b2395dd6d73c162e23a2d7c6d6d7789
   languageName: node
   linkType: hard
 
-"@trpc/tanstack-react-query@npm:11.16.0":
-  version: 11.16.0
-  resolution: "@trpc/tanstack-react-query@npm:11.16.0"
+"@trpc/tanstack-react-query@npm:11.17.0":
+  version: 11.17.0
+  resolution: "@trpc/tanstack-react-query@npm:11.17.0"
   peerDependencies:
     "@tanstack/react-query": ^5.80.3
-    "@trpc/client": 11.16.0
-    "@trpc/server": 11.16.0
+    "@trpc/client": 11.17.0
+    "@trpc/server": 11.17.0
     react: ">=18.2.0"
     typescript: ">=5.7.2"
   bin:
     intent: bin/intent.js
-  checksum: a8fff4b721e5f2c2f57c154c28338b4d1ba6dd5e2c8c34d327ab9db675f065ce1fc7d8a9f6d4105af501290cae6c17aab75f70d3a85a62d71dfa5005be8fe8f2
+  checksum: 0d71a8acedc00a8c8c526cb595dda1bbf7e58f29d6a0fc3a30a5c07fabfd03876f1ef724381c7b6c167526b9ae372fab6198e6c1e1fbc09066658f78299d8ef9
   languageName: node
   linkType: hard
 
@@ -13884,9 +13884,9 @@ shadcn@latest:
     "@tailwindcss/postcss": ^4.0.15
     "@tailwindcss/typography": 0.5.19
     "@tanstack/react-query": 5.100.8
-    "@trpc/client": 11.16.0
-    "@trpc/server": 11.16.0
-    "@trpc/tanstack-react-query": 11.16.0
+    "@trpc/client": 11.17.0
+    "@trpc/server": 11.17.0
+    "@trpc/tanstack-react-query": 11.17.0
     "@tsparticles/engine": 3.9.1
     "@tsparticles/react": 3.0.0
     "@tsparticles/slim": 3.9.1

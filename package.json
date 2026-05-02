@@ -14,7 +14,7 @@
     "preview": "next build && next start",
     "porless:get": "portless get",
     "start": "next start",
-    "test:e2e": "playwright test --reporter=list",
+    "test:e2e": "playwright test",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:desktop": "playwright test --project=desktop",
     "test:e2e:features": "playwright test e2e/features/",

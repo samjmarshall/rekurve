@@ -4,6 +4,5 @@
       "path": "/api/cron/nurture-scheduler",
       "schedule": "0 0 * * *"
     }
-  ],
-  "ignoreBuildStep": "if [ \"$VERCEL_GIT_PULL_REQUEST_ID\" != \"\" ] || [ \"$VERCEL_GIT_COMMIT_REF\" == \"main\" ]; then exit 1; else exit 0; fi"
+  ]
 }

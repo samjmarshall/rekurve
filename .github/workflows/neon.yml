@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Get branch name
         id: branch_name
-        uses: tj-actions/branch-names@v8
+        uses: tj-actions/branch-names@v9
 
   delete_neon_branch:
     name: Delete Neon Branch

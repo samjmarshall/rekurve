@@ -11405,12 +11405,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:7.66.0":
-  version: 7.66.0
-  resolution: "react-hook-form@npm:7.66.0"
+"react-hook-form@npm:7.75.0":
+  version: 7.75.0
+  resolution: "react-hook-form@npm:7.75.0"
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
-  checksum: 10796a0c45fd94012fe0feb0b7186c5785c259b1bb6ca96f841e394f528b26442de7e2e5dbbe1a1d94429f2dd6f78c600cdadc2d6c78294e0d33d28ca3ad93f5
+  checksum: 340db890db1c03575260d3a365f340c5115df159a18c1dc1e26bb0b313bcbac9c4af08bc8b7a80df152c323b4ae3a63cbeb6384a951d31e6b16055f89160b43e
   languageName: node
   linkType: hard
 
@@ -13930,7 +13930,7 @@ shadcn@latest:
     react: 19.2.4
     react-dom: 19.2.4
     react-fast-marquee: 1.6.5
-    react-hook-form: 7.66.0
+    react-hook-form: 7.75.0
     react-rough-notation: 1.0.8
     resend: 6.9.4
     server-only: 0.0.1

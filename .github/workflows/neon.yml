@@ -32,9 +32,17 @@ jobs:
           branch: preview/${{ needs.setup.outputs.branch }}
           api_key: ${{ secrets.NEON_API_KEY }}
 
-      - name: Delete local Neon Branch
-        uses: neondatabase/delete-branch-action@v3
-        with:
-          project_id: ${{ vars.NEON_PROJECT_ID }}
-          branch: local/${{ needs.setup.outputs.branch }}
-          api_key: ${{ secrets.NEON_API_KEY }}
+      - name: Delete local Neon Branch (if exists)
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+          BRANCH_NAME: local/${{ needs.setup.outputs.branch }}
+        run: |
+          npm i -g neonctl@v2
+          if neonctl branches list --project-id "$PROJECT_ID" --output json \
+            | jq -e --arg name "$BRANCH_NAME" 'any((.branches // .)[]; .name == $name)' > /dev/null; then
+            echo "Branch $BRANCH_NAME exists — deleting"
+            neonctl branches delete "$BRANCH_NAME" --project-id "$PROJECT_ID"
+          else
+            echo "Branch $BRANCH_NAME does not exist — skipping delete"
+          fi

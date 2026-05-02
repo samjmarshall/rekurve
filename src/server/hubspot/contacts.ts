@@ -1,4 +1,5 @@
 import { FilterOperatorEnum } from "@hubspot/api-client/lib/codegen/crm/contacts/models/Filter";
+import { env } from "~/env";
 import { hubspot } from "./client";
 import {
   ALL_PROPERTIES,
@@ -34,6 +35,15 @@ function mapContact(response: {
 export async function createContact(
   data: ContactData,
 ): Promise<HubSpotContact> {
+  if (env.HUBSPOT_MOCK === "true") {
+    console.log("[hubspot-mock] createContact");
+    return {
+      id: `dev_stub_${Math.random().toString(36).slice(2)}`,
+      properties: {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  }
   const response = await hubspot.crm.contacts.basicApi.create({
     properties: toHubSpotProperties(data),
     associations: [],
@@ -43,6 +53,15 @@ export async function createContact(
 
 /** Fetch a contact by HubSpot ID. */
 export async function getContact(hubspotId: string): Promise<HubSpotContact> {
+  if (env.HUBSPOT_MOCK === "true") {
+    console.log("[hubspot-mock] getContact");
+    return {
+      id: hubspotId,
+      properties: {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  }
   const response = await hubspot.crm.contacts.basicApi.getById(
     hubspotId,
     ALL_PROPERTIES,
@@ -55,6 +74,15 @@ export async function updateContact(
   hubspotId: string,
   data: ContactData,
 ): Promise<HubSpotContact> {
+  if (env.HUBSPOT_MOCK === "true") {
+    console.log("[hubspot-mock] updateContact");
+    return {
+      id: hubspotId,
+      properties: {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  }
   const response = await hubspot.crm.contacts.basicApi.update(hubspotId, {
     properties: toHubSpotProperties(data),
   });
@@ -63,6 +91,10 @@ export async function updateContact(
 
 /** Search contacts by email, name, or other query string. */
 export async function searchContacts(query: string): Promise<HubSpotContact[]> {
+  if (env.HUBSPOT_MOCK === "true") {
+    console.log("[hubspot-mock] searchContacts");
+    return [];
+  }
   const response = await hubspot.crm.contacts.searchApi.doSearch({
     query,
     properties: ALL_PROPERTIES,
@@ -79,6 +111,10 @@ export async function findExistingContact(
   email?: string | null,
   phone?: string | null,
 ): Promise<HubSpotContact | null> {
+  if (env.HUBSPOT_MOCK === "true") {
+    console.log("[hubspot-mock] findExistingContact");
+    return null;
+  }
   if (email) {
     const match = await findByFilter("email", email);
     if (match) return match;

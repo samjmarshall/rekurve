@@ -12,9 +12,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@anthropic-ai/sdk@npm:^0.91.0":
-  version: 0.91.1
-  resolution: "@anthropic-ai/sdk@npm:0.91.1"
+"@anthropic-ai/sdk@npm:0.92.0":
+  version: 0.92.0
+  resolution: "@anthropic-ai/sdk@npm:0.92.0"
   dependencies:
     json-schema-to-ts: ^3.1.1
   peerDependencies:
@@ -24,7 +24,7 @@ __metadata:
       optional: true
   bin:
     anthropic-ai-sdk: bin/cli
-  checksum: e38232c9bad55166a62621b8290c859321510ee42607012ab715d1dcc7e76ccebc95f99b1f331b6437d410c21e31f101ddeeee5cb97eba7b0b25ca1beea308da
+  checksum: 9651b9f8a2290d7cb1dfdd7f5252a9d8a89a8a54443c47fb33a6508bb299f99ad596c827b786fa7fadd2024a44465c525db2c8373382fcb0dbb180f0c921e560
   languageName: node
   linkType: hard
 
@@ -13331,7 +13331,7 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"typescript@npm:^6.0.0":
+"typescript@npm:6.0.3":
   version: 6.0.3
   resolution: "typescript@npm:6.0.3"
   bin:
@@ -13351,7 +13351,7 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^6.0.0#~builtin<compat/typescript>":
+"typescript@patch:typescript@6.0.3#~builtin<compat/typescript>":
   version: 6.0.3
   resolution: "typescript@patch:typescript@npm%3A6.0.3#~builtin<compat/typescript>::version=6.0.3&hash=5786d5"
   bin:
@@ -13627,7 +13627,7 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"vaul@npm:^1.1.2":
+"vaul@npm:1.1.2":
   version: 1.1.2
   resolution: "vaul@npm:1.1.2"
   dependencies:
@@ -13882,7 +13882,7 @@ shadcn@latest:
   version: 0.0.0-use.local
   resolution: "www@workspace:."
   dependencies:
-    "@anthropic-ai/sdk": ^0.91.0
+    "@anthropic-ai/sdk": 0.92.0
     "@auto-it/conventional-commits": ^11.3.6
     "@auto-it/git-tag": ^11.3.6
     "@auto-it/released": ^11.3.6
@@ -13950,8 +13950,8 @@ shadcn@latest:
     tsx: ^4.21.0
     tw-animate-css: ^1.4.0
     twilio: 6.0.0
-    typescript: ^6.0.0
-    vaul: ^1.1.2
+    typescript: 6.0.3
+    vaul: 1.1.2
     vercel: ^51.8.0
     zod: 4.4.2
   languageName: unknown

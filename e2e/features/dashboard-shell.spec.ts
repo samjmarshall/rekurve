@@ -85,14 +85,6 @@ test.describe("Dashboard Shell — Navigation", () => {
     baseURL,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "Mobile only");
-    // Marked broken on mobile: under hasTouch:true, vaul drawer (SmsShareDrawer)
-    // mounted in every queue row registers document-level touch listeners that
-    // intercept the bottom-nav click. Fix by lazy-mounting the drawer or
-    // narrowing vaul's listener scope, then remove this fixme.
-    test.fixme(
-      testInfo.project.name === "mobile",
-      "Vaul touch listeners intercept bottom-nav clicks under hasTouch",
-    );
     await withAuth(context, session, baseURL!);
     await page.goto("/dashboard");
 

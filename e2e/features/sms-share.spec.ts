@@ -21,8 +21,10 @@ import { getSessionCookie } from "../utils/session-cookie";
 // Helpers
 // ---------------------------------------------------------------------------
 
+// posthog-js ≥ 1.x calls `/flags/?v=2`; older versions hit `/decide`. Match
+// both so the route stays correct across SDK upgrades.
 async function routePostHog(page: Page, flags: Record<string, boolean>) {
-  await page.route(/\/rk\/decide/, async (route) => {
+  await page.route(/\/rk\/(flags|decide)/, async (route) => {
     await route.fulfill({
       contentType: "application/json",
       body: JSON.stringify({ featureFlags: flags }),
@@ -54,9 +56,15 @@ async function stubNativeShare(page: Page, behavior: "resolve" | "reject") {
   `);
 }
 
-// Force desktop path by making canShare always return false.
+// Force desktop path by making canShare always return false. Also override the
+// userAgent to a Mac UA so canUseSmsLink() returns true and the "Open in
+// Messages" link is rendered (not md:hidden) on desktop viewports.
 async function stubDesktopShare(page: Page) {
   await page.addInitScript(`
+    Object.defineProperty(navigator, 'userAgent', {
+      value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+      configurable: true,
+    });
     Object.defineProperty(navigator, 'canShare', {
       value: () => false,
       configurable: true,
@@ -284,11 +292,17 @@ test.describe("SMS Share — E2E", () => {
     const messagesLink = page.getByTestId("sms-share-messages");
     await expect(messagesLink).toHaveAttribute("href", /^sms:/);
 
-    // Intercept the sms: navigation so headless Chrome doesn't hang
-    await page.route(/^sms:/, (route) => route.abort());
+    // Strip the sms: href before clicking. We've already asserted it above; if
+    // we leave it on, the click triggers a navigation that races with — and
+    // cancels — the in-flight approve mutation. Removing it lets the JS
+    // onClick handler (handleMessages → onApprove → mutate) complete cleanly.
+    await messagesLink.evaluate((el) => el.removeAttribute("href"));
 
     await messagesLink.click();
 
+    await expect(
+      page.getByTestId("app-toast").filter({ hasText: "Draft approved" }),
+    ).toBeVisible();
     await expect(queue.row(msg.id)).toBeHidden();
 
     const dbState = await getMessageStatus(msg.id);
@@ -392,6 +406,9 @@ test.describe("SMS Share — E2E", () => {
 
     // Row leaves the queue
     await expect(queue.row(msg.id)).toBeHidden();
+    await expect(
+      page.getByTestId("app-toast").filter({ hasText: "Draft approved" }),
+    ).toBeVisible();
 
     const dbState = await getMessageStatus(msg.id);
     expect(dbState?.status).toBe("edited_and_approved");
@@ -432,9 +449,11 @@ test.describe("SMS Share — E2E", () => {
     });
     messageIds.push(msg.id);
 
+    const flagsReady = page.waitForResponse(/\/rk\/(flags|decide)/);
     await page.goto("/dashboard");
     const queue = new ActionQueueSection(page);
     await expect(queue.row(msg.id)).toBeVisible();
+    await flagsReady;
 
     await queue.approveButton(msg.id).click();
 

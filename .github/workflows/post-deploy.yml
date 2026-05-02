@@ -7,7 +7,7 @@ on:
 
 jobs:
   setup:
-    name: Setup (${{ github.event.client_payload.environment }})
+    name: DB Migration & E2E Setup (${{ github.event.client_payload.environment }})
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -126,6 +126,7 @@ jobs:
     permissions:
       contents: read
       actions: read
+      statuses: write
     strategy:
       fail-fast: false
       matrix:

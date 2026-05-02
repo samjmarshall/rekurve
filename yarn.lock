@@ -3731,42 +3731,47 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@t3-oss/env-core@npm:0.13.0":
-  version: 0.13.0
-  resolution: "@t3-oss/env-core@npm:0.13.0"
+"@t3-oss/env-core@npm:0.13.11":
+  version: 0.13.11
+  resolution: "@t3-oss/env-core@npm:0.13.11"
   peerDependencies:
     arktype: ^2.1.0
     typescript: ">=5.0.0"
     valibot: ^1.0.0-beta.7 || ^1.0.0
-    zod: ^3.24.0 || ^4.0.0-beta.0
+    zod: ^3.24.0 || ^4.0.0
   peerDependenciesMeta:
+    arktype:
+      optional: true
     typescript:
       optional: true
     valibot:
       optional: true
     zod:
       optional: true
-  checksum: 3c412cd5678d83b05724fe8f536cfb6882d0bf4997a8f3161d1b163ad2255c64c0f7d69c8d555e122cd837280e51865e7596150db5d8b0735027bd3a82c792ab
+  checksum: 7017a809d7b822f5d86dabee9f75b655face148575abb0c45b8a10d15120dee7c2bb15c8ab4f0b3c90f20edda2deda61f7a5a1f38cb13d67b398c38e64f15e24
   languageName: node
   linkType: hard
 
-"@t3-oss/env-nextjs@npm:0.13.0":
-  version: 0.13.0
-  resolution: "@t3-oss/env-nextjs@npm:0.13.0"
+"@t3-oss/env-nextjs@npm:0.13.11":
+  version: 0.13.11
+  resolution: "@t3-oss/env-nextjs@npm:0.13.11"
   dependencies:
-    "@t3-oss/env-core": 0.13.0
+    "@t3-oss/env-core": 0.13.11
   peerDependencies:
+    arktype: ^2.1.0
     typescript: ">=5.0.0"
     valibot: ^1.0.0-beta.7 || ^1.0.0
-    zod: ^3.24.0 || ^4.0.0-beta.0
+    zod: ^3.24.0 || ^4.0.0
   peerDependenciesMeta:
+    arktype:
+      optional: true
     typescript:
       optional: true
     valibot:
       optional: true
     zod:
       optional: true
-  checksum: 7d57f72acb5ecf7499224bce8801151de4001a14145d8e6c0f35c9e57cd759ad94e40bc0a2cb170afe8a817796211592aa13eff5ddaad0683040db3c6e92c178
+  checksum: 8241a5b1d6d03b1e0428623accd05623f9efc92acdeea079b0e8feb86a8723aa6796441e2f03371acd36ea7be31daeaee2b9c437b226732a78d300f04c40a00f
   languageName: node
   linkType: hard
 
@@ -13890,7 +13895,7 @@ shadcn@latest:
     "@rsbuild/plugin-react": ^2.0.0
     "@rstest/core": ^0.9.5
     "@rstest/coverage-istanbul": ^0.3.0
-    "@t3-oss/env-nextjs": 0.13.0
+    "@t3-oss/env-nextjs": 0.13.11
     "@tailwindcss/postcss": ^4.0.15
     "@tailwindcss/typography": 0.5.19
     "@tanstack/react-query": 5.100.8

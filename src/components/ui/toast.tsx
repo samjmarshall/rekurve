@@ -27,7 +27,7 @@ function ToastViewport() {
               "group relative flex w-full items-start gap-3 rounded-lg border bg-background p-4 shadow-lg",
               "data-open:fade-in-0 data-open:slide-in-from-bottom-4 data-open:animate-in",
               "data-closed:fade-out-0 data-closed:animate-out",
-              "data-[type=error]:border-destructive/30 data-[type=error]:bg-destructive/5",
+              "data-[type=error]:border-destructive/30",
               "duration-200",
             )}
           >

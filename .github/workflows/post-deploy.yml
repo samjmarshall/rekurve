@@ -20,6 +20,11 @@ jobs:
       pre_migrate_timestamp: ${{ steps.pre_migrate.outputs.timestamp }}
 
     steps:
+      - name: Register job against commit for GitHub Action visibility
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: "Post-Deploy Verification"
+
       - name: Checkout
         uses: vercel/repository-dispatch/actions/checkout@v1
 

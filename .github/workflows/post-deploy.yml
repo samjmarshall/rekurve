@@ -7,12 +7,13 @@ on:
 
 jobs:
   setup:
-    name: Setup (${{ github.event.client_payload.environment }})
+    name: DB Migration & E2E Setup (${{ github.event.client_payload.environment }})
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
       actions: read
+      statuses: write
     outputs:
       db_url: ${{ steps.neon.outputs.db_url }}
       db_url_unpooled: ${{ steps.neon.outputs.db_url_unpooled }}
@@ -20,6 +21,11 @@ jobs:
       pre_migrate_timestamp: ${{ steps.pre_migrate.outputs.timestamp }}
 
     steps:
+      - name: Report job & status
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: "DB Migration & E2E Setup"
+
       - name: Checkout
         uses: vercel/repository-dispatch/actions/checkout@v1
 
@@ -113,19 +119,25 @@ jobs:
         run: yarn playwright install-deps
 
   shard:
-    name: Verify shard ${{ matrix.shard }}/8 (${{ github.event.client_payload.environment }})
+    name: E2E Test ${{ matrix.shard }}/4 (${{ github.event.client_payload.environment }})
     needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read
       actions: read
+      statuses: write
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        shard: [1, 2, 3, 4]
 
     steps:
+      - name: Report job & status
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: "E2E Test ${{ matrix.shard }}"
+
       - name: Checkout
         uses: vercel/repository-dispatch/actions/checkout@v1
 
@@ -154,7 +166,7 @@ jobs:
       - name: Run Playwright tests
         run: make test_e2e
         env:
-          PLAYWRIGHT_SHARD: ${{ matrix.shard }}/8
+          PLAYWRIGHT_SHARD: ${{ matrix.shard }}/4
           E2E_SKIP_GLOBAL_TEARDOWN: "1"
           VERCEL_URL: ${{ github.event.client_payload.url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
@@ -174,6 +186,7 @@ jobs:
           path: |
             blob-report/
             test-results/
+          if-no-files-found: error
           retention-days: 30
 
   summary:
@@ -189,11 +202,6 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Report status to Vercel
-        uses: vercel/repository-dispatch/actions/status@v1
-        with:
-          name: "Post-Deploy Verification"
-
       - name: Checkout
         uses: vercel/repository-dispatch/actions/checkout@v1
 
@@ -216,7 +224,10 @@ jobs:
           merge-multiple: true
 
       - name: Merge blob reports into HTML
-        run: yarn playwright merge-reports --reporter html ./all-blob-reports
+        # The shard upload step bundles `blob-report/` and `test-results/`
+        # together, so `merge-multiple: true` puts blob files under
+        # `all-blob-reports/blob-report/`, not at the top level.
+        run: yarn playwright merge-reports --reporter html ./all-blob-reports/blob-report
 
       - name: Upload merged report
         uses: actions/upload-artifact@v4
@@ -284,14 +295,17 @@ jobs:
             -d "{\"source_branch_id\": \"$BRANCH_ID\", \"source_timestamp\": \"$BEFORE_TS\", \"preserve_under_name\": \"pre-migration-backup\"}"
           echo "::warning::Production database restored to pre-migration state ($BEFORE_TS)"
 
-  # Override the commit status when any shard or the summary is cancelled (e.g. timeout).
-  # The Vercel post-status action reports `success` on cancellation, which
-  # masks failures on the PR. This job runs after shard+summary complete and
-  # overwrites the commit status with `failure` so PR checks reflect reality.
-  override-cancelled-status:
-    name: Mark cancelled run as failed
+  # Override the commit status when any shard fails/cancels or the summary
+  # job itself does not succeed. The Vercel post-status action posts its
+  # status from the start of the summary job using `needs.shard.result`, so
+  # it can't see failures inside the summary job (e.g. merge-reports failing)
+  # and reports `success` on cancellation. This job runs after shard+summary
+  # complete and overwrites the commit status with `failure` so PR checks
+  # reflect reality.
+  override-status:
+    name: Mark failed run as failed
     needs: [shard, summary]
-    if: ${{ always() && (contains(needs.shard.result, 'cancelled') || needs.summary.result == 'cancelled') }}
+    if: ${{ always() && (needs.summary.result != 'success' || contains(needs.shard.result, 'failure') || contains(needs.shard.result, 'cancelled')) }}
     runs-on: ubuntu-latest
     permissions:
       statuses: write
@@ -302,10 +316,17 @@ jobs:
           SHA: ${{ github.event.client_payload.git.sha }}
           REPO: ${{ github.repository }}
           TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SHARD_RESULT: ${{ needs.shard.result }}
+          SUMMARY_RESULT: ${{ needs.summary.result }}
         run: |
+          if [ "$SUMMARY_RESULT" = "cancelled" ] || [[ "$SHARD_RESULT" == *cancelled* ]]; then
+            DESCRIPTION="Job cancelled (likely timeout)"
+          else
+            DESCRIPTION="Verification failed (shard: $SHARD_RESULT, summary: $SUMMARY_RESULT)"
+          fi
           gh api -X POST \
             "repos/$REPO/statuses/$SHA" \
             -f state=failure \
             -f context="Post-Deploy Verification" \
-            -f description="Job cancelled (likely timeout)" \
+            -f description="$DESCRIPTION" \
             -f target_url="$TARGET_URL"

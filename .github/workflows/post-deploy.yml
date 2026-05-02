@@ -179,7 +179,7 @@ jobs:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
       - name: Upload blob report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: blob-report-${{ matrix.shard }}-${{ github.event.client_payload.environment }}
@@ -217,7 +217,7 @@ jobs:
           key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
 
       - name: Download blob reports
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: all-blob-reports
           pattern: blob-report-*-${{ github.event.client_payload.environment }}
@@ -230,7 +230,7 @@ jobs:
         run: yarn playwright merge-reports --reporter html ./all-blob-reports/blob-report
 
       - name: Upload merged report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-${{ github.event.client_payload.environment }}
           path: playwright-report/

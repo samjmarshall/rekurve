@@ -2932,15 +2932,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/core@npm:1.6.0":
-  version: 1.6.0
-  resolution: "@posthog/core@npm:1.6.0"
-  dependencies:
-    cross-spawn: ^7.0.6
-  checksum: d0d9878b19f44187da015a8305750c7193f07e17b3052df03a8eab718660161a310d9c01e22be1181fbc67ed0ae8842e442e670a6aa0d9ac5f366337e052b42d
-  languageName: node
-  linkType: hard
-
 "@posthog/nextjs-config@npm:1.9.16":
   version: 1.9.16
   resolution: "@posthog/nextjs-config@npm:1.9.16"
@@ -7861,7 +7852,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:12.38.0, framer-motion@npm:^12.23.24":
+"framer-motion@npm:12.38.0, framer-motion@npm:^12.38.0":
   version: 12.38.0
   resolution: "framer-motion@npm:12.38.0"
   dependencies:
@@ -9699,12 +9690,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react@npm:0.577.0":
-  version: 0.577.0
-  resolution: "lucide-react@npm:0.577.0"
+"lucide-react@npm:1.14.0":
+  version: 1.14.0
+  resolution: "lucide-react@npm:1.14.0"
   peerDependencies:
     react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: f39db5fb91e925480c9d697f4fc2474d692abcda8e069a5be3295ce9c370dbf7fb55a6b88f94ab5d8b2f834bb76407926b312e2f88992aad62e7567efeb87dcc
+  checksum: 6db2fcc6d7545fabdec6f82db386f7f872a974aa0a4c508e6e23988055712286dccff2e0ef472ee5dc5f3852f1c3e916e84c92e52f049561b6829b6bc2f6483b
   languageName: node
   linkType: hard
 
@@ -10094,11 +10085,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion@npm:12.23.24":
-  version: 12.23.24
-  resolution: "motion@npm:12.23.24"
+"motion@npm:12.38.0":
+  version: 12.38.0
+  resolution: "motion@npm:12.38.0"
   dependencies:
-    framer-motion: ^12.23.24
+    framer-motion: ^12.38.0
     tslib: ^2.4.0
   peerDependencies:
     "@emotion/is-prop-valid": "*"
@@ -10111,7 +10102,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 4e7046f312b85adf96f64f91d67f6f6880bab2ff6e9cdd62cd3e888da8c2f52e14202eb4c095e246cf760a2080fef449115174f8f4f24b1618520501b53b8485
+  checksum: df2db5f958a205b4f31631d30d5699e09052a32444684574f5b896169c3c70cca28836961a7482172bb7c7db9291fa2cb46987ba77102ba220efc773928fd4c7
   languageName: node
   linkType: hard
 
@@ -11087,10 +11078,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postal-mime@npm:2.7.3":
-  version: 2.7.3
-  resolution: "postal-mime@npm:2.7.3"
-  checksum: da7730d3452cdfa5d55d7ab6f73a5b214ce3464453f79549615aacd7bbddce614b6bf044409803a378fc5dc693a5d9699b5e5001baef7fd2b5c914a656536df7
+"postal-mime@npm:2.7.4":
+  version: 2.7.4
+  resolution: "postal-mime@npm:2.7.4"
+  checksum: a30e896a4b9b24f710c3ea2b1e340f3fee75743a9dc71cbccc365019e57a96c9f07ee9b276fc7832f5167ea7fbdeb817aab18ac70384691a128376960e8ae444
   languageName: node
   linkType: hard
 
@@ -11153,12 +11144,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"posthog-node@npm:5.14.0":
-  version: 5.14.0
-  resolution: "posthog-node@npm:5.14.0"
+"posthog-node@npm:5.33.0":
+  version: 5.33.0
+  resolution: "posthog-node@npm:5.33.0"
   dependencies:
-    "@posthog/core": 1.6.0
-  checksum: edfa3d3e8404f64827efceb7b2995107af791bff69b7e29002a3ece2670180b341ac74e22ce174f2b21962c83c687cd21b89ba16eb6e0493e7a2f6052a8beaeb
+    "@posthog/core": 1.28.0
+  peerDependencies:
+    rxjs: ^7.0.0
+  peerDependenciesMeta:
+    rxjs:
+      optional: true
+  checksum: 120d3ea7b2072342aa983537e0e812bfacb9c6fe3706a8eb8d8318641265b5f01e5c588348a958c9e054358dc0fa95cbb07fb47a2739e289038bb2e58878cb2e
   languageName: node
   linkType: hard
 
@@ -11405,12 +11401,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:7.66.0":
-  version: 7.66.0
-  resolution: "react-hook-form@npm:7.66.0"
+"react-hook-form@npm:7.75.0":
+  version: 7.75.0
+  resolution: "react-hook-form@npm:7.75.0"
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
-  checksum: 10796a0c45fd94012fe0feb0b7186c5785c259b1bb6ca96f841e394f528b26442de7e2e5dbbe1a1d94429f2dd6f78c600cdadc2d6c78294e0d33d28ca3ad93f5
+  checksum: 340db890db1c03575260d3a365f340c5115df159a18c1dc1e26bb0b313bcbac9c4af08bc8b7a80df152c323b4ae3a63cbeb6384a951d31e6b16055f89160b43e
   languageName: node
   linkType: hard
 
@@ -11676,18 +11672,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resend@npm:6.9.4":
-  version: 6.9.4
-  resolution: "resend@npm:6.9.4"
+"resend@npm:6.12.2":
+  version: 6.12.2
+  resolution: "resend@npm:6.12.2"
   dependencies:
-    postal-mime: 2.7.3
-    svix: 1.86.0
+    postal-mime: 2.7.4
+    svix: 1.90.0
   peerDependencies:
     "@react-email/render": "*"
   peerDependenciesMeta:
     "@react-email/render":
       optional: true
-  checksum: 26980b5e271f8047ac0833b6cd032095b9b7971c8b78200e9a8465bf8866e64bf1d5e42dc1638cfe34392747c5e433b76a61cc7ffce7408f8f0c77fa608b1322
+  checksum: ba7ce0e087655b690b5d51dc6ccfdce58c49809032570c8ee2e9b119186a55ef4bb8dc9987d3b1883778ade48d861d77a32bc51e6560346673063bea7c948152
   languageName: node
   linkType: hard
 
@@ -12784,13 +12780,13 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"svix@npm:1.86.0":
-  version: 1.86.0
-  resolution: "svix@npm:1.86.0"
+"svix@npm:1.90.0":
+  version: 1.90.0
+  resolution: "svix@npm:1.90.0"
   dependencies:
     standardwebhooks: 1.0.0
     uuid: ^10.0.0
-  checksum: 06b7a8b5ea4b024473d17a7143142982ff06a294618320789d3430223ebee07edbe20cee7ed8b0fb9b2f2b6f5048d16bdfed84e909477694740867255d4d2f8d
+  checksum: 3fecb82831288937301c51be050d1da6194f8b89f22699ea3728d6f57c7008583e8f1dd36d203c716237254cd624c736b009d0e578e787f7494c05f2bce05b08
   languageName: node
   linkType: hard
 
@@ -12820,14 +12816,7 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"tailwind-merge@npm:3.3.1":
-  version: 3.3.1
-  resolution: "tailwind-merge@npm:3.3.1"
-  checksum: ace3675227d86f1def95b25b7f6793268a6ab2f340b43ef64ad25646588d2b1d87714cd60db6947bfdb5bb85be3bb6ce1802021620c541ef7a9c3faa05915f2b
-  languageName: node
-  linkType: hard
-
-"tailwind-merge@npm:^3.0.1":
+"tailwind-merge@npm:3.5.0, tailwind-merge@npm:^3.0.1":
   version: 3.5.0
   resolution: "tailwind-merge@npm:3.5.0"
   checksum: 34d1ba25a9e55fdc0885a14221650623472b70c969b8da0dd494753a311318469f203b21fc2278d9b679d41c04451b5e2c725d14d0f510ca07feae903c6479d3
@@ -13219,9 +13208,9 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"twilio@npm:5.13.1":
-  version: 5.13.1
-  resolution: "twilio@npm:5.13.1"
+"twilio@npm:6.0.0":
+  version: 6.0.0
+  resolution: "twilio@npm:6.0.0"
   dependencies:
     axios: ^1.13.5
     dayjs: ^1.11.9
@@ -13230,7 +13219,7 @@ shadcn@latest:
     qs: ^6.14.1
     scmp: ^2.1.0
     xmlbuilder: ^13.0.2
-  checksum: 5fe28470873f861d72e3d0192a58aff443131c90341f2580df2ef6b0d7c646662fbede41a7d1aa96cae5c8ab257c4ae9a7adfb2394a972f79136976e69055dfa
+  checksum: 333fe2e9c339ae7d68eadeb5c14e498dfa19e8c3524769f325d591debf6f854a658cb0ee65956f6d3a88e71b5409fe0c05c04d357b7d40c6cce965a08362206d
   languageName: node
   linkType: hard
 
@@ -13917,8 +13906,8 @@ shadcn@latest:
     framer-motion: 12.38.0
     husky: ^9.1.7
     input-otp: 1.4.2
-    lucide-react: 0.577.0
-    motion: 12.23.24
+    lucide-react: 1.14.0
+    motion: 12.38.0
     next: 16.2.3
     next-themes: 0.4.6
     pako: ^2.1.0
@@ -13926,25 +13915,25 @@ shadcn@latest:
     postcss: ^8.5.3
     postgres: ^3.4.8
     posthog-js: 1.372.5
-    posthog-node: 5.14.0
+    posthog-node: 5.33.0
     react: 19.2.4
     react-dom: 19.2.4
     react-fast-marquee: 1.6.5
-    react-hook-form: 7.66.0
+    react-hook-form: 7.75.0
     react-rough-notation: 1.0.8
-    resend: 6.9.4
+    resend: 6.12.2
     server-only: 0.0.1
     shadcn: latest
     superjson: 2.2.6
-    tailwind-merge: 3.3.1
+    tailwind-merge: 3.5.0
     tailwindcss: ^4.0.15
     tsx: ^4.21.0
     tw-animate-css: ^1.4.0
-    twilio: 5.13.1
+    twilio: 6.0.0
     typescript: ^5.8.2
     vaul: ^1.1.2
     vercel: ^51.8.0
-    zod: 4.0.0
+    zod: 4.4.2
   languageName: unknown
   linkType: soft
 
@@ -14132,10 +14121,10 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"zod@npm:4.0.0":
-  version: 4.0.0
-  resolution: "zod@npm:4.0.0"
-  checksum: 5ac864e12c94504863330e2e96d03afafe2fde304405ec9dd0bc86f73d1e24f5decc4b164cd60c1e5678c47a52d5660e13713c37a30476d73b5edf5cf2b36448
+"zod@npm:4.4.2":
+  version: 4.4.2
+  resolution: "zod@npm:4.4.2"
+  checksum: e8f5718b8f92fadef578d242c4949cf5196338746d738d4cf80efe7b1fdc791f51ebc73a5667484b273aa825869ea79384911f62c2f973928266da91dcfa9cb4
   languageName: node
   linkType: hard
 

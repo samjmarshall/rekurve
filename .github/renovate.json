@@ -3,6 +3,6 @@
   "extends": ["github>V2-Digital/renovate-config"],
   "schedule": ["* 9-16 * * 1-5"],
   "timezone": "Australia/Sydney",
-  "prConcurrentLimit": 10,
+  "prConcurrentLimit": 6,
   "packageRules": []
 }

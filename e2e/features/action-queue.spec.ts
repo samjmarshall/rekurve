@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 import { ActionQueueSection } from "../pages/sections/action-queue.section";
 import {
@@ -17,6 +18,38 @@ import { getSessionCookie } from "../utils/session-cookie";
 const hasTwilioCredentials =
   !!process.env.TWILIO_AUTH_TOKEN &&
   !process.env.TWILIO_AUTH_TOKEN.startsWith("placeholder");
+
+// posthog-js ≥ 1.x calls `/flags/?v=2`; older versions hit `/decide`. Match
+// both so the route stays correct across SDK upgrades.
+async function routePostHog(page: Page, flags: Record<string, boolean>) {
+  await page.route(/\/rk\/(flags|decide)/, async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ featureFlags: flags }),
+    });
+  });
+}
+
+// Stub navigator.canShare/share/clipboard so the SMS approve flow goes through
+// shareNative() → approve.mutate({skipDispatch:true}). Avoids relying on a real
+// Twilio dispatch, which is what `sms-twilio-dispatch=on` would require.
+async function stubNativeShareResolve(page: Page) {
+  await page.addInitScript(`
+    Object.defineProperty(navigator, 'canShare', {
+      value: (data) => !!(data && data.text),
+      configurable: true,
+    });
+    Object.defineProperty(navigator, 'share', {
+      value: () => Promise.resolve(),
+      configurable: true,
+    });
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: () => Promise.resolve() },
+      writable: true,
+      configurable: true,
+    });
+  `);
+}
 
 test.describe("Action Queue — E2E", () => {
   test.skip(
@@ -52,6 +85,8 @@ test.describe("Action Queue — E2E", () => {
       "Requires real Twilio credentials — set TWILIO_AUTH_TOKEN to a non-placeholder value",
     );
 
+    await routePostHog(page, {});
+    await stubNativeShareResolve(page);
     await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     const lead = await seedLead({
@@ -78,7 +113,7 @@ test.describe("Action Queue — E2E", () => {
 
     await expect(queue.row(msg.id)).toBeHidden();
     await expect(
-      page.getByTestId("app-toast").filter({ hasText: "Sent to your phone" }),
+      page.getByTestId("app-toast").filter({ hasText: "Draft approved" }),
     ).toBeVisible();
 
     const record = await getMessageStatus(msg.id);
@@ -95,6 +130,8 @@ test.describe("Action Queue — E2E", () => {
       "Requires real Twilio credentials — set TWILIO_AUTH_TOKEN to a non-placeholder value",
     );
 
+    await routePostHog(page, {});
+    await stubNativeShareResolve(page);
     await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     const lead = await seedLead({
@@ -124,7 +161,7 @@ test.describe("Action Queue — E2E", () => {
     // Wait for the success toast before reading the DB. The optimistic update
     // hides the row instantly, but the mutation is still in flight.
     await expect(
-      page.getByTestId("app-toast").filter({ hasText: "Sent to your phone" }),
+      page.getByTestId("app-toast").filter({ hasText: "Draft approved" }),
     ).toBeVisible();
 
     const record = await getMessageStatus(msg.id);

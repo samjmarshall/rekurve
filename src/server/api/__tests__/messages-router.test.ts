@@ -702,9 +702,70 @@ describe("messages.approve — email channel", () => {
       expect(mockDb.update).not.toHaveBeenCalled();
     }
   });
+
+  test("approve sms + skipDispatch: true → dispatchSms not called, sentAt stamped, status flips", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      baseMessage,
+    );
+    const approved = {
+      ...baseMessage,
+      status: "approved" as const,
+      approvedAt: new Date(),
+      sentAt: new Date(),
+    };
+    const { set } = mockUpdateReturning(approved);
+
+    const caller = await getCaller();
+    const result = await caller.messages.approve({
+      id: MSG_ID,
+      skipDispatch: true,
+    });
+
+    expect(result.status).toBe("approved");
+    expect(mockDispatchSms).not.toHaveBeenCalled();
+    expect(set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: "approved",
+        approvedAt: expect.any(Date),
+        sentAt: expect.any(Date),
+      }),
+    );
+  });
 });
 
 describe("messages.editAndApprove — sms channel", () => {
+  test("editAndApprove sms + skipDispatch: true → dispatchSms not called, edited body saved, sentAt stamped", async () => {
+    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
+      baseMessage,
+    );
+    const edited = {
+      ...baseMessage,
+      status: "edited_and_approved" as const,
+      body: "Edited body",
+      originalBody: baseMessage.body,
+      approvedAt: new Date(),
+      sentAt: new Date(),
+    };
+    const { set } = mockUpdateReturning(edited);
+
+    const caller = await getCaller();
+    const result = await caller.messages.editAndApprove({
+      id: MSG_ID,
+      body: "Edited body",
+      skipDispatch: true,
+    });
+
+    expect(result.status).toBe("edited_and_approved");
+    expect(mockDispatchSms).not.toHaveBeenCalled();
+    expect(set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: "edited_and_approved",
+        body: "Edited body",
+        sentAt: expect.any(Date),
+      }),
+    );
+  });
+
   test("dispatches with input.body, not the existing row body", async () => {
     (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
       baseMessage,

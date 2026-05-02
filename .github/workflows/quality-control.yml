@@ -27,6 +27,7 @@ jobs:
         with:
           path: .yarn/cache
           key: yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: yarn-
 
       - run: make install
 
@@ -57,6 +58,7 @@ jobs:
         with:
           path: .yarn/cache
           key: yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: yarn-
 
       - run: make install
 
@@ -99,6 +101,7 @@ jobs:
         with:
           path: .yarn/cache
           key: yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: yarn-
 
       - run: make install
 
@@ -107,6 +110,7 @@ jobs:
 
       - name: Unit Test Coverage PR Comment
         if: ${{ github.event_name == 'pull_request' }}
+        continue-on-error: true
         uses: MishaKav/jest-coverage-comment@main
         with:
           title: Unit Test Coverage

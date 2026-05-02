@@ -31,3 +31,18 @@ test("twilioClient is exported and instantiated with env credentials", async () 
     "test-auth-token",
   );
 });
+
+test("env vars unset → twilioClient is null", async () => {
+  rs.doMock("~/env", () => ({
+    env: {
+      TWILIO_ACCOUNT_SID: undefined,
+      TWILIO_AUTH_TOKEN: undefined,
+      TWILIO_FROM_NUMBER: undefined,
+      TWILIO_CONSULTANT_NUMBER: undefined,
+    },
+  }));
+
+  const { twilioClient } = await import("../client");
+  expect(twilioClient).toBeNull();
+  expect(mockTwilioConstructor).not.toHaveBeenCalled();
+});

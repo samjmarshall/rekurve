@@ -14,6 +14,7 @@ export const messageStatusSchema = z.enum([
 // approve / dismiss — id only
 export const messageApproveSchema = z.object({
   id: z.string().uuid(),
+  skipDispatch: z.boolean().optional(),
 });
 
 export const messageDismissSchema = z.object({
@@ -29,6 +30,7 @@ export const messageEditAndApproveSchema = z.object({
     .trim()
     .min(1, "Message body cannot be empty")
     .max(1600, "Message body cannot exceed 1600 characters"),
+  skipDispatch: z.boolean().optional(),
 });
 
 // snooze — id + snoozedUntil at least MIN_SNOOZE_BUFFER_MS in the future

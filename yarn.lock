@@ -9690,12 +9690,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react@npm:0.577.0":
-  version: 0.577.0
-  resolution: "lucide-react@npm:0.577.0"
+"lucide-react@npm:1.14.0":
+  version: 1.14.0
+  resolution: "lucide-react@npm:1.14.0"
   peerDependencies:
     react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: f39db5fb91e925480c9d697f4fc2474d692abcda8e069a5be3295ce9c370dbf7fb55a6b88f94ab5d8b2f834bb76407926b312e2f88992aad62e7567efeb87dcc
+  checksum: 6db2fcc6d7545fabdec6f82db386f7f872a974aa0a4c508e6e23988055712286dccff2e0ef472ee5dc5f3852f1c3e916e84c92e52f049561b6829b6bc2f6483b
   languageName: node
   linkType: hard
 
@@ -13906,7 +13906,7 @@ shadcn@latest:
     framer-motion: 12.38.0
     husky: ^9.1.7
     input-otp: 1.4.2
-    lucide-react: 0.577.0
+    lucide-react: 1.14.0
     motion: 12.38.0
     next: 16.2.3
     next-themes: 0.4.6

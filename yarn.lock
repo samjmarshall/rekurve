@@ -2932,15 +2932,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/core@npm:1.6.0":
-  version: 1.6.0
-  resolution: "@posthog/core@npm:1.6.0"
-  dependencies:
-    cross-spawn: ^7.0.6
-  checksum: d0d9878b19f44187da015a8305750c7193f07e17b3052df03a8eab718660161a310d9c01e22be1181fbc67ed0ae8842e442e670a6aa0d9ac5f366337e052b42d
-  languageName: node
-  linkType: hard
-
 "@posthog/nextjs-config@npm:1.9.16":
   version: 1.9.16
   resolution: "@posthog/nextjs-config@npm:1.9.16"
@@ -11153,12 +11144,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"posthog-node@npm:5.14.0":
-  version: 5.14.0
-  resolution: "posthog-node@npm:5.14.0"
+"posthog-node@npm:5.33.0":
+  version: 5.33.0
+  resolution: "posthog-node@npm:5.33.0"
   dependencies:
-    "@posthog/core": 1.6.0
-  checksum: edfa3d3e8404f64827efceb7b2995107af791bff69b7e29002a3ece2670180b341ac74e22ce174f2b21962c83c687cd21b89ba16eb6e0493e7a2f6052a8beaeb
+    "@posthog/core": 1.28.0
+  peerDependencies:
+    rxjs: ^7.0.0
+  peerDependenciesMeta:
+    rxjs:
+      optional: true
+  checksum: 120d3ea7b2072342aa983537e0e812bfacb9c6fe3706a8eb8d8318641265b5f01e5c588348a958c9e054358dc0fa95cbb07fb47a2739e289038bb2e58878cb2e
   languageName: node
   linkType: hard
 
@@ -13212,9 +13208,9 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"twilio@npm:5.13.1":
-  version: 5.13.1
-  resolution: "twilio@npm:5.13.1"
+"twilio@npm:6.0.0":
+  version: 6.0.0
+  resolution: "twilio@npm:6.0.0"
   dependencies:
     axios: ^1.13.5
     dayjs: ^1.11.9
@@ -13223,7 +13219,7 @@ shadcn@latest:
     qs: ^6.14.1
     scmp: ^2.1.0
     xmlbuilder: ^13.0.2
-  checksum: 5fe28470873f861d72e3d0192a58aff443131c90341f2580df2ef6b0d7c646662fbede41a7d1aa96cae5c8ab257c4ae9a7adfb2394a972f79136976e69055dfa
+  checksum: 333fe2e9c339ae7d68eadeb5c14e498dfa19e8c3524769f325d591debf6f854a658cb0ee65956f6d3a88e71b5409fe0c05c04d357b7d40c6cce965a08362206d
   languageName: node
   linkType: hard
 
@@ -13919,7 +13915,7 @@ shadcn@latest:
     postcss: ^8.5.3
     postgres: ^3.4.8
     posthog-js: 1.372.5
-    posthog-node: 5.14.0
+    posthog-node: 5.33.0
     react: 19.2.4
     react-dom: 19.2.4
     react-fast-marquee: 1.6.5
@@ -13933,11 +13929,11 @@ shadcn@latest:
     tailwindcss: ^4.0.15
     tsx: ^4.21.0
     tw-animate-css: ^1.4.0
-    twilio: 5.13.1
+    twilio: 6.0.0
     typescript: ^5.8.2
     vaul: ^1.1.2
     vercel: ^51.8.0
-    zod: 4.0.0
+    zod: 4.4.2
   languageName: unknown
   linkType: soft
 
@@ -14125,10 +14121,10 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"zod@npm:4.0.0":
-  version: 4.0.0
-  resolution: "zod@npm:4.0.0"
-  checksum: 5ac864e12c94504863330e2e96d03afafe2fde304405ec9dd0bc86f73d1e24f5decc4b164cd60c1e5678c47a52d5660e13713c37a30476d73b5edf5cf2b36448
+"zod@npm:4.4.2":
+  version: 4.4.2
+  resolution: "zod@npm:4.4.2"
+  checksum: e8f5718b8f92fadef578d242c4949cf5196338746d738d4cf80efe7b1fdc791f51ebc73a5667484b273aa825869ea79384911f62c2f973928266da91dcfa9cb4
   languageName: node
   linkType: hard
 

@@ -2899,18 +2899,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/cli@npm:~0.5.13":
-  version: 0.5.30
-  resolution: "@posthog/cli@npm:0.5.30"
+"@posthog/cli@npm:~0.7.3":
+  version: 0.7.11
+  resolution: "@posthog/cli@npm:0.7.11"
   dependencies:
-    axios: ^1.13.2
+    axios: ^1.13.5
     axios-proxy-builder: ^0.1.2
     console.table: ^0.10.0
     detect-libc: ^2.1.2
-    rimraf: ^6.1.2
+    rimraf: ^6.1.3
   bin:
     posthog-cli: run-posthog-cli.js
-  checksum: 8c8738d084873271e0e14aa048acc4c46ad31f54c9f7d64d89694517ae272b4648153845d2c4b64793304bb7a88a7cfced14fc4ff391f24848256c44dfbb8b98
+  checksum: 8bc9309b63cd1e39ba2c1df32ea4985ca16080622b3441bb81cd389fe07a28212333d4a45860581ef676927760c4531f35e23b293430e0042312eb16c76ff0cc
   languageName: node
   linkType: hard
 
@@ -2923,6 +2923,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@posthog/core@npm:1.28.0":
+  version: 1.28.0
+  resolution: "@posthog/core@npm:1.28.0"
+  dependencies:
+    "@posthog/types": 1.372.6
+  checksum: 61c297cb18773cb508e848287b562aba7e8ab2a2d23cd638b9a868ebe81861828192a3730ce9717d1b5494318d45eda87715d5fb82f5809f4c01eb1f42ab9305
+  languageName: node
+  linkType: hard
+
 "@posthog/core@npm:1.6.0":
   version: 1.6.0
   resolution: "@posthog/core@npm:1.6.0"
@@ -2932,17 +2941,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/nextjs-config@npm:1.6.0":
-  version: 1.6.0
-  resolution: "@posthog/nextjs-config@npm:1.6.0"
+"@posthog/nextjs-config@npm:1.9.16":
+  version: 1.9.16
+  resolution: "@posthog/nextjs-config@npm:1.9.16"
   dependencies:
-    "@posthog/cli": ~0.5.13
-    "@posthog/core": 1.6.0
-    "@posthog/webpack-plugin": 1.1.0
+    "@posthog/cli": ~0.7.3
+    "@posthog/plugin-utils": 1.1.1
+    "@posthog/webpack-plugin": 1.4.16
     semver: ^7.7.2
   peerDependencies:
     next: ">12.1.0"
-  checksum: 85f513fed82597ebf74c5761154204ef3d36bd6baa9ef13253e64273cc5aa3bb141f0a5dffb11a57333f8e546464c6e8ec0ee1c6ce94fa9c74998fac01a53118
+  checksum: d4d1840aec90020fb09901eb6e4343f42deddf1259c219f095dc3bf8c9d95aa8c6d18f47a82e71cd6201d84d6083e889e6f82de7a2b7fb849598a72213dfad76
+  languageName: node
+  linkType: hard
+
+"@posthog/plugin-utils@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@posthog/plugin-utils@npm:1.1.1"
+  dependencies:
+    cross-spawn: ^7.0.6
+  checksum: 992ac38d4d191e3a964e14b0b2df644a5775f4b096d3280c5e3a3449dc85de6a4ca891ccab2cdb6d0313c62e654d9117b9251ac12880d28dd40d05920a6921de
   languageName: node
   linkType: hard
 
@@ -2953,13 +2971,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/webpack-plugin@npm:1.1.0":
-  version: 1.1.0
-  resolution: "@posthog/webpack-plugin@npm:1.1.0"
+"@posthog/types@npm:1.372.6":
+  version: 1.372.6
+  resolution: "@posthog/types@npm:1.372.6"
+  checksum: 0b5ae2ebec62d228c968687dacd3585875791601b10b7774b58b59dd380714b33fd9020a657a67eb5dbfff392e0764c586d12e9b7f6d20a5d3a611b720d3a90f
+  languageName: node
+  linkType: hard
+
+"@posthog/webpack-plugin@npm:1.4.16":
+  version: 1.4.16
+  resolution: "@posthog/webpack-plugin@npm:1.4.16"
   dependencies:
-    "@posthog/cli": ~0.5.13
-    "@posthog/core": 1.6.0
-  checksum: 6d15a5f824ede39863853ad60b78fd1b2ca5768ae0b65e7fef38a220068244912d7cf225f2180d891cb8e825706c66de7696cd59d221bdca04b07a93f7dbb57b
+    "@posthog/cli": ~0.7.3
+    "@posthog/core": 1.28.0
+    "@posthog/plugin-utils": 1.1.1
+  peerDependencies:
+    webpack: ^5
+  checksum: 834bab33d49e3e83c743a767bb2dbe0edbcaf79caf9dd02bc581ada1c0ea1d3744406bb66654706e136c9c25ef5153c04489fd5fdb94e758ac79c1fa48d043e4
   languageName: node
   linkType: hard
 
@@ -3927,21 +3955,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.95.2":
-  version: 5.95.2
-  resolution: "@tanstack/query-core@npm:5.95.2"
-  checksum: 25eed48481fbfea07f0f324b5f906acfa6ea8f90cf2b82d476cb5e34055379284ac88fb67e0a6437e4fc3280f67c1d79212a7c26c627f1c03935bd2eaacaf689
+"@tanstack/query-core@npm:5.100.8":
+  version: 5.100.8
+  resolution: "@tanstack/query-core@npm:5.100.8"
+  checksum: b2938f074c1ba75a69f0f9ad25b27d2e5d5e144c204e9bce4408206ca27e1cc43735413fbb8d7174a84a98b24fd559dbdcd4f9db3d7bedcb748793a996f16059
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:5.95.2":
-  version: 5.95.2
-  resolution: "@tanstack/react-query@npm:5.95.2"
+"@tanstack/react-query@npm:5.100.8":
+  version: 5.100.8
+  resolution: "@tanstack/react-query@npm:5.100.8"
   dependencies:
-    "@tanstack/query-core": 5.95.2
+    "@tanstack/query-core": 5.100.8
   peerDependencies:
     react: ^18 || ^19
-  checksum: 9e3eac1ce0b561c8d07b0ad1125ca7a11862e779a64df48c0e518338d304a077f866b8780fb53d1577a49a19166c97d83c856f30e99f02d764176770aa992c5a
+  checksum: 71354e418416e1e11d73511ab5bc0bb39f35d2bc37d3ad131cd71123759e9ee38bf01684573f6962adbb8156223565bc2de080dbb920285dc3a0cee1a0fdfdf6
   languageName: node
   linkType: hard
 
@@ -5439,17 +5467,6 @@ __metadata:
   dependencies:
     tunnel: ^0.0.6
   checksum: 17e000cdf30dc7b03aaed4afb3e0c3daf0bcce08117b1f6626bcfaa9cbe247d205c9ea78ee1dccbd28ed3e5ccda409242816071e8a33c1fd605ea8443370707c
-  languageName: node
-  linkType: hard
-
-"axios@npm:^1.13.2":
-  version: 1.14.0
-  resolution: "axios@npm:1.14.0"
-  dependencies:
-    follow-redirects: ^1.15.11
-    form-data: ^4.0.5
-    proxy-from-env: ^2.1.0
-  checksum: 505d21ea777e7613ec61dc2ca92647a55878b6c86ae268e791747fb199913e68b1a9bdb9faa5a72eb59dcefc5e93c2579636504b84dbfed59aa9a680ade749e6
   languageName: node
   linkType: hard
 
@@ -7844,7 +7861,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:12.38.0, framer-motion@npm:^12.23.24":
+"framer-motion@npm:12.38.0, framer-motion@npm:^12.38.0":
   version: 12.38.0
   resolution: "framer-motion@npm:12.38.0"
   dependencies:
@@ -10077,11 +10094,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion@npm:12.23.24":
-  version: 12.23.24
-  resolution: "motion@npm:12.23.24"
+"motion@npm:12.38.0":
+  version: 12.38.0
+  resolution: "motion@npm:12.38.0"
   dependencies:
-    framer-motion: ^12.23.24
+    framer-motion: ^12.38.0
     tslib: ^2.4.0
   peerDependencies:
     "@emotion/is-prop-valid": "*"
@@ -10094,7 +10111,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 4e7046f312b85adf96f64f91d67f6f6880bab2ff6e9cdd62cd3e888da8c2f52e14202eb4c095e246cf760a2080fef449115174f8f4f24b1618520501b53b8485
+  checksum: df2db5f958a205b4f31631d30d5699e09052a32444684574f5b896169c3c70cca28836961a7482172bb7c7db9291fa2cb46987ba77102ba220efc773928fd4c7
   languageName: node
   linkType: hard
 
@@ -11070,10 +11087,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postal-mime@npm:2.7.3":
-  version: 2.7.3
-  resolution: "postal-mime@npm:2.7.3"
-  checksum: da7730d3452cdfa5d55d7ab6f73a5b214ce3464453f79549615aacd7bbddce614b6bf044409803a378fc5dc693a5d9699b5e5001baef7fd2b5c914a656536df7
+"postal-mime@npm:2.7.4":
+  version: 2.7.4
+  resolution: "postal-mime@npm:2.7.4"
+  checksum: a30e896a4b9b24f710c3ea2b1e340f3fee75743a9dc71cbccc365019e57a96c9f07ee9b276fc7832f5167ea7fbdeb817aab18ac70384691a128376960e8ae444
   languageName: node
   linkType: hard
 
@@ -11109,9 +11126,9 @@ __metadata:
   linkType: hard
 
 "postgres@npm:^3.4.8":
-  version: 3.4.8
-  resolution: "postgres@npm:3.4.8"
-  checksum: 65458ca2e3f3157effe73ca173b7f86898cb0d26f2c5e74894bf0e3a13b8d9227c28923057c350de020b29bbb6f1bfc0854c6ea1989daae21500b18c885bcae5
+  version: 3.4.9
+  resolution: "postgres@npm:3.4.9"
+  checksum: d7d3375d46d18f41a6d12893659105c5f2865ae42f5991cfe4ead460d24639f98d50fa3c307c882b838e0ad2cee07168e979b0eccc7f3262b18365b0da06a428
   languageName: node
   linkType: hard
 
@@ -11388,12 +11405,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:7.66.0":
-  version: 7.66.0
-  resolution: "react-hook-form@npm:7.66.0"
+"react-hook-form@npm:7.75.0":
+  version: 7.75.0
+  resolution: "react-hook-form@npm:7.75.0"
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
-  checksum: 10796a0c45fd94012fe0feb0b7186c5785c259b1bb6ca96f841e394f528b26442de7e2e5dbbe1a1d94429f2dd6f78c600cdadc2d6c78294e0d33d28ca3ad93f5
+  checksum: 340db890db1c03575260d3a365f340c5115df159a18c1dc1e26bb0b313bcbac9c4af08bc8b7a80df152c323b4ae3a63cbeb6384a951d31e6b16055f89160b43e
   languageName: node
   linkType: hard
 
@@ -11659,18 +11676,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resend@npm:6.9.4":
-  version: 6.9.4
-  resolution: "resend@npm:6.9.4"
+"resend@npm:6.12.2":
+  version: 6.12.2
+  resolution: "resend@npm:6.12.2"
   dependencies:
-    postal-mime: 2.7.3
-    svix: 1.86.0
+    postal-mime: 2.7.4
+    svix: 1.90.0
   peerDependencies:
     "@react-email/render": "*"
   peerDependenciesMeta:
     "@react-email/render":
       optional: true
-  checksum: 26980b5e271f8047ac0833b6cd032095b9b7971c8b78200e9a8465bf8866e64bf1d5e42dc1638cfe34392747c5e433b76a61cc7ffce7408f8f0c77fa608b1322
+  checksum: ba7ce0e087655b690b5d51dc6ccfdce58c49809032570c8ee2e9b119186a55ef4bb8dc9987d3b1883778ade48d861d77a32bc51e6560346673063bea7c948152
   languageName: node
   linkType: hard
 
@@ -11777,7 +11794,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:^6.1.2":
+"rimraf@npm:^6.1.3":
   version: 6.1.3
   resolution: "rimraf@npm:6.1.3"
   dependencies:
@@ -12767,13 +12784,13 @@ shadcn@latest:
   languageName: node
   linkType: hard
 
-"svix@npm:1.86.0":
-  version: 1.86.0
-  resolution: "svix@npm:1.86.0"
+"svix@npm:1.90.0":
+  version: 1.90.0
+  resolution: "svix@npm:1.90.0"
   dependencies:
     standardwebhooks: 1.0.0
     uuid: ^10.0.0
-  checksum: 06b7a8b5ea4b024473d17a7143142982ff06a294618320789d3430223ebee07edbe20cee7ed8b0fb9b2f2b6f5048d16bdfed84e909477694740867255d4d2f8d
+  checksum: 3fecb82831288937301c51be050d1da6194f8b89f22699ea3728d6f57c7008583e8f1dd36d203c716237254cd624c736b009d0e578e787f7494c05f2bce05b08
   languageName: node
   linkType: hard
 
@@ -13870,14 +13887,14 @@ shadcn@latest:
     "@neondatabase/serverless": 1.1.0
     "@opentelemetry/api": ^1.9.1
     "@playwright/test": ^1.57.0
-    "@posthog/nextjs-config": 1.6.0
+    "@posthog/nextjs-config": 1.9.16
     "@rsbuild/plugin-react": ^2.0.0
     "@rstest/core": ^0.9.5
     "@rstest/coverage-istanbul": ^0.3.0
     "@t3-oss/env-nextjs": 0.13.0
     "@tailwindcss/postcss": ^4.0.15
     "@tailwindcss/typography": 0.5.19
-    "@tanstack/react-query": 5.95.2
+    "@tanstack/react-query": 5.100.8
     "@trpc/client": 11.16.0
     "@trpc/server": 11.16.0
     "@trpc/tanstack-react-query": 11.16.0
@@ -13901,7 +13918,7 @@ shadcn@latest:
     husky: ^9.1.7
     input-otp: 1.4.2
     lucide-react: 0.577.0
-    motion: 12.23.24
+    motion: 12.38.0
     next: 16.2.3
     next-themes: 0.4.6
     pako: ^2.1.0
@@ -13913,9 +13930,9 @@ shadcn@latest:
     react: 19.2.4
     react-dom: 19.2.4
     react-fast-marquee: 1.6.5
-    react-hook-form: 7.66.0
+    react-hook-form: 7.75.0
     react-rough-notation: 1.0.8
-    resend: 6.9.4
+    resend: 6.12.2
     server-only: 0.0.1
     shadcn: latest
     superjson: 2.2.6

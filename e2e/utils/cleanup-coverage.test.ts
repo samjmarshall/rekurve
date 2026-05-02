@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "@rstest/core";
+import { describe, expect, it, rs } from "@rstest/core";
 
 const specsDir = join(process.cwd(), "e2e/features");
 
@@ -32,5 +32,27 @@ describe("cleanup-coverage", () => {
     }
 
     expect(violations).toEqual([]);
+  });
+
+  it("E2E_SKIP_GLOBAL_TEARDOWN=1 disables globalTeardown in playwright config", async () => {
+    const saved = process.env.E2E_SKIP_GLOBAL_TEARDOWN;
+
+    try {
+      process.env.E2E_SKIP_GLOBAL_TEARDOWN = "1";
+      rs.resetModules();
+      const withSkip = await import("../../playwright.config");
+      expect(withSkip.default.globalTeardown).toBeUndefined();
+
+      delete process.env.E2E_SKIP_GLOBAL_TEARDOWN;
+      rs.resetModules();
+      const withoutSkip = await import("../../playwright.config");
+      expect(withoutSkip.default.globalTeardown).toBe(
+        "./e2e/utils/global-teardown.ts",
+      );
+    } finally {
+      if (saved === undefined) delete process.env.E2E_SKIP_GLOBAL_TEARDOWN;
+      else process.env.E2E_SKIP_GLOBAL_TEARDOWN = saved;
+      rs.resetModules();
+    }
   });
 });

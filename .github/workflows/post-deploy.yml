@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: read
       actions: read
+      statuses: write
     outputs:
       db_url: ${{ steps.neon.outputs.db_url }}
       db_url_unpooled: ${{ steps.neon.outputs.db_url_unpooled }}

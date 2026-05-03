@@ -68,8 +68,8 @@
     "next-themes": "0.4.6",
     "posthog-js": "1.372.5",
     "posthog-node": "5.33.0",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
     "react-fast-marquee": "1.6.5",
     "react-hook-form": "7.75.0",
     "react-rough-notation": "1.0.8",
@@ -95,7 +95,7 @@
     "@tailwindcss/postcss": "^4.0.15",
     "@types/node": "^20.14.10",
     "@types/pako": "^2.0.4",
-    "@types/react": "19.2.13",
+    "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@types/three": "^0.184.0",
     "auto": "^11.3.6",
@@ -118,7 +118,7 @@
   },
   "packageManager": "yarn@3.8.7",
   "resolutions": {
-    "@types/react": "19.2.13",
+    "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "postcss": "^8.5.10"
   }

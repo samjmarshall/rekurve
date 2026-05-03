@@ -40,7 +40,7 @@ jobs:
         run: |
           npm i -g neonctl@v2
           if neonctl branches list --project-id "$PROJECT_ID" --output json \
-            | jq -e --arg name "$BRANCH_NAME" 'any((.branches // .)[]; .name == $name)' > /dev/null; then
+            | jq -e --arg name "$BRANCH_NAME" '[.. | objects | .name? // empty] | any(. == $name)' > /dev/null; then
             echo "Branch $BRANCH_NAME exists — deleting"
             neonctl branches delete "$BRANCH_NAME" --project-id "$PROJECT_ID"
           else

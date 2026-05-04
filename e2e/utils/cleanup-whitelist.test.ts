@@ -62,6 +62,7 @@ describe("cleanup-whitelist", () => {
       "SmsShareMessages", // sms-share.spec.ts — seedLead, no HubSpot sync
       "SmsShareClose", // sms-share.spec.ts — seedLead, no HubSpot sync
       "SmsEditMobile", // sms-share.spec.ts — seedLead, no HubSpot sync
+      "SmsEditDesktop", // sms-share.spec.ts — seedLead, no HubSpot sync
       "SmsFlagOn", // sms-share.spec.ts — seedLead, no HubSpot sync
       "Persist", // leads-crud.spec.ts — form persistence test, never submitted
       "Bad", // leads-crud.spec.ts — validation test, submission blocked by error

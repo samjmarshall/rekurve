@@ -1,46 +1,33 @@
 name: Neon
 
 on:
-  pull_request:
-    types:
-      - closed
+  delete:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.ref }}
 
 jobs:
-  setup:
-    name: Setup
-    outputs:
-      branch: ${{ steps.branch_name.outputs.current_branch }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get branch name
-        id: branch_name
-        uses: tj-actions/branch-names@v9
-
   delete_neon_branch:
     name: Delete Neon Branch
-    needs: setup
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    if: github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
     steps:
       - name: Delete preview Neon Branch
         uses: neondatabase/delete-branch-action@v3
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          branch: preview/${{ needs.setup.outputs.branch }}
+          branch: preview/${{ github.event.ref }}
           api_key: ${{ secrets.NEON_API_KEY }}
 
       - name: Delete local Neon Branch (if exists)
         env:
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
           PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
-          BRANCH_NAME: local/${{ needs.setup.outputs.branch }}
+          BRANCH_NAME: local/${{ github.event.ref }}
         run: |
           npm i -g neonctl@v2
           if neonctl branches list --project-id "$PROJECT_ID" --output json \
-            | jq -e --arg name "$BRANCH_NAME" 'any((.branches // .)[]; .name == $name)' > /dev/null; then
+            | jq -e --arg name "$BRANCH_NAME" '[.. | objects | .name? // empty] | any(. == $name)' > /dev/null; then
             echo "Branch $BRANCH_NAME exists — deleting"
             neonctl branches delete "$BRANCH_NAME" --project-id "$PROJECT_ID"
           else

@@ -1,5 +1,6 @@
 ---
 model: sonnet
+effort: xhigh
 ---
 # Validate Plan
 

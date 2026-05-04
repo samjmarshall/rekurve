@@ -15,14 +15,33 @@ import {
   useSnoozeAction,
 } from "./use-queue-actions";
 
+type PendingShare = {
+  body: string;
+  messageId: string;
+  leadName: string;
+  source: "approve" | "edit";
+};
+
 export function DraftActionBar({ row }: { row: DraftRowData }) {
   const [editOpen, setEditOpen] = useState(false);
   const [snoozeOpen, setSnoozeOpen] = useState(false);
   const [dismissOpen, setDismissOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [pendingShare, setPendingShare] = useState<PendingShare | null>(null);
 
-  const approve = useApproveAction();
+  const approve = useApproveAction({
+    onRequestSmsShare: (body, messageId, leadName) => {
+      setPendingShare({ body, messageId, leadName, source: "approve" });
+      setIsDrawerOpen(true);
+    },
+  });
   const dismiss = useDismissAction();
-  const editAndApprove = useEditAndApproveAction();
+  const editAndApprove = useEditAndApproveAction({
+    onRequestSmsShare: (body, messageId, leadName) => {
+      setPendingShare({ body, messageId, leadName, source: "edit" });
+      setIsDrawerOpen(true);
+    },
+  });
   const snooze = useSnoozeAction();
 
   const isPending =
@@ -30,8 +49,7 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
     dismiss.isPending ||
     editAndApprove.isPending ||
     snooze.isPending ||
-    approve.smsShareState.isDrawerOpen ||
-    editAndApprove.smsShareState.isDrawerOpen;
+    isDrawerOpen;
 
   // For SMS rows with flag OFF, route through the share flow.
   // The cast is safe: behaviorally identical to mutate for the EditDialog consumer.
@@ -47,10 +65,26 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
         }) as unknown as typeof editAndApprove.mutate)
       : editAndApprove.mutate;
 
-  // Expose whichever SMS share drawer is currently active (approve or edit).
-  const smsShareState = approve.smsShareState.isDrawerOpen
-    ? approve.smsShareState
-    : editAndApprove.smsShareState;
+  const handleDrawerApprove = () => {
+    if (pendingShare) {
+      if (pendingShare.source === "approve") {
+        approve.mutate({ id: pendingShare.messageId, skipDispatch: true });
+      } else {
+        editAndApprove.mutate({
+          id: pendingShare.messageId,
+          body: pendingShare.body,
+          skipDispatch: true,
+        });
+      }
+    }
+    setIsDrawerOpen(false);
+    setPendingShare(null);
+  };
+
+  const handleDrawerCancel = () => {
+    setIsDrawerOpen(false);
+    setPendingShare(null);
+  };
 
   return (
     <>
@@ -120,12 +154,12 @@ export function DraftActionBar({ row }: { row: DraftRowData }) {
         isPending={dismiss.isPending}
       />
       <SmsShareDrawer
-        open={smsShareState.isDrawerOpen}
-        body={smsShareState.pendingBody}
-        messageId={smsShareState.pendingMessageId}
-        leadName={smsShareState.pendingLeadName}
-        onApprove={smsShareState.onApproveDrawer}
-        onCancel={smsShareState.onCancelDrawer}
+        open={isDrawerOpen}
+        body={pendingShare?.body ?? ""}
+        messageId={pendingShare?.messageId ?? ""}
+        leadName={pendingShare?.leadName}
+        onApprove={handleDrawerApprove}
+        onCancel={handleDrawerCancel}
       />
     </>
   );

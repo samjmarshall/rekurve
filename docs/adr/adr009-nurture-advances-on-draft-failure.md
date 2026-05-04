@@ -1,6 +1,6 @@
 # Nurture scheduler advances `nextStepAt` even when `draftMessage` throws
 
-**Status:** accepted
+**Status:** superseded by [adr011](adr011-followup-drafts-retry-then-pause.md) (proposed 2026-05-04)
 
 `runSchedulerTick` walks every active `nurture_sequences` row whose `nextStepAt` has passed and, for each one, attempts a `draftMessage` call. On success, the draft is inserted into `message_queue` with `status='pending'` and `drafted++`. On failure (Anthropic 5xx, timeout, schema-validation reject, `INSERT INTO message_queue` rejection, any throw inside the per-row `try` block), the error is logged with `[nurture-scheduler] draftMessage failed for sequence <id>:` and `failed++` — and `nextStepAt` is *still* advanced by the cadence (`scheduler.ts:125-132`). One Claude failure costs one missed touch on that lead's cadence boundary, never more. The next tick (24h later) sees the row with a future `nextStepAt` and skips it; the lead picks up its sequence again on the *next* cadence boundary (`+CADENCE_DAYS[sequenceType]` from the failed tick). The rule prioritises bounded forward progress over guaranteed delivery: a poison row that consistently throws cannot block every later row in the same tick, cannot accumulate into a backlog, and does not need a retry surface to recover.
 

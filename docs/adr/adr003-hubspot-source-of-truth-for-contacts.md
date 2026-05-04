@@ -1,6 +1,6 @@
 # HubSpot is the source of truth for contact data
 
-**Status:** accepted
+**Status:** superseded by [adr013](adr013-local-db-canonical-for-lead-data.md) (proposed 2026-05-04)
 
 HubSpot is the source of truth for contact data. The app writes to HubSpot first on every `leads.create` and `leads.update`, then mirrors the result to the local `leads` table; HubSpot pushes inbound changes through a webhook that upserts the same table. The local row exists only to attach app-derived fields (`scoreMetadata`, `preferredEstates`, `preferredSuburbs`, `referrerName`, `lastContactedAt`, `nextActionAt`) to a HubSpot contact ID — it is never the canonical record for identity, address, or qualification answers. `leadScore` and `leadStage` round-trip through HubSpot but are recomputed by `scoreLead()` on every qualifying edit, so an out-of-band HubSpot edit to either survives only until the next score run.
 

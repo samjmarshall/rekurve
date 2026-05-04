@@ -1,7 +1,7 @@
 ---
 name: web-research
 description: Deep multi-source web research — synthesising findings across ≥3 sources, resolving conflicting information, surveying best-practices, evaluating comparisons and benchmarks. Proactively use when the answer requires synthesis or the caller needs a survey of a space. Do not use for single-fact or library-docs lookups (use web-lookup), codebase questions (use codebase-locator/analyzer), or thoughts/ (use thoughts-locator).
-tools: WebSearch, WebFetch, TodoWrite, Read, Grep, Glob, LS
+tools: WebSearch, WebFetch, TodoWrite, Read, Bash
 color: yellow
 model: opus
 effort: max

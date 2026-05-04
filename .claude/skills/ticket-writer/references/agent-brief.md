@@ -1,11 +1,6 @@
----
-name: agent-brief
-description: How to write the body of a ticket so an AFK coding agent can pick it up days or weeks later and still produce the right work.
----
-
 # Writing tickets for AFK coding agents
 
-The ticket body **is the contract** the agent will work from. The original chat that produced the ticket, the design doc that backed it, and the implementer's mental model all evaporate. What stays is the body and its acceptance criteria.
+The ticket body **is the contract** the agent will work from. The originating chat, the backing design doc, and the implementer's mental model all evaporate. What stays is the body and its acceptance criteria.
 
 ## Principles
 
@@ -15,8 +10,7 @@ The ticket may sit in the backlog for days or weeks. The codebase will change in
 
 - **Do** describe interfaces, types, and behavioural contracts.
 - **Do** name specific types, function signatures, or config shapes the agent should look for.
-- **Don't** reference file paths — they go stale.
-- **Don't** reference line numbers.
+- **Don't** reference file paths or line numbers — they go stale.
 - **Don't** assume the current implementation structure will remain the same.
 
 A `References` section at the bottom can name a representative file as a *starting point for exploration*, but the body must not depend on that path being correct.
@@ -32,11 +26,21 @@ Describe **what** the system should do, not **how** to implement it. The agent w
 
 ### Complete, testable acceptance criteria
 
-The agent needs to know when it is done. Every criterion is independently verifiable — binary pass/fail. If a criterion includes a measurement, the measurement must be runnable from the criterion text alone (`make check passes`, `gh issue list --label X returns ≥1 result`, `the new ADR file exists at the conventional path`).
+The agent needs to know when it is done. See § Acceptance criteria below.
 
 ### Explicit scope boundaries
 
 State what is **out of scope**. Without it, the agent gold-plates: refactors adjacent code, "improves" related modules, generalises a one-off into a framework. The Out-of-Scope list is a defensive contract, not optional polish.
+
+## Acceptance criteria
+
+Every criterion must be binary, specific, measurable, independent, and runnable from the criterion text alone. Examples: `make check passes`, `gh issue list --label X returns ≥1 result`, `ADR file exists at the conventional path`. Cover happy path, error cases, edge cases.
+
+Use checkboxes; Given/When/Then is fine for behavioural specs.
+
+### Push back on weak criteria
+
+"Feature works properly", "users are happy", "no bugs", "looks good", "performs well" — every one needs a specific, measurable replacement before the ticket ships.
 
 ## Body template (AFK-ready)
 
@@ -112,8 +116,6 @@ sets the whole object in one call.
 
 Part of #228
 ```
-
-This works because: behaviour described not files patched, four AC are mechanically verifiable, scope boundary stops the agent refactoring nearby hooks, the file path is explicitly a "starting point" so a rename doesn't invalidate the ticket.
 
 ## Anti-patterns to refuse
 

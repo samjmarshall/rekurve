@@ -1,31 +1,14 @@
----
-name: epic-breakdown
-description: How to break a design doc, plan, or PRD into an epic with child issues using tracer-bullet vertical slices, then publish them in dependency order.
----
-
 # Breaking a plan into an epic with child issues
 
 Use this workflow when the user brings a `thoughts/designs/*.md`, a `thoughts/plans/*.md`, a PRD, or an in-chat spec and wants it turned into a parent epic plus independently-grabbable child issues.
 
 The single-ticket workflow in `SKILL.md` covers atomic issues. This sub-skill covers the breakdown.
 
-## Tracer-bullet vertical slices
+## Vertical-slice rules
 
-A child issue is a **thin vertical slice** that cuts through every relevant layer (schema, API, UI, tests, docs) end-to-end. Not a horizontal layer cake.
+Vertical-slice rules are defined in **`SKILL.md` § Tracer-bullet vertical slices**. Every child issue follows them — refer to that section for the comparison table and the "thin slice through every layer" principle. This file covers the *publishing workflow* once you've sliced.
 
-| Bad (horizontal by layer) | Good (vertical by behaviour) |
-|---|---|
-| Issue 1: Build all schema | Issue 1: Password reset path (schema + API + UI + test) |
-| Issue 2: Build all APIs | Issue 2: Password change path (schema + API + UI + test) |
-| Issue 3: Build all UIs | Issue 3: Password complexity rules (validation + UI hint + test) |
-| → Nothing shippable until all complete | → Each issue shippable on its own |
-
-Rules:
-
-- Each slice delivers a narrow but **complete** path. A completed slice is demoable or verifiable on its own.
-- Prefer many thin slices over few thick ones. If a slice is >2 days, split it.
-- Documentation-only slices are valid (e.g. an ADR + `CLAUDE.md` note). They follow the same rules.
-- Mark each slice **AFK** or **HITL — <reason>**. Prefer AFK. A well-decomposed epic is mostly AFK with a few HITL slices gating the rest (the architectural call, the design review).
+Per `SKILL.md` § Work-readiness, each slice carries an AFK or HITL — `<reason>` tag. A well-decomposed epic is mostly AFK with a few HITL slices gating the rest (the architectural call, the design review).
 
 ## Workflow
 
@@ -40,7 +23,7 @@ Rules:
 Number each proposed slice. For each, show:
 
 - **Title** — short, action-verb opening (`Add`, `Replace`, `Fix`, `Document`, `Lift`).
-- **Type** — AFK or HITL — <reason>.
+- **Type** — AFK or HITL — `<reason>`.
 - **One-line summary** of the end-to-end behaviour delivered.
 - **Blocked by** — which other slices (by number) must complete first. `None — can start immediately` if no blockers.
 
@@ -72,7 +55,7 @@ Once the user approves:
    ```
 
    Gotchas: must be `-F` (integer), not `-f` (string). Use the REST `.id`, not the GraphQL `node_id`.
-6. Add each child to the GitHub Project (`gh project item-add`) and set fields (Priority, Size, Iteration) per the GitHub Projects table in `SKILL.md`.
+6. Add each child to the GitHub Project (`gh project item-add`) and set fields (Priority, Estimate, Iteration) per the GitHub Projects table in `SKILL.md`.
 
 Steps 2–6 are **one turn, no mid-flow prompts**. Linking and field assignment are part of "create".
 

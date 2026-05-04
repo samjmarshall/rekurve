@@ -1,6 +1,6 @@
 # Nurture auto-start failures are swallowed on the lead write path
 
-**Status:** accepted
+**Status:** superseded by [adr010](adr010-inngest-source-of-truth-for-followup-plan.md) (proposed 2026-05-04)
 
 `leads.create` and `leads.update` invoke `startOrUpdateSequence` after the canonical lead row is written and (on update) re-scored. The call is wrapped in `.catch(console.error)` and never blocks the mutation: a failure logs `[leads.create] nurture sequence start failed for lead <id>:` (or the `.update` variant) and the mutation returns the scored row regardless. Lead capture is the load-bearing path — a consultant entering a walk-in must succeed even if the nurture infra is degraded (missing migration, partial-index drift on `nurture_active_one_per_lead_uidx`, enum mismatch between `sequenceTypeEnum` / `sequenceStatusEnum` and `SEQUENCE_TYPE_BY_STAGE`, transient DB error, race against a concurrent `startSequence` for the same lead). Nurture is best-effort scaffolding around the canonical lead row; it is not part of the lead-create contract. The rule is site-scoped: nurture-side effects on the lead write path are best-effort, regardless of the specific function being invoked.
 

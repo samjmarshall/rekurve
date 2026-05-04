@@ -31,8 +31,7 @@ let mockMutate: ReturnType<typeof rs.fn>;
 let mockIsFeatureEnabled: ReturnType<typeof rs.fn>;
 let mockCanUseNativeShare: ReturnType<typeof rs.fn>;
 let mockShareNative: ReturnType<typeof rs.fn>;
-let mockOpenDrawer: ReturnType<typeof rs.fn>;
-let mockCloseDrawer: ReturnType<typeof rs.fn>;
+let mockRequestSmsShare: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
@@ -41,8 +40,7 @@ beforeEach(() => {
   mockIsFeatureEnabled = rs.fn();
   mockCanUseNativeShare = rs.fn();
   mockShareNative = rs.fn();
-  mockOpenDrawer = rs.fn();
-  mockCloseDrawer = rs.fn();
+  mockRequestSmsShare = rs.fn();
 
   rs.doMock("posthog-js", () => ({
     default: { isFeatureEnabled: mockIsFeatureEnabled },
@@ -52,14 +50,6 @@ beforeEach(() => {
     canUseNativeShare: mockCanUseNativeShare,
     shareNative: mockShareNative,
     canUseSmsLink: rs.fn().mockReturnValue(false),
-    useSmsShare: rs.fn().mockReturnValue({
-      isDrawerOpen: false,
-      openDrawer: mockOpenDrawer,
-      closeDrawer: mockCloseDrawer,
-      pendingBody: "",
-      pendingMessageId: "",
-      pendingLeadName: "",
-    }),
   }));
 
   rs.doMock("@tanstack/react-query", () => ({
@@ -108,12 +98,6 @@ beforeEach(() => {
   rs.doMock("~/components/ui/toast", () => ({
     useToastManager: rs.fn().mockReturnValue({ add: rs.fn() }),
   }));
-
-  rs.doMock("react", () => ({
-    useRef: rs
-      .fn()
-      .mockImplementation((initial: unknown) => ({ current: initial })),
-  }));
 });
 
 // Flush microtasks (for .then chains off shareNative)
@@ -132,7 +116,7 @@ describe("useApproveAction — handleApprove", () => {
     mockShareNative.mockResolvedValue(undefined);
 
     const { useApproveAction } = await import("../use-queue-actions");
-    const hook = useApproveAction();
+    const hook = useApproveAction({ onRequestSmsShare: mockRequestSmsShare });
 
     hook.handleApprove(smsRow);
 
@@ -155,7 +139,7 @@ describe("useApproveAction — handleApprove", () => {
     );
 
     const { useApproveAction } = await import("../use-queue-actions");
-    const hook = useApproveAction();
+    const hook = useApproveAction({ onRequestSmsShare: mockRequestSmsShare });
 
     hook.handleApprove(smsRow);
 
@@ -165,16 +149,16 @@ describe("useApproveAction — handleApprove", () => {
     expect(mockMutate).not.toHaveBeenCalled();
   });
 
-  test("flag OFF + SMS + no native share: calls openDrawer with body and id", async () => {
+  test("flag OFF + SMS + no native share: calls onRequestSmsShare with body, id, and leadName", async () => {
     mockIsFeatureEnabled.mockReturnValue(false);
     mockCanUseNativeShare.mockReturnValue(false);
 
     const { useApproveAction } = await import("../use-queue-actions");
-    const hook = useApproveAction();
+    const hook = useApproveAction({ onRequestSmsShare: mockRequestSmsShare });
 
     hook.handleApprove(smsRow);
 
-    expect(mockOpenDrawer).toHaveBeenCalledWith(
+    expect(mockRequestSmsShare).toHaveBeenCalledWith(
       smsRow.body,
       smsRow.id,
       smsRow.lead.firstName,
@@ -187,31 +171,31 @@ describe("useApproveAction — handleApprove", () => {
     mockIsFeatureEnabled.mockReturnValue(true);
 
     const { useApproveAction } = await import("../use-queue-actions");
-    const hook = useApproveAction();
+    const hook = useApproveAction({ onRequestSmsShare: mockRequestSmsShare });
 
     hook.handleApprove(smsRow);
 
     expect(mockMutate).toHaveBeenCalledWith({ id: smsRow.id });
     expect(mockShareNative).not.toHaveBeenCalled();
-    expect(mockOpenDrawer).not.toHaveBeenCalled();
+    expect(mockRequestSmsShare).not.toHaveBeenCalled();
   });
 
   test("email channel: always calls mutate regardless of flag state", async () => {
     mockIsFeatureEnabled.mockReturnValue(false); // flag OFF — should still use mutate for email
 
     const { useApproveAction } = await import("../use-queue-actions");
-    const hook = useApproveAction();
+    const hook = useApproveAction({ onRequestSmsShare: mockRequestSmsShare });
 
     hook.handleApprove(emailRow);
 
     expect(mockMutate).toHaveBeenCalledWith({ id: emailRow.id });
     expect(mockShareNative).not.toHaveBeenCalled();
-    expect(mockOpenDrawer).not.toHaveBeenCalled();
+    expect(mockRequestSmsShare).not.toHaveBeenCalled();
   });
 });
 
 // ---------------------------------------------------------------------------
-// useEditAndApproveAction — editAndShareApprove + onApproveDrawer
+// useEditAndApproveAction — editAndShareApprove
 // ---------------------------------------------------------------------------
 
 describe("useEditAndApproveAction — editAndShareApprove", () => {
@@ -221,7 +205,9 @@ describe("useEditAndApproveAction — editAndShareApprove", () => {
     mockShareNative.mockResolvedValue(undefined);
 
     const { useEditAndApproveAction } = await import("../use-queue-actions");
-    const hook = useEditAndApproveAction();
+    const hook = useEditAndApproveAction({
+      onRequestSmsShare: mockRequestSmsShare,
+    });
 
     hook.editAndShareApprove(smsRow.id, "Edited body", smsRow.lead.firstName);
 
@@ -236,38 +222,32 @@ describe("useEditAndApproveAction — editAndShareApprove", () => {
     });
   });
 
-  test("flag OFF + no native share: calls openDrawer, stores pending edit for onApproveDrawer", async () => {
+  test("flag OFF + no native share: calls onRequestSmsShare with body, id, and leadName", async () => {
     mockIsFeatureEnabled.mockReturnValue(false);
     mockCanUseNativeShare.mockReturnValue(false);
 
     const { useEditAndApproveAction } = await import("../use-queue-actions");
-    const hook = useEditAndApproveAction();
+    const hook = useEditAndApproveAction({
+      onRequestSmsShare: mockRequestSmsShare,
+    });
 
     hook.editAndShareApprove(smsRow.id, "Edited body", smsRow.lead.firstName);
 
-    expect(mockOpenDrawer).toHaveBeenCalledWith(
+    expect(mockRequestSmsShare).toHaveBeenCalledWith(
       "Edited body",
       smsRow.id,
       smsRow.lead.firstName,
     );
     expect(mockMutate).not.toHaveBeenCalled();
-
-    // Drawer onApprove triggers editAndApprove.mutate with body=editedBody, skipDispatch: true
-    hook.smsShareState.onApproveDrawer();
-
-    expect(mockMutate).toHaveBeenCalledWith({
-      id: smsRow.id,
-      body: "Edited body",
-      skipDispatch: true,
-    });
-    expect(mockCloseDrawer).toHaveBeenCalled();
   });
 
   test("flag ON: calls editAndApprove.mutate directly without skipDispatch", async () => {
     mockIsFeatureEnabled.mockReturnValue(true);
 
     const { useEditAndApproveAction } = await import("../use-queue-actions");
-    const hook = useEditAndApproveAction();
+    const hook = useEditAndApproveAction({
+      onRequestSmsShare: mockRequestSmsShare,
+    });
 
     hook.editAndShareApprove(smsRow.id, "Edited body", smsRow.lead.firstName);
 
@@ -276,6 +256,6 @@ describe("useEditAndApproveAction — editAndShareApprove", () => {
       body: "Edited body",
     });
     expect(mockShareNative).not.toHaveBeenCalled();
-    expect(mockOpenDrawer).not.toHaveBeenCalled();
+    expect(mockRequestSmsShare).not.toHaveBeenCalled();
   });
 });

@@ -421,7 +421,77 @@ test.describe("SMS Share — E2E", () => {
   });
 
   // -------------------------------------------------------------------------
-  // 7. Flag ON: Twilio path runs, share UI never appears
+  // 7. Desktop edit & approve via drawer: edited body propagates through
+  // -------------------------------------------------------------------------
+
+  test("desktop edit & approve via drawer: dialog closes, drawer shows leadName and edited body, Copy approves with edited body", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await routePostHog(page, {});
+    await stubDesktopShare(page);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const lead = await seedLead({
+      firstName: "SmsEditDesktop",
+      lastName: `E2E-${suffix}`,
+    });
+    leadIds.push(lead.id);
+
+    const originalBody = `Original desktop body ${suffix}`;
+    const editedBody = `Edited desktop body ${suffix}`;
+
+    const msg = await seedPendingMessage({
+      leadId: lead.id,
+      channel: "sms",
+      body: originalBody,
+      priority: 80,
+    });
+    messageIds.push(msg.id);
+
+    await page.goto("/dashboard");
+    const queue = new ActionQueueSection(page);
+    await expect(queue.row(msg.id)).toBeVisible();
+
+    // Open edit dialog, change body, save
+    await queue.editButton(msg.id).click();
+    await expect(page.getByTestId(`edit-dialog-${msg.id}`)).toBeVisible();
+    await queue.editBody(msg.id).fill(editedBody);
+    await queue.editSave(msg.id).click();
+
+    // Dialog closes and drawer opens
+    await expect(page.getByTestId(`edit-dialog-${msg.id}`)).not.toBeVisible();
+    await expect(page.getByTestId("sms-share-drawer")).toBeVisible();
+
+    // Drawer title contains lead's first name
+    await expect(page.getByTestId("sms-share-title")).toHaveText(
+      `Send message to ${lead.firstName}`,
+    );
+
+    // Click Copy — approves with the edited body
+    await page.getByTestId("sms-share-copy").click();
+
+    await expect(page.getByTestId("sms-share-drawer")).not.toBeVisible();
+    await expect(queue.row(msg.id)).toBeHidden();
+    await expect(
+      page.getByTestId("app-toast").filter({ hasText: "Draft approved" }),
+    ).toBeVisible();
+
+    const dbState = await getMessageStatus(msg.id);
+    expect(dbState?.status).toBe("edited_and_approved");
+    expect(dbState?.body).toBe(editedBody);
+    expect(dbState?.original_body).toBe(originalBody);
+    expect(dbState?.sent_at).not.toBeNull();
+
+    const convRows = await getConversationsForMessage(msg.id);
+    expect(convRows).toHaveLength(0);
+  });
+
+  // -------------------------------------------------------------------------
+  // 8. Flag ON: Twilio path runs, share UI never appears (was 7)
   // -------------------------------------------------------------------------
 
   test("flag ON: Twilio dispatch path runs, share drawer never shown", async ({

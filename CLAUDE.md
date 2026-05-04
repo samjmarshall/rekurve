@@ -86,3 +86,9 @@ Use the `frontend-design` skill when implementing UI components, pages, or layou
 ### Verification
 
 **NEVER run `make build`, `make check`, `make test`, or `make test_e2e` directly via Bash.** Always use **@agent-codebase-verification**! This applies to both proactive post-code-change verification *and* explicit user requests ("run make test", "run the e2e suite"). The agent isolates verbose build/test output from the main context and returns a compact pass/fail result.
+
+---
+
+## Frontend Architecture
+
+**Context Providers**: reserved for genuinely global state (auth, theme, feature flags, transport clients, routing). For page- or modal-local state, inline `useState` in the owning component and pass values down as explicit named props — never extract into a custom hook (callable elsewhere) or a Context Provider (widens the read/write surface to the whole subtree). See [ADR-012](docs/adr/adr012-context-providers-for-global-state-only.md).

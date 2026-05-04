@@ -13,6 +13,12 @@
       "skillPath": "domain-model/SKILL.md",
       "computedHash": "4d91ed2249dbf6f96f7aa5b9fca069c8a3837b6dea3c06620335efbc0f7971e3"
     },
+    "grill-with-docs": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/grill-with-docs/SKILL.md",
+      "computedHash": "31a5b1ae116558bf7d3f633f442835f54bd7645923d4f45c7823e52a97317666"
+    },
     "improve-codebase-architecture": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -23,6 +29,18 @@
       "source": "rstackjs/agent-skills",
       "sourceType": "github",
       "computedHash": "8ca3c141b9019509b9f1d43a2d1c14860507955907a9ec582a5e361e79c85296"
+    },
+    "to-issues": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/to-issues/SKILL.md",
+      "computedHash": "73a91f30784523aa59ec9b02769576ebfc738e2cd5ad8f6441076031f0a5d5ac"
+    },
+    "triage": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/triage/SKILL.md",
+      "computedHash": "2b6efb6da12d92551772fcc04acf331f4e0e6f7bd9d4cb23ce0b301e0b128feb"
     },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",

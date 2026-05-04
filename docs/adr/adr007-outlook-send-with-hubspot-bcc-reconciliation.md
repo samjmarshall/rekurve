@@ -21,3 +21,14 @@ Outbound email approved on `/dashboard` is sent via Microsoft Graph `/me/sendMai
 - **MSAL `acquireTokenByCode` workaround.** The SDK's typed result drops `refresh_token`, so the OAuth callback POSTs `/oauth2/v2.0/token` directly to capture it. If MSAL changes its surface, the hand-rolled fetch needs review — this is fragile against SDK upgrades and worth flagging in code review when `@azure/msal-node` is bumped.
 
 This ADR records the shipped state. A successor design (`thoughts/designs/2026-04-27-email-compose-providers.md`) is under active consideration in response to [#154](https://github.com/samjmarshall/www/issues/154) (silent SMTP failure) and [#156](https://github.com/samjmarshall/www/issues/156) (MIME-content sendMail); if it ships, it will supersede this ADR.
+
+## Consequence update — 2026-05-04 (ADR-013 / ADR-014)
+
+The *core decision* of this ADR — Outlook + HubSpot BCC over Resend / Single-Send / direct Engagements POST — is preserved under [ADR-013](adr013-local-db-canonical-for-lead-data.md). The *mechanism* changes:
+
+- The synchronous Microsoft Graph send from the approve mutation moves into an Inngest worker subscribed to a `message.approval-requested` event published through the [outbox](adr014-outbox-pattern-for-inngest-delivery.md). The mutation commits the message-state transition locally and returns to the Consultant immediately; the Graph send happens in the worker.
+- The BCC reconciliation flow becomes a `step.waitForEvent("hubspot.email.engagement-created", { match: "data.correlationId" })` keyed by a generated correlation ID stamped into the email's `internetMessageId` header. The fuzzy ±5-minute subject match window is replaced by deterministic correlation. The `hubspotActivityId` nullable window survives but is bounded by the `step.waitForEvent` timeout instead of "indefinitely if the webhook is dropped."
+- A `step.waitForEvent` timeout (e.g. 1 h) emits `hubspot.engagement-missed` for the operator surface, replacing the silent indefinite-null state and removing one of the open consequences of this ADR.
+- The Graph 202-then-silent-bounce gap (#154) becomes a separate Inngest function subscribed to a future Graph webhook for delivery status; the worker stamps the bounce on the local `conversations` row instead of leaving the dashboard saying "Sent" while SMTP later rejects.
+
+The schema is unchanged. The choice of Outlook is unchanged. The single-mailbox-per-Consultant lock-in stands. The successor design referenced above folds into the ADR-013 / ADR-014 plan rather than superseding this ADR independently.

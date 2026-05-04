@@ -2,10 +2,9 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import posthog from "posthog-js";
-import { useRef } from "react";
 import { useToastManager } from "~/components/ui/toast";
 import { type RouterOutputs, useTRPC } from "~/trpc/react";
-import { canUseNativeShare, shareNative, useSmsShare } from "./use-sms-share";
+import { canUseNativeShare, shareNative } from "./use-sms-share";
 
 type ListPending = RouterOutputs["messages"]["listPending"];
 type ListPendingRow = ListPending[number];
@@ -89,27 +88,18 @@ function buildErrorToast(err: unknown, defaultTitle: string): ToastOptions {
   };
 }
 
-export type SmsShareState = {
-  isDrawerOpen: boolean;
-  pendingBody: string;
-  pendingMessageId: string;
-  pendingLeadName: string;
-  onApproveDrawer: () => void;
-  onCancelDrawer: () => void;
-};
+interface SmsShareOptions {
+  onRequestSmsShare: (
+    body: string,
+    messageId: string,
+    leadName: string,
+  ) => void;
+}
 
-export function useApproveAction() {
+export function useApproveAction({ onRequestSmsShare }: SmsShareOptions) {
   const trpc = useTRPC();
   const toast = useToastManager();
   const optimistic = useOptimisticRemove();
-  const {
-    isDrawerOpen,
-    openDrawer,
-    closeDrawer,
-    pendingBody,
-    pendingMessageId,
-    pendingLeadName,
-  } = useSmsShare();
 
   const approve = useMutation(
     trpc.messages.approve.mutationOptions({
@@ -141,33 +131,16 @@ export function useApproveAction() {
           .then(() => approve.mutate({ id: row.id, skipDispatch: true }))
           .catch(() => {});
       } else {
-        openDrawer(row.body, row.id, row.lead.firstName);
+        onRequestSmsShare(row.body, row.id, row.lead.firstName);
       }
     } else {
       approve.mutate({ id: row.id });
     }
   };
 
-  const onApproveDrawer = () => {
-    approve.mutate({ id: pendingMessageId, skipDispatch: true });
-    closeDrawer();
-  };
-
-  const onCancelDrawer = () => {
-    closeDrawer();
-  };
-
   return {
     ...approve,
     handleApprove,
-    smsShareState: {
-      isDrawerOpen,
-      pendingBody,
-      pendingMessageId,
-      pendingLeadName,
-      onApproveDrawer,
-      onCancelDrawer,
-    } satisfies SmsShareState,
   };
 }
 
@@ -198,19 +171,12 @@ export function useDismissAction() {
   );
 }
 
-export function useEditAndApproveAction() {
+export function useEditAndApproveAction({
+  onRequestSmsShare,
+}: SmsShareOptions) {
   const trpc = useTRPC();
   const toast = useToastManager();
   const optimistic = useOptimisticRemove();
-  const {
-    isDrawerOpen,
-    openDrawer,
-    closeDrawer,
-    pendingBody,
-    pendingMessageId,
-    pendingLeadName,
-  } = useSmsShare();
-  const pendingEditRef = useRef<{ id: string; body: string } | null>(null);
 
   const editAndApprove = useMutation(
     trpc.messages.editAndApprove.mutationOptions({
@@ -250,39 +216,16 @@ export function useEditAndApproveAction() {
           )
           .catch(() => {});
       } else {
-        pendingEditRef.current = { id, body: editedBody };
-        openDrawer(editedBody, id, leadFirstName);
+        onRequestSmsShare(editedBody, id, leadFirstName);
       }
     } else {
       editAndApprove.mutate({ id, body: editedBody });
     }
   };
 
-  const onApproveDrawer = () => {
-    if (pendingEditRef.current) {
-      const { id, body } = pendingEditRef.current;
-      editAndApprove.mutate({ id, body, skipDispatch: true });
-      pendingEditRef.current = null;
-    }
-    closeDrawer();
-  };
-
-  const onCancelDrawer = () => {
-    pendingEditRef.current = null;
-    closeDrawer();
-  };
-
   return {
     ...editAndApprove,
     editAndShareApprove,
-    smsShareState: {
-      isDrawerOpen,
-      pendingBody,
-      pendingMessageId,
-      pendingLeadName,
-      onApproveDrawer,
-      onCancelDrawer,
-    } satisfies SmsShareState,
   };
 }
 

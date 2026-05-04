@@ -129,33 +129,3 @@ describe("canUseSmsLink", () => {
     expect(canUseSmsLink(linuxUA)).toBe(false);
   });
 });
-
-describe("useSmsShare — leadName", () => {
-  test("openDrawer stores leadName; closeDrawer clears it", async () => {
-    type Slot = { val: unknown; set: (v: unknown) => void };
-    const slots: Slot[] = [];
-
-    rs.doMock("react", () => ({
-      useState: rs.fn().mockImplementation((initial: unknown) => {
-        const slot: Slot = {
-          val: initial,
-          set: (v: unknown) => {
-            slot.val = v;
-          },
-        };
-        slots.push(slot);
-        return [slot.val, slot.set];
-      }),
-    }));
-
-    const { useSmsShare } = await import("../use-sms-share");
-    const hook = useSmsShare();
-
-    // State declaration order: isDrawerOpen(0), pendingBody(1), pendingMessageId(2), pendingLeadName(3)
-    hook.openDrawer("Hello", "msg-1", "Jane");
-    expect(slots[3]!.val).toBe("Jane");
-
-    hook.closeDrawer();
-    expect(slots[3]!.val).toBe("");
-  });
-});

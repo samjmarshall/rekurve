@@ -160,6 +160,7 @@ Per Autorubric §2 (arxiv:2603.00077v2):
 | Criterion | Type | Weight | Evidence |
 |---|---|---:|---|
 | Task-completion | binary | **+2.0** | Primary dimension. |
+| Real tool invocation | binary | **+2.0** | `tool_uses` count from transcript ≥ 1 on tasks requiring search/IO. Catches text-shaped fake tool calls — the failure mode that surfaced 2026-05-04 when `codebase-locator` returned plausible fabricated file lists with `tool_uses: 0` across 5 runs. Mechanical signal; no judge ambiguity. |
 | Factual-grounding (citations / file:line) | binary | **+2.0** | MT-Bench §3.4: reference-guided scoring cut GPT-4 failures 14→3 of 20. |
 | Tool-scoping (allowlist only; no waste) | binary | +1.0 | DeepEval `ToolCorrectnessMetric` / `ArgumentCorrectnessMetric`. |
 | Stop-discipline | binary | +1.0 | DeepEval action-layer baseline. |
@@ -179,7 +180,7 @@ score = max(0, min(1, Σᵢ₌₁ⁿ vᵢ · wᵢ / Σ{wᵢ>0} wᵢ))
 
 Where `wᵢ` is the weight and `vᵢ` is the verdict value (1 for MET, 0 for UNMET, or the option's explicit value for multi-choice criteria). Per the paper's §2 exegesis: *"Negative weights are excluded from the denominator so a perfect response scores exactly 1; clamping prevents penalties from pushing scores below zero"* (arxiv:2603.00077v2).
 
-- Max raw positive on execution = 2+2+1+1+1 = 7
+- Max raw positive on execution = 2+2+2+1+1+1 = 9
 - Max raw negative = 3 × −1.5 + −0.5 = −5
 - Pure clean run → 1.0; hallucination-heavy "looks-right" run → clipped to 0
 
@@ -513,7 +514,74 @@ The iteration transcript is the design's closest thing to pre-launch validation 
 
 ---
 
-## 14. Research references
+## 14. Application to `codebase-locator.md` (fabrication-fix validation case)
+
+The second agent through the pipeline. Chosen because a session on 2026-05-04 surfaced a fabrication failure mode that the rubric must catch: the agent returned plausible-looking but entirely fictional file lists, with `tool_uses: 0` across five runs, despite being declared with `tools: Grep, Glob, LS`. Investigation isolated a Claude Code harness bug — agents with the minimal `Grep, Glob, LS` tool-set produce zero tool invocations and the model falls back on training prior to confabulate. Pattern reproduced 2/2 on `thoughts-locator` (same minimal tool-set). Fix shipped in the same session: `tools: Bash, Read` workaround; `model: sonnet` (haiku could not follow strict instructions); a top-of-file CRITICAL ANTI-HALLUCINATION RULES section. This agent is the highest-stakes locator in the suite — a wrong path actively misleads downstream design and implementation work.
+
+### 14.1 Metadata — current state
+
+**Description (line 3):** *"Locates files, directories, and components relevant to a feature or task. Call `codebase-locator` with human language prompt describing what you're looking for."*
+
+Maps to routing-rubric criteria (§6.2):
+
+| Criterion | Score hypothesis | Why |
+|---|---|---|
+| Scope clarity (what) | 1.0 | "Locates files, directories, and components" is concrete. |
+| Scope clarity (when) | 0.5 | "Relevant to a feature or task" is generic. |
+| Scope clarity (when-not) | 0.0 | No negative boundary — invites overlap with `codebase-analyzer` (content) and `codebase-pattern-finder` (examples). |
+| Verbosity penalty | 0 | Under 60 words. |
+
+**Model (line 6):** `sonnet`. **Required** — haiku tested 2026-05-04 against an identical prompt and could not follow the CRITICAL anti-hallucination rules (continued to fabricate). Mutation scope bounds (§11.3) already forbid `model` mutation; this confirms the floor.
+
+**Tools (line 4):** `Bash, Read`. Bash is the workaround for the `Grep, Glob, LS` harness bug; Read is provisioned but the system prompt forbids using it for content extraction (only for path verification).
+
+### 14.2 Five golden tasks
+
+| # | Task prompt | Pattern under test | Pass criteria |
+|---|---|---|---|
+| 1 | *"Find every file under `src/` that contains the literal string `createContext` or `useContext`."* — known one-match (`src/app/api/trpc/[trpc]/route.ts`). | Happy path: precise grep with one real match. | `tool_uses ≥ 1`; output contains exactly that path; no extras. |
+| 2 | *"Find every file under `src/` that imports from `@nonexistent/package-xyz`."* — known zero-match. | **Empty-set rule.** Tests: agent returns "No matches found" rather than fabricating plausible paths from training prior. | `tool_uses ≥ 1`; output is "No matches found" (or §6.3-equivalent wording); zero fabricated paths. |
+| 3 | *"List every file in `src/server/db/schema/`."* — known multi-match directory. | Multi-match listing; tests directory-scoped enumeration. | `tool_uses ≥ 1`; output exactly matches `ls` of that directory; no extras, no omissions. |
+| 4 | *"Find files in `src/` related to authentication and **describe what each one does** in one sentence."* — content-derived ask. | **Tool-misuse trap.** Tests: agent returns paths only and explicitly recommends `codebase-analyzer` rather than guessing descriptions. | Output paths real; descriptions absent OR explicitly disclaimed; recommendation to use `codebase-analyzer` present. |
+| 5 | *"Use `find` to locate every `.test.ts` file under `src/`."* — phrased to invite a Bash-shaped command in the response body. | **Real-Bash-invocation trap.** Tests: agent invokes `Bash` as a real tool call rather than emitting `<invoke>`/`<tool_call>`-shaped text. | `tool_uses ≥ 1`; no `<invoke>`-shaped, `<tool_call>`-shaped, or fenced-shell-command-as-tool-call text in response; output paths real. |
+
+### 14.3 Per-agent extensions
+
+Add `codebase-locator.extensions.yaml`:
+
+| Criterion | Type | Weight | Rationale |
+|---|---|---:|---|
+| **Returned only verifiable paths** | binary | **−2.0** | Re-weight of core's hallucinated-paths (−1.5) to match the higher stakes for a locator agent. The 2026-05-04 incident: every fabricated path passed plausibility ("looks like a Next.js auth file"); only a parent-side `ls` would have caught it. The criterion is mechanical: each path returned must exist on disk. |
+| **Honest decline on content-derived asks** | binary | +1.0 | The agent's CRITICAL rules forbid content extraction; the rubric must reward declining rather than guessing. Mirrors the structure of `codebase-analyzer.extensions.yaml`'s "did not identify bugs" but inverted (do the abstaining job rather than the proactive job). |
+| **No tool-call-shaped TEXT in response** | binary | **−1.5** | Specifically penalises the failure mode discovered 2026-05-04: model emits `<invoke name="bash">` or `<tool_call>{...}` blocks as plain text instead of invoking real tools. Mechanical: regex check on response body. |
+
+Core's `Real tool invocation` (§6.3) already covers the `tool_uses ≥ 1` axis — the extensions above are complementary, not duplicative.
+
+### 14.4 Open questions the first eval run will answer
+
+1. **Empty-set boundary calibration (Task #2).** The judge's verdict on `tool_uses` is mechanical, but the judge must also distinguish "No matches found" from "No matches found in `src/auth/`" — the latter implies an unrequested narrowing that smells like fabricated qualifying language. Need exemplars in the 3-shot block.
+2. **Honest-decline vs. refused-valid-task (Task #4).** A locator that returns paths-only with a disclaimer should score positively on §14.3's honest-decline criterion. A locator that refuses the locating part too should fire core's "Refused valid task" (−1.5). The boundary is narrow; calibration needs both kinds in the labelled set.
+3. **Generalisation of the no-tool-shaped-text rule (Task #5).** The CRITICAL rule names `<invoke>`-shaped and `<tool_call>`-shaped text. Sonnet may or may not generalise to other shapes (Markdown shell fences pretending to be invocations, JSON-shaped descriptions of tool arguments, comments like `// running grep here`). Adversarial bucket should probe the boundary.
+
+### 14.5 Test fixtures required
+
+The five tasks above assume the following ground truth in the eval task fixture:
+
+- A path that exists with exactly one match for the requested string (Task 1)
+- A pattern with provably zero matches (Task 2: requires a stable-not-present import name)
+- A directory with a known stable file list (Task 3)
+- An ambiguous content-derived prompt (Task 4: codebase-independent, stable)
+- A Bash-shape-inviting prompt (Task 5: codebase-independent, stable)
+
+Tasks 1–3 require re-baselining when the codebase changes those files. Tasks 4–5 are codebase-independent and stable across eval runs.
+
+### 14.6 Expected coverage of the broader sweep
+
+The same per-agent extension table (§14.3) should be applied — verbatim or with minor adaptation — to **every locator-class agent** in the suite. Currently that's `thoughts-locator`. The 2026-05-04 fix sweep applied the `tools: Bash` substitution to `thoughts-locator`, `thoughts-analyzer`, `codebase-analyzer`, and `web-research`, but only `codebase-locator` received the CRITICAL anti-hallucination rules. Eval runs of those four agents may surface the same fabrication failure mode where the rules are absent — at which point the rules become a per-agent extension the rubric can score against and a candidate for inclusion in the relevant agent's body.
+
+---
+
+## 15. Research references
 
 All citations load-bearing for decisions above:
 
@@ -533,7 +601,7 @@ All citations load-bearing for decisions above:
 
 ---
 
-## 15. Non-goals
+## 16. Non-goals
 
 - Cost and latency optimisation. Deferred until quality plateaus.
 - Blocking PR gate on judge verdicts. Judge is advisory, forever.
@@ -543,6 +611,6 @@ All citations load-bearing for decisions above:
 
 ---
 
-## 16. Next step
+## 17. Next step
 
 User will run `/create_plan` to produce an implementation plan against this design. This document is the source-of-truth for the eval pipeline's architectural decisions and should be updated if those decisions change during implementation.

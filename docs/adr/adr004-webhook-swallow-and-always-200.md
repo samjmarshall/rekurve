@@ -16,3 +16,14 @@ The HubSpot webhook handler at `POST /api/hubspot/webhook` validates the v3 sign
 - **Idempotency is a hard requirement of every event handler.** Because retries don't exist, the handler must be safe to receive the same event twice — HubSpot does occasionally re-deliver after network partitions. All current handlers satisfy this: `contact.creation` upserts on `hubspot_contact_id`, `contact.propertyChange` writes a single field by primary key, `contact.deletion` is a `DELETE WHERE` no-op on missing rows, `object.creation` for emails reconciles via an `isNull(hubspotActivityId)` guard. New handlers must continue this pattern; throwing on a "duplicate" event is a bug, not a defence.
 - **Adding a new subscription type means consciously copying the try/catch dispatch shape.** A handler that throws breaks the contract and re-introduces retry storms. The current `route.ts` structure makes this mistake easy to spot in review (one switch arm per type, one try/catch outside the switch), but there is no compile-time enforcement.
 - **Signature and timestamp validation are the only hard rejections.** This is the explicit boundary of the always-200 rule. A request that fails the v3 signature check or arrives outside the 5-minute window returns 401; everything past that gate is best-effort. Future hardening (e.g. payload schema validation) has to decide which side of the gate it sits on — pre-gate failures must remain 4xx, post-gate failures must remain 200.
+
+## Consequence update — 2026-05-04 (ADR-013 / ADR-014)
+
+Under [ADR-013](adr013-local-db-canonical-for-lead-data.md), the local DB is canonical for Lead data and HubSpot is downstream. Two of the four event arms change shape:
+
+- **`contact.propertyChange`** — log-and-drop. The local DB is canonical; honouring HubSpot direct edits would be bidirectional sync, which we deferred to post-PMF. The handler returns the event to the always-200 path without applying any change.
+- **`contact.deletion`** — log-and-drop. Same reasoning.
+- **`contact.creation`** — unchanged in posture, but now writes through the [outbox](adr014-outbox-pattern-for-inngest-delivery.md) instead of calling `scoreLead` and `startOrUpdateSequence` directly. The local row is inserted in a transaction that also inserts a `lead.captured` outbox row; Inngest workers then pick up scoring and Follow-up plan start.
+- **`object.creation`** for emails — unchanged. ADR-007's reconciliation surface stays.
+
+The always-200 rule, signature-as-only-hard-rejection rule, and idempotency-required-for-every-handler rule are all preserved. The handler shrinks but the contract does not.

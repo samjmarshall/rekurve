@@ -25,6 +25,14 @@ One of `unqualified | nurture | warm | hot`. Derived from the Score, persisted o
 **Qualifying field**:
 A field that, when changed, triggers `scoreLead()` to re-run. Defined as `SCORING_FIELDS` in `src/server/api/routers/leads.ts`. Out-of-band edits to non-qualifying fields skip re-scoring.
 
+**Follow-up plan**:
+A Lead's active autopilot follow-up. Carries the rhythm (3-day for unqualified, 7-day for warm, 14-day for nurture) and the timing of the next outbound message. One Lead has at most one active Follow-up plan at a time. Run state is owned by Inngest (one function instance per active plan); the local DB owns the *outputs* of the plan (drafted Follow-up messages in `message_queue`) but not the plan's control state.
+_Avoid_: "sequence" in prose (legacy term, on its way out with the `nurture_sequences` table).
+
+**Follow-up message**:
+One drafted outbound message produced by a Follow-up plan when its rhythm fires — written by Claude, dropped into `message_queue` for the Consultant to approve. The unit ADR-009's "one missed touch, never more" bound was framed in.
+_Avoid_: "step" (collides with Inngest's `step.run` primitive once the migration lands).
+
 ## Relationships
 
 - A **Consultant** captures **Leads** through the app; every Lead has exactly one **Contact** in HubSpot.

@@ -1,11 +1,18 @@
 ---
 name: ticket-writer
-description: Interactive guide for writing clear, actionable Jira, Linear, GitHub, or File tickets through collaborative refinement. Use when users want to create, review, or improve tickets, user stories, bugs, epics, technical tasks, or spikes. Helps eliminate ambiguity by challenging vague requirements and ensuring tickets contain complete context, testable acceptance criteria, and actionable requirements before development begins. Also use for breaking down large work, writing acceptance criteria, or ensuring tickets are "ready for development."
+description: Single entry point for turning a design, plan, PRD, or in-chat spec into either a single GitHub Issue or a parent epic with child issues. Use when the user wants to create, review, or improve any ticket destined for a coding agent or another developer to pick up. Covers atomic issues, bug reports, technical tasks, spikes, and epic breakdowns using tracer-bullet vertical slices. Output is AFK-ready by default — written so a coding agent days later can produce the right work without the original chat context.
 ---
 
 # Ticket Writer Skill
 
-Guide experienced engineers through writing high-quality tickets for Jira, Linear, GitHub, or File through a skeptical, thorough, and iterative collaborative process.
+Single entry point for ticket creation. Two shapes of work:
+
+1. **Atomic issue** — one user story, bug, technical task, or spike. Use the workflow in this file.
+2. **Epic + child issues** — a design / plan / PRD broken into independently-grabbable vertical slices. Use the workflow in **[references/epic-breakdown.md](references/epic-breakdown.md)**.
+
+Every ticket body must be **AFK-ready** by default — durable enough that a coding agent picking it up days later, with no access to the original chat context, can produce the right work. The principles are in **[references/agent-brief.md](references/agent-brief.md)** and they apply to atomic issues and epic children alike.
+
+Guide experienced engineers through writing these tickets via a skeptical, thorough, iterative collaborative process.
 
 ## Core Philosophy
 
@@ -25,7 +32,7 @@ When users request help with tickets, follow this collaborative process:
 
 Ask clarifying questions:
 - **Type**: User story, bug, technical task, epic/project, or spike?
-- **System**: Jira, Linear, GitHub, or File?
+- **Destination**: GitHub Issue or local file (`thoughts/tickets/...`)?
 - **State**: Starting from scratch, improving existing, or reviewing?
 - **Audience**: Who will implement this?
 - **Purpose**: What problem is being solved?
@@ -94,13 +101,21 @@ Present draft tickets and explicitly ask:
 
 Continue refining until passing the **"Ready for Development" test**: A developer unfamiliar with the context could complete it without asking clarifying questions.
 
-### 5. Provide Appropriate Template
+### 5. Apply the AFK-agent body principles, then offer a template
 
-Based on ticket type, offer the relevant template from references:
+Every ticket body — atomic issue or epic child — must satisfy the principles in **[references/agent-brief.md](references/agent-brief.md)**:
+
+- **Durability over precision** — describe interfaces and behaviour, not file paths or line numbers (those go stale).
+- **Behavioural, not procedural** — say *what* the system should do, let the agent decide *how*.
+- **Complete, testable acceptance criteria** — each one binary pass/fail, mechanically verifiable.
+- **Explicit Out-of-Scope section** — defensive contract that stops gold-plating.
+
+Then, based on ticket type, offer the relevant per-type template:
+
 - **User stories**: See [references/story-template.md](references/story-template.md)
 - **Bugs**: See [references/bug-template.md](references/bug-template.md)
 - **Technical tasks**: See [references/task-template.md](references/task-template.md)
-- **Epics/Projects**: See [references/epic-template.md](references/epic-template.md)
+- **Epics/Projects**: See [references/epic-template.md](references/epic-template.md) — and follow the breakdown workflow in [references/epic-breakdown.md](references/epic-breakdown.md) for the children.
 - **Spikes**: See [references/spike-template.md](references/spike-template.md)
 
 ---
@@ -183,51 +198,24 @@ Then I should receive a reset email within 2 minutes
 
 **Ideal ticket size**: Can be completed in 1-2 days by one developer (including implementation, testing, code review, fixes).
 
-**If >2 days**: Break it down further.
+**If >2 days**: Break it down into a parent epic + tracer-bullet child slices. Use the workflow in **[references/epic-breakdown.md](references/epic-breakdown.md)** — it covers vertical-slice rules, the quiz-the-user loop, dependency-ordered publishing, and parent/child wiring via `gh`.
 
-### Vertical Slicing
+### Tracer-bullet vertical slices (summary)
 
-**Bad** (horizontal by layer):
-- Story 1: Build all database tables
-- Story 2: Build all APIs
-- Story 3: Build all UIs
-→ Nothing shippable until all complete
+A child slice cuts through every relevant layer end-to-end (schema + API + UI + tests + docs as applicable). Not a horizontal layer cake.
 
-**Good** (vertical by feature):
-- Story 1: Password reset (database + API + UI)
-- Story 2: Password change (database + API + UI)
-→ Each story independently shippable
+| Bad (horizontal by layer) | Good (vertical by behaviour) |
+|---|---|
+| Issue 1: Build all schema | Issue 1: Password reset path (schema + API + UI + test) |
+| Issue 2: Build all APIs | Issue 2: Password change path (schema + API + UI + test) |
+| Issue 3: Build all UIs | Issue 3: Password complexity rules (validation + UI hint + test) |
+| → Nothing shippable until all complete | → Each issue shippable on its own |
+
+A completed slice is demoable or verifiable on its own. Prefer many thin slices over few thick ones. Each slice gets its own `**Work-readiness:** AFK / HITL — <reason>` tag.
 
 ---
 
 ## System-Specific Guidance
-
-### Jira
-
-**Key fields**: Issue Type, Priority, Components, Labels, Epic Link, Sprint, Story Points, Assignee
-
-**Link types**: "is blocked by" / "blocks" (critical), "relates to", "duplicates"
-
-**Best practices**:
-- Clone well-groomed tickets for consistency
-- Use templates for descriptions
-- Centralize info in Jira (not Slack)
-- Link to Confluence for detailed specs (don't duplicate)
-
-### Linear
-
-**Philosophy**: "Write issues, not user stories"-be direct for simple tasks.
-
-**Key fields**: Status, Priority, Estimate, Labels, Project, Cycle, Team
-
-**Hierarchy**: Issues (atomic) → Projects (weeks) → Initiatives (goals) → Cycles (1-2 weeks)
-
-**Best practices**:
-- Keep issues small (1-2 days)
-- Use keyboard shortcuts (C create, E edit, T status)
-- Leverage Git integration for auto-status updates
-- Don't save everything to backlog
-- Use project updates for stakeholder communication
 
 ### GitHub Issues
 
@@ -455,7 +443,7 @@ Watch for and challenge:
    - How many users affected?
    - Design mockups or style guide available?
 
-4. **System**: Jira, Linear, GitHub, or File?
+4. **Destination**: GitHub Issue or local file (`thoughts/tickets/...`)?
 
 Once you answer these, I'll help you craft a detailed ticket with proper acceptance criteria, technical considerations, and all context your team needs."
 
@@ -467,53 +455,17 @@ This approach:
 
 ---
 
-## MCP Tool Integration
+## Creating Issues via `gh` CLI
 
-When MCP servers are available, the ticket-writer skill can directly create, update, and manage tickets in your project management system.
+Use the `gh` CLI for all GitHub operations. Common operations:
 
-### Available Operations
+- Create: `gh issue create --title "…" --body "$(cat <<'EOF' … EOF)" --label "…"`
+- Update: `gh issue edit <N> --body "…" --add-label "…"`
+- Comment: `gh issue comment <N> --body "…"`
+- Close: `gh issue close <N> --comment "…"`
+- Search: `gh issue list --label "…" --state open --json number,title,labels`
 
-**If GitHub MCP is available:**
-- Create issues directly: `github__create_issue`
-- Update existing issues: `github__update_issue`
-- Add labels: `github__add_labels_to_issue`
-- Link to milestones: Associate issues with releases
-- Reference in commits: Use `Closes #123` syntax in PR descriptions
-- Create pull requests: `github__create_pull_request` with issue linking
-- Add comments: `github__add_issue_comment` for collaboration
-- Search issues: `github__list_issues` with filters
-
-**If Jira MCP is available:**
-- Create issues with proper type: `jira__create_issue`
-- Link related issues: `jira__link_issues` (blocks, relates to, duplicates)
-- Assign to sprint: `jira__move_issues_to_sprint`
-- Transition workflow: `jira__transition_issue` (To Do → In Progress → Done)
-- Add comments: `jira__add_comment`
-- Search with JQL: `jira__search_issues`
-
-**If Linear MCP is available:**
-- Create issues: `linear__create_issue`
-- Associate with projects: `linear__add_issue_to_project`
-- Add to cycles: `linear__add_issue_to_cycle`
-- Update status: `linear__update_issue_status`
-- Add labels: `linear__add_label_to_issue`
-- Assign to users: `linear__assign_issue`
-
-### Workflow with MCP
-
-1. **Gather requirements** through questioning
-2. **Draft ticket content** collaboratively
-3. **Review with user** for completeness
-4. **Create + link + populate in one turn**: After plan approval, create tickets, wire sub-issue relationships, add to the project, and set fields - one turn, no re-confirmation. Linking and field assignment are part of "create".
-5. **If no MCP / CLI available**: Provide formatted markdown for manual entry.
-
-### Benefits of MCP Integration
-
-- **Consistency**: Tickets created with validated structure
-- **Speed**: Eliminate copy-paste and manual field population
-- **Traceability**: Automatic linking and cross-referencing
-- **Validation**: Ensure required fields are populated before creation
-- **Iteration**: Easy to update tickets as requirements evolve
+After plan approval, create tickets, wire sub-issue relationships, add to the project, and set fields in one turn. Linking and field assignment are part of "create".
 
 ---
 
@@ -527,5 +479,4 @@ When MCP servers are available, the ticket-writer skill can directly create, upd
 6. **Be skeptical**: Challenge vague requirements, identify gaps
 7. **Respect teammates**: Well-written tickets respect everyone's time
 8. **Iterate**: First draft is rarely perfect; refine collaboratively
-9. **System awareness**: Tailor to Jira or Linear conventions
-10. **Enforce standards**: Use Definition of Ready rigorously
+9. **Enforce standards**: Use Definition of Ready rigorously

@@ -49,6 +49,8 @@ export const env = createEnv({
       .string()
       .regex(/^\+\d{8,15}$/, "Must be E.164")
       .optional(),
+    INNGEST_EVENT_KEY: z.string().min(1).optional(),
+    INNGEST_SIGNING_KEY: z.string().min(1).optional(),
   },
 
   /**
@@ -91,6 +93,8 @@ export const env = createEnv({
     TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
     TWILIO_FROM_NUMBER: process.env.TWILIO_FROM_NUMBER,
     TWILIO_CONSULTANT_NUMBER: process.env.TWILIO_CONSULTANT_NUMBER,
+    INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
+    INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

@@ -63,6 +63,9 @@ env_pull_preview:
 release:
 	yarn release
 
+inngest_dev:
+	yarn inngest:dev
+
 clean:
 	rm -rf .next/ next-env.d.ts tsconfig.tsbuildinfo \
 		node_modules .yarn/cache .yarn/install-state.gz \

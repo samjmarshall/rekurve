@@ -102,6 +102,11 @@ Point-in-time architecture decisions — why we chose X over Y — live in [`doc
 | [007](adr/adr007-outlook-send-with-hubspot-bcc-reconciliation.md) | Outlook send with HubSpot BCC reconciliation |
 | [008](adr/adr008-nurture-auto-start-is-best-effort.md) | Nurture auto-start failures are swallowed on the lead write path |
 | [009](adr/adr009-nurture-advances-on-draft-failure.md) | Nurture scheduler advances `nextStepAt` even when `draftMessage` throws |
+| [010](adr/adr010-inngest-source-of-truth-for-followup-plan.md) | Inngest is the source of truth for Follow-up plan run state |
+| [011](adr/adr011-followup-drafts-retry-then-pause.md) | Follow-up drafts retry then pause on persistent failure |
+| [012](adr/adr012-context-providers-for-global-state-only.md) | Context Providers reserved for genuinely global state only |
+| [013](adr/adr013-local-db-canonical-for-lead-data.md) | Local DB is the canonical store for lead data |
+| [014](adr/adr014-outbox-pattern-for-inngest-delivery.md) | Transactional outbox for at-least-once delivery to Inngest |
 
 ## Prerequisites
 
@@ -163,6 +168,8 @@ cp .env.example .env
 | `NEON_API_KEY` | Database | Neon API key (optional — local DB branching) |
 | `NEON_PROJECT_ID` | Database | Neon project ID (optional — local DB branching) |
 | `ROBOTS_TXT` | SEO | `Disallow` (default) or `Allow` |
+| `INNGEST_EVENT_KEY` | Inngest | Event API key (optional — not required for local dev server) |
+| `INNGEST_SIGNING_KEY` | Inngest | Signing key for webhook verification (optional — not required locally) |
 
 Environment validation is enforced at build time via `src/env.js` (uses `@t3-oss/env-nextjs` + Zod). Set `SKIP_ENV_VALIDATION=1` to bypass during Docker builds or CI steps that don't need the full env.
 
@@ -192,6 +199,7 @@ All commands go through the `Makefile`. Prefer `make` targets over raw `yarn`/`n
 | `make vercel_link` | Link local project to Vercel (one-time per clone) |
 | `make env_pull` | Pull development env vars from Vercel into `.env.local` |
 | `make env_pull_preview` | Pull preview env vars from Vercel for the current branch |
+| `make inngest_dev` | Start Inngest dev server at `http://localhost:8288` (run alongside `make start`) |
 | `make release` | Semantic release via `auto shipit` |
 | `make clean` | Remove `.next`, `node_modules`, caches |
 

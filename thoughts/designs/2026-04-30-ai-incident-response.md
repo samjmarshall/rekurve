@@ -57,6 +57,9 @@ PostHog handles errors *and* product analytics from one vendor. Sentry is the ea
 | **PostHog Insight alerts** | Threshold breaches on signup conversion, payment success rate, DAU | Better Stack incoming webhook |
 | **Vercel Log Drain** | Runtime logs, 5xx, uncaught exceptions, WAF deny events | Better Stack log management → log alerts |
 | **Vercel deploy webhook** | Production build failures | Better Stack incoming webhook |
+| **GitHub Actions `post-deploy.yml`** (release event) | Verified-production release event (SHA + optional release tag) | Better Stack Telemetry log ingest (release marker, not an alert source) |
+| **GitHub Actions `post-deploy.yml`** (migration heartbeat, P1) | Production DB migration failure — schema out of sync with live code | Better Stack heartbeat monitor (high-severity escalation) |
+| **GitHub Actions `post-deploy.yml`** (verification heartbeat, P3-P4) | Production E2E / integration test failure — blocks subsequent deploys including Renovate CVE patches | Better Stack heartbeat monitor (business-hours escalation) |
 | **Better Stack Uptime** | 5–10 production endpoints, 1-minute frequency, 2 regions | Better Stack incident (native) |
 
 Every signal converges on Better Stack as a single incident object before the agent ever sees it.
@@ -336,6 +339,10 @@ Each week is independently shippable.
 - Configure Vercel Log Drain → Better Stack.
 - Set up Better Stack uptime checks (5 endpoints) and 3 log-alert rules.
 - Create the synthetic "AI Triage" on-call user with a placeholder webhook (`httpbin.org/200`).
+- **Enable the BetterStack release event** in `.github/workflows/post-deploy.yml` (job `release-event`) — uncomment the "Send release event to BetterStack" step and add `BETTERSTACK_INGESTING_HOST` (var) + `BETTERSTACK_SOURCE_TOKEN` (secret). Already-live PostHog annotation in the same step is the working reference.
+- **Enable the BetterStack failure heartbeats** in `.github/workflows/post-deploy.yml` — uncomment two commented-out steps:
+  - `Notify BetterStack — production migration failed (P1)` in the `setup` job. Provision a heartbeat monitor with high-severity / out-of-hours escalation; store its URL in secret `BETTERSTACK_HEARTBEAT_MIGRATION`. Failed migrations leave schema out of sync with already-deployed code.
+  - `Notify BetterStack — production verification failed (P3-P4)` in the `override-status` job. Provision a separate heartbeat monitor with business-hours-only escalation; store its URL in secret `BETTERSTACK_HEARTBEAT_VERIFICATION`. These failures block subsequent deploys (including Renovate CVE patches) so they're real incidents, just not 2 a.m. pages.
 - **Pre-commit smoke test:** install Better Stack mobile apps, send test critical alert on real devices, verify silent-mode bypass. **Gate:** if it fails, defect to PagerDuty Pro.
 
 **Outcome:** every signal converges into Better Stack as a real incident, paging humans correctly. Alert taxonomy validated *before* an agent enters the picture.

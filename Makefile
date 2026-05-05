@@ -20,6 +20,13 @@ test:
 test_coverage:
 	yarn test --coverage
 
+# Integration tests hit a real Neon branch — gated by INTEGRATION_DB so the
+# default `make test` skips them. Locally: INTEGRATION_DB=1 make test_integration
+# (DATABASE_URL must be set). In CI, the post-deploy `integration` job sets
+# both against the resolved Preview branch.
+test_integration:
+	yarn test:integration
+
 test_e2e:
 	yarn test:e2e $(if $(PLAYWRIGHT_SHARD),--shard=$(PLAYWRIGHT_SHARD),)
 

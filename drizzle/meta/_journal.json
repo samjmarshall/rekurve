@@ -36,6 +36,13 @@
       "when": 1777417269562,
       "tag": "0004_magical_thundra",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1777982256179,
+      "tag": "0005_rapid_sentinel",
+      "breakpoints": true
     }
   ]
 }

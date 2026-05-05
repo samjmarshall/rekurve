@@ -6,7 +6,9 @@
   "scripts": {
     "build": "next build",
     "check": "biome check . && tsc --noEmit",
-    "dev": "portless run --force next dev --turbo",
+    "dev": "concurrently -k -n www,inngest -c blue,green \"yarn dev:www\" \"yarn dev:inngest\"",
+    "dev:www": "portless run --force next dev --turbo",
+    "dev:inngest": "portless run --force --name inngest.www --app-port 8288 inngest dev -u https://www.localhost/api/inngest",
     "format:check": "biome format .",
     "format:write": "biome format --write .",
     "lint": "biome lint .",
@@ -33,7 +35,6 @@
     "test": "rstest run",
     "test:watch": "rstest watch",
     "test:integration": "rstest run integration.test",
-    "inngest:dev": "inngest dev",
     "seed:dev": "tsx scripts/seed-dev.ts",
     "posthog:setup": "tsx scripts/posthog-setup.ts",
     "postinstall": "husky",

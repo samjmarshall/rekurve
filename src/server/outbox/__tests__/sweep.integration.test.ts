@@ -8,6 +8,18 @@ const TEST_EVENT = `outbox.integration.sweep.${Date.now()}.${Math.random().toStr
 
 describe.skipIf(!process.env.INTEGRATION_DB)("outboxSweep integration", () => {
   test("marks inserted rows as processed and is idempotent on re-run", async () => {
+    rs.resetModules();
+
+    // doMock must be called before importing sweep — sweep statically imports
+    // ~/inngest/client at load time, so the mock must be registered first.
+    const mockSend = rs.fn().mockResolvedValue([]);
+    rs.doMock("~/inngest/client", () => ({
+      inngest: {
+        createFunction: rs.fn().mockReturnValue({}),
+        send: mockSend,
+      },
+    }));
+
     const { db } = await import("~/server/db");
     const { outbox } = await import("~/server/db/schema/outbox");
     const { runSweep } = await import("../sweep");
@@ -19,15 +31,6 @@ describe.skipIf(!process.env.INTEGRATION_DB)("outboxSweep integration", () => {
       { eventName: TEST_EVENT, payload: { n: 2 }, createdAt: past },
       { eventName: TEST_EVENT, payload: { n: 3 }, createdAt: past },
     ]);
-
-    // Stub inngest.send so no real events are dispatched
-    const mockSend = rs.fn().mockResolvedValue([]);
-    rs.doMock("~/inngest/client", () => ({
-      inngest: {
-        createFunction: rs.fn().mockReturnValue({}),
-        send: mockSend,
-      },
-    }));
 
     const mockStep = {
       run: rs

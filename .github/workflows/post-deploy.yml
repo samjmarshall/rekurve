@@ -118,6 +118,46 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: yarn playwright install-deps
 
+  integration:
+    name: Rstest Integration (${{ github.event.client_payload.environment }})
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+      statuses: write
+
+    steps:
+      - name: Report job & status
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: "Rstest Integration"
+
+      - name: Checkout
+        uses: vercel/repository-dispatch/actions/checkout@v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Restore node_modules cache
+        uses: actions/cache/restore@v5
+        with:
+          path: node_modules
+          key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
+          fail-on-cache-miss: true
+
+      - name: Run integration tests
+        if: needs.setup.outputs.db_url
+        run: make test_integration
+        env:
+          INTEGRATION_DB: "1"
+          SKIP_ENV_VALIDATION: "1"
+          DATABASE_URL: ${{ needs.setup.outputs.db_url }}
+          DATABASE_URL_UNPOOLED: ${{ needs.setup.outputs.db_url_unpooled }}
+
   shard:
     name: E2E Test ${{ matrix.shard }}/4 (${{ github.event.client_payload.environment }})
     needs: setup
@@ -304,8 +344,8 @@ jobs:
   # reflect reality.
   override-status:
     name: Mark failed run as failed
-    needs: [shard, summary]
-    if: ${{ always() && (needs.summary.result != 'success' || contains(needs.shard.result, 'failure') || contains(needs.shard.result, 'cancelled')) }}
+    needs: [integration, shard, summary]
+    if: ${{ always() && (needs.summary.result != 'success' || needs.integration.result == 'failure' || needs.integration.result == 'cancelled' || contains(needs.shard.result, 'failure') || contains(needs.shard.result, 'cancelled')) }}
     runs-on: ubuntu-latest
     permissions:
       statuses: write
@@ -318,11 +358,12 @@ jobs:
           TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           SHARD_RESULT: ${{ needs.shard.result }}
           SUMMARY_RESULT: ${{ needs.summary.result }}
+          INTEGRATION_RESULT: ${{ needs.integration.result }}
         run: |
-          if [ "$SUMMARY_RESULT" = "cancelled" ] || [[ "$SHARD_RESULT" == *cancelled* ]]; then
+          if [ "$SUMMARY_RESULT" = "cancelled" ] || [[ "$SHARD_RESULT" == *cancelled* ]] || [ "$INTEGRATION_RESULT" = "cancelled" ]; then
             DESCRIPTION="Job cancelled (likely timeout)"
           else
-            DESCRIPTION="Verification failed (shard: $SHARD_RESULT, summary: $SUMMARY_RESULT)"
+            DESCRIPTION="Verification failed (integration: $INTEGRATION_RESULT, shard: $SHARD_RESULT, summary: $SUMMARY_RESULT)"
           fi
           gh api -X POST \
             "repos/$REPO/statuses/$SHA" \

@@ -445,7 +445,7 @@ jobs:
 
       - name: Annotate PostHog with release
         env:
-          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+          POSTHOG_ANNOTATION_API_KEY: ${{ secrets.POSTHOG_ANNOTATION_API_KEY }}
           POSTHOG_PROJECT_ID: ${{ vars.POSTHOG_PROJECT_ID }}
           POSTHOG_HOST: ${{ vars.POSTHOG_HOST }}
           SHA: ${{ github.event.client_payload.git.sha }}
@@ -461,7 +461,7 @@ jobs:
             CONTENT="Deploy $SHORT_SHA on $REF by $ACTOR — $URL"
           fi
           curl -fsS -X POST "$POSTHOG_HOST/api/projects/$POSTHOG_PROJECT_ID/annotations/" \
-            -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
+            -H "Authorization: Bearer $POSTHOG_ANNOTATION_API_KEY" \
             -H "Content-Type: application/json" \
             -d "$(jq -nc \
               --arg content "$CONTENT" \

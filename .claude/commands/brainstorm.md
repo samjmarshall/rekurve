@@ -23,7 +23,7 @@ Interview me relentlessly about every aspect of this design until we reach a sha
    - **@agent-codebase-pattern-finder** - To find similar features we can model after
    - **@agent-thoughts-locator** - To find any research, plans, or decisions about this area
    - **@agent-thoughts-analyzer** - To extract key insights from the most relevant documents
-- **ALWAYS use @agent-web-lookup or @agent-web-research** for web research - NEVER call WebSearch or WebFetch directly. Use `web-lookup` for single-fact queries (haiku, fast); use `web-research` for multi-source synthesis or conflict resolution (opus, deep).
+- **ALWAYS use @agent-web-lookup or @agent-web-research** for web research - NEVER call WebSearch or WebFetch directly. Use `web-lookup` for single-fact queries (fast); use `web-research` for multi-source synthesis or conflict resolution (deep).
 - **If a question can be answered by exploring the codebase, explore instead of asking.**
 
 **Exploring approaches:**

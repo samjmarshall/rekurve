@@ -1,6 +1,12 @@
 # Rekurve
 
-AI sales assistant for new home builders.
+> A Claude Code harness example for Real Engineers with a Real Project
+
+Hi, I'm Sam, and this is an AI sales assistant I built for my wife. She's a Sales Consultant for a new home builder in Brisbane, Australia.
+
+The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC); as Matt Pocock would say "Skills for Real Engineers". To do this properly, I chose to solve a real world problem with real commercial impact. Also my wife has been asking for something this this for some time; wo win-win, happy wife happy life and I get to prove out, teak and tune my AI Agent coding harness that I can use every day and make it work exactly how I to build and operate.
+
+If you're interested in seeing how I use Claude Code, see the `CLAUDE.md` and `.claude/` config folder. Try it outa for yourself. Details on how I use it are roughly documented in the [Development Workflows](#development-workflows) section below.
 
 ## Getting started
 
@@ -530,3 +536,7 @@ Step-by-step for human developers and AI agents:
 | E2E testing | Yes | + test env | — | Yes | — |
 | AI-assisted development | Yes | Full set | Optional | Optional | Yes |
 | Ralph automation | Yes | Full set | Optional | Optional | Yes + plan file |
+
+## License
+
+[MIT](../LICENSE) © 2025–2026 Samuel Marshall

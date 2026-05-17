@@ -292,6 +292,8 @@ To add the `email.creation` subscription: HubSpot Settings → Integrations → 
 
 ## CI/CD Pipeline
 
+![ci-cd](./ci-cd.png)
+
 ### Active Workflows
 
 #### Quality Control (`quality-control.yml`)

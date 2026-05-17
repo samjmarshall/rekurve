@@ -1,12 +1,21 @@
+---
+Status: 'Accepted'
+Deciders: 'Sam Marshall'
+Date: '2026-04-29'
+# prettier-ignore
+---
+
 # Layout-level auth gates instead of `middleware.ts`
 
-**Status:** accepted
+## Context
 
-Every authenticated route group gates access in its own `layout.tsx` via `await getSession()` + `redirect()`. We do not use `middleware.ts` for auth, and we do not plan to. The two reasons that drove this: (1) each route group has fundamentally different auth needs — `(application)` requires a session, `(login)` requires the absence of one, and `(website)` must have no auth at all — which a single middleware can only express through path-prefix branching; (2) past experience with `middleware.ts` is that it grows complex, is hard to test, and behaves in surprising ways under the Edge runtime.
+Each route group has fundamentally different auth needs: `(application)` requires a session, `(login)` requires the absence of one, and `(website)` must have no auth at all. A single `middleware.ts` can only express opposite rules through path-prefix branching, runs on the Edge runtime (which complicates session/DB access), and historically becomes a hard-to-test choke point.
 
-## Considered options
+Where should authenticated route groups enforce their session gates?
 
-- **`middleware.ts`** — rejected. Forces opposite rules for `(application)` and `(login)` into one file gated by path prefixes, runs on the Edge runtime (which complicates session/DB access), and historically becomes a hard-to-test choke point.
+## Decision
+
+We will gate auth in each route group's `layout.tsx` via `await getSession()` + `redirect()`. We will not use `middleware.ts` for auth.
 
 ## Consequences
 

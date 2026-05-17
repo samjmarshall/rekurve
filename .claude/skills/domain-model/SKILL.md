@@ -78,4 +78,11 @@ Only offer to create an ADR when all three are true:
 2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
 3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
 
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+If any of the three is missing, skip the ADR.
+
+When all three hold, pick the template that matches the shape of the decision:
+
+- **[ADR-TEMPLATE-IN-DEPTH.md](./ADR-TEMPLATE-IN-DEPTH.md)** when the session surfaced ≥2 genuine alternatives that were weighed side-by-side.
+- **[ADR-TEMPLATE-SIMPLE.md](./ADR-TEMPLATE-SIMPLE.md)** when the decision is real but there was effectively one path with a constraint or two.
+
+See [ADR-FORMAT.md](./ADR-FORMAT.md) for the full writing guide, frontmatter spec, and anti-patterns.

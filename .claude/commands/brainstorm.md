@@ -12,7 +12,7 @@ Help turn ideas into fully formed designs and specs through natural collaborativ
 
 Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design in small sections (200-300 words), checking after each section whether it looks right so far.
 
-Interview me relentlessly about every aspect of this design until we reach a shared understanding.Walk down each branch of the design tree, resolving dependencies between decisions one-by-one.
+Interview me relentlessly about every aspect of this design until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one.
 
 ## The Process
 
@@ -23,7 +23,7 @@ Interview me relentlessly about every aspect of this design until we reach a sha
    - **@agent-codebase-pattern-finder** - To find similar features we can model after
    - **@agent-thoughts-locator** - To find any research, plans, or decisions about this area
    - **@agent-thoughts-analyzer** - To extract key insights from the most relevant documents
-- **ALWAYS use @agent-web-lookup or @agent-web-research** for web research - NEVER call WebSearch or WebFetch directly. Use `web-lookup` for single-fact queries (haiku, fast); use `web-research` for multi-source synthesis or conflict resolution (opus, deep).
+- **ALWAYS use @agent-web-lookup or @agent-web-research** for web research - NEVER call WebSearch or WebFetch directly. Use `web-lookup` for single-fact queries (fast); use `web-research` for multi-source synthesis or conflict resolution (deep).
 - **If a question can be answered by exploring the codebase, explore instead of asking.**
 
 **Exploring approaches:**

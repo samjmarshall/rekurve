@@ -97,11 +97,28 @@ jobs:
           DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url_unpooled }}
 
       - name: Run database migrations
+        id: migrate
         if: steps.neon.outputs.db_url
         run: yarn db:migrate
         env:
           SKIP_ENV_VALIDATION: 1
           DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url_unpooled }}
+
+      # Notify BetterStack on production migration failure (P1) — uncomment
+      # once a heartbeat monitor is provisioned and BETTERSTACK_HEARTBEAT_MIGRATION
+      # is set. Migrations run *after* Vercel has deployed the new code, so a
+      # failed migration leaves the schema out of sync with live code → P1.
+      # The `/1` suffix signals failure (non-zero exit code), which fires the
+      # heartbeat monitor's incident escalation.
+      # - name: Notify BetterStack — production migration failed (P1)
+      #   if: ${{ failure() && steps.migrate.outcome == 'failure' && github.event.client_payload.environment == 'production' }}
+      #   env:
+      #     BETTERSTACK_HEARTBEAT_MIGRATION: ${{ secrets.BETTERSTACK_HEARTBEAT_MIGRATION }}
+      #     SHA: ${{ github.event.client_payload.git.sha }}
+      #     RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      #   run: |
+      #     curl -fsS -X POST "$BETTERSTACK_HEARTBEAT_MIGRATION/1" \
+      #       -d "Production DB migration failed for $SHA — $RUN_URL"
 
       - name: Cache Playwright browsers
         id: playwright-cache
@@ -371,3 +388,110 @@ jobs:
             -f context="Post-Deploy Verification" \
             -f description="$DESCRIPTION" \
             -f target_url="$TARGET_URL"
+
+      # Notify BetterStack on production E2E / integration test failure
+      # (P3-P4) — uncomment once a heartbeat monitor is provisioned and
+      # BETTERSTACK_HEARTBEAT_VERIFICATION is set. These failures don't roll
+      # back the deploy (Vercel has already shipped) but they block subsequent
+      # deploys including critical CVE patches from Renovate, so they need
+      # business-hours attention. Use a less aggressive escalation policy on
+      # this monitor than the migration heartbeat.
+      # - name: Notify BetterStack — production verification failed (P3-P4)
+      #   if: ${{ github.event.client_payload.environment == 'production' }}
+      #   env:
+      #     BETTERSTACK_HEARTBEAT_VERIFICATION: ${{ secrets.BETTERSTACK_HEARTBEAT_VERIFICATION }}
+      #     COMMIT_SHA: ${{ github.event.client_payload.git.sha }}
+      #     RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      #     SHARD_RESULT: ${{ needs.shard.result }}
+      #     INTEGRATION_RESULT: ${{ needs.integration.result }}
+      #     SUMMARY_RESULT: ${{ needs.summary.result }}
+      #   run: |
+      #     curl -fsS -X POST "$BETTERSTACK_HEARTBEAT_VERIFICATION/1" \
+      #       -d "Production post-deploy verification failed for $COMMIT_SHA (integration: $INTEGRATION_RESULT, shard: $SHARD_RESULT, summary: $SUMMARY_RESULT) — $RUN_URL"
+
+  # Emit a release event to observability platforms once production verification
+  # passes, so incidents and metric changes can be correlated to a specific
+  # deploy SHA. `version` is set only when the deploy SHA matches a GitHub
+  # Release tag (i.e. semantic-release cut a feat/fix release), which lets
+  # consumers distinguish user-facing releases from chore/docs/ci deploys.
+  release-event:
+    name: Release Event
+    needs: [integration, shard, summary]
+    if: ${{ github.event.client_payload.environment == 'production' && needs.summary.result == 'success' && needs.integration.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Resolve release version (if SHA matches latest release tag)
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.client_payload.git.sha }}
+        run: |
+          VERSION=""
+          LATEST_TAG=$(gh release view --repo "$REPO" --json tagName --jq '.tagName' 2>/dev/null || echo "")
+          if [ -n "$LATEST_TAG" ]; then
+            TAG_SHA=$(gh api "repos/$REPO/commits/$LATEST_TAG" --jq '.sha' 2>/dev/null || echo "")
+            if [ "$TAG_SHA" = "$SHA" ]; then
+              VERSION="$LATEST_TAG"
+            fi
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [ -n "$VERSION" ]; then
+            echo "Resolved release tag $VERSION for $SHA"
+          else
+            echo "No release tag points at $SHA — emitting deploy event without version"
+          fi
+
+      - name: Annotate PostHog with release
+        env:
+          POSTHOG_ANNOTATION_API_KEY: ${{ secrets.POSTHOG_ANNOTATION_API_KEY }}
+          POSTHOG_PROJECT_ID: ${{ vars.POSTHOG_PROJECT_ID }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST }}
+          SHA: ${{ github.event.client_payload.git.sha }}
+          REF: ${{ github.event.client_payload.git.ref }}
+          URL: ${{ github.event.client_payload.url }}
+          ACTOR: ${{ github.actor }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          SHORT_SHA="${SHA:0:7}"
+          if [ -n "$VERSION" ]; then
+            CONTENT="Release $VERSION ($SHORT_SHA) by $ACTOR — $URL"
+          else
+            CONTENT="Deploy $SHORT_SHA on $REF by $ACTOR — $URL"
+          fi
+          curl -fsS -X POST "$POSTHOG_HOST/api/projects/$POSTHOG_PROJECT_ID/annotations/" \
+            -H "Authorization: Bearer $POSTHOG_ANNOTATION_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -nc \
+              --arg content "$CONTENT" \
+              --arg scope "project" \
+              '{content:$content, scope:$scope}')"
+
+      # BetterStack release event — uncomment once a Telemetry source is
+      # provisioned and BETTERSTACK_INGESTING_HOST + BETTERSTACK_SOURCE_TOKEN
+      # are populated. Sends a structured log so the event can be filtered/
+      # overlaid against incidents and uptime data. `version` is omitted when
+      # no release tag points at this SHA (chore/docs/ci deploys).
+      # - name: Send release event to BetterStack
+      #   env:
+      #     BETTERSTACK_INGESTING_HOST: ${{ vars.BETTERSTACK_INGESTING_HOST }}
+      #     BETTERSTACK_SOURCE_TOKEN: ${{ secrets.BETTERSTACK_SOURCE_TOKEN }}
+      #     SHA: ${{ github.event.client_payload.git.sha }}
+      #     REF: ${{ github.event.client_payload.git.ref }}
+      #     URL: ${{ github.event.client_payload.url }}
+      #     ACTOR: ${{ github.actor }}
+      #     VERSION: ${{ steps.version.outputs.version }}
+      #   run: |
+      #     curl -fsS -X POST "https://$BETTERSTACK_INGESTING_HOST/" \
+      #       -H "Authorization: Bearer $BETTERSTACK_SOURCE_TOKEN" \
+      #       -H "Content-Type: application/json" \
+      #       -d "$(jq -nc \
+      #         --arg event "release" \
+      #         --arg sha "$SHA" \
+      #         --arg version "$VERSION" \
+      #         --arg ref "$REF" \
+      #         --arg url "$URL" \
+      #         --arg actor "$ACTOR" \
+      #         '{event:$event, sha:$sha, ref:$ref, url:$url, actor:$actor}
+      #          + (if $version != "" then {version:$version} else {} end)')"

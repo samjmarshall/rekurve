@@ -2,7 +2,7 @@
 
 > A Claude Code harness example for Real Engineers with a Real Project
 
-Hi, I'm Sam, and this is an AI sales assistant I built for my wife. She's a Sales Consultant for a new home builder in Brisbane, Australia.
+Hi, I'm Sam and this is an AI sales assistant I built for my wife. She's a Sales Consultant for a new home builder in Brisbane, Australia.
 
 The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC); as Matt Pocock would say "Skills for Real Engineers". To do this properly, I chose to solve a real world problem with real commercial impact. Also my wife has been asking for something this this for some time; wo win-win, happy wife happy life and I get to prove out, teak and tune my AI Agent coding harness that I can use every day and make it work exactly how I to build and operate.
 

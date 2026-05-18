@@ -15,8 +15,7 @@ __pycache__/
 /test-results/
 /playwright-report/
 /blob-report/
-/playwright/.cache/
-/playwright/.auth/
+/playwright/
 
 # database
 /prisma/db.sqlite
@@ -60,11 +59,8 @@ yarn-error.log*
 !.claude/
 !CLAUDE.md
 
-# Relocated to nested private repo — must remain untracked in public www
+# Nested private repo — must remain untracked in public www
 /thoughts/
-/docs/business/
-/docs/sales/
-/docs/marketing/
 
 # skills (installed per-machine via npx skills)
 /.agents/

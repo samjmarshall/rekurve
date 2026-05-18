@@ -75,7 +75,7 @@ related-prs: [144]
 - `NEXT_PUBLIC_POSTHOG_KEY` — public project key (`src/env.js:45`)
 - `NEXT_PUBLIC_POSTHOG_HOST` — `https://us.i.posthog.com` (`src/env.js:46`)
 - `POSTHOG_ERROR_TRACKING_API_KEY` — server-side personal API key for sourcemap upload (`src/env.js:25`)
-- `POSTHOG_PROJECT_ID` — `254485`, used by `withPostHogConfig` (`src/env.js:26`)
+- `POSTHOG_PROJECT_ID` — your project ID, used by `withPostHogConfig` (`src/env.js:26`)
 - No feature flags. The SDK initialises on every `(website)` and `(login)` page load.
 
 ## Flow

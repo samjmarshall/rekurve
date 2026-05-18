@@ -12,16 +12,20 @@
  *
  * Prerequisites:
  * - PostHog Personal API Key (create at: My Settings > Personal API Keys)
- * - Project ID: 254485
+ * - Project ID: set via POSTHOG_PROJECT_ID env var
  *
  * Usage:
- *   POSTHOG_PERSONAL_API_KEY=phx_xxx yarn posthog:setup
+ *   POSTHOG_PROJECT_ID=<id> POSTHOG_PERSONAL_API_KEY=phx_xxx yarn posthog:setup
  *
  * Reference: thoughts/plans/2025-11-27-posthog-manual-testing-setup-guide.md
  */
 
 const POSTHOG_API_BASE = "https://us.posthog.com";
-const PROJECT_ID = "254485";
+const PROJECT_ID: string = (() => {
+  const id = process.env.POSTHOG_PROJECT_ID;
+  if (!id) throw new Error("POSTHOG_PROJECT_ID env var is required");
+  return id;
+})();
 
 interface PostHogResponse {
   id: number;

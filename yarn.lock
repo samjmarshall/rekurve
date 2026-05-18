@@ -11064,12 +11064,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react@npm:1.14.0":
-  version: 1.14.0
-  resolution: "lucide-react@npm:1.14.0"
+"lucide-react@npm:1.16.0":
+  version: 1.16.0
+  resolution: "lucide-react@npm:1.16.0"
   peerDependencies:
     react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 6db2fcc6d7545fabdec6f82db386f7f872a974aa0a4c508e6e23988055712286dccff2e0ef472ee5dc5f3852f1c3e916e84c92e52f049561b6829b6bc2f6483b
+  checksum: 4e2f341385faa47474107f040fa4c7e0ef052a2a36e5e8b4737237e41cdcaa0e16533549002d322aa1e480cd9f21a8ecd88b047b75df84387482d64a49c0e901
   languageName: node
   linkType: hard
 
@@ -15332,7 +15332,7 @@ __metadata:
     inngest: 4.2.6
     inngest-cli: ^1.19.1
     input-otp: 1.4.2
-    lucide-react: 1.14.0
+    lucide-react: 1.16.0
     motion: 12.38.0
     next: 16.2.6
     next-themes: 0.4.6

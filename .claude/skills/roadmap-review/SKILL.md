@@ -78,8 +78,7 @@ gh issue list --repo <owner>/<repo> --state all --json number,title,state,milest
 ```
 
 Also read:
-- `thoughts/docs/sales/pilot-program.md` - Current pilot strategy
-- `thoughts/docs/business/` - Business case and validation docs
+- `thoughts/docs/` - Non-technical project docs (strategy, messaging, pilot feedback)
 - `thoughts/designs/` - Recent design decisions
 
 ### Step 2: Collaborative Discovery (One Question at a Time)

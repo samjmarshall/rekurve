@@ -61,21 +61,17 @@ How should the OTP-send endpoint be rate-limited?
 4. **Neon/Postgres-backed better-auth `rateLimit`** — excluded by constraint
    (store must not be Neon); recorded for completeness.
 
-| Criterion | 1. Upstash direct + hook | 2. Vercel WAF | 3. better-auth + Upstash store |
-|---|---|---|---|
-| Cost, pre-PMF | $0 (≤500K cmds/mo) | $0 (≤1M reqs on Pro) | $0 |
-| Cost scaling | $0.20/100K, **documented**, no minimum | region-based, **undocumented/opaque** | $0.20/100K |
-| Custom key (email) | **Yes** | No (IP/JA4 only < Enterprise) | No (IP-only, no hook) |
-| Per-route config in code | **Yes** | Dashboard/Terraform | per-path window/max only |
-| Local `next start` / E2E | **Yes** | No documented local path | Yes |
-| Honours ADR-002 | **Yes** (in `auth.ts`, no middleware) | n/a (edge) | Yes |
-| New infra / lock-in | Upstash acct + 2 secrets / low–mod | none / high | Upstash + bug #1891 / mod |
+## Decision Outcome
 
-## Decision
+Chosen option: **"1. `@upstash/ratelimit` called directly, email-keyed, via a
+better-auth `hooks.before` middleware"**, because it is the only option that
+keys on the submitted email (the real abuse vector) while running unchanged
+under local `next start` — so #267's E2E acceptance test is deterministic — at
+$0 pre-PMF cost and with no `middleware.ts` (honouring ADR-002).
 
-Adopt **Option 1**. Use `@upstash/ratelimit` + `@upstash/redis` on the Upstash
-free tier, invoked from a better-auth `createAuthMiddleware` **`before`** hook
-in `src/lib/auth.ts` matched to `ctx.path === "/email-otp/send-verification-otp"`.
+Use `@upstash/ratelimit` + `@upstash/redis` on the Upstash free tier, invoked
+from a better-auth `createAuthMiddleware` **`before`** hook in `src/lib/auth.ts`
+matched to `ctx.path === "/email-otp/send-verification-otp"`.
 
 - **Two fixed-window limiters**, checked before the email dispatches:
   **email** (normalized `trim().toLowerCase()`) at **3 / 15 min** (primary —
@@ -95,16 +91,7 @@ in `src/lib/auth.ts` matched to `ctx.path === "/email-otp/send-verification-otp"
   `~/env`; added to Vercel (`--sensitive` for the token), never hand-edited
   into `.env.local`.
 
-Rejected: **Option 2** fails the local-E2E criterion (no documented local
-path; per-region counters) and the cost-predictability driver (opaque
-overage), and cannot key on email below Enterprise. **Option 3** inherits
-IP-only keying (defeats the threat model), a secondary-storage TTL/memory
-footgun, and open bug #1891. **Option 4** is excluded by the no-Neon
-constraint.
-
-## Consequences
-
-**Positive**
+### Positive Consequences
 
 - Defends the actual abuse vector (one email → many Resend sends); IP-only
   options cannot.
@@ -114,7 +101,7 @@ constraint.
 - No `middleware.ts`; consistent with ADR-002. Future per-route limits are
   pure code (a new `Ratelimit` instance), no dashboard/Terraform coupling.
 
-**Negative / accepted**
+### Negative Consequences
 
 - Fail-open: an Upstash outage is a bounded, logged protection gap on this one
   route (accepted over a total login outage).
@@ -124,12 +111,28 @@ constraint.
   `ephemeralCache`).
 - Couples to better-auth 1.6.9 `ctx` shape — pin the version; re-verify the
   hook `ctx` accessors and the 429 body shape at implementation.
+- Follow-up work required: `/create_plan` against #267 drives implementation
+  (env wiring, `auth.ts` hook, `src/lib/rate-limit.ts`, the E2E spec); a
+  correction comment on #267 is recommended (the wrong endpoint + non-existent
+  plugin will otherwise mislead the implementer) — pending approval; revisit
+  if a second pilot needs per-tenant limits (currently one constant set, per
+  #267 scope).
 
-**Follow-ups**
+## Pros and Cons of the Options
 
-- `/create_plan` against #267 drives implementation (env wiring, `auth.ts`
-  hook, `src/lib/rate-limit.ts`, the E2E spec).
-- Recommend a correction comment on #267 (the wrong endpoint + non-existent
-  plugin will otherwise mislead the implementer) — pending approval.
-- Revisit if a second pilot needs per-tenant limits (currently one constant
-  set, per #267 scope).
+| Criterion | 1. Upstash direct + hook | 2. Vercel WAF | 3. better-auth + Upstash store |
+|---|---|---|---|
+| Cost, pre-PMF | $0 (≤500K cmds/mo) | $0 (≤1M reqs on Pro) | $0 |
+| Cost scaling | $0.20/100K, **documented**, no minimum | region-based, **undocumented/opaque** | $0.20/100K |
+| Custom key (email) | **Yes** | No (IP/JA4 only < Enterprise) | No (IP-only, no hook) |
+| Per-route config in code | **Yes** | Dashboard/Terraform | per-path window/max only |
+| Local `next start` / E2E | **Yes** | No documented local path | Yes |
+| Honours ADR-002 | **Yes** (in `auth.ts`, no middleware) | n/a (edge) | Yes |
+| New infra / lock-in | Upstash acct + 2 secrets / low–mod | none / high | Upstash + bug #1891 / mod |
+
+**Option 2 (Vercel WAF)** fails the local-E2E criterion (no documented local
+path; per-region counters) and the cost-predictability driver (opaque
+overage), and cannot key on email below Enterprise. **Option 3 (better-auth +
+Upstash store)** inherits IP-only keying (defeats the threat model), a
+secondary-storage TTL/memory footgun, and open bug #1891. **Option 4
+(Neon-backed)** is excluded by the no-Neon constraint.

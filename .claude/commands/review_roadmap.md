@@ -29,8 +29,8 @@ gh issue list --repo samjmarshall/www --state all --json number,title,state,mile
 
 ## Context to Read
 
-- `docs/sales/pilot-program.md` - Current pilot strategy
-- `docs/business/Rekurve MVP Business Case Validation.md` - Business case
+- `thoughts/docs/sales/pilot-program.md` - Current pilot strategy
+- `thoughts/docs/business/Rekurve MVP Business Case Validation.md` - Business case
 - Recent designs in `thoughts/designs/` - Past decisions
 
 ## Then Begin Collaborative Review

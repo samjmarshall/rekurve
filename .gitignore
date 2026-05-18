@@ -58,8 +58,13 @@ yarn-error.log*
 
 # Claude
 !.claude/
-!thoughts/
 !CLAUDE.md
+
+# Relocated to nested private repo — must remain untracked in public www
+/thoughts/
+/docs/business/
+/docs/sales/
+/docs/marketing/
 
 # skills (installed per-machine via npx skills)
 /.agents/

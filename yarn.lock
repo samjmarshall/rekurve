@@ -6687,11 +6687,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.10.12, baseline-browser-mapping@npm:^2.9.15, baseline-browser-mapping@npm:^2.9.19":
-  version: 2.10.25
-  resolution: "baseline-browser-mapping@npm:2.10.25"
+  version: 2.10.31
+  resolution: "baseline-browser-mapping@npm:2.10.31"
   bin:
     baseline-browser-mapping: dist/cli.cjs
-  checksum: 285ddc00c39704fc905cd9bb296cc01f653f37618cd1da4dfd03d098cec30f17bdfc133ac87b9d49938cefc58b30bccb7a49c15aa1da8930581fce61d07b514a
+  checksum: b52fe5e0d91f92cd593243882331d3d6f88e3cb23688723b28060e728f4f9e2680f363a7a572e385880e4a80cc093e6b76d60639a285dccc3a60af68c4b55e9e
   languageName: node
   linkType: hard
 

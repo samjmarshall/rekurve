@@ -9,13 +9,14 @@ import {
   Server,
   Workflow,
 } from "lucide-react";
+import Image from "next/image";
 
 import { Badge } from "~/components/ui/Badge";
 import { Card, CardContent } from "~/components/ui/Card";
 import { BrandShimmer } from "../brand-shimmer";
 
 const credentials = [
-  "Member of the founding team at V2 AI",
+  "1st Engineering hire at V2 AI",
   "Leading Gen AI Prototyping Partner for Amazon Web Services - APAC",
   "10+ years scaling production systems",
 ];
@@ -24,7 +25,7 @@ const techStack = [
   {
     layer: "Intelligence Layer",
     icon: Brain,
-    content: "Gemini, Anthropic + Proprietary Models",
+    content: "Anthropic + Proprietary Models",
   },
   {
     layer: "Orchestration Layer",
@@ -66,9 +67,13 @@ export function AboutFounder() {
             <div className="relative mx-auto w-fit lg:mx-0">
               <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-transparent bg-linear-to-br from-accent-blue via-primary to-primary p-1 shadow-2xl">
                 <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-neutral-800 to-black">
-                  <div className="font-bold text-4xl text-white tracking-wide">
-                    SM
-                  </div>
+                  <Image
+                    src="/sam.jpeg"
+                    alt="Sam Marshall"
+                    width={192}
+                    height={192}
+                    className="rounded-full"
+                  />
                 </div>
               </div>
             </div>

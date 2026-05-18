@@ -8,6 +8,8 @@ The purpose of this project is to showcase the workflow and results of my person
 
 If you're interested in seeing how I use Claude Code, see the `CLAUDE.md` and `.claude/` config folder. Try it outa for yourself. Details on how I use it are roughly documented in the [Development Workflows](#development-workflows) section below.
 
+If you would like help with building, implementing or simply discovering problems/solutions in your Enterprise, reach out to me on [Linkedin](https://www.linkedin.com/in/sam-j-marshall/) or get in touch with the [V2 AI](https://www.v2.ai/contact?utm_source=github&utm_medium=referral&utm_campaign=rekurve&utm_content=readme-contact-cta) team.
+
 ## Getting started
 
 ```bash

@@ -81,7 +81,7 @@ Once generally available, pricing will be structured as:
 
 ## Technical Stack
 
-- Intelligence: Gemini, Anthropic + Proprietary Models
+- Intelligence: Anthropic + Proprietary Models
 - Orchestration: Proprietary AI Agent Engine
 - Data: Clay, Clearbit, Apollo for real-time enrichment
 - Integrations: HubSpot, Salesforce, Pipedrive
@@ -91,10 +91,10 @@ Once generally available, pricing will be structured as:
 ## Founder
 
 **Sam Marshall, Principal AI Engineer**
-- Member of founding team at V2 AI
+- 1st technical hire at V2 AI
 - Leading Gen AI Prototyping Partner for AWS APAC
 - 10+ years scaling production systems
-- Background in enterprise architecture at Google, Amazon, Netflix scale
+- Background in enterprise software and architecture
 
 ## Contact Information
 

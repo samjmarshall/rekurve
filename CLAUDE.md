@@ -4,7 +4,7 @@
 
 ## Current Project State
 
-**Status**: Pre-PMF validation phase. Running free Release Pilot to validate use cases.
+**Status**: Pre-PMF validation phase.
 
 **Project Tracking**: [GitHub Project](https://github.com/users/samjmarshall/projects/2) - all tasks, roadmap, and progress tracked via GitHub Issues.
 

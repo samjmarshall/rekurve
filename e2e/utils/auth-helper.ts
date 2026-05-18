@@ -92,6 +92,13 @@ export function uniquePhone(): string {
  *   - Full-form tests: email matches `e2e-%@test.rekurve.dev`
  *   - All other tests: first_name in TEST_FIRST_NAMES (hubspot-helper.ts).
  */
+export async function cleanupVerificationByIdentifier(
+  emails: string[],
+): Promise<void> {
+  if (emails.length === 0) return;
+  await sql()`DELETE FROM "verification" WHERE identifier = ANY(${emails})`;
+}
+
 export async function deleteTestLeads(): Promise<void> {
   await sql()`
     DELETE FROM "leads"

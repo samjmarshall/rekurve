@@ -2,6 +2,7 @@ import { pluginReact } from "@rsbuild/plugin-react";
 import { defineConfig } from "@rstest/core";
 
 export default defineConfig({
+  setupFiles: ["./rstest.setup.ts"],
   include: [
     "src/**/*.test.ts",
     "src/**/*.test.tsx",

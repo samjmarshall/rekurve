@@ -14,9 +14,13 @@ jobs:
       contents: read
       actions: read
       statuses: write
+    # NOTE: db_url / db_url_unpooled are deliberately NOT job outputs.
+    # GitHub silently scrubs any job output whose value contains a
+    # registered secret (the Neon URI embeds the role password) → it
+    # arrives empty in `needs.setup.outputs.*`. Only the non-secret
+    # branch_id crosses the job boundary; every consuming job re-derives
+    # the URLs from it via the ./.github/actions/neon-db-url composite.
     outputs:
-      db_url: ${{ steps.neon.outputs.db_url }}
-      db_url_unpooled: ${{ steps.neon.outputs.db_url_unpooled }}
       branch_id: ${{ steps.neon.outputs.branch_id }}
       pre_migrate_timestamp: ${{ steps.pre_migrate.outputs.timestamp }}
 
@@ -52,7 +56,7 @@ jobs:
         if: steps.modules-cache.outputs.cache-hit != 'true'
         run: make install
 
-      - name: Resolve Neon branch database URL
+      - name: Resolve Neon branch
         id: neon
         env:
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
@@ -71,38 +75,44 @@ jobs:
           fi
 
           if [ -z "$BRANCH_ID" ]; then
-            echo "::warning::Could not resolve Neon branch for ref '$GIT_REF' — auth tests will skip"
-            exit 0
+            echo "::error::Could not resolve Neon branch for ref '$GIT_REF' \
+          (environment '$ENVIRONMENT'). DB-dependent E2E/integration tests \
+          now require a database — failing here at the source so the cause \
+          is one clear error, not a wall of downstream neon() failures."
+            exit 1
           fi
 
-          POOLED=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
-            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/connection_uri?branch_id=$BRANCH_ID&role_name=neondb_owner&database_name=neondb")
-          DIRECT=$(curl -s -H "Authorization: Bearer $NEON_API_KEY" \
-            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/connection_uri?branch_id=$BRANCH_ID&role_name=neondb_owner&database_name=neondb&pooled=false")
-
-          echo "db_url=$(echo "$POOLED" | jq -r '.uri')" >> "$GITHUB_OUTPUT"
-          echo "db_url_unpooled=$(echo "$DIRECT" | jq -r '.uri')" >> "$GITHUB_OUTPUT"
+          # branch_id is NOT a secret — it crosses the job boundary safely.
           echo "branch_id=$BRANCH_ID" >> "$GITHUB_OUTPUT"
 
+      - name: Resolve database URLs
+        id: dburl
+        if: steps.neon.outputs.branch_id
+        uses: ./.github/actions/neon-db-url
+        with:
+          neon_api_key: ${{ secrets.NEON_API_KEY }}
+          neon_project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch_id: ${{ steps.neon.outputs.branch_id }}
+
       - name: Record pre-migration timestamp
-        if: steps.neon.outputs.db_url
+        if: steps.neon.outputs.branch_id
         id: pre_migrate
         run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
 
       - name: Run database check
-        if: steps.neon.outputs.db_url
+        if: steps.neon.outputs.branch_id
         run: yarn db:check
         env:
           SKIP_ENV_VALIDATION: 1
-          DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url_unpooled }}
+          DATABASE_URL_UNPOOLED: ${{ steps.dburl.outputs.db_url_unpooled }}
 
       - name: Run database migrations
         id: migrate
-        if: steps.neon.outputs.db_url
+        if: steps.neon.outputs.branch_id
         run: yarn db:migrate
         env:
           SKIP_ENV_VALIDATION: 1
-          DATABASE_URL_UNPOOLED: ${{ steps.neon.outputs.db_url_unpooled }}
+          DATABASE_URL_UNPOOLED: ${{ steps.dburl.outputs.db_url_unpooled }}
 
       # Notify BetterStack on production migration failure (P1) — uncomment
       # once a heartbeat monitor is provisioned and BETTERSTACK_HEARTBEAT_MIGRATION
@@ -166,14 +176,23 @@ jobs:
           key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
           fail-on-cache-miss: true
 
+      - name: Resolve database URLs
+        id: dburl
+        if: needs.setup.outputs.branch_id
+        uses: ./.github/actions/neon-db-url
+        with:
+          neon_api_key: ${{ secrets.NEON_API_KEY }}
+          neon_project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch_id: ${{ needs.setup.outputs.branch_id }}
+
       - name: Run integration tests
-        if: needs.setup.outputs.db_url
+        if: needs.setup.outputs.branch_id
         run: make test_integration
         env:
           INTEGRATION_DB: "1"
           SKIP_ENV_VALIDATION: "1"
-          DATABASE_URL: ${{ needs.setup.outputs.db_url }}
-          DATABASE_URL_UNPOOLED: ${{ needs.setup.outputs.db_url_unpooled }}
+          DATABASE_URL: ${{ steps.dburl.outputs.db_url }}
+          DATABASE_URL_UNPOOLED: ${{ steps.dburl.outputs.db_url_unpooled }}
 
   shard:
     name: E2E Test ${{ matrix.shard }}/4 (${{ github.event.client_payload.environment }})
@@ -220,6 +239,30 @@ jobs:
       - name: Install Playwright system deps
         run: yarn playwright install-deps
 
+      - name: Resolve database URLs
+        id: dburl
+        if: needs.setup.outputs.branch_id
+        uses: ./.github/actions/neon-db-url
+        with:
+          neon_api_key: ${{ secrets.NEON_API_KEY }}
+          neon_project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch_id: ${{ needs.setup.outputs.branch_id }}
+
+      # Defensive guard: if the setup job resolved a branch, the DB URL
+      # MUST be present here. Fail loudly now instead of letting Playwright
+      # run with an empty DATABASE_URL and surface a confusing mid-suite
+      # `No database connection string was provided to neon()` error.
+      - name: Assert DB URL resolved when a branch exists
+        if: needs.setup.outputs.branch_id
+        env:
+          DATABASE_URL: ${{ steps.dburl.outputs.db_url }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::branch_id was resolved but DATABASE_URL is empty \
+          — neon-db-url did not produce a URL. Aborting before Playwright."
+            exit 1
+          fi
+
       - name: Run Playwright tests
         run: make test_e2e
         env:
@@ -227,7 +270,7 @@ jobs:
           E2E_SKIP_GLOBAL_TEARDOWN: "1"
           VERCEL_URL: ${{ github.event.client_payload.url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
-          DATABASE_URL: ${{ needs.setup.outputs.db_url }}
+          DATABASE_URL: ${{ steps.dburl.outputs.db_url }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           HUBSPOT_ACCESS_TOKEN: ${{ secrets.HUBSPOT_ACCESS_TOKEN }}
           # Inbound webhook tests only run on production — the HubSpot
@@ -321,10 +364,19 @@ jobs:
           path: node_modules
           key: yarn-modules-${{ hashFiles('yarn.lock', '.yarnrc.yml') }}
 
+      - name: Resolve database URLs
+        id: dburl
+        if: needs.setup.outputs.branch_id
+        uses: ./.github/actions/neon-db-url
+        with:
+          neon_api_key: ${{ secrets.NEON_API_KEY }}
+          neon_project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch_id: ${{ needs.setup.outputs.branch_id }}
+
       - name: Sweep test residue
-        if: needs.setup.outputs.db_url
+        if: needs.setup.outputs.branch_id
         env:
-          DATABASE_URL: ${{ needs.setup.outputs.db_url }}
+          DATABASE_URL: ${{ steps.dburl.outputs.db_url }}
           HUBSPOT_ACCESS_TOKEN: ${{ secrets.HUBSPOT_ACCESS_TOKEN }}
         run: yarn tsx -e "import('./e2e/utils/global-teardown.ts').then(m => m.default())"
 

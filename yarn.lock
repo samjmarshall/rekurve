@@ -12,11 +12,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@anthropic-ai/sdk@npm:0.92.0":
-  version: 0.92.0
-  resolution: "@anthropic-ai/sdk@npm:0.92.0"
+"@anthropic-ai/sdk@npm:0.97.0":
+  version: 0.97.0
+  resolution: "@anthropic-ai/sdk@npm:0.97.0"
   dependencies:
     json-schema-to-ts: ^3.1.1
+    standardwebhooks: ^1.0.0
   peerDependencies:
     zod: ^3.25.0 || ^4.0.0
   peerDependenciesMeta:
@@ -24,7 +25,7 @@ __metadata:
       optional: true
   bin:
     anthropic-ai-sdk: bin/cli
-  checksum: 9651b9f8a2290d7cb1dfdd7f5252a9d8a89a8a54443c47fb33a6508bb299f99ad596c827b786fa7fadd2024a44465c525db2c8373382fcb0dbb180f0c921e560
+  checksum: 9d9de16fef575128a74d6d8bc111570e7386d07301490356e0bf7db46c77a428ce5b8ea307ec6afb74a206d9df08b321bdd251fb7edb288e9c0ca395b842170d
   languageName: node
   linkType: hard
 
@@ -14153,7 +14154,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"standardwebhooks@npm:1.0.0":
+"standardwebhooks@npm:1.0.0, standardwebhooks@npm:^1.0.0":
   version: 1.0.0
   resolution: "standardwebhooks@npm:1.0.0"
   dependencies:
@@ -15581,7 +15582,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "www@workspace:."
   dependencies:
-    "@anthropic-ai/sdk": 0.92.0
+    "@anthropic-ai/sdk": 0.97.0
     "@auto-it/conventional-commits": ^11.3.6
     "@auto-it/git-tag": ^11.3.6
     "@auto-it/released": ^11.3.6

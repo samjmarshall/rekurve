@@ -1,9 +1,16 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { emailOTP } from "better-auth/plugins";
 import { Resend } from "resend";
 import { env } from "~/env";
+import {
+  emailLimiter,
+  firstForwardedIp,
+  ipLimiter,
+  normalizeEmail,
+} from "~/lib/rate-limit";
 import { db } from "~/server/db";
 import * as authSchema from "~/server/db/schema/auth";
 
@@ -43,4 +50,41 @@ export const auth = betterAuth({
     }),
     nextCookies(), // must be last
   ],
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== "/email-otp/send-verification-otp") return;
+
+      const email = normalizeEmail(ctx.body?.email as string | undefined);
+      if (!email) return;
+
+      const ip = firstForwardedIp(ctx.headers?.get("x-forwarded-for"));
+
+      let e: Awaited<ReturnType<typeof emailLimiter.limit>>;
+      let i: Awaited<ReturnType<typeof ipLimiter.limit>>;
+      try {
+        [e, i] = await Promise.all([
+          emailLimiter.limit(email),
+          ipLimiter.limit(ip),
+        ]);
+      } catch (err) {
+        console.error(
+          "[otp-rate-limit] limiter unavailable, failing open",
+          err,
+        );
+        return;
+      }
+
+      if (!e.success || !i.success) {
+        const reset = Math.max(e.reset ?? 0, i.reset ?? 0);
+        const retryAfter = reset
+          ? Math.max(1, Math.ceil((reset - Date.now()) / 1000))
+          : undefined;
+        throw new APIError(
+          "TOO_MANY_REQUESTS",
+          { message: "Too many requests. Please try again later." },
+          retryAfter ? { "Retry-After": String(retryAfter) } : undefined,
+        );
+      }
+    }),
+  },
 });

@@ -40,11 +40,6 @@ const hasTwilioCredentials =
   !process.env.TWILIO_AUTH_TOKEN!.startsWith("placeholder");
 
 test.describe("SMS Dispatch — E2E", () => {
-  test.skip(
-    !process.env.DATABASE_URL,
-    "Requires direct DB access — skipped in CI",
-  );
-
   let session: TestSession;
   const leadIds: string[] = [];
   const messageIds: string[] = [];

@@ -15,11 +15,6 @@ function withAuth(
 }
 
 test.describe("Dashboard Shell — Navigation", () => {
-  test.skip(
-    !process.env.DATABASE_URL,
-    "Requires direct DB access — skipped in CI",
-  );
-
   let session: TestSession;
 
   test.beforeAll(async () => {
@@ -117,11 +112,6 @@ test.describe("Dashboard Shell — Navigation", () => {
 });
 
 test.describe("Dashboard Shell — Empty States", () => {
-  test.skip(
-    !process.env.DATABASE_URL,
-    "Requires direct DB access — skipped in CI",
-  );
-
   let session: TestSession;
 
   test.beforeAll(async () => {
@@ -188,11 +178,6 @@ test.describe("Dashboard Shell — Empty States", () => {
 });
 
 test.describe("Dashboard Shell — Sign Out", () => {
-  test.skip(
-    !process.env.DATABASE_URL,
-    "Requires direct DB access — skipped in CI",
-  );
-
   let session: TestSession;
 
   test.beforeAll(async () => {

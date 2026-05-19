@@ -31,8 +31,8 @@ function signHubSpotWebhook(args: {
 
 test.describe("Email Dispatch — E2E", () => {
   test.skip(
-    !process.env.DATABASE_URL || !process.env.HUBSPOT_CLIENT_SECRET,
-    "Requires DATABASE_URL and HUBSPOT_CLIENT_SECRET — skipped in CI",
+    !process.env.HUBSPOT_CLIENT_SECRET,
+    "Requires HUBSPOT_CLIENT_SECRET",
   );
 
   let session: TestSession;

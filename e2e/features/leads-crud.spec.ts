@@ -12,11 +12,6 @@ import { cleanupTestLeadsByPhone } from "../utils/hubspot-helper";
 import { getSessionCookie } from "../utils/session-cookie";
 
 test.describe("Leads CRUD — E2E", () => {
-  test.skip(
-    !process.env.DATABASE_URL,
-    "Requires direct DB access — skipped in CI",
-  );
-
   let session: TestSession;
   const phones: string[] = [];
 

@@ -65,7 +65,7 @@ export default defineConfig({
       name: "tablet",
       // HubSpot-mutating tests run on desktop only — they aren't viewport-specific
       // and parallel HubSpot API load across 3 projects causes timeouts and DB cleanup races.
-      testIgnore: ["**/hubspot-sync.spec.ts"],
+      testIgnore: ["**/hubspot-sync.spec.ts", "**/otp-rate-limit.spec.ts"],
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 768, height: 1024 },
@@ -73,7 +73,7 @@ export default defineConfig({
     },
     {
       name: "mobile",
-      testIgnore: ["**/hubspot-sync.spec.ts"],
+      testIgnore: ["**/hubspot-sync.spec.ts", "**/otp-rate-limit.spec.ts"],
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 375, height: 667 },

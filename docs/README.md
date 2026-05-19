@@ -115,6 +115,7 @@ Point-in-time architecture decisions — why we chose X over Y — live in [`doc
 | [012](adr/adr012-context-providers-for-global-state-only.md) | Context Providers reserved for genuinely global state only |
 | [013](adr/adr013-local-db-canonical-for-lead-data.md) | Local DB is the canonical store for lead data |
 | [014](adr/adr014-outbox-pattern-for-inngest-delivery.md) | Transactional outbox for at-least-once delivery to Inngest |
+| [015](adr/adr015-upstash-rate-limit-for-otp-send.md) | Upstash rate-limit for OTP-send, email-keyed, via better-auth before-hook |
 
 ## Prerequisites
 
@@ -178,6 +179,8 @@ cp .env.example .env
 | `ROBOTS_TXT` | SEO | `Disallow` (default) or `Allow` |
 | `INNGEST_EVENT_KEY` | Inngest | Event API key (optional — not required for local dev server) |
 | `INNGEST_SIGNING_KEY` | Inngest | Signing key for webhook verification (optional — not required locally) |
+| `KV_REST_API_URL` | Rate-limiting | Upstash Redis REST URL — gates OTP-send rate limiter (required; use `make env_pull` from Vercel) |
+| `KV_REST_API_TOKEN` | Rate-limiting | Upstash Redis REST token (sensitive — `vercel env add KV_REST_API_TOKEN --sensitive`) |
 
 Environment validation is enforced at build time via `src/env.js` (uses `@t3-oss/env-nextjs` + Zod). Set `SKIP_ENV_VALIDATION=1` to bypass during Docker builds or CI steps that don't need the full env.
 

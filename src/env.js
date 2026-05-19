@@ -51,6 +51,8 @@ export const env = createEnv({
       .optional(),
     INNGEST_EVENT_KEY: z.string().min(1).optional(),
     INNGEST_SIGNING_KEY: z.string().min(1).optional(),
+    KV_REST_API_URL: z.url(),
+    KV_REST_API_TOKEN: z.string().min(1),
   },
 
   /**
@@ -95,6 +97,8 @@ export const env = createEnv({
     TWILIO_CONSULTANT_NUMBER: process.env.TWILIO_CONSULTANT_NUMBER,
     INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
     INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
+    KV_REST_API_URL: process.env.KV_REST_API_URL,
+    KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

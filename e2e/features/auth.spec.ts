@@ -32,11 +32,6 @@ test.describe("Unauthenticated Redirects", () => {
 });
 
 test.describe("Authenticated Redirects", () => {
-  test.skip(
-    !process.env.DATABASE_URL,
-    "Requires direct DB access — skipped in CI",
-  );
-
   let session: TestSession;
 
   test.beforeAll(async () => {

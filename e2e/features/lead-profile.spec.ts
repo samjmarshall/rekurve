@@ -20,11 +20,6 @@ import {
 import { getSessionCookie } from "../utils/session-cookie";
 
 test.describe("Lead Profile — E2E", () => {
-  test.skip(
-    !process.env.DATABASE_URL,
-    "Requires direct DB access — skipped in CI",
-  );
-
   let session: TestSession;
   const phones: string[] = [];
 
@@ -292,11 +287,6 @@ test.describe("Lead Profile — E2E", () => {
 });
 
 test.describe("Lead Profile — Conversation history", () => {
-  test.skip(
-    !process.env.DATABASE_URL,
-    "Requires direct DB access — skipped in CI",
-  );
-
   let session: TestSession;
   const leadIds: string[] = [];
   const convIds: string[] = [];

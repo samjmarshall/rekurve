@@ -30,10 +30,7 @@ import { getSessionCookie } from "../utils/session-cookie";
 test.describe.configure({ mode: "serial", timeout: 60_000 });
 
 test.describe("HubSpot Outbound Sync — E2E", () => {
-  test.skip(
-    !process.env.HUBSPOT_ACCESS_TOKEN || !process.env.DATABASE_URL,
-    "Requires HUBSPOT_ACCESS_TOKEN and DATABASE_URL — skipped in CI",
-  );
+  test.skip(!process.env.HUBSPOT_ACCESS_TOKEN, "Requires HUBSPOT_ACCESS_TOKEN");
 
   let session: TestSession;
   const phones: string[] = [];
@@ -186,10 +183,8 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
 
 test.describe("HubSpot Inbound Sync — E2E", () => {
   test.skip(
-    !process.env.HUBSPOT_ACCESS_TOKEN ||
-      !process.env.DATABASE_URL ||
-      !process.env.HUBSPOT_WEBHOOK_ACTIVE,
-    "Requires HUBSPOT_ACCESS_TOKEN, DATABASE_URL, and HUBSPOT_WEBHOOK_ACTIVE — only against production (webhook target is production-only)",
+    !process.env.HUBSPOT_ACCESS_TOKEN || !process.env.HUBSPOT_WEBHOOK_ACTIVE,
+    "Requires HUBSPOT_ACCESS_TOKEN and HUBSPOT_WEBHOOK_ACTIVE — only against production (webhook target is production-only)",
   );
 
   let session: TestSession;

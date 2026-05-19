@@ -82,11 +82,6 @@ async function stubDesktopShare(page: Page) {
 // ---------------------------------------------------------------------------
 
 test.describe("SMS Share — E2E", () => {
-  test.skip(
-    !process.env.DATABASE_URL,
-    "Requires direct DB access — skipped in CI",
-  );
-
   let session: TestSession;
   const leadIds: string[] = [];
   const messageIds: string[] = [];

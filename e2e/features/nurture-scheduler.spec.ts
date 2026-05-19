@@ -23,7 +23,6 @@ import {
 import { getSessionCookie } from "../utils/session-cookie";
 
 test.describe("Nurture scheduler", () => {
-  test.skip(!process.env.DATABASE_URL, "DB required");
   test.skip(!process.env.CRON_SECRET, "CRON_SECRET required");
 
   let session: TestSession;

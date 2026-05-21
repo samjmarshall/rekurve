@@ -4,11 +4,13 @@
 
 Hi, I'm Sam and this is an AI sales assistant I built for my wife. She's a Sales Consultant for a new home builder in Brisbane, Australia.
 
-The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC); as Matt Pocock would say "Skills for Real Engineers". To do this properly, I chose to solve a real world problem with real commercial impact. Also my wife has been asking for something this this for some time; wo win-win, happy wife happy life and I get to prove out, teak and tune my AI Agent coding harness that I can use every day and make it work exactly how I to build and operate.
+The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC); as Matt Pocock would say "Skills for Real Engineers". To do this properly, I chose to solve a real-world problem with real commercial need. Also, my wife has been asking for something this this for a long time... so win-win right? happy wife, happy life.
 
-If you're interested in seeing how I use Claude Code, see the `CLAUDE.md` and `.claude/` config folder. Try it outa for yourself. Details on how I use it are roughly documented in the [Development Workflows](#development-workflows) section below.
+This is my sandbox project; where I get to test, tweak and tune my AI Agent coding harness, and try new technologies, which I often use in my professional life. However, in this case, I get to make it work exactly how I prefer to build and operate.
 
-If you would like help with building, implementing or simply discovering problems/solutions in your Enterprise, reach out to me on [Linkedin](https://www.linkedin.com/in/sam-j-marshall/) or get in touch with the [V2 AI](https://www.v2.ai/contact?utm_source=github&utm_medium=referral&utm_campaign=rekurve&utm_content=readme-contact-cta) team.
+If you're interested in seeing how I use Claude Code, see the `CLAUDE.md` and `.claude/` config folder. Try it out for yourself. More details on how it all works are roughly documented in the [Claude Code Harness Overview](#claude-code-harness-overview) section below.
+
+If you would like help with building, implementing or simply discovering problems/solutions for AI to solve in your Enterprise, reach out to me on [Linkedin](https://www.linkedin.com/in/sam-j-marshall/) or get in touch with the [V2 AI](https://www.v2.ai/contact?utm_source=github&utm_medium=referral&utm_campaign=rekurve&utm_content=readme-contact-cta) team.
 
 ## Claude Code Harness Overview
 

@@ -75,14 +75,30 @@ export const auth = betterAuth({
       }
 
       if (!e.success || !i.success) {
-        const reset = Math.max(e.reset ?? 0, i.reset ?? 0);
-        const retryAfter = reset
-          ? Math.max(1, Math.ceil((reset - Date.now()) / 1000))
+        // Pick the reset of the limiter that actually fired. If both fired,
+        // prefer the email window — it's the more specific signal and avoids
+        // leaking IP-window state to a caller who already knows their email's.
+        const firedReset = !e.success ? e.reset : i.reset;
+        const retryAfter = firedReset
+          ? Math.max(1, Math.ceil((firedReset - Date.now()) / 1000))
           : undefined;
+        if (retryAfter) {
+          // ctx.setHeader writes into ctx.context.responseHeaders (captured via
+          // kAPIErrorHeaderSymbol). Also pass via the third arg to APIError so
+          // better-call's toResponse picks it up through error.headers for the
+          // before-hook error path (which bypasses kAPIErrorHeaderSymbol).
+          ctx.setHeader("Retry-After", String(retryAfter));
+          ctx.setHeader("X-Retry-After", String(retryAfter));
+        }
         throw new APIError(
           "TOO_MANY_REQUESTS",
           { message: "Too many requests. Please try again later." },
-          retryAfter ? { "Retry-After": String(retryAfter) } : undefined,
+          retryAfter
+            ? {
+                "Retry-After": String(retryAfter),
+                "X-Retry-After": String(retryAfter),
+              }
+            : undefined,
         );
       }
     }),

@@ -18,7 +18,7 @@ If you would like help with building, implementing or simply discovering problem
 
 Not every task uses every step. Small fixes can skip straight to Implement → Commit. The full flow is available when needed.
 
-### Interactive Claude Workflows
+### Interactive Claude Skills/Commands
 
 These commands are invoked inside [Claude Code](https://claude.ai/code) via slash commands.
 

@@ -27,7 +27,7 @@ These commands are invoked inside [Claude Code](https://claude.ai/code) via slas
 | Command | What it does | When to use |
 |---------|-------------|-------------|
 | `/brainstorm` | Socratic exploration of rough ideas into a design doc | Before writing code — refine what you're building |
-| `/write_ticket` | Collaborative ticket writing | Creating GitHub issues with clear scope |
+| `/write_tickets` | Collaborative ticket writing | Creating GitHub issues with clear scope |
 | `/review_roadmap` | GitHub Project prioritization review | Re-assessing milestone priorities |
 | `/create_plan` | Research-heavy plan creation → `thoughts/plans/`. Applies `frontend-design` skill for UI work | Starting a new feature or significant change |
 | `/iterate_plan` | Update existing plan with new feedback | Plan needs revision after code review or discovery |
@@ -85,9 +85,9 @@ Ralph auto-detects a sibling `.spec.json` when given a `.md` path. You can also 
 
 **When to use Ralph vs interactive `/implement_plan`:**
 - Use **Ralph** for well-defined plans where you want hands-off execution (e.g., overnight runs, large multi-section plans)
-  - Typically for tickets flagged as **AFK** by `/write_ticket`.
+  - Typically for tickets flagged as **AFK** by `/write_tickets`.
 - Use **`/implement_plan`** when you want to stay in the loop, review changes as they happen, or the plan requires judgment calls
-  - For tickets flagged as **HIITL** by `/write_ticket`.
+  - For tickets flagged as **HIITL** by `/write_tickets`.
 
 ### Prerequisites by Task Type
 

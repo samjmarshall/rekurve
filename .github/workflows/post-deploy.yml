@@ -30,6 +30,20 @@ jobs:
         with:
           name: "DB Migration & E2E Setup"
 
+      - name: Debug — log client_payload
+        env:
+          PAYLOAD: ${{ toJSON(github.event.client_payload) }}
+        run: |
+          echo "::group::Full github.event.client_payload"
+          echo "$PAYLOAD"
+          echo "::endgroup::"
+          echo "environment:     ${{ github.event.client_payload.environment }}"
+          echo "git.ref:         ${{ github.event.client_payload.git.ref }}"
+          echo "git.sha:         ${{ github.event.client_payload.git.sha }}"
+          echo "url:             ${{ github.event.client_payload.url }}"
+          echo "production_url:  ${{ github.event.client_payload.production_url }}"
+          echo "branch_url:      ${{ github.event.client_payload.branch_url }}"
+
       - name: Checkout
         uses: vercel/repository-dispatch/actions/checkout@v1
 
@@ -262,6 +276,16 @@ jobs:
           — neon-db-url did not produce a URL. Aborting before Playwright."
             exit 1
           fi
+
+      - name: Debug — log VERCEL_URL passed to Playwright
+        env:
+          COMPUTED_VERCEL_URL: ${{ github.event.client_payload.environment == 'production' && github.event.client_payload.production_url || github.event.client_payload.branch_url }}
+        run: |
+          echo "environment:     ${{ github.event.client_payload.environment }}"
+          echo "url:             ${{ github.event.client_payload.url }}"
+          echo "production_url:  ${{ github.event.client_payload.production_url }}"
+          echo "branch_url:      ${{ github.event.client_payload.branch_url }}"
+          echo "→ VERCEL_URL:    $COMPUTED_VERCEL_URL"
 
       - name: Run Playwright tests
         run: make test_e2e

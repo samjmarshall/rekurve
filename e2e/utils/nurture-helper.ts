@@ -104,6 +104,16 @@ export async function cleanupSequences(ids: string[]): Promise<void> {
   await sql()`DELETE FROM "nurture_sequences" WHERE id = ANY(${ids}::uuid[])`;
 }
 
+// Removes any active sequence the cron would pick up on its next tick. Safe to
+// call alongside the auto-starts test, whose seeded sequence is dated 3 days
+// in the future and won't match.
+export async function cleanupDueActiveSequences(): Promise<void> {
+  await sql()`
+    DELETE FROM "nurture_sequences"
+    WHERE status = 'active' AND next_step_at <= NOW()
+  `;
+}
+
 export async function cronRequestContext(
   baseURL: string,
 ): Promise<APIRequestContext> {

@@ -14,6 +14,7 @@ import {
   seedLead,
 } from "../utils/messages-helper";
 import {
+  cleanupDueActiveSequences,
   cleanupSequences,
   cronRequestContext,
   getActiveSequenceByLead,
@@ -97,6 +98,15 @@ test.describe("Nurture scheduler", () => {
 
     let seededLeadId: string;
     let draftedMessageId: string;
+
+    // The Neon preview branch is reused across runs; a prior aborted run can
+    // leave an active+due sequence behind that the cron will also draft,
+    // breaking the strict `drafted: 1` assertion below. Wipe due sequences
+    // here so only the freshly-seeded one is in scope. Safe vs the parallel
+    // "auto-starts" test (its sequence is dated 3 days out).
+    test.beforeAll(async () => {
+      await cleanupDueActiveSequences();
+    });
 
     test("cron drafts a pending message", async ({ baseURL }) => {
       const lead = await seedLead({

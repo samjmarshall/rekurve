@@ -45,7 +45,7 @@ export default function Privacy() {
           </Link>
           .
         </p>
-        <p>Last Updated: 21 May 2024</p>
+        <p>Last Updated: 25 May 2026</p>
         <h2>What is Personal Information?</h2>
         <p>
           Personal information is any information or an opinion about an
@@ -68,9 +68,8 @@ export default function Privacy() {
           </li>
           <li className="ml-6 space-y-2">
             <b>Usage Data</b> - We may collect information about how you access,
-            use and interact with the website. We do this by using a range of
-            tools such as Google Analytics and AdWords. This information may
-            include:
+            use and interact with the website using PostHog, a product analytics
+            platform. This information may include:
             <ol className="list-disc space-y-2">
               <li className="ml-6">
                 the location from which you have come to the site and the pages
@@ -82,6 +81,23 @@ export default function Privacy() {
                 browser type, language and operating system; and
               </li>
             </ol>
+          </li>
+          <li className="ml-6 space-y-2">
+            <b>Identified Personal Information (booking form and sign-in)</b> -
+            When you interact with our booking enquiry form, your responses are
+            sent to PostHog, which functions as both our analytics platform and
+            a store of booking-form submissions. The information sent includes:{" "}
+            <i>
+              name, email address, phone number, company name, company size,
+              industry, location, qualification challenges, freetext goals,
+              timeline, and indicative revenue.
+            </i>{" "}
+            When you begin interacting with the booking form, PostHog starts a
+            session recording of that interaction — site-wide session recording
+            is off by default and only activates once you start using the form.
+            The email address you provide when requesting a one-time sign-in
+            code is also sent to PostHog. Runtime error events may additionally
+            be tagged with your identified email address.
           </li>
           <li className="ml-6">
             <b>Tracking and Cookies Data</b> - We use cookies on the website. A
@@ -181,9 +197,9 @@ export default function Privacy() {
           </li>
         </ol>
         <p>
-          We will also take reasonable steps to destroy or de-identify Personal
-          Information once we no longer require it for the purposes for which it
-          was collected or for any secondary purpose permitted under the APPs.
+          We retain Personal Information for as long as it is needed to provide
+          our services and to meet our legal obligations. We do not currently
+          operate automated retention or deletion schedules.
         </p>
         <h2>
           Who do we disclose your Personal Information to, and why?&nbsp;&nbsp;
@@ -221,9 +237,37 @@ export default function Privacy() {
           </li>
           <li>
             <p>
-              third parties to collect and process data, such as Google
-              Analytics and AdWords;
+              the following third-party processors, each of which receives
+              Personal Information only to the extent necessary to perform their
+              respective functions:
             </p>
+            <ul className="list-disc space-y-2">
+              <li className="ml-6">
+                <b>PostHog</b> — product analytics and session replay; receives
+                booking-form submissions, sign-in OTP request emails, identified
+                user properties, and runtime error events tagged with the
+                identified user;
+              </li>
+              <li className="ml-6">
+                <b>HubSpot</b> — CRM; system of record for leads in the
+                authenticated application;
+              </li>
+              <li className="ml-6">
+                <b>Resend</b> — transactional email; receives recipient email
+                address and one-time codes for sign-in;
+              </li>
+              <li className="ml-6">
+                <b>Neon</b> — managed PostgreSQL; primary database for the
+                authenticated application;
+              </li>
+              <li className="ml-6">
+                <b>Vercel</b> — hosting and request logs; and
+              </li>
+              <li className="ml-6">
+                <b>Upstash</b> — rate-limit state; short-lived counters keyed by
+                email address and IP address.
+              </li>
+            </ul>
           </li>
           <li>
             <p>our marketing providers; and</p>
@@ -233,12 +277,12 @@ export default function Privacy() {
           </li>
         </ol>
         <p>
-          We may disclose your Personal Information to recipients which are
-          located outside of Australia for some of these purposes, including in
-          the Unites States of America &amp; Japan. Where we disclose Personal
-          Information to third parties overseas, we will take reasonable steps
-          to ensure that data security and appropriate privacy practices are
-          maintained.
+          We may disclose your Personal Information to recipients located
+          outside Australia. The third-party processors named above (PostHog,
+          HubSpot, Resend, Neon, Vercel, and Upstash) are all located in the
+          United States. Where we disclose Personal Information to third parties
+          overseas, we will take reasonable steps to ensure that data security
+          and appropriate privacy practices are maintained.
         </p>
         <p>We may also disclose your Personal Information to others where:</p>
         <ol>

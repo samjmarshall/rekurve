@@ -2,17 +2,22 @@
 
 > A Claude Code harness example for Real Engineers with a Real Project
 
-Hi, I'm Sam and this is an AI sales assistant I built for my wife. She's a Sales Consultant for a new home builder in Brisbane, Australia.
+Hi, I'm Sam and this is an AI sales assistant I built for my wife, a Sales Consultant for a new home builder in Brisbane, Australia.
 
-The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC); as Matt Pocock would say "Skills for Real Engineers". To do this properly, I chose to solve a real-world problem with real commercial need. Also, my wife has been asking for something this this for a long time... so win-win right? happy wife, happy life.
+The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC); as Matt Pocock would say "Skills for Real Engineers". To do this properly, I chose to solve a real-world problem with a real commercial need.
 
-This is my sandbox project; where I get to test, tweak and tune my AI Agent coding harness, and try new technologies, which I often use in my professional life. However, in this case, I get to make it work exactly how I prefer to build and operate.
+This is my sandbox project; where I get to test, tweak and tune my AI Agent coding harness, and try new technologies. Learnings that transfer to my career/professional life once proven.
 
-If you're interested in seeing how I use Claude Code, see the `CLAUDE.md` and `.claude/` config folder. Try it out for yourself. More details on how it all works are roughly documented in the [Claude Code Harness Overview](#claude-code-harness-overview) section below.
+If you're interested in seeing how I use Claude Code for this project, see the `CLAUDE.md` and `.claude/` config folder. Try it out for yourself. More details on how it all works are roughly documented in the [Claude Code Harness Overview](#claude-code-harness-overview) section below.
 
 If you would like help with building, implementing or simply discovering problems/solutions for AI to solve in your Enterprise, reach out to me on [Linkedin](https://www.linkedin.com/in/sam-j-marshall/) or get in touch with the [V2 AI](https://www.v2.ai/contact?utm_source=github&utm_medium=referral&utm_campaign=rekurve&utm_content=readme-contact-cta) team.
 
 ## Claude Code Harness Overview
+
+> [!CAUTION]
+> The ***BIGBEST*** mistake I see individuals and teams make is copy/pasting someone elses Harness. *Do not do this* unless you're happy with someone elses process & results, assuming they also have a similar tech stack.
+> This Claude Code harness & workflow is an example, a rough template you can test, pick and chose from. It is not something I think you should simply copy/paste without modifying for yourself and your specific project context.
+> I'm sure you can still get good results from copy/pasting this exact Harness. I'm simply highlighting my recommendation to study it instead. Test it and apply what is relevant to you. Building up a Harness molded to you and your specific use cases, not the other way around.
 
 ### Workflow
 
@@ -27,7 +32,7 @@ These commands are invoked inside [Claude Code](https://claude.ai/code) via slas
 | Command | What it does | When to use |
 |---------|-------------|-------------|
 | `/brainstorm` | Socratic exploration of rough ideas into a design doc | Before writing code — refine what you're building |
-| `/write_ticket` | Collaborative ticket writing | Creating GitHub issues with clear scope |
+| `/write_tickets` | Collaborative ticket writing | Creating GitHub issues with clear scope |
 | `/review_roadmap` | GitHub Project prioritization review | Re-assessing milestone priorities |
 | `/create_plan` | Research-heavy plan creation → `thoughts/plans/`. Applies `frontend-design` skill for UI work | Starting a new feature or significant change |
 | `/iterate_plan` | Update existing plan with new feedback | Plan needs revision after code review or discovery |
@@ -85,9 +90,9 @@ Ralph auto-detects a sibling `.spec.json` when given a `.md` path. You can also 
 
 **When to use Ralph vs interactive `/implement_plan`:**
 - Use **Ralph** for well-defined plans where you want hands-off execution (e.g., overnight runs, large multi-section plans)
-  - Typically for tickets flagged as **AFK** by `/write_ticket`.
+  - Typically for tickets flagged as **AFK** by `/write_tickets`.
 - Use **`/implement_plan`** when you want to stay in the loop, review changes as they happen, or the plan requires judgment calls
-  - For tickets flagged as **HIITL** by `/write_ticket`.
+  - For tickets flagged as **HIITL** by `/write_tickets`.
 
 ### Prerequisites by Task Type
 

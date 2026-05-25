@@ -4,7 +4,7 @@ import { Redis } from "@upstash/redis";
 import { env } from "~/env";
 
 const OTP_SEND_EMAIL_MAX = 3;
-const OTP_SEND_IP_MAX = 10;
+const OTP_SEND_IP_MAX = 50;
 const OTP_SEND_WINDOW: Duration = "15 m";
 
 const redis = new Redis({

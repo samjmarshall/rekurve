@@ -76,7 +76,7 @@ matched to `ctx.path === "/email-otp/send-verification-otp"`.
 - **Two fixed-window limiters**, checked before the email dispatches:
   **email** (normalized `trim().toLowerCase()`) at **3 / 15 min** (primary —
   the threat model); **client IP** (`x-forwarded-for` first hop) at
-  **10 / 15 min** (backstop). `ephemeralCache` enabled. Limits are named
+  **50 / 15 min** (backstop). `ephemeralCache` enabled. Limits are named
   constants in one module.
 - **Over limit → HTTP 429** with body `{ error: { message } }` (matches the
   existing `/login` error path + `e2e/utils/auth-mock.ts` contract) and a
@@ -136,3 +136,23 @@ overage), and cannot key on email below Enterprise. **Option 3 (better-auth +
 Upstash store)** inherits IP-only keying (defeats the threat model), a
 secondary-storage TTL/memory footgun, and open bug #1891. **Option 4
 (Neon-backed)** is excluded by the no-Neon constraint.
+
+## Revisions
+
+### 2026-05-25 — IP backstop raised 10 → 50 / 15 min
+
+`OTP_SEND_IP_MAX` in `src/lib/rate-limit.ts` raised from **10** to **50** per
+15-min window. The email-keyed primary limiter (`OTP_SEND_EMAIL_MAX = 3`) is
+unchanged — the threat model is unaffected.
+
+Why: the `otp-rate-limit.spec.ts` canary issues ~13 real
+`POST /email-otp/send-verification-otp` calls from a single CI-runner IP
+within ~10 seconds (each case uses a unique email, but the IP key is shared).
+At 10 / 15 min the backstop trips part-way through the spec — see post-deploy
+run [26272636618](https://github.com/samjmarshall/www/actions/runs/26272636618/job/77329542386)
+where `case 4 s1` and `case 1` retries got 429 from the IP key while their
+fresh email keys were still empty. The same shared-IP pattern is also a real
+production case (corporate NAT, mobile carrier CGNAT, family/office Wi-Fi).
+50 / 15 min ≈ 3.3 sends/min from one IP is still a meaningful backstop against
+loop-style abuse while removing the canary-trip and the shared-IP false
+positive.

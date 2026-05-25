@@ -268,7 +268,7 @@ jobs:
         env:
           PLAYWRIGHT_SHARD: ${{ matrix.shard }}/4
           E2E_SKIP_GLOBAL_TEARDOWN: "1"
-          VERCEL_URL: ${{ github.event.client_payload.environment == 'production' && github.event.client_payload.production_url || github.event.client_payload.url }}
+          VERCEL_URL: ${{ github.event.client_payload.environment == 'production' && github.event.client_payload.production_url || github.event.client_payload.branch_url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           DATABASE_URL: ${{ steps.dburl.outputs.db_url }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}

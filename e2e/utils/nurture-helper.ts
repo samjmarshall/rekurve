@@ -4,6 +4,8 @@ import { type APIRequestContext, request } from "@playwright/test";
 
 import "dotenv/config";
 
+import { TEST_FIRST_NAMES } from "./hubspot-helper";
+
 let _sql: NeonQueryFunction<false, false> | undefined;
 function sql() {
   _sql ??= neon(process.env.DATABASE_URL!);
@@ -104,13 +106,26 @@ export async function cleanupSequences(ids: string[]): Promise<void> {
   await sql()`DELETE FROM "nurture_sequences" WHERE id = ANY(${ids}::uuid[])`;
 }
 
-// Removes any active sequence the cron would pick up on its next tick. Safe to
-// call alongside the auto-starts test, whose seeded sequence is dated 3 days
-// in the future and won't match.
+/**
+ * Removes active sequences the cron would pick up on its next tick, scoped to
+ * test-created rows only (lead first_name in TEST_FIRST_NAMES OR email matches
+ * e2e-%@test.rekurve.dev). Mirrors the marker pattern in
+ * auth-helper.deleteTestLeads so production rows are never in scope — safe to
+ * run against the production DB in post-deploy E2E without an env guard.
+ *
+ * Safe alongside the auto-starts test: its seeded sequence is dated 3 days in
+ * the future and won't match next_step_at <= NOW().
+ */
 export async function cleanupDueActiveSequences(): Promise<void> {
   await sql()`
     DELETE FROM "nurture_sequences"
-    WHERE status = 'active' AND next_step_at <= NOW()
+    WHERE status = 'active'
+      AND next_step_at <= NOW()
+      AND lead_id IN (
+        SELECT id FROM "leads"
+        WHERE first_name = ANY(${TEST_FIRST_NAMES})
+           OR email LIKE 'e2e-%@test.rekurve.dev'
+      )
   `;
 }
 

@@ -16,8 +16,10 @@ If you would like help with building, implementing or simply discovering problem
 
 > [!CAUTION]
 > The ***BIGGEST*** mistake I see individuals and teams make is copy/pasting someone elses Harness. *Do not do this* unless you're happy with someone elses process & results, assuming they also have a similar tech stack.
-> This Claude Code harness & workflow is an example, a rough template you can test, pick and chose from. It is not something I think you should simply copy/paste without modifying for yourself and your specific project context.
-> I'm sure you can still get good results from copy/pasting this exact Harness. I'm simply highlighting my recommendation to study it instead. Test it and apply what is relevant to you. Building up a Harness molded to you and your specific use cases, not the other way around.
+>
+> This AI coding workflow & harness is just an example, a rough template you can test; then pick and chose from. You should _NOT_ blindly copy/paste it! Modifying it for yourself and your specific project context.
+>
+> I'm sure you can still get good results from copy/pasting this exact Harness. I'm simply highlighting my recommendation to study it instead. Test it, then apply what is relevant to you. Building up a Harness molded to you and your specific use cases, not the other way around.
 
 ### Workflow
 

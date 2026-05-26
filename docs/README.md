@@ -109,7 +109,7 @@ Ralph auto-detects a sibling `.spec.json` when given a `.md` path. You can also 
 ```bash
 make install     # install deps
 make env_pull    # pull env vars from Vercel (run make vercel_link first on a new clone)
-make start       # dev server at https://www.localhost
+make start       # dev server at https://rekurve.localhost
 ```
 
 ## Architecture
@@ -340,7 +340,7 @@ Email dispatch routes through each consultant's Microsoft 365 mailbox via the Mi
 
 1. Go to [portal.azure.com](https://portal.azure.com) → Azure Active Directory → App registrations → New registration
 2. Set **Supported account types** to `Accounts in any organizational directory (Any Azure AD directory - Multitenant)`
-3. Add a Redirect URI: `https://www.localhost/api/auth/ms-graph/callback` (Web platform)
+3. Add a Redirect URI: `https://rekurve.localhost/api/auth/ms-graph/callback` (Web platform)
 4. Under **Certificates & secrets**, create a client secret
 5. Under **API permissions**, add delegated permissions: `Mail.Send`, `User.Read`, `offline_access`
 
@@ -351,7 +351,7 @@ Add these to Vercel (use `--sensitive` for secrets):
 ```bash
 vercel env add MS_GRAPH_CLIENT_ID
 vercel env add MS_GRAPH_CLIENT_SECRET   # --sensitive
-vercel env add MS_GRAPH_REDIRECT_URI    # e.g. https://www.localhost/api/auth/ms-graph/callback
+vercel env add MS_GRAPH_REDIRECT_URI    # e.g. https://rekurve.localhost/api/auth/ms-graph/callback
 vercel env add HUBSPOT_BCC_ADDRESS      # e.g. 12345678@bcc.hubspot.com (from HubSpot Settings → Integrations → Email)
 ```
 

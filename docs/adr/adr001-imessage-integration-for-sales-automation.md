@@ -7,7 +7,7 @@ Date: '2026-03-27'
 
 # Use iMessage via Device-Bridge Service for Automated Sales Messaging
 
-Technical Story: Automated messages sent from the consultant's personal phone number for trust and seamless manual takeover. Related: samjmarshall/www#87 (Epic 3: HITL Message Queue + Nurture)
+Technical Story: Automated messages sent from the consultant's personal phone number for trust and seamless manual takeover. Related: samjmarshall/rekurve#87 (Epic 3: HITL Message Queue + Nurture)
 
 ## Context and Problem Statement
 

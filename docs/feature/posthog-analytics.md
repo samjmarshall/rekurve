@@ -151,8 +151,8 @@ stateDiagram-v2
   - [PostHog analytics integration](../../thoughts/plans/2025-11-25-posthog-analytics-integration.md)
   - [PostHog user identification](../../thoughts/plans/2025-11-27-posthog-user-identification.md)
   - [PostHog dashboards, funnels & alerts](../../thoughts/plans/2025-11-27-posthog-dashboards-funnels-alerts.md)
-- GitHub issues: [#37](https://github.com/samjmarshall/www/issues/37), [#39](https://github.com/samjmarshall/www/issues/39), [#40](https://github.com/samjmarshall/www/issues/40), [#41](https://github.com/samjmarshall/www/issues/41), [#42](https://github.com/samjmarshall/www/issues/42), [#43](https://github.com/samjmarshall/www/issues/43), [#44](https://github.com/samjmarshall/www/issues/44), [#45](https://github.com/samjmarshall/www/issues/45), [#46](https://github.com/samjmarshall/www/issues/46), [#108](https://github.com/samjmarshall/www/issues/108)
-- Shipping PRs: [#144](https://github.com/samjmarshall/www/pull/144) (E2E capture harness)
+- GitHub issues: [#37](https://github.com/samjmarshall/rekurve/issues/37), [#39](https://github.com/samjmarshall/rekurve/issues/39), [#40](https://github.com/samjmarshall/rekurve/issues/40), [#41](https://github.com/samjmarshall/rekurve/issues/41), [#42](https://github.com/samjmarshall/rekurve/issues/42), [#43](https://github.com/samjmarshall/rekurve/issues/43), [#44](https://github.com/samjmarshall/rekurve/issues/44), [#45](https://github.com/samjmarshall/rekurve/issues/45), [#46](https://github.com/samjmarshall/rekurve/issues/46), [#108](https://github.com/samjmarshall/rekurve/issues/108)
+- Shipping PRs: [#144](https://github.com/samjmarshall/rekurve/pull/144) (E2E capture harness)
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature posthog-analytics`.*

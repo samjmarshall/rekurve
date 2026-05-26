@@ -8,7 +8,7 @@ Date: '2026-05-18'
 # Rate-limit the OTP-send endpoint with Upstash, email-keyed, via a better-auth before-hook
 
 Technical Story: S1 (HIGH) + S2 (MEDIUM) of the deferred security remediation —
-[samjmarshall/www#267](https://github.com/samjmarshall/www/issues/267). Design:
+[samjmarshall/rekurve#267](https://github.com/samjmarshall/rekurve/issues/267). Design:
 `thoughts/designs/2026-05-18-otp-send-rate-limiting.md`.
 
 ## Context and Problem Statement
@@ -156,7 +156,7 @@ Why: the `otp-rate-limit.spec.ts` canary issues ~13 real
 `POST /email-otp/send-verification-otp` calls from a single CI-runner IP
 within ~10 seconds (each case uses a unique email, but the IP key is shared).
 At 10 / 15 min the backstop trips part-way through the spec — see post-deploy
-run [26272636618](https://github.com/samjmarshall/www/actions/runs/26272636618/job/77329542386)
+run [26272636618](https://github.com/samjmarshall/rekurve/actions/runs/26272636618/job/77329542386)
 where `case 4 s1` and `case 1` retries got 429 from the IP key while their
 fresh email keys were still empty. The same shared-IP pattern is also a real
 production case (corporate NAT, mobile carrier CGNAT, family/office Wi-Fi).

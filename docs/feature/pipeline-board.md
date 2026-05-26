@@ -149,8 +149,8 @@ sequenceDiagram
   - [AI qualification scoring](ai-qualification-scoring.md) — assigns the `lead_stage` the board groups by
   - [Quick capture form](quick-capture-form.md) — every quick-captured lead lands in the Unqualified column
   - [Full lead enquiry form](full-lead-enquiry-form.md) — fills enough fields to score Warm/Hot on submit
-- GitHub issue: [#100](https://github.com/samjmarshall/www/issues/100)
-- Shipping PR: [#124](https://github.com/samjmarshall/www/pull/124)
+- GitHub issue: [#100](https://github.com/samjmarshall/rekurve/issues/100)
+- Shipping PR: [#124](https://github.com/samjmarshall/rekurve/pull/124)
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature pipeline-board`.*

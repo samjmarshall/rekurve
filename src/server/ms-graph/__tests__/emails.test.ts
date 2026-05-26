@@ -19,7 +19,8 @@ beforeEach(() => {
       HUBSPOT_BCC_ADDRESS: BCC_ADDRESS,
       MS_GRAPH_CLIENT_ID: "test-client-id",
       MS_GRAPH_CLIENT_SECRET: "test-secret",
-      MS_GRAPH_REDIRECT_URI: "https://www.localhost/api/auth/ms-graph/callback",
+      MS_GRAPH_REDIRECT_URI:
+        "https://rekurve.localhost/api/auth/ms-graph/callback",
     },
   }));
 

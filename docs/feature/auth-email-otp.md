@@ -150,8 +150,8 @@ sequenceDiagram
 - Related plans:
   - [better-auth — Email OTP setup](../../thoughts/plans/2026-03-29-91-better-auth-email-otp.md)
   - [Login page & auth redirect flow](../../thoughts/plans/2026-03-30-login-page-auth-flow.md)
-- GitHub issues: [#91](https://github.com/samjmarshall/www/issues/91), [#92](https://github.com/samjmarshall/www/issues/92)
-- Shipping PRs: [#104](https://github.com/samjmarshall/www/pull/104), [#106](https://github.com/samjmarshall/www/pull/106), [#107](https://github.com/samjmarshall/www/pull/107), [#120](https://github.com/samjmarshall/www/pull/120)
+- GitHub issues: [#91](https://github.com/samjmarshall/rekurve/issues/91), [#92](https://github.com/samjmarshall/rekurve/issues/92)
+- Shipping PRs: [#104](https://github.com/samjmarshall/rekurve/pull/104), [#106](https://github.com/samjmarshall/rekurve/pull/106), [#107](https://github.com/samjmarshall/rekurve/pull/107), [#120](https://github.com/samjmarshall/rekurve/pull/120)
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature auth-email-otp`.*

@@ -157,8 +157,8 @@ flowchart LR
 - Design: [AI sales assistant for new home builders](../../thoughts/designs/2026-03-27-ai-sales-assistant-new-home-builders.md) — see "Human-in-the-Loop (HITL)" and "Action Queue".
 - Plan: [`draftMessage` implementation plan](../../thoughts/plans/2026-04-13-ENG-127-draft-message.md)
 - Companion plan (router that consumes the output): [tRPC messages router + Zod schemas](../../thoughts/plans/2026-04-12-ENG-126-messages-router.md)
-- GitHub issues: [#127](https://github.com/samjmarshall/rekurve-www/issues/127) (this feature), [#87](https://github.com/samjmarshall/rekurve-www/issues/87) (Epic 3 parent)
-- Shipping commit: [`0f39355`](https://github.com/samjmarshall/rekurve-www/commit/0f39355aa0bcd1dee8336c5742d348762b02a9a3) — landed direct to `main`, no PR.
+- GitHub issues: [#127](https://github.com/samjmarshall/rekurve/issues/127) (this feature), [#87](https://github.com/samjmarshall/rekurve/issues/87) (Epic 3 parent)
+- Shipping commit: [`0f39355`](https://github.com/samjmarshall/rekurve/commit/0f39355aa0bcd1dee8336c5742d348762b02a9a3) — landed direct to `main`, no PR.
 - Sibling features:
   - [Action queue](action-queue.md) — UI that surfaces the drafted rows (lands when documented).
   - [Nurture scheduler](nurture-scheduler.md) — the only caller (lands when documented).

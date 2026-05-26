@@ -267,8 +267,8 @@ No PostHog events. No emails. No queue inserts.
   - [Full lead enquiry form](full-lead-enquiry-form.md) — fires `leads.create`
   - [Lead profile](lead-profile.md) — fires `leads.update`
   - [AI qualification scoring](ai-qualification-scoring.md) — `scoreLead()` pushes its score + stage to HubSpot via this feature
-- GitHub issues: [#95](https://github.com/samjmarshall/www/issues/95), [#102](https://github.com/samjmarshall/www/issues/102)
-- Shipping PRs: [#113](https://github.com/samjmarshall/www/pull/113), [#123](https://github.com/samjmarshall/www/pull/123)
+- GitHub issues: [#95](https://github.com/samjmarshall/rekurve/issues/95), [#102](https://github.com/samjmarshall/rekurve/issues/102)
+- Shipping PRs: [#113](https://github.com/samjmarshall/rekurve/pull/113), [#123](https://github.com/samjmarshall/rekurve/pull/123)
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature hubspot-contact-sync`.*

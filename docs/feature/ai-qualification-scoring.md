@@ -143,8 +143,8 @@ stateDiagram-v2
 - Sibling features that consume the score:
   - [Quick capture form](quick-capture-form.md) — every quick-captured lead lands at score 0 / `unqualified`
   - [Full lead enquiry form](full-lead-enquiry-form.md) — fills enough fields to score `warm`/`hot` on submit
-- GitHub issue: [#99](https://github.com/samjmarshall/www/issues/99)
-- Shipping PR: [#122](https://github.com/samjmarshall/www/pull/122) (commits `7dc57dc` AI engine + `25588bc` deterministic refactor)
+- GitHub issue: [#99](https://github.com/samjmarshall/rekurve/issues/99)
+- Shipping PR: [#122](https://github.com/samjmarshall/rekurve/pull/122) (commits `7dc57dc` AI engine + `25588bc` deterministic refactor)
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature ai-qualification-scoring`.*

@@ -156,8 +156,8 @@ sequenceDiagram
   - [HubSpot contact sync (#102)](../../thoughts/plans/2026-04-08-102-hubspot-contact-sync.md)
   - [AI qualification scoring (#99)](../../thoughts/plans/2026-04-08-99-ai-qualification-scoring-engine.md)
   - [Nurture scheduler (#132)](../../thoughts/plans/2026-04-20-ENG-132-nurture-scheduler.md)
-- GitHub issues: [#98](https://github.com/samjmarshall/www/issues/98)
-- Shipping PRs: [#121](https://github.com/samjmarshall/www/pull/121) (plus follow-up commit `55c2e13` raising the FAB above the bottom nav)
+- GitHub issues: [#98](https://github.com/samjmarshall/rekurve/issues/98)
+- Shipping PRs: [#121](https://github.com/samjmarshall/rekurve/pull/121) (plus follow-up commit `55c2e13` raising the FAB above the bottom nav)
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature quick-capture-form`.*

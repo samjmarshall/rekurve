@@ -83,7 +83,7 @@ Pick the diagram type that fits:
 - stateDiagram-v2   — explicit state transitions
 - graph TD / LR     — feature spans ≥3 services/modules
 
-Mirror the styles in /Users/sam/workspace/rekurve/www/docs/README.md so they render in the existing stack.
+Mirror the styles in /Users/sam/workspace/rekurve/rekurve/docs/README.md so they render in the existing stack.
 -->
 
 **State transitions** (if applicable): {pending → drafted → approved → sent}.

@@ -81,7 +81,7 @@ Return success from the mutation immediately and push the auto-start onto a dura
 
 - Bad, for pilot — building a durable retry surface for a single side effect duplicates the recovery model when the cron tick already re-scans `nurture_sequences` daily.
 - Bad, because the next cron tick *is* the queue for active sequences; for missed auto-starts specifically, the recovery is a future qualifying edit re-firing `startOrUpdateSequence`.
-- Neutral — Vercel Workflows is open as a spike ([#153](https://github.com/samjmarshall/www/issues/153)) for nurture + dispatch retry. If pilot evidence shows real touch-loss, that's where the investment goes, not a one-off retry path for auto-start.
+- Neutral — Vercel Workflows is open as a spike ([#153](https://github.com/samjmarshall/rekurve/issues/153)) for nurture + dispatch retry. If pilot evidence shows real touch-loss, that's where the investment goes, not a one-off retry path for auto-start.
 
 ### 5. Partial-success response shape
 
@@ -99,4 +99,4 @@ Return `{ lead, nurtureSequenceStarted: false }` (or HTTP 207 multi-status) when
 - Sibling ADR: [adr004 — HubSpot webhook swallow and always-200](adr004-webhook-swallow-and-always-200.md) — sibling swallow rule on a different surface.
 - Sibling ADR: [adr009 — Nurture scheduler advances `nextStepAt` even on draft failure](adr009-nurture-advances-on-draft-failure.md) — the second nurture-related swallow, async cron tick rather than synchronous write path.
 - Superseded by [ADR010](adr010-inngest-source-of-truth-for-followup-plan.md) — Inngest becomes the source of truth for Follow-up plan run state, with an at-least-once contract that replaces the swallow posture.
-- Open spike: [#153](https://github.com/samjmarshall/www/issues/153) — Vercel Workflows alternative; revisit deferred-job option if pilot evidence shows real auto-start loss.
+- Open spike: [#153](https://github.com/samjmarshall/rekurve/issues/153) — Vercel Workflows alternative; revisit deferred-job option if pilot evidence shows real auto-start loss.

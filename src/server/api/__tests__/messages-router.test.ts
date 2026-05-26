@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
+
 import { TRPCError } from "@trpc/server";
 import type { createCaller } from "../root";
 
@@ -52,8 +53,9 @@ beforeEach(() => {
       HUBSPOT_BCC_ADDRESS: "bcc@bcc.hubspot.com",
       MS_GRAPH_CLIENT_ID: "test-id",
       MS_GRAPH_CLIENT_SECRET: "test-secret",
-      MS_GRAPH_REDIRECT_URI: "https://www.localhost/api/auth/ms-graph/callback",
-      BETTER_AUTH_URL: "https://www.localhost",
+      MS_GRAPH_REDIRECT_URI:
+        "https://rekurve.localhost/api/auth/ms-graph/callback",
+      BETTER_AUTH_URL: "https://rekurve.localhost",
       TWILIO_ACCOUNT_SID: "ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       TWILIO_AUTH_TOKEN: "test-auth-token",
       TWILIO_FROM_NUMBER: "+14155551234",

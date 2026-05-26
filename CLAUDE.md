@@ -22,8 +22,8 @@ Prefer Makefile targets with `yarn` as a fallback — never use `npm` or `npx` d
 - `make install` — install dependencies (`yarn`)
 
 The dev server runs via Vercel Portless - no port.
-- Main worktree (no prefix): https://www.localhost
-- Linked worktree on branch "fix-ui": https://fix-ui.www.localhost
+- Main worktree (no prefix): https://rekurve.localhost
+- Linked worktree on branch "fix-ui": https://fix-ui.rekurve.localhost
 
 ---
 

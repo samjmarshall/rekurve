@@ -369,7 +369,7 @@ setup_devserver() {
 
   # Get the worktree-aware URL from portless (respects branch prefix)
   local app_url
-  app_url=$(cd "$WORKTREE_DIR" && yarn portless get www 2>/dev/null) || app_url="http://localhost:3000"
+  app_url=$(cd "$WORKTREE_DIR" && yarn portless get rekurve 2>/dev/null) || app_url="http://localhost:3000"
 
   # Wait for server to be ready
   local retries=30

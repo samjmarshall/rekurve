@@ -210,6 +210,7 @@ Point-in-time architecture decisions — why we chose X over Y — live in [`doc
 | [013](adr/adr013-local-db-canonical-for-lead-data.md) | Local DB is the canonical store for lead data |
 | [014](adr/adr014-outbox-pattern-for-inngest-delivery.md) | Transactional outbox for at-least-once delivery to Inngest |
 | [015](adr/adr015-upstash-rate-limit-for-otp-send.md) | Upstash rate-limit for OTP-send, email-keyed, via better-auth before-hook |
+| [016](adr/adr016-trpc-ai-procedure-rate-limit.md) | tRPC AI procedure rate limit via `aiProcedure` building block, per-user, fail-open |
 
 ## Prerequisites
 

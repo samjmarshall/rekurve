@@ -30,6 +30,18 @@ export const ipLimiter = new Ratelimit({
   prefix: "otp-send:ip",
 });
 
+export const AI_RATE_LIMIT_REQUESTS = 10;
+export const AI_RATE_LIMIT_WINDOW: Duration = "15 m";
+
+export const aiLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.fixedWindow(AI_RATE_LIMIT_REQUESTS, AI_RATE_LIMIT_WINDOW),
+  ephemeralCache: new Map(),
+  timeout: 1000,
+  analytics: true,
+  prefix: "rl:ai",
+});
+
 export function normalizeEmail(
   raw: string | null | undefined,
 ): string | undefined {

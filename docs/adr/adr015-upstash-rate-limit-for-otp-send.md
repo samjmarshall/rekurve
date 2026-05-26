@@ -137,6 +137,13 @@ Upstash store)** inherits IP-only keying (defeats the threat model), a
 secondary-storage TTL/memory footgun, and open bug #1891. **Option 4
 (Neon-backed)** is excluded by the no-Neon constraint.
 
+## Related
+
+- **ADR-016** (`docs/adr/adr016-trpc-ai-procedure-rate-limit.md`) — extends
+  this pattern to the tRPC AI surface with a third `rl:ai` limiter keyed by
+  `userId` and a `responseMeta` callback that threads `Retry-After` through
+  `TRPCError.cause.reset`.
+
 ## Revisions
 
 ### 2026-05-25 — IP backstop raised 10 → 50 / 15 min

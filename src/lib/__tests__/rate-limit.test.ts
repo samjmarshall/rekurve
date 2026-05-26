@@ -1,5 +1,17 @@
 import { describe, expect, test } from "@rstest/core";
-import { firstForwardedIp, normalizeEmail } from "../rate-limit";
+import {
+  AI_RATE_LIMIT_REQUESTS,
+  AI_RATE_LIMIT_WINDOW,
+  firstForwardedIp,
+  normalizeEmail,
+} from "../rate-limit";
+
+describe("aiLimiter constants", () => {
+  test("requests and window match documented defaults", () => {
+    expect(AI_RATE_LIMIT_REQUESTS).toBe(10);
+    expect(AI_RATE_LIMIT_WINDOW).toBe("15 m");
+  });
+});
 
 describe("normalizeEmail", () => {
   test("trims and lowercases a padded mixed-case address", () => {

@@ -2,6 +2,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
+import { aiLimiter } from "~/lib/rate-limit";
 import { getSession } from "~/lib/session";
 import { db } from "~/server/db";
 
@@ -64,3 +65,36 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+const aiRateLimitMiddleware = t.middleware(async ({ ctx, next }) => {
+  const userId = ctx.session?.user?.id;
+  if (!userId) {
+    // Belt-and-braces: protectedProcedure narrows this, but guards against
+    // a future re-ordering that could silently key on undefined.
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  let result: { success: boolean; reset: number };
+  try {
+    result = await aiLimiter.limit(userId);
+  } catch (err) {
+    console.warn("[ai-rate-limit] limiter unavailable, failing open", err);
+    return next();
+  }
+
+  if (!result.success) {
+    console.info("[ai-rate-limit] limit exceeded", {
+      userId,
+      reset: result.reset,
+    });
+    throw new TRPCError({
+      code: "TOO_MANY_REQUESTS",
+      message: "AI request limit exceeded. Please try again later.",
+      cause: { reset: result.reset },
+    });
+  }
+
+  return next();
+});
+
+export const aiProcedure = protectedProcedure.use(aiRateLimitMiddleware);

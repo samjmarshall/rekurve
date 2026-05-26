@@ -34,6 +34,11 @@ export const auth = betterAuth({
       maxAge: 5 * 60,
     },
   },
+  rateLimit: {
+    customRules: {
+      "/email-otp/send-verification-otp": false,
+    },
+  },
   plugins: [
     emailOTP({
       otpLength: 6,

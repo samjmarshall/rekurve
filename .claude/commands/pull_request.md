@@ -6,7 +6,7 @@ effort: xhigh
 ---
 
 # Pull Request
-yea 
+
 Use the `pull-request` skill to create or update a Pull Request for the current branch.
 
 Arguments passed: $ARGUMENTS

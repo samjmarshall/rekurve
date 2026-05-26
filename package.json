@@ -49,7 +49,7 @@
     "@hubspot/api-client": "13.5.0",
     "@microsoft/microsoft-graph-client": "^3",
     "@neondatabase/serverless": "1.1.0",
-    "@posthog/nextjs-config": "1.9.16",
+    "@posthog/nextjs-config": "1.9.36",
     "@t3-oss/env-nextjs": "0.13.11",
     "@tailwindcss/typography": "0.5.19",
     "@tanstack/react-query": "5.100.8",

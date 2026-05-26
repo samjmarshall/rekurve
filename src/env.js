@@ -24,6 +24,15 @@ export const env = createEnv({
     CRON_SECRET: z.string().min(16),
     DATABASE_URL: z.url(),
     DATABASE_URL_UNPOOLED: z.url(),
+    DEPLOYMENT_URL: z.preprocess(
+      (str) =>
+        process.env.VERCEL
+          ? `https://${process.env.VERCEL_URL}`
+          : process.env.PORTLESS_URL
+            ? process.env.PORTLESS_URL
+            : str,
+      z.url(),
+    ),
     HUBSPOT_ACCESS_TOKEN: z.string().min(1),
     HUBSPOT_CLIENT_SECRET: z.string().min(1),
     HUBSPOT_BCC_ADDRESS: z.string().min(1),
@@ -53,7 +62,6 @@ export const env = createEnv({
       .string()
       .regex(/^\+\d{8,15}$/, "Must be E.164")
       .optional(),
-    VERCEL_DEPLOYMENT_URL: z.url(),
   },
 
   /**
@@ -78,6 +86,7 @@ export const env = createEnv({
     CRON_SECRET: process.env.CRON_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     DATABASE_URL_UNPOOLED: process.env.DATABASE_URL_UNPOOLED,
+    DEPLOYMENT_URL: process.env.DEPLOYMENT_URL,
     HUBSPOT_ACCESS_TOKEN: process.env.HUBSPOT_ACCESS_TOKEN,
     HUBSPOT_CLIENT_SECRET: process.env.HUBSPOT_CLIENT_SECRET,
     HUBSPOT_BCC_ADDRESS: process.env.HUBSPOT_BCC_ADDRESS,
@@ -100,7 +109,6 @@ export const env = createEnv({
     TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
     TWILIO_FROM_NUMBER: process.env.TWILIO_FROM_NUMBER,
     TWILIO_CONSULTANT_NUMBER: process.env.TWILIO_CONSULTANT_NUMBER,
-    VERCEL_DEPLOYMENT_URL: process.env.VERCEL_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

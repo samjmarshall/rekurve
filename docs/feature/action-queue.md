@@ -216,8 +216,8 @@ stateDiagram-v2
   - [HubSpot email dispatch](hubspot-email-dispatch.md) — what `approve`/`editAndApprove` invoke for email rows.
   - [Lead profile](lead-profile.md) — where the consultant goes after approving (conversation history).
   - [Dashboard app shell](dashboard-app-shell.md) — provides the route group, nav, and bottom-nav offset.
-- GitHub issues: [#128](https://github.com/samjmarshall/rekurve-www/issues/128) (this feature), [#152](https://github.com/samjmarshall/rekurve-www/issues/152) (dispatch-failure fix), [#87](https://github.com/samjmarshall/rekurve-www/issues/87) (Epic 3 parent).
-- Shipping PRs: [#145](https://github.com/samjmarshall/rekurve-www/pull/145) (initial build), [#146](https://github.com/samjmarshall/rekurve-www/pull/146) (ultrareview fixes), [#158](https://github.com/samjmarshall/rekurve-www/pull/158) (ENG-152 reorder + email-dispatch wiring).
+- GitHub issues: [#128](https://github.com/samjmarshall/rekurve/issues/128) (this feature), [#152](https://github.com/samjmarshall/rekurve/issues/152) (dispatch-failure fix), [#87](https://github.com/samjmarshall/rekurve/issues/87) (Epic 3 parent).
+- Shipping PRs: [#145](https://github.com/samjmarshall/rekurve/pull/145) (initial build), [#146](https://github.com/samjmarshall/rekurve/pull/146) (ultrareview fixes), [#158](https://github.com/samjmarshall/rekurve/pull/158) (ENG-152 reorder + email-dispatch wiring).
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature action-queue`.*

@@ -24,7 +24,7 @@ gh project field-list 2 --owner samjmarshall --format json
 
 3. **List all issues with milestones:**
 ```bash
-gh issue list --repo samjmarshall/www --state all --json number,title,state,milestone,labels --limit 100
+gh issue list --repo samjmarshall/rekurve --state all --json number,title,state,milestone,labels --limit 100
 ```
 
 ## Context to Read

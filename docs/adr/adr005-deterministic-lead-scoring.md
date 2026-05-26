@@ -9,7 +9,7 @@ Date: '2026-04-29'
 
 ## Context and Problem Statement
 
-The lead form collects six structured qualification fields (booleans, enums, a parsed budget number) that feed a 100-point rubric, and the rubric total derives the lead stage. The consultant sees the score and a per-factor breakdown on the lead profile, and the breakdown drives the "next question" prompt. The first implementation routed scoring through Claude Haiku; PR [#122](https://github.com/samjmarshall/www/pull/122) shipped that version in commit `7dc57dc` and ripped it out hours later in commit `25588bc`, replacing it with a pure TypeScript engine (`qualifyAndScore()` in `src/server/scoring/`).
+The lead form collects six structured qualification fields (booleans, enums, a parsed budget number) that feed a 100-point rubric, and the rubric total derives the lead stage. The consultant sees the score and a per-factor breakdown on the lead profile, and the breakdown drives the "next question" prompt. The first implementation routed scoring through Claude Haiku; PR [#122](https://github.com/samjmarshall/rekurve/pull/122) shipped that version in commit `7dc57dc` and ripped it out hours later in commit `25588bc`, replacing it with a pure TypeScript engine (`qualifyAndScore()` in `src/server/scoring/`).
 
 Is lead scoring an LLM call or a TypeScript engine?
 
@@ -71,6 +71,6 @@ Routed the same six structured inputs through Haiku via `messages.parse()`. Ship
 
 ## Links
 
-- Shipping PR: [#122](https://github.com/samjmarshall/www/pull/122) — commits `7dc57dc` (AI engine) and `25588bc` (deterministic refactor)
+- Shipping PR: [#122](https://github.com/samjmarshall/rekurve/pull/122) — commits `7dc57dc` (AI engine) and `25588bc` (deterministic refactor)
 - Plan: [Deterministic Lead Scoring Engine — Refactor Plan](../../thoughts/plans/2026-04-08-99-ai-qualification-scoring-engine.md)
 - Feature doc: [AI qualification scoring](../feature/ai-qualification-scoring.md)

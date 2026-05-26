@@ -116,8 +116,8 @@ flowchart LR
 - Epic: [Epic 1: MVP Foundation](../../thoughts/epics/2026-03-27-epic-1-foundation.md)
 - Related plans: [Dashboard App Shell — Mobile-Responsive Empty State](../../thoughts/plans/2026-03-31-94-dashboard-app-shell.md)
 - Related features: [Email OTP login](auth-email-otp.md) — sits behind the auth gate this shell relies on
-- GitHub issues: [#94](https://github.com/samjmarshall/www/issues/94)
-- Shipping PRs: [#111](https://github.com/samjmarshall/www/pull/111)
+- GitHub issues: [#94](https://github.com/samjmarshall/rekurve/issues/94)
+- Shipping PRs: [#111](https://github.com/samjmarshall/rekurve/pull/111)
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature dashboard-app-shell`.*

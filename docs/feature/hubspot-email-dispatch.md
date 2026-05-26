@@ -29,7 +29,7 @@ related-prs: [158]
 - **Inbound email** — replies in Outlook do not flow back into the conversation log. Belongs in a follow-up once the outbound foundation has soaked.
 - **Inbound webhook stub** — the handler ignores `email.creation` events with `hs_email_direction = INCOMING_EMAIL`.
 - **Nightly missed-webhook reconciler** — if HubSpot never fires the webhook (or it errors), `hubspotActivityId` stays `NULL` indefinitely. Acceptable trade-off for pilot.
-- **SMS dispatch** — owned by [#129](https://github.com/samjmarshall/www/issues/129), parallel branch.
+- **SMS dispatch** — owned by [#129](https://github.com/samjmarshall/rekurve/issues/129), parallel branch.
 - **Multi-tenant Microsoft onboarding UI** — one consultant, one mailbox.
 - **HTML email** — body is plain text (matches the AI-drafted format from [ai-message-drafting](ai-message-drafting.md)).
 - **Shared mailboxes / send-as / delegated send** — own mailbox only.
@@ -77,7 +77,7 @@ related-prs: [158]
 **Trade-offs**:
 - **Async reconciliation window** — `conversations.hubspotActivityId` stays `NULL` for ~15–90 seconds after send (HubSpot ingestion delay). Lead profile and any other consumer must tolerate the null state.
 - **No missed-webhook recovery** — if HubSpot drops the webhook, the row's `hubspotActivityId` is `NULL` forever. A nightly reconciler is a follow-up ticket.
-- **Silent SMTP failure** — Graph returns 202 (queued) before SMTP delivery. Microsoft's outbound infrastructure can later bounce with `550 5.7.501 Spam abuse detected from IP range` and the dashboard already showed "Sent via email". Tracked as [#154](https://github.com/samjmarshall/www/issues/154); the [compose-providers design](../../thoughts/designs/2026-04-27-email-compose-providers.md) addresses it via webhook-driven send detection.
+- **Silent SMTP failure** — Graph returns 202 (queued) before SMTP delivery. Microsoft's outbound infrastructure can later bounce with `550 5.7.501 Spam abuse detected from IP range` and the dashboard already showed "Sent via email". Tracked as [#154](https://github.com/samjmarshall/rekurve/issues/154); the [compose-providers design](../../thoughts/designs/2026-04-27-email-compose-providers.md) addresses it via webhook-driven send detection.
 - **Single mailbox per consultant** — `ms_graph_tokens.userId` is the primary key. No shared mailbox, no send-as.
 - **Subject-based reconciliation is fuzzy** — two outbound emails to the same lead with the same subject within ±5 min would race. AI drafts vary subjects; risk is low at pilot scale.
 - **No `ms_graph_tokens` token encryption at rest** — flagged as a known TODO. Postgres column-level encryption is a follow-up.
@@ -217,8 +217,8 @@ stateDiagram-v2
 - Epic: [Epic 3 — HITL Message Queue + Nurture Sequences](../../thoughts/epics/2026-03-27-epic-3-hitl-message-queue-nurture.md)
 - Implementation plan: [ENG-130 — Outlook Email Dispatch + HubSpot Activity Reconciliation](../../thoughts/plans/2026-04-25-ENG-130-hubspot-email-outlook-dispatch.md)
 - Related features: [action-queue](action-queue.md), [ai-message-drafting](ai-message-drafting.md), [hubspot-contact-sync](hubspot-contact-sync.md), [lead-profile](lead-profile.md)
-- GitHub issues: [#130](https://github.com/samjmarshall/www/issues/130), [#152](https://github.com/samjmarshall/www/issues/152), [#87](https://github.com/samjmarshall/www/issues/87) (epic), [#154](https://github.com/samjmarshall/www/issues/154) (silent send-failure follow-up), [#156](https://github.com/samjmarshall/www/issues/156) (MIME-content sendMail follow-up)
-- Shipping PR: [#158](https://github.com/samjmarshall/www/pull/158)
+- GitHub issues: [#130](https://github.com/samjmarshall/rekurve/issues/130), [#152](https://github.com/samjmarshall/rekurve/issues/152), [#87](https://github.com/samjmarshall/rekurve/issues/87) (epic), [#154](https://github.com/samjmarshall/rekurve/issues/154) (silent send-failure follow-up), [#156](https://github.com/samjmarshall/rekurve/issues/156) (MIME-content sendMail follow-up)
+- Shipping PR: [#158](https://github.com/samjmarshall/rekurve/pull/158)
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature hubspot-email-dispatch`.*

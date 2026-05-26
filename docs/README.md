@@ -43,7 +43,9 @@ These commands are invoked inside [Claude Code](https://claude.ai/code) via slas
 | `/plan-to-ralph-spec <path>` | Convert markdown plan to `.spec.json` for Ralph | Before running `ralph.sh` — produces the JSON spec Ralph reads |
 | `/commit` | Structured conventional commit | Ready to commit (follows repo conventions) |
 | `/design_review` | Visual/accessibility/brand review via Playwright | After UI/UX changes, before committing |
-| `/pull-request` | Create or update a PR — generates title (create) and description from diff + template | Before opening or updating a PR |
+| `/pull_request` | Create or update a PR — generates title (create) and description from diff + template | Before opening or updating a PR |
+| `/document_feature <feature-name>` | Interview-driven living feature doc at `docs/feature/{slug}.md` — present-tense "what does this do today" | After a feature ships — keep the feature reference current |
+| `/domain_model <plan-path>` | Interview-driven domain modeling, sharpen terminology and update `CONTEXT.md`, align language before implementation. Write/update Architecture Decision Records (ADRs) | After brainstorm for drafting domain models / ADRs. After plan implementation for accepting/rejecting drafted ADRs or writing new ADRs when difficult to reverse decisions are made. |
 
 ### Automated: Ralph Loop
 
@@ -111,7 +113,7 @@ Ralph auto-detects a sibling `.spec.json` when given a `.md` path. You can also 
 ```bash
 make install     # install deps
 make env_pull    # pull env vars from Vercel (run make vercel_link first on a new clone)
-make start       # dev server at https://www.localhost
+make start       # dev server at https://rekurve.localhost
 ```
 
 ## Architecture
@@ -212,6 +214,7 @@ Point-in-time architecture decisions — why we chose X over Y — live in [`doc
 | [013](adr/adr013-local-db-canonical-for-lead-data.md) | Local DB is the canonical store for lead data |
 | [014](adr/adr014-outbox-pattern-for-inngest-delivery.md) | Transactional outbox for at-least-once delivery to Inngest |
 | [015](adr/adr015-upstash-rate-limit-for-otp-send.md) | Upstash rate-limit for OTP-send, email-keyed, via better-auth before-hook |
+| [016](adr/adr016-trpc-ai-procedure-rate-limit.md) | tRPC AI procedure rate limit via `aiProcedure` building block, per-user, fail-open |
 
 ## Prerequisites
 
@@ -341,7 +344,7 @@ Email dispatch routes through each consultant's Microsoft 365 mailbox via the Mi
 
 1. Go to [portal.azure.com](https://portal.azure.com) → Azure Active Directory → App registrations → New registration
 2. Set **Supported account types** to `Accounts in any organizational directory (Any Azure AD directory - Multitenant)`
-3. Add a Redirect URI: `https://www.localhost/api/auth/ms-graph/callback` (Web platform)
+3. Add a Redirect URI: `https://rekurve.localhost/api/auth/ms-graph/callback` (Web platform)
 4. Under **Certificates & secrets**, create a client secret
 5. Under **API permissions**, add delegated permissions: `Mail.Send`, `User.Read`, `offline_access`
 
@@ -352,7 +355,7 @@ Add these to Vercel (use `--sensitive` for secrets):
 ```bash
 vercel env add MS_GRAPH_CLIENT_ID
 vercel env add MS_GRAPH_CLIENT_SECRET   # --sensitive
-vercel env add MS_GRAPH_REDIRECT_URI    # e.g. https://www.localhost/api/auth/ms-graph/callback
+vercel env add MS_GRAPH_REDIRECT_URI    # e.g. https://rekurve.localhost/api/auth/ms-graph/callback
 vercel env add HUBSPOT_BCC_ADDRESS      # e.g. 12345678@bcc.hubspot.com (from HubSpot Settings → Integrations → Email)
 ```
 

@@ -64,7 +64,7 @@ jobs:
       #   with:
       #     pagerduty-integration-key: ${{ secrets.PAGERDUTY_INTEGRATION_KEY }}
       #     pagerduty-dedup-key: npm_audit
-      #     runbook-url: https://github.com/samjmarshall/www/docs/run-books/...
+      #     runbook-url: https://github.com/samjmarshall/rekurve/docs/run-books/...
       #
       # - name: Resolve PagerDuty alert on success
       #   if: ${{ !failure() && !cancelled() }}

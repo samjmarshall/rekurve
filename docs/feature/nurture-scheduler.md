@@ -249,8 +249,8 @@ stateDiagram-v2
   - [Action queue](action-queue.md) — where the cron-inserted `pending` rows land for the consultant to approve.
   - [HubSpot email dispatch](hubspot-email-dispatch.md) — what runs after Approve on email-channel rows.
   - [AI qualification scoring](ai-qualification-scoring.md) — produces `leadStage` which drives sequence type.
-- GitHub issues: [#132](https://github.com/samjmarshall/rekurve-www/issues/132) (this feature), [#87](https://github.com/samjmarshall/rekurve-www/issues/87) (Epic 3 parent), [#153](https://github.com/samjmarshall/rekurve-www/issues/153) (open spike — Vercel Workflows alternative).
-- Shipping PR: [#147](https://github.com/samjmarshall/rekurve-www/pull/147).
+- GitHub issues: [#132](https://github.com/samjmarshall/rekurve/issues/132) (this feature), [#87](https://github.com/samjmarshall/rekurve/issues/87) (Epic 3 parent), [#153](https://github.com/samjmarshall/rekurve/issues/153) (open spike — Vercel Workflows alternative).
+- Shipping PR: [#147](https://github.com/samjmarshall/rekurve/pull/147).
 - Vercel — [Managing Cron Jobs](https://vercel.com/docs/cron-jobs/manage-cron-jobs).
 
 ---

@@ -158,8 +158,8 @@ flowchart LR
 - Epic: [Epic 3 — HITL Message Queue + Nurture Sequences](../../thoughts/epics/2026-03-27-epic-3-hitl-message-queue-nurture.md)
 - Implementation plan: [ENG-131 — Conversation Log on Lead Profile](../../thoughts/plans/2026-04-26-ENG-131-conversation-log-lead-profile.md)
 - Related features: [lead-profile](lead-profile.md), [action-queue](action-queue.md), [ai-message-drafting](ai-message-drafting.md), [hubspot-email-dispatch](hubspot-email-dispatch.md), [pipeline-board](pipeline-board.md)
-- GitHub issues: [#131](https://github.com/samjmarshall/www/issues/131), [#87](https://github.com/samjmarshall/www/issues/87) (epic)
-- Shipping PR: [#159](https://github.com/samjmarshall/www/pull/159)
+- GitHub issues: [#131](https://github.com/samjmarshall/rekurve/issues/131), [#87](https://github.com/samjmarshall/rekurve/issues/87) (epic)
+- Shipping PR: [#159](https://github.com/samjmarshall/rekurve/pull/159)
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature lead-conversation-history`.*

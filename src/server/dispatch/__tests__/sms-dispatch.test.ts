@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
+
 import { TRPCError } from "@trpc/server";
 
 const LEAD_ID = "660e8400-e29b-41d4-a716-446655440001";
@@ -41,7 +42,7 @@ beforeEach(() => {
 
   rs.doMock("~/env", () => ({
     env: {
-      BETTER_AUTH_URL: "https://www.localhost",
+      BETTER_AUTH_URL: "https://rekurve.localhost",
       TWILIO_ACCOUNT_SID: "ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       TWILIO_AUTH_TOKEN: "test-auth-token",
       TWILIO_FROM_NUMBER: "+14155551234",
@@ -62,7 +63,7 @@ describe("dispatchSms", () => {
 
     expect(mockSendSmsToConsultant).toHaveBeenCalledWith(
       "Hi Jane, your lot is ready.",
-      { statusCallback: "https://www.localhost/api/twilio/status" },
+      { statusCallback: "https://rekurve.localhost/api/twilio/status" },
     );
   });
 

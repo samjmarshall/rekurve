@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
+
 import { TRPCError } from "@trpc/server";
 
 const LEAD_ID = "660e8400-e29b-41d4-a716-446655440001";
@@ -56,7 +57,8 @@ beforeEach(() => {
       HUBSPOT_BCC_ADDRESS: "bcc@bcc.hubspot.com",
       MS_GRAPH_CLIENT_ID: "test-id",
       MS_GRAPH_CLIENT_SECRET: "test-secret",
-      MS_GRAPH_REDIRECT_URI: "https://www.localhost/api/auth/ms-graph/callback",
+      MS_GRAPH_REDIRECT_URI:
+        "https://rekurve.localhost/api/auth/ms-graph/callback",
     },
   }));
 

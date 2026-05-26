@@ -183,8 +183,8 @@ No PostHog events. No emails. No queue inserts.
   - [Quick capture form](quick-capture-form.md) — creates the leads that arrive Unqualified with five gaps
   - [Full lead enquiry form](full-lead-enquiry-form.md) — creates leads that arrive Warm/Hot
   - [Dashboard app shell](dashboard-app-shell.md) — provides the sticky-bar offset (`md:left-64`) the edit action bar relies on
-- GitHub issue: [#101](https://github.com/samjmarshall/www/issues/101)
-- Shipping PR: [#125](https://github.com/samjmarshall/www/pull/125)
+- GitHub issue: [#101](https://github.com/samjmarshall/rekurve/issues/101)
+- Shipping PR: [#125](https://github.com/samjmarshall/rekurve/pull/125)
 
 ---
 *Generated from interview on 2026-04-28. To regenerate, run `/document-feature lead-profile`.*

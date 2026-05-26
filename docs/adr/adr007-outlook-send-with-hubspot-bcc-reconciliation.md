@@ -7,7 +7,7 @@ Date: '2026-04-29'
 
 # Outlook send with HubSpot BCC reconciliation
 
-Technical Story: Issue [#130](https://github.com/samjmarshall/www/issues/130) — originally specified the HubSpot Single-Send Transactional API; pilot cost gating and the "invisible infrastructure" posture moved the send path to the consultant's Outlook mailbox with BCC reconciliation.
+Technical Story: Issue [#130](https://github.com/samjmarshall/rekurve/issues/130) — originally specified the HubSpot Single-Send Transactional API; pilot cost gating and the "invisible infrastructure" posture moved the send path to the consultant's Outlook mailbox with BCC reconciliation.
 
 ## Context and Problem Statement
 
@@ -43,7 +43,7 @@ Chosen option: "1. Graph `/me/sendMail` + `HUBSPOT_BCC_ADDRESS` reconciliation",
 
 - **`conversations.hubspotActivityId` is nullable for ~15–90s after every send, and indefinitely if the webhook is dropped.** This is the operational shape of "HubSpot creates the engagement asynchronously." Most consumers (lead profile, queue UI, conversation log) tolerate the null state and should continue to. The approve mutation does not block on reconciliation. Future features that require a guaranteed `hubspotActivityId` cannot be built on `conversations` without first solving missed-webhook recovery — a nightly reconciler (find rows older than ~15min with null `hubspotActivityId`, query HubSpot for matching engagements, stamp them) is the obvious shape but is deliberately deferred until pilot evidence shows the webhook actually drops events. Any feature that *cannot* tolerate indefinite null on this column owns the reconciler as a blocker.
 - **Subject-based reconciliation is fuzzy at the ±5-minute boundary.** Two outbound emails to the same lead with the same subject within 5 minutes will race; the closest-by-`createdAt` candidate wins, the other stays null. Acceptable at pilot volume because AI drafts vary subjects; if collision rates rise, the matching window narrows or the match key extends (e.g. body hash) before the window widens.
-- **Silent SMTP-bounce gap ([#154](https://github.com/samjmarshall/www/issues/154)).** Graph returns 202 (queued) before SMTP delivery. Microsoft can later bounce with `550 5.7.501 Spam abuse detected from IP range` and the dashboard will already have shown "Sent via email". This is a known limitation of "trust the 202"; the successor design folded into adr013 / adr014 addresses it via webhook-driven send detection.
+- **Silent SMTP-bounce gap ([#154](https://github.com/samjmarshall/rekurve/issues/154)).** Graph returns 202 (queued) before SMTP delivery. Microsoft can later bounce with `550 5.7.501 Spam abuse detected from IP range` and the dashboard will already have shown "Sent via email". This is a known limitation of "trust the 202"; the successor design folded into adr013 / adr014 addresses it via webhook-driven send detection.
 - **MSAL `acquireTokenByCode` workaround fragility.** The SDK's typed result drops `refresh_token`, so the OAuth callback POSTs `/oauth2/v2.0/token` directly to capture it. If MSAL changes its surface, the hand-rolled fetch needs review — fragile against `@azure/msal-node` upgrades and worth flagging in code review when the package is bumped.
 
 ## Pros and Cons of the Options
@@ -56,13 +56,13 @@ The consultant authorises Microsoft Graph access via OAuth; the approve mutation
 | ---- | ---- |
 | Lead sees the consultant's own email as the sender — Rekurve stays invisible | `hubspotActivityId` nullable for ~15–90s after every send (indefinitely if webhook drops) |
 | HubSpot's native BCC ingestion produces the highest-fidelity timeline engagement (correct MIME, headers, threading, direction flags) | ±5-minute subject-match reconciliation can race on rapid-fire same-subject sends |
-| Outlook thread lands in the consultant's Sent Items — they can reply natively at any time | Graph returns 202 before SMTP delivery — silent bounce gap ([#154](https://github.com/samjmarshall/www/issues/154)) |
+| Outlook thread lands in the consultant's Sent Items — they can reply natively at any time | Graph returns 202 before SMTP delivery — silent bounce gap ([#154](https://github.com/samjmarshall/rekurve/issues/154)) |
 | Forward-compatible with inbound replies: the original BCC stays on the reply thread, so HubSpot picks the reply up the same way | MSAL `acquireTokenByCode` workaround is fragile against `@azure/msal-node` upgrades |
 | Zero subscription cost — uses the consultant's existing M365 mailbox | Schema locks one Microsoft mailbox per consultant — multi-mailbox onboarding is a schema + OAuth-flow change |
 
 ### 2. HubSpot Single-Send Transactional API
 
-What issue [#130](https://github.com/samjmarshall/www/issues/130) originally specified — call HubSpot's Single-Send endpoint and let HubSpot send the email and write the engagement in one call.
+What issue [#130](https://github.com/samjmarshall/rekurve/issues/130) originally specified — call HubSpot's Single-Send endpoint and let HubSpot send the email and write the engagement in one call.
 
 | Pros | Cons |
 | ---- | ---- |
@@ -103,8 +103,8 @@ The schema is unchanged. The choice of Outlook is unchanged. The single-mailbox-
 ## Links
 
 - Successor design: [Email compose providers](../../thoughts/designs/2026-04-27-email-compose-providers.md)
-- Issue [#130](https://github.com/samjmarshall/www/issues/130) — originally specified HubSpot Single-Send
-- Issue [#154](https://github.com/samjmarshall/www/issues/154) — silent SMTP bounce after Graph 202
-- Issue [#156](https://github.com/samjmarshall/www/issues/156) — MIME-content `sendMail`
+- Issue [#130](https://github.com/samjmarshall/rekurve/issues/130) — originally specified HubSpot Single-Send
+- Issue [#154](https://github.com/samjmarshall/rekurve/issues/154) — silent SMTP bounce after Graph 202
+- Issue [#156](https://github.com/samjmarshall/rekurve/issues/156) — MIME-content `sendMail`
 - Refined by [ADR013](adr013-local-db-canonical-for-lead-data.md)
 - Refined by [ADR014](adr014-outbox-pattern-for-inngest-delivery.md)

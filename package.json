@@ -1,5 +1,5 @@
 {
-  "name": "www",
+  "name": "rekurve",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
@@ -7,9 +7,9 @@
   "scripts": {
     "build": "next build",
     "check": "biome check . && tsc --noEmit",
-    "dev": "concurrently -k -n www,inngest -c blue,green \"yarn dev:www\" \"yarn dev:inngest\"",
-    "dev:www": "portless run --force ./scripts/dev-www.sh",
-    "dev:inngest": "portless run --force --name inngest.www ./scripts/dev-inngest.sh",
+    "dev": "concurrently -k -n rekurve,inngest -c blue,green \"yarn dev:rekurve\" \"yarn dev:inngest\"",
+    "dev:rekurve": "portless run --force ./scripts/dev-rekurve.sh",
+    "dev:inngest": "portless run --force --name inngest.rekurve ./scripts/dev-inngest.sh",
     "format:check": "biome format .",
     "format:write": "biome format --write .",
     "lint": "biome lint .",

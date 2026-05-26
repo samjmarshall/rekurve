@@ -18,7 +18,7 @@ const resend = new Resend(env.RESEND_API_KEY);
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
-  trustedOrigins: [env.VERCEL_DEPLOYMENT_URL],
+  trustedOrigins: [env.DEPLOYMENT_URL],
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: authSchema,
@@ -32,6 +32,11 @@ export const auth = betterAuth({
       // clients for up to 5 minutes. Acceptable for this app; reduce or
       // disable if immediate revocation becomes a requirement.
       maxAge: 5 * 60,
+    },
+  },
+  rateLimit: {
+    customRules: {
+      "/email-otp/send-verification-otp": false,
     },
   },
   plugins: [

@@ -35,4 +35,4 @@ make start       # shell 1 — Next.js via Vercel Portless
 make inngest_dev # shell 2 — Inngest dev UI at http://localhost:8288
 ```
 
-The Inngest dev UI auto-discovers the serve endpoint at `https://www.localhost/api/inngest` and lists the registered functions (`outbox-sweep`, `outbox-prune`).
+The Inngest dev UI auto-discovers the serve endpoint at `https://rekurve.localhost/api/inngest` and lists the registered functions (`outbox-sweep`, `outbox-prune`).

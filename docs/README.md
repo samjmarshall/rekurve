@@ -41,7 +41,9 @@ These commands are invoked inside [Claude Code](https://claude.ai/code) via slas
 | `/plan-to-ralph-spec <path>` | Convert markdown plan to `.spec.json` for Ralph | Before running `ralph.sh` — produces the JSON spec Ralph reads |
 | `/commit` | Structured conventional commit | Ready to commit (follows repo conventions) |
 | `/design_review` | Visual/accessibility/brand review via Playwright | After UI/UX changes, before committing |
-| `/pull-request` | Create or update a PR — generates title (create) and description from diff + template | Before opening or updating a PR |
+| `/pull_request` | Create or update a PR — generates title (create) and description from diff + template | Before opening or updating a PR |
+| `/document_feature <feature-name>` | Interview-driven living feature doc at `docs/feature/{slug}.md` — present-tense "what does this do today" | After a feature ships — keep the feature reference current |
+| `/domain_model <plan-path>` | Interview-driven domain modeling, sharpen terminology and update `CONTEXT.md`, align language before implementation. Write/update Architecture Decision Records (ADRs) | After brainstorm for drafting domain models / ADRs. After plan implementation for accepting/rejecting drafted ADRs or writing new ADRs when difficult to reverse decisions are made. |
 
 ### Automated: Ralph Loop
 

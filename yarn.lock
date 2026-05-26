@@ -12,9 +12,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@anthropic-ai/sdk@npm:0.97.0":
-  version: 0.97.0
-  resolution: "@anthropic-ai/sdk@npm:0.97.0"
+"@anthropic-ai/sdk@npm:0.97.1":
+  version: 0.97.1
+  resolution: "@anthropic-ai/sdk@npm:0.97.1"
   dependencies:
     json-schema-to-ts: ^3.1.1
     standardwebhooks: ^1.0.0
@@ -25,7 +25,7 @@ __metadata:
       optional: true
   bin:
     anthropic-ai-sdk: bin/cli
-  checksum: 9d9de16fef575128a74d6d8bc111570e7386d07301490356e0bf7db46c77a428ce5b8ea307ec6afb74a206d9df08b321bdd251fb7edb288e9c0ca395b842170d
+  checksum: d266572143acba8dad3a74e73ab3da81b6d49a0e254cf1748597e764ccf4ee6b8688474bdf4086af31420ba5e6b501902f3e02e63eedb41a302567d6615a7d12
   languageName: node
   linkType: hard
 
@@ -13266,7 +13266,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "rekurve@workspace:."
   dependencies:
-    "@anthropic-ai/sdk": 0.97.0
+    "@anthropic-ai/sdk": 0.97.1
     "@auto-it/conventional-commits": ^11.3.6
     "@auto-it/git-tag": ^11.3.6
     "@auto-it/released": ^11.3.6

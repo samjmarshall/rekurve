@@ -1,18 +1,11 @@
 import { FilterOperatorEnum } from "@hubspot/api-client/lib/codegen/crm/contacts/models/Filter";
 import { env } from "~/env";
 import { hubspot } from "./client";
-import {
-  ALL_PROPERTIES,
-  type AppField,
-  fromHubSpotProperties,
-  toHubSpotProperties,
-} from "./properties";
-
-export type ContactData = Partial<Record<AppField, string | boolean | null>>;
+import { ALL_PROPERTIES, type HubSpotContactProperties } from "./properties";
 
 export interface HubSpotContact {
   id: string;
-  properties: Partial<Record<AppField, string>>;
+  properties: Record<string, string | null>;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,15 +18,15 @@ function mapContact(response: {
 }): HubSpotContact {
   return {
     id: response.id,
-    properties: fromHubSpotProperties(response.properties),
+    properties: response.properties,
     createdAt: response.createdAt.toISOString(),
     updatedAt: response.updatedAt.toISOString(),
   };
 }
 
-/** Create a contact in HubSpot. Returns the mapped contact. */
+/** Create a contact in HubSpot. Returns the contact with raw HubSpot properties. */
 export async function createContact(
-  data: ContactData,
+  properties: HubSpotContactProperties,
 ): Promise<HubSpotContact> {
   if (env.HUBSPOT_MOCK === "true") {
     console.log("[hubspot-mock] createContact");
@@ -45,7 +38,7 @@ export async function createContact(
     };
   }
   const response = await hubspot.crm.contacts.basicApi.create({
-    properties: toHubSpotProperties(data),
+    properties,
     associations: [],
   });
   return mapContact(response);
@@ -72,7 +65,7 @@ export async function getContact(hubspotId: string): Promise<HubSpotContact> {
 /** Update a contact's properties. */
 export async function updateContact(
   hubspotId: string,
-  data: ContactData,
+  properties: HubSpotContactProperties,
 ): Promise<HubSpotContact> {
   if (env.HUBSPOT_MOCK === "true") {
     console.log("[hubspot-mock] updateContact");
@@ -84,7 +77,7 @@ export async function updateContact(
     };
   }
   const response = await hubspot.crm.contacts.basicApi.update(hubspotId, {
-    properties: toHubSpotProperties(data),
+    properties,
   });
   return mapContact(response);
 }

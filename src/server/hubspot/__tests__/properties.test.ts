@@ -1,127 +1,161 @@
 import { describe, expect, test } from "@rstest/core";
-import {
-  coerceFromHubSpot,
-  fromHubSpotProperties,
-  PROPERTY_MAP,
-  toAppField,
-  toHubSpotProperties,
-} from "../properties";
+import { fromContactProperties, toContactProperties } from "../properties";
 
-describe("toHubSpotProperties", () => {
-  test("maps app fields to HubSpot property names", () => {
-    const result = toHubSpotProperties({
+describe("toContactProperties", () => {
+  test("maps app keys to HubSpot property names with stringified values", () => {
+    const result = toContactProperties({
       firstName: "Jane",
       lastName: "Doe",
       email: "jane@example.com",
-      hasLand: true,
     });
     expect(result).toEqual({
       firstname: "Jane",
       lastname: "Doe",
       email: "jane@example.com",
-      has_land: "true",
     });
   });
 
-  test("skips null and undefined values", () => {
-    const result = toHubSpotProperties({
+  test("stringifies booleans", () => {
+    expect(toContactProperties({ hasLand: true })).toEqual({
+      has_land: "true",
+    });
+    expect(toContactProperties({ seenBroker: false })).toEqual({
+      seen_broker: "false",
+    });
+  });
+
+  test("stringifies numbers", () => {
+    expect(toContactProperties({ leadScore: 85 })).toEqual({
+      lead_score: "85",
+    });
+  });
+
+  test("drops null and undefined values", () => {
+    const result = toContactProperties({
       firstName: "Jane",
       email: null,
+      phone: undefined,
     });
     expect(result).toEqual({ firstname: "Jane" });
   });
+
+  test("drops keys not in PROPERTY_MAP", () => {
+    const input = {
+      firstName: "Jane",
+      referrerName: "Alice",
+      id: "some-uuid",
+      scoreMetadata: { score: 85 },
+    } as Record<string, unknown>;
+    const result = toContactProperties(
+      input as Parameters<typeof toContactProperties>[0],
+    );
+    expect(result).toEqual({ firstname: "Jane" });
+  });
+
+  test("empty input returns empty output", () => {
+    expect(toContactProperties({})).toEqual({});
+  });
 });
 
-describe("fromHubSpotProperties", () => {
-  test("maps HubSpot properties back to app fields", () => {
-    const result = fromHubSpotProperties({
+describe("fromContactProperties", () => {
+  test("maps HubSpot keys to app keys with coerced types", () => {
+    const result = fromContactProperties({
       firstname: "Jane",
       lastname: "Doe",
       has_land: "true",
+      lead_score: "85",
     });
     expect(result).toEqual({
       firstName: "Jane",
       lastName: "Doe",
-      hasLand: "true",
+      hasLand: true,
+      leadScore: 85,
     });
   });
 
+  test("skips unknown HubSpot keys", () => {
+    const result = fromContactProperties({
+      firstname: "Jane",
+      hs_analytics_source: "ORGANIC_SEARCH",
+    });
+    expect(result).toEqual({ firstName: "Jane" });
+  });
+
   test("skips null values", () => {
-    const result = fromHubSpotProperties({
+    const result = fromContactProperties({
       firstname: "Jane",
       lastname: null,
     });
     expect(result).toEqual({ firstName: "Jane" });
   });
 
-  test("ignores unknown HubSpot properties", () => {
-    const result = fromHubSpotProperties({
-      firstname: "Jane",
-      unknown_prop: "value",
+  test("handles single-key input (webhook handlePropertyChange shape)", () => {
+    expect(fromContactProperties({ lead_stage: "hot" })).toEqual({
+      leadStage: "hot",
     });
-    expect(result).toEqual({ firstName: "Jane" });
-  });
-});
-
-describe("leadScore and leadStage mapping", () => {
-  test("maps leadScore and leadStage to HubSpot properties", () => {
-    const result = toHubSpotProperties({ leadScore: "85", leadStage: "hot" });
-    expect(result).toEqual({ lead_score: "85", lead_stage: "hot" });
-  });
-
-  test("maps HubSpot lead_score and lead_stage back to app fields", () => {
-    const result = fromHubSpotProperties({
-      lead_score: "85",
-      lead_stage: "hot",
+    expect(fromContactProperties({ has_land: "false" })).toEqual({
+      hasLand: false,
     });
-    expect(result).toEqual({ leadScore: "85", leadStage: "hot" });
+  });
+
+  test("empty input returns empty output", () => {
+    expect(fromContactProperties({})).toEqual({});
   });
 });
 
-describe("PROPERTY_MAP", () => {
-  test("has 20 entries", () => {
-    expect(Object.keys(PROPERTY_MAP)).toHaveLength(20);
-  });
+describe("round-trip", () => {
+  test("to → from preserves all PROPERTY_MAP fields with correct types", () => {
+    const input = {
+      firstName: "Jane",
+      lastName: "Doe",
+      email: "jane@example.com",
+      phone: "0400000000",
+      hasLand: true,
+      landRegistered: false,
+      landAddress: "1 Main St",
+      landSizeSqm: "500",
+      propertyType: "house_and_land",
+      budget: "$700K",
+      seenBroker: true,
+      constructionTimeline: "6_12_months",
+      resolveFinanceOptedIn: false,
+      preferredContactTime: "morning",
+      landWidth: "20",
+      landDepth: "25",
+      leadScore: 85,
+      leadStage: "hot",
+      notes: "Interested in acreage",
+      leadSource: "direct",
+    } satisfies Parameters<typeof toContactProperties>[0];
 
-  test("round-trips all fields", () => {
-    const input: Record<string, string> = {};
-    for (const key of Object.keys(PROPERTY_MAP)) {
-      input[key] = "test";
-    }
-    const hubspotProps = toHubSpotProperties(input as Record<string, string>);
-    const roundTripped = fromHubSpotProperties(hubspotProps);
-    expect(Object.keys(roundTripped).sort()).toEqual(
-      Object.keys(PROPERTY_MAP).sort(),
-    );
-  });
-});
+    const hubspotProps = toContactProperties(input);
+    const result = fromContactProperties(hubspotProps);
 
-describe("toAppField", () => {
-  test("maps known HubSpot property to app field", () => {
-    expect(toAppField("lead_score")).toBe("leadScore");
-    expect(toAppField("preferred_contact_time")).toBe("preferredContactTime");
-  });
+    expect(result.firstName).toBe("Jane");
+    expect(result.lastName).toBe("Doe");
+    expect(result.email).toBe("jane@example.com");
+    expect(result.phone).toBe("0400000000");
+    expect(result.hasLand).toBe(true);
+    expect(result.landRegistered).toBe(false);
+    expect(result.landAddress).toBe("1 Main St");
+    expect(result.landSizeSqm).toBe("500");
+    expect(result.propertyType).toBe("house_and_land");
+    expect(result.budget).toBe("$700K");
+    expect(result.seenBroker).toBe(true);
+    expect(result.constructionTimeline).toBe("6_12_months");
+    expect(result.resolveFinanceOptedIn).toBe(false);
+    expect(result.preferredContactTime).toBe("morning");
+    expect(result.landWidth).toBe("20");
+    expect(result.landDepth).toBe("25");
+    expect(result.leadScore).toBe(85);
+    expect(result.leadStage).toBe("hot");
+    expect(result.notes).toBe("Interested in acreage");
+    expect(result.leadSource).toBe("direct");
 
-  test("returns undefined for unknown property", () => {
-    expect(toAppField("hs_analytics_source")).toBeUndefined();
-  });
-});
-
-describe("coerceFromHubSpot", () => {
-  test("coerces boolean fields from string", () => {
-    expect(coerceFromHubSpot("hasLand", "true")).toBe(true);
-    expect(coerceFromHubSpot("hasLand", "false")).toBe(false);
-    expect(coerceFromHubSpot("seenBroker", "true")).toBe(true);
-    expect(coerceFromHubSpot("resolveFinanceOptedIn", "false")).toBe(false);
-  });
-
-  test("coerces integer fields from string", () => {
-    expect(coerceFromHubSpot("leadScore", "85")).toBe(85);
-    expect(coerceFromHubSpot("leadScore", "0")).toBe(0);
-  });
-
-  test("passes string fields through unchanged", () => {
-    expect(coerceFromHubSpot("firstName", "Jane")).toBe("Jane");
-    expect(coerceFromHubSpot("leadStage", "hot")).toBe("hot");
+    // Non-mapped fields are absent
+    expect((result as Record<string, unknown>).referrerName).toBeUndefined();
+    expect((result as Record<string, unknown>).id).toBeUndefined();
+    // 20 mapped fields survive the round-trip
+    expect(Object.keys(result)).toHaveLength(20);
   });
 });

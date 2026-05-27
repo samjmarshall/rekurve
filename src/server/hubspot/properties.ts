@@ -1,9 +1,6 @@
-/**
- * Bidirectional map between app field names and HubSpot contact property names.
- * Standard HubSpot properties (firstname, lastname, email, phone) use built-in names.
- * Custom properties match the names created in the HubSpot account.
- */
-export const PROPERTY_MAP = {
+import type { leads } from "~/server/db/schema/leads";
+
+const PROPERTY_MAP = {
   firstName: "firstname",
   lastName: "lastname",
   email: "email",
@@ -34,39 +31,6 @@ const REVERSE_MAP = Object.fromEntries(
   Object.entries(PROPERTY_MAP).map(([k, v]) => [v, k]),
 ) as Record<HubSpotProperty, AppField>;
 
-/** Convert app field names to HubSpot property names. */
-export function toHubSpotProperties(
-  data: Partial<Record<AppField, string | boolean | null>>,
-): Record<string, string> {
-  const properties: Record<string, string> = {};
-  for (const [key, value] of Object.entries(data)) {
-    const hsKey = PROPERTY_MAP[key as AppField];
-    if (hsKey && value != null) {
-      properties[hsKey] = String(value);
-    }
-  }
-  return properties;
-}
-
-/** Convert HubSpot properties back to app field names. */
-export function fromHubSpotProperties(
-  properties: Record<string, string | null>,
-): Partial<Record<AppField, string>> {
-  const result: Partial<Record<AppField, string>> = {};
-  for (const [key, value] of Object.entries(properties)) {
-    const appKey = REVERSE_MAP[key as HubSpotProperty];
-    if (appKey && value != null) {
-      result[appKey] = value;
-    }
-  }
-  return result;
-}
-
-/** Look up the app field name for a HubSpot property. Returns undefined if not mapped. */
-export function toAppField(hubspotProperty: string): AppField | undefined {
-  return REVERSE_MAP[hubspotProperty as HubSpotProperty];
-}
-
 const BOOLEAN_FIELDS: ReadonlySet<string> = new Set<AppField>([
   "hasLand",
   "landRegistered",
@@ -77,7 +41,7 @@ const BOOLEAN_FIELDS: ReadonlySet<string> = new Set<AppField>([
 const INTEGER_FIELDS: ReadonlySet<string> = new Set<AppField>(["leadScore"]);
 
 /** Coerce a HubSpot string value to the app's expected type for a given field. */
-export function coerceFromHubSpot(
+function coerceFromHubSpot(
   field: AppField,
   value: string,
 ): string | boolean | number {
@@ -88,3 +52,34 @@ export function coerceFromHubSpot(
 
 /** All HubSpot property names to request when fetching contacts. */
 export const ALL_PROPERTIES = Object.values(PROPERTY_MAP);
+
+/** Raw HubSpot wire format: property names as strings, values as strings. */
+export type HubSpotContactProperties = Record<string, string>;
+
+/** Convert app-keyed lead data to HubSpot wire format, stringifying all values. */
+export function toContactProperties(
+  input: Partial<Record<AppField, unknown>>,
+): HubSpotContactProperties {
+  const properties: HubSpotContactProperties = {};
+  for (const [key, value] of Object.entries(input)) {
+    const hsKey = PROPERTY_MAP[key as AppField];
+    if (hsKey && value != null) {
+      properties[hsKey] = String(value);
+    }
+  }
+  return properties;
+}
+
+/** Convert HubSpot wire properties to app-keyed lead fields with type coercion. */
+export function fromContactProperties(
+  hubspotProps: Record<string, unknown>,
+): Partial<typeof leads.$inferSelect> {
+  const result: Record<string, string | boolean | number> = {};
+  for (const [key, value] of Object.entries(hubspotProps)) {
+    const appKey = REVERSE_MAP[key as HubSpotProperty];
+    if (appKey && value != null) {
+      result[appKey] = coerceFromHubSpot(appKey, String(value));
+    }
+  }
+  return result as Partial<typeof leads.$inferSelect>;
+}

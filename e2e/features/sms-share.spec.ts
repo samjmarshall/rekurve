@@ -240,6 +240,13 @@ test.describe("SMS Share — E2E", () => {
     await expect(page.getByTestId("sms-share-drawer")).not.toBeVisible();
     await expect(queue.row(msg.id)).toBeHidden();
 
+    // Wait for the approve mutation to settle before reading DB state. The 1200ms
+    // clipboard delay means the mutation is still in-flight when the drawer closes
+    // optimistically; anchoring on the toast guarantees onSuccess has fired.
+    await expect(
+      page.getByTestId("app-toast").filter({ hasText: "Draft approved" }),
+    ).toBeVisible();
+
     const dbState = await getMessageStatus(msg.id);
     expect(dbState?.status).toBe("approved");
     expect(dbState?.sent_at).not.toBeNull();

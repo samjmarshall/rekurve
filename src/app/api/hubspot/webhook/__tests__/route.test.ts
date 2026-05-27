@@ -34,7 +34,7 @@ beforeEach(() => {
     getContact: mockGetContact,
     getEmailEngagement: mockGetEmailEngagement,
     findContactIdForEmail: mockFindContactIdForEmail,
-    toAppField: rs.fn((prop: string) => {
+    fromContactProperties: rs.fn((props: Record<string, unknown>) => {
       const map: Record<string, string> = {
         firstname: "firstName",
         lastname: "lastName",
@@ -42,11 +42,14 @@ beforeEach(() => {
         phone: "phone",
         lead_score: "leadScore",
       };
-      return map[prop];
-    }),
-    coerceFromHubSpot: rs.fn((field: string, value: string) => {
-      if (field === "leadScore") return parseInt(value, 10);
-      return value;
+      const result: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(props)) {
+        const appKey = map[k];
+        if (appKey && v != null) {
+          result[appKey] = appKey === "leadScore" ? parseInt(String(v), 10) : v;
+        }
+      }
+      return result;
     }),
   }));
 
@@ -140,7 +143,7 @@ describe("POST /api/hubspot/webhook", () => {
     mockIsValid.mockReturnValue(true);
     mockGetContact.mockResolvedValue({
       id: "1",
-      properties: { firstName: "Test", lastName: "User" },
+      properties: { firstname: "Test", lastname: "User" },
       createdAt: "2026-01-01T00:00:00.000Z",
       updatedAt: "2026-01-01T00:00:00.000Z",
     });
@@ -158,8 +161,8 @@ describe("Webhook event processing", () => {
     mockGetContact.mockResolvedValue({
       id: "456",
       properties: {
-        firstName: "Jane",
-        lastName: "Doe",
+        firstname: "Jane",
+        lastname: "Doe",
         email: "jane@example.com",
       },
       createdAt: "2026-01-01T00:00:00.000Z",
@@ -262,7 +265,7 @@ describe("Webhook event processing", () => {
       .mockRejectedValueOnce(new Error("HubSpot API down"))
       .mockResolvedValueOnce({
         id: "789",
-        properties: { firstName: "Ok", lastName: "Lead" },
+        properties: { firstname: "Ok", lastname: "Lead" },
         createdAt: "2026-01-01T00:00:00.000Z",
         updatedAt: "2026-01-01T00:00:00.000Z",
       });

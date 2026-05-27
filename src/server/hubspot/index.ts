@@ -1,6 +1,5 @@
 export { hubspot } from "./client";
 export {
-  type ContactData,
   createContact,
   findExistingContact,
   getContact,
@@ -15,9 +14,7 @@ export {
 } from "./emails";
 export {
   ALL_PROPERTIES,
-  coerceFromHubSpot,
-  fromHubSpotProperties,
-  PROPERTY_MAP,
-  toAppField,
-  toHubSpotProperties,
+  fromContactProperties,
+  type HubSpotContactProperties,
+  toContactProperties,
 } from "./properties";

@@ -137,6 +137,59 @@ Source maps are only uploaded during CI builds (`CI=true`). In local dev, `withP
 
 ---
 
+## Vercel Integration
+
+### Confirming the PostHog marketplace integration is installed
+
+1. Open the [Vercel dashboard](https://vercel.com/dashboard).
+2. Navigate to **your project → Integrations** tab.
+3. Under **Installed**, confirm the **PostHog** tile is listed.
+
+If the tile is missing, install it from the [Vercel marketplace](https://vercel.com/integrations/posthog) (one-click, then authorise PostHog to access the project). The integration automatically injects `NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_POSTHOG_HOST` as environment variables on the Vercel project.
+
+### Env vars: marketplace-injected vs hand-set
+
+| Var | Source |
+|-----|--------|
+| `NEXT_PUBLIC_POSTHOG_KEY` | Injected by the Vercel ↔ PostHog marketplace integration |
+| `NEXT_PUBLIC_POSTHOG_HOST` | Injected by the Vercel ↔ PostHog marketplace integration |
+| `POSTHOG_ERROR_TRACKING_API_KEY` | Hand-set with `--sensitive`; consumed at build time only by `withPostHogConfig` (`next.config.ts:93`) |
+| `POSTHOG_PROJECT_ID` | Hand-set with `--sensitive`; consumed at build time only by `withPostHogConfig` (`next.config.ts:94`) |
+
+`POSTHOG_ERROR_TRACKING_API_KEY` and `POSTHOG_PROJECT_ID` are **not** injected by the marketplace integration — they must be added manually via `vercel env add --sensitive`.
+
+### Verifying source-map upload locally
+
+Source-map upload is gated on `CI=true` (`next.config.ts:98`). To confirm it works without a full CI run:
+
+```sh
+CI=true make build
+```
+
+Watch stdout for `withPostHogConfig` upload-completion lines. A successful upload looks like:
+
+```
+[PostHog] Source maps uploaded successfully
+```
+
+After the build, verify in PostHog:
+
+1. Open PostHog dashboard → **Project Settings** → **Error Tracking** → **Source maps**.
+2. Confirm the production bundle hashes from this build appear in the list.
+
+If the upload step is absent from stdout, check that `POSTHOG_ERROR_TRACKING_API_KEY` and `POSTHOG_PROJECT_ID` are present in your local `.env.local` (pulled via `make env_pull`).
+
+### Verifying deobfuscated stack traces in production
+
+1. Deploy a branch to production (or trigger a Vercel production deploy).
+2. In the deployed app, trigger a deliberate unhandled exception (e.g., throw from a route handler and call it from the browser).
+3. Open PostHog → **Error Tracking**.
+4. Open the new issue — the stack trace should show original source file paths and line numbers rather than minified bundle identifiers.
+
+If the trace is still obfuscated, the source maps were not uploaded for this deploy. Re-check that `CI=true` was set during the Vercel build (Vercel sets this automatically for production builds) and that the personal API key is present in Vercel's environment.
+
+---
+
 ## Out-of-Scope Alignment Notes
 
 The original issue #200 text contained language suggesting `POSTHOG_KEY` should be server-only. This is resolved: the project token (`NEXT_PUBLIC_POSTHOG_KEY`) is public-safe by PostHog's canonical design and must remain `NEXT_PUBLIC_*` so the browser bundle can use it. The actual secret is `POSTHOG_ERROR_TRACKING_API_KEY` (personal API key), which is already server-only. No code change is needed.

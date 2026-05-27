@@ -1,3 +1,5 @@
+import type { leads } from "~/server/db/schema/leads";
+
 /**
  * Bidirectional map between app field names and HubSpot contact property names.
  * Standard HubSpot properties (firstname, lastname, email, phone) use built-in names.
@@ -88,3 +90,34 @@ export function coerceFromHubSpot(
 
 /** All HubSpot property names to request when fetching contacts. */
 export const ALL_PROPERTIES = Object.values(PROPERTY_MAP);
+
+/** Raw HubSpot wire format: property names as strings, values as strings. */
+export type HubSpotContactProperties = Record<string, string>;
+
+/** Convert app-keyed lead data to HubSpot wire format, stringifying all values. */
+export function toContactProperties(
+  input: Partial<Record<AppField, unknown>>,
+): HubSpotContactProperties {
+  const properties: HubSpotContactProperties = {};
+  for (const [key, value] of Object.entries(input)) {
+    const hsKey = PROPERTY_MAP[key as AppField];
+    if (hsKey && value != null) {
+      properties[hsKey] = String(value);
+    }
+  }
+  return properties;
+}
+
+/** Convert HubSpot wire properties to app-keyed lead fields with type coercion. */
+export function fromContactProperties(
+  hubspotProps: Record<string, unknown>,
+): Partial<typeof leads.$inferSelect> {
+  const result: Record<string, string | boolean | number> = {};
+  for (const [key, value] of Object.entries(hubspotProps)) {
+    const appKey = REVERSE_MAP[key as HubSpotProperty];
+    if (appKey && value != null) {
+      result[appKey] = coerceFromHubSpot(appKey, String(value));
+    }
+  }
+  return result as Partial<typeof leads.$inferSelect>;
+}

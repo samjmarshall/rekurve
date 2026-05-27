@@ -5154,21 +5154,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.100.8":
-  version: 5.100.8
-  resolution: "@tanstack/query-core@npm:5.100.8"
-  checksum: b2938f074c1ba75a69f0f9ad25b27d2e5d5e144c204e9bce4408206ca27e1cc43735413fbb8d7174a84a98b24fd559dbdcd4f9db3d7bedcb748793a996f16059
+"@tanstack/query-core@npm:5.100.14":
+  version: 5.100.14
+  resolution: "@tanstack/query-core@npm:5.100.14"
+  checksum: 50c5e0651f689566b5279c57b654bcbad643dc68c0e82bf5835945d68009664817416e72ebeec26fb00bb38900205d81734a5c720bbb1f31de3d3c02037d64ab
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:5.100.8":
-  version: 5.100.8
-  resolution: "@tanstack/react-query@npm:5.100.8"
+"@tanstack/react-query@npm:5.100.14":
+  version: 5.100.14
+  resolution: "@tanstack/react-query@npm:5.100.14"
   dependencies:
-    "@tanstack/query-core": 5.100.8
+    "@tanstack/query-core": 5.100.14
   peerDependencies:
     react: ^18 || ^19
-  checksum: 71354e418416e1e11d73511ab5bc0bb39f35d2bc37d3ad131cd71123759e9ee38bf01684573f6962adbb8156223565bc2de080dbb920285dc3a0cee1a0fdfdf6
+  checksum: a3d41ec848e5779b0efee6e736bfd10fcea55d0a3d45fe99028acc8858c4f473168ee95c8dd727b173130e7b2d19f5494458044576e9b7da8e5d291ac1fa2008
   languageName: node
   linkType: hard
 
@@ -13246,7 +13246,7 @@ __metadata:
     "@t3-oss/env-nextjs": 0.13.11
     "@tailwindcss/postcss": ^4.0.15
     "@tailwindcss/typography": 0.5.19
-    "@tanstack/react-query": 5.100.8
+    "@tanstack/react-query": 5.100.14
     "@trpc/client": 11.17.0
     "@trpc/server": 11.17.0
     "@trpc/tanstack-react-query": 11.17.0

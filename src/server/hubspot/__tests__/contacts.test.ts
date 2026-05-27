@@ -54,17 +54,14 @@ describe("createContact", () => {
     mockCreate.mockResolvedValue(MOCK_RESPONSE);
 
     const { createContact } = await import("../contacts");
-    const result = await createContact({
-      firstName: "Jane",
-      lastName: "Doe",
-    });
+    const result = await createContact({ firstname: "Jane", lastname: "Doe" });
 
     expect(mockCreate).toHaveBeenCalledWith({
       properties: { firstname: "Jane", lastname: "Doe" },
       associations: [],
     });
     expect(result.id).toBe("123");
-    expect(result.properties.firstName).toBe("Jane");
+    expect(result.properties.firstname).toBe("Jane");
   });
 });
 

@@ -5,11 +5,10 @@ import { env } from "~/env";
 import { db } from "~/server/db";
 import { conversations, leads } from "~/server/db/schema";
 import {
-  coerceFromHubSpot,
   findContactIdForEmail,
+  fromContactProperties,
   getContact,
   getEmailEngagement,
-  toAppField,
 } from "~/server/hubspot";
 
 interface WebhookEvent {
@@ -109,23 +108,14 @@ async function handleContactCreation(hubspotId: string): Promise<void> {
   // Fetch full contact from HubSpot (creation events don't include properties)
   const contact = await getContact(hubspotId);
 
-  // Build local record from HubSpot properties
-  const record: Record<string, unknown> = {
+  const mapped = fromContactProperties(contact.properties);
+  const record = {
     hubspotContactId: hubspotId,
-    firstName: contact.properties.firstName ?? "Unknown",
-    lastName: contact.properties.lastName ?? "Unknown",
+    ...mapped,
+    firstName: mapped.firstName ?? "Unknown",
+    lastName: mapped.lastName ?? "Unknown",
     updatedAt: new Date(),
   };
-
-  // Map all available properties with type coercion
-  for (const [field, value] of Object.entries(contact.properties)) {
-    if (value != null && field !== "firstName" && field !== "lastName") {
-      record[field] = coerceFromHubSpot(
-        field as Parameters<typeof coerceFromHubSpot>[0],
-        value,
-      );
-    }
-  }
 
   // Upsert: insert or update if hubspotContactId already exists
   await db
@@ -142,14 +132,12 @@ async function handlePropertyChange(
   propertyName: string,
   propertyValue: string,
 ): Promise<void> {
-  const appField = toAppField(propertyName);
-  if (!appField) return; // Not a mapped property — ignore
-
-  const coerced = coerceFromHubSpot(appField, propertyValue);
+  const updates = fromContactProperties({ [propertyName]: propertyValue });
+  if (Object.keys(updates).length === 0) return;
 
   await db
     .update(leads)
-    .set({ [appField]: coerced, updatedAt: new Date() })
+    .set({ ...updates, updatedAt: new Date() })
     .where(eq(leads.hubspotContactId, hubspotId));
 }
 

@@ -120,28 +120,38 @@ beforeEach(() => {
       createdAt: "2026-01-01T00:00:00.000Z",
       updatedAt: "2026-01-01T00:00:00.000Z",
     }),
-    PROPERTY_MAP: {
-      firstName: "firstname",
-      lastName: "lastname",
-      email: "email",
-      phone: "phone",
-      hasLand: "has_land",
-      landRegistered: "land_registered",
-      landAddress: "land_address",
-      landSizeSqm: "land_size_sqm",
-      propertyType: "property_type",
-      budget: "budget",
-      seenBroker: "seen_broker",
-      constructionTimeline: "construction_timeline",
-      resolveFinanceOptedIn: "resolve_finance_opted_in",
-      preferredContactTime: "preferred_contact_time",
-      landWidth: "land_width",
-      landDepth: "land_depth",
-      leadScore: "lead_score",
-      leadStage: "lead_stage",
-      notes: "notes",
-      leadSource: "lead_source",
-    },
+    toContactProperties: rs
+      .fn()
+      .mockImplementation((data: Record<string, unknown>) => {
+        const map: Record<string, string> = {
+          firstName: "firstname",
+          lastName: "lastname",
+          email: "email",
+          phone: "phone",
+          hasLand: "has_land",
+          landRegistered: "land_registered",
+          landAddress: "land_address",
+          landSizeSqm: "land_size_sqm",
+          propertyType: "property_type",
+          budget: "budget",
+          seenBroker: "seen_broker",
+          constructionTimeline: "construction_timeline",
+          resolveFinanceOptedIn: "resolve_finance_opted_in",
+          preferredContactTime: "preferred_contact_time",
+          landWidth: "land_width",
+          landDepth: "land_depth",
+          leadScore: "lead_score",
+          leadStage: "lead_stage",
+          notes: "notes",
+          leadSource: "lead_source",
+        };
+        const result: Record<string, string> = {};
+        for (const [k, v] of Object.entries(data)) {
+          const hk = map[k];
+          if (hk && v != null) result[hk] = String(v);
+        }
+        return result;
+      }),
   }));
 });
 
@@ -268,7 +278,7 @@ describe("leads.create — HubSpot sync", () => {
 
     expect(updateContact).toHaveBeenCalledWith(
       "hs-existing",
-      expect.objectContaining({ firstName: "John" }),
+      expect.objectContaining({ firstname: "John" }),
     );
   });
 

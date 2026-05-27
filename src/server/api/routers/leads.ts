@@ -12,7 +12,7 @@ import { leads } from "~/server/db/schema";
 import {
   createContact,
   findExistingContact,
-  PROPERTY_MAP,
+  toContactProperties,
   updateContact as updateHubSpotContact,
 } from "~/server/hubspot";
 import { startOrUpdateSequence } from "~/server/nurture/scheduler";
@@ -50,10 +50,10 @@ async function scoreLead(
     .returning();
 
   if (hubspotContactId) {
-    await updateHubSpotContact(hubspotContactId, {
-      leadScore: String(result.score),
-      leadStage: result.stage,
-    }).catch((err) => {
+    await updateHubSpotContact(
+      hubspotContactId,
+      toContactProperties({ leadScore: result.score, leadStage: result.stage }),
+    ).catch((err) => {
       console.error(`[scoring] HubSpot sync failed for lead ${lead.id}:`, err);
     });
   }
@@ -82,12 +82,7 @@ export const leadsRouter = createTRPCRouter({
     .input(leadCreateSchema)
     .mutation(async ({ ctx, input }) => {
       // 1. Extract HubSpot-mapped fields from input
-      const hubspotData: Record<string, string | boolean | null> = {};
-      for (const key of Object.keys(input) as Array<keyof typeof input>) {
-        if (key in PROPERTY_MAP && input[key] != null) {
-          hubspotData[key] = input[key] as string | boolean | null;
-        }
-      }
+      const hubspotData = toContactProperties(input);
 
       // 2. Dedup: search HubSpot for existing contact by email/phone
       const existing = await findExistingContact(input.email, input.phone);
@@ -234,12 +229,7 @@ export const leadsRouter = createTRPCRouter({
 
       // Write mapped fields to HubSpot first (if linked)
       if (existing.hubspotContactId) {
-        const hubspotData: Record<string, string | boolean | null> = {};
-        for (const key of Object.keys(data) as Array<keyof typeof data>) {
-          if (key in PROPERTY_MAP && data[key] !== undefined) {
-            hubspotData[key] = data[key] as string | boolean | null;
-          }
-        }
+        const hubspotData = toContactProperties(data);
         if (Object.keys(hubspotData).length > 0) {
           await updateHubSpotContact(existing.hubspotContactId, hubspotData);
         }

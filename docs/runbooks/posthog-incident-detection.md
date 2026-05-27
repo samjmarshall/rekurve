@@ -190,6 +190,79 @@ If the trace is still obfuscated, the source maps were not uploaded for this dep
 
 ---
 
+## Alert Configuration
+
+Four alerts feed the PostHog → Better Stack detection pipe. Each is configured in the PostHog dashboard; the runbook below captures every form-field value so the configuration is reproducible.
+
+**Webhook destination**: Better Stack incoming webhook URL (provisioned by an adjacent W1 ticket). If the real URL is not yet available, use a [webhook.site](https://webhook.site) placeholder and log the swap follow-up in `thoughts/notes/posthog-alert-thresholds.md`.
+
+---
+
+### Error Tracking — New Issue
+
+| Field | Value |
+|-------|-------|
+| UI path | PostHog → **Error Tracking** → **Alerts** → **New alert** |
+| Alert type | **New issue** |
+| Name | `New error issue` |
+| Destination | Better Stack incoming webhook URL |
+
+Fires once per new fingerprint — i.e. every first occurrence of an error that PostHog hasn't grouped before.
+
+---
+
+### Error Tracking — Volume Spike
+
+| Field | Value |
+|-------|-------|
+| UI path | PostHog → **Error Tracking** → **Alerts** → **New alert** |
+| Alert type | **Volume spike** |
+| Name | `Error volume spike` |
+| Threshold | 50 % above the 7-day rolling mean (PostHog default) |
+| Destination | Better Stack incoming webhook URL |
+
+Fires when the aggregate error rate spikes sharply within a sliding window, regardless of fingerprint.
+
+---
+
+### Insight — Signup Conversion Deviation
+
+| Field | Value |
+|-------|-------|
+| UI path | PostHog → **Insights** → open the **Signup conversion** insight → **Alerts** (bell icon) → **New alert** |
+| Alert type | **Threshold** |
+| Name | `Signup conversion deviation` |
+| Metric | Signup-form conversion funnel (step 1 → step 2 completion rate) |
+| Condition | Value deviates **more than 50 %** from 7-day rolling mean |
+| Destination | Better Stack incoming webhook URL |
+
+Baseline data accumulates for ~2 weeks before this threshold becomes meaningful; see `thoughts/notes/posthog-alert-thresholds.md` for the review date.
+
+---
+
+### Insight — Pilot-Customer DAU Floor
+
+| Field | Value |
+|-------|-------|
+| UI path | PostHog → **Insights** → open the **Pilot DAU** insight → **Alerts** (bell icon) → **New alert** |
+| Alert type | **Threshold** |
+| Name | `Pilot-customer DAU floor` |
+| Metric | Distinct daily active users filtered to the Creation Homes QLD pilot cohort |
+| Condition | Value **falls below** sensible floor (leave at default pending baseline; see review date below) |
+| Destination | Better Stack incoming webhook URL |
+
+---
+
+### Verifying alerts are wired
+
+After saving each alert in the PostHog UI:
+
+1. PostHog → **Error Tracking** → **Alerts** — confirm two rows with status **Active** and the expected webhook URL.
+2. PostHog → **Insights** → **Alerts** — confirm two rows with status **Active** and the expected webhook URL.
+3. Fire a synthetic exception (see §5 of the Verify Install Checklist above); a Better Stack incident should appear within ~60 seconds.
+
+---
+
 ## Out-of-Scope Alignment Notes
 
 The original issue #200 text contained language suggesting `POSTHOG_KEY` should be server-only. This is resolved: the project token (`NEXT_PUBLIC_POSTHOG_KEY`) is public-safe by PostHog's canonical design and must remain `NEXT_PUBLIC_*` so the browser bundle can use it. The actual secret is `POSTHOG_ERROR_TRACKING_API_KEY` (personal API key), which is already server-only. No code change is needed.

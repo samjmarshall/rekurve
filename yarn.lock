@@ -4102,12 +4102,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/core@npm:1.28.0":
-  version: 1.28.0
-  resolution: "@posthog/core@npm:1.28.0"
+"@posthog/core@npm:1.28.7":
+  version: 1.28.7
+  resolution: "@posthog/core@npm:1.28.7"
   dependencies:
-    "@posthog/types": 1.372.6
-  checksum: 61c297cb18773cb508e848287b562aba7e8ab2a2d23cd638b9a868ebe81861828192a3730ce9717d1b5494318d45eda87715d5fb82f5809f4c01eb1f42ab9305
+    "@posthog/types": 1.373.2
+  checksum: 84b0470c5da15935eff402d1aca2f32c68b21fb7e9ea31c4e69446bba430157a0a6538dd1733f73c0113b56e3b287c5ac43ae8255c0201273d57e72474fca7e4
   languageName: node
   linkType: hard
 
@@ -4152,10 +4152,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@posthog/types@npm:1.372.6":
-  version: 1.372.6
-  resolution: "@posthog/types@npm:1.372.6"
-  checksum: 0b5ae2ebec62d228c968687dacd3585875791601b10b7774b58b59dd380714b33fd9020a657a67eb5dbfff392e0764c586d12e9b7f6d20a5d3a611b720d3a90f
+"@posthog/types@npm:1.373.2":
+  version: 1.373.2
+  resolution: "@posthog/types@npm:1.373.2"
+  checksum: bc9ee44d17f966e535e95ba5a417245a31676868e6c30bb22db19cfcc96319d4a3990ddc1703818df33e19d4d60d5dbf3a4bc128d5eb142e4a1b6fab0d12ef41
   languageName: node
   linkType: hard
 
@@ -12732,17 +12732,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"posthog-node@npm:5.33.0":
-  version: 5.33.0
-  resolution: "posthog-node@npm:5.33.0"
+"posthog-node@npm:5.33.7":
+  version: 5.33.7
+  resolution: "posthog-node@npm:5.33.7"
   dependencies:
-    "@posthog/core": 1.28.0
+    "@posthog/core": 1.28.7
   peerDependencies:
     rxjs: ^7.0.0
   peerDependenciesMeta:
     rxjs:
       optional: true
-  checksum: 120d3ea7b2072342aa983537e0e812bfacb9c6fe3706a8eb8d8318641265b5f01e5c588348a958c9e054358dc0fa95cbb07fb47a2739e289038bb2e58878cb2e
+  checksum: 58e7430cccea1a4063e7fba999e0d7c502abf74b418a55dcfebe65608c8f46254c4e92b175a949e2238f4aeb54960e8f8f85656f4df2c32e569b0de052e8070c
   languageName: node
   linkType: hard
 
@@ -13283,7 +13283,7 @@ __metadata:
     postcss: ^8.5.3
     postgres: ^3.4.8
     posthog-js: 1.374.4
-    posthog-node: 5.33.0
+    posthog-node: 5.33.7
     react: 19.2.6
     react-dom: 19.2.6
     react-fast-marquee: 1.6.5

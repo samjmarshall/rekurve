@@ -9,142 +9,14 @@ import {
 } from "~/server/api/schemas/leads";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { leads } from "~/server/db/schema";
-import {
-  createContact,
-  findExistingContact,
-  toContactProperties,
-  updateContact as updateHubSpotContact,
-} from "~/server/hubspot";
-import { startOrUpdateSequence } from "~/server/nurture/scheduler";
-import type { ScoreMetadata } from "~/server/scoring";
-import { qualifyAndScore } from "~/server/scoring";
-
-/**
- * Synchronously re-score a lead, persist the new score/stage/metadata, and
- * push the score/stage to HubSpot if linked. Returns the fully-scored row so
- * callers can send an authoritative response back to the client.
- *
- * Scoring and the score write propagate errors. HubSpot push errors are
- * logged, not thrown — scoring must not fail because of a CRM outage.
- */
-async function scoreLead(
-  db: typeof import("~/server/db").db,
-  lead: typeof leads.$inferSelect,
-  hubspotContactId: string | null,
-): Promise<typeof leads.$inferSelect> {
-  const result = qualifyAndScore(lead);
-  const metadata: ScoreMetadata = {
-    ...result,
-    scoredAt: new Date().toISOString(),
-  };
-
-  const [scored] = await db
-    .update(leads)
-    .set({
-      leadScore: result.score,
-      leadStage: result.stage,
-      scoreMetadata: metadata,
-      updatedAt: new Date(),
-    })
-    .where(eq(leads.id, lead.id))
-    .returning();
-
-  if (hubspotContactId) {
-    await updateHubSpotContact(
-      hubspotContactId,
-      toContactProperties({ leadScore: result.score, leadStage: result.stage }),
-    ).catch((err) => {
-      console.error(`[scoring] HubSpot sync failed for lead ${lead.id}:`, err);
-    });
-  }
-
-  return scored!;
-}
-
-// Qualification fields that trigger re-scoring
-const SCORING_FIELDS = new Set([
-  "hasLand",
-  "landRegistered",
-  "landAddress",
-  "landSizeSqm",
-  "landWidth",
-  "landDepth",
-  "seenBroker",
-  "constructionTimeline",
-  "budget",
-  "propertyType",
-  "preferredEstates",
-  "preferredSuburbs",
-]);
+import { captureLead, updateLead } from "~/server/leads/intake";
 
 export const leadsRouter = createTRPCRouter({
   create: protectedProcedure
     .input(leadCreateSchema)
-    .mutation(async ({ ctx, input }) => {
-      // 1. Extract HubSpot-mapped fields from input
-      const hubspotData = toContactProperties(input);
-
-      // 2. Dedup: search HubSpot for existing contact by email/phone
-      const existing = await findExistingContact(input.email, input.phone);
-      const hubspotContact = existing
-        ? await updateHubSpotContact(existing.id, hubspotData)
-        : await createContact(hubspotData);
-
-      // 3. Write to local DB with hubspotContactId. Upsert on
-      // hubspot_contact_id so we cooperate with the inbound webhook: if
-      // HubSpot's contact.creation webhook lands first (e.g. when HubSpot
-      // fires it between our HubSpot write and this insert), its
-      // placeholder row is replaced with the full form data instead of
-      // causing a unique-constraint error.
-      let lead: typeof leads.$inferSelect;
-      try {
-        const [inserted] = await ctx.db
-          .insert(leads)
-          .values({
-            ...input,
-            hubspotContactId: hubspotContact.id,
-            leadStage: "unqualified",
-            leadScore: 0,
-          })
-          .onConflictDoUpdate({
-            target: leads.hubspotContactId,
-            set: {
-              ...input,
-              hubspotContactId: hubspotContact.id,
-              updatedAt: new Date(),
-            },
-          })
-          .returning();
-        lead = inserted!;
-      } catch (err) {
-        const cause = err instanceof Error ? err.cause : undefined;
-        console.error(
-          `[leads.create] local insert failed for HubSpot contact ${hubspotContact.id}:`,
-          err,
-          "cause:",
-          cause,
-        );
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: `Lead saved to HubSpot (contact ID: ${hubspotContact.id}) but local save failed. Retry or check HubSpot.`,
-        });
-      }
-
-      // 4. Score synchronously so the response reflects the final score/stage
-      const scored = await scoreLead(ctx.db, lead, lead.hubspotContactId);
-
-      // 5. Auto-start nurture sequence (non-blocking — nurture failure must not block lead create)
-      await startOrUpdateSequence(ctx.db, scored.id, scored.leadStage).catch(
-        (err) => {
-          console.error(
-            `[leads.create] nurture sequence start failed for lead ${scored.id}:`,
-            err,
-          );
-        },
-      );
-
-      return scored;
-    }),
+    .mutation(({ ctx, input }) =>
+      captureLead(ctx.db, input, { db: ctx.db, userId: ctx.session.user.id }),
+    ),
 
   getById: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
@@ -215,60 +87,12 @@ export const leadsRouter = createTRPCRouter({
 
   update: protectedProcedure
     .input(leadUpdateSchema)
-    .mutation(async ({ ctx, input }) => {
+    .mutation(({ ctx, input }) => {
       const { id, ...data } = input;
-
-      // Fetch the lead to get its hubspotContactId
-      const existing = await ctx.db.query.leads.findFirst({
-        where: eq(leads.id, id),
-        columns: { hubspotContactId: true },
+      return updateLead(ctx.db, id, data, {
+        db: ctx.db,
+        userId: ctx.session.user.id,
       });
-      if (!existing) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Lead not found" });
-      }
-
-      // Write mapped fields to HubSpot first (if linked)
-      if (existing.hubspotContactId) {
-        const hubspotData = toContactProperties(data);
-        if (Object.keys(hubspotData).length > 0) {
-          await updateHubSpotContact(existing.hubspotContactId, hubspotData);
-        }
-      }
-
-      // Update local DB
-      const [updated] = await ctx.db
-        .update(leads)
-        .set({ ...data, updatedAt: new Date() })
-        .where(eq(leads.id, id))
-        .returning();
-
-      if (!updated) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Lead not found" });
-      }
-
-      // Re-score if qualification fields changed — awaited so the returned
-      // row always reflects the latest score/stage/scoreMetadata.
-      const hasQualificationChange = Object.keys(data).some((k) =>
-        SCORING_FIELDS.has(k),
-      );
-      if (hasQualificationChange) {
-        const scored = await scoreLead(
-          ctx.db,
-          updated,
-          updated.hubspotContactId,
-        );
-        await startOrUpdateSequence(ctx.db, scored.id, scored.leadStage).catch(
-          (err) => {
-            console.error(
-              `[leads.update] nurture sequence update failed for lead ${scored.id}:`,
-              err,
-            );
-          },
-        );
-        return scored;
-      }
-
-      return updated;
     }),
 
   delete: protectedProcedure

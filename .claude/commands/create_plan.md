@@ -13,6 +13,14 @@ Produce a complete, actionable plan at `thoughts/plans/YYYY-MM-DD-ENG-XXXX-descr
 2. **Align.** Share a 2–4 bullet design sketch and get explicit agreement. Ask only what code cannot answer.
 3. **Write.** Save the plan to the path above using the template below and stop. The final plan must have zero open questions — resolve them before writing.
 
+## Design-doc handoff (ADRs & terminology)
+
+When planning from a `/brainstorm` design doc, reconcile its appendix **before** writing phases:
+
+- **Unresolved `## ADR Candidates` or `## Terminology TODO`** mean `/domain_model` hasn't run. **STOP and do not draft the plan** — those decisions must exist as **Proposed** ADRs (and terms persisted to `CONTEXT.md`) before planning. Tell the user to run `` `/domain_model <design-doc-path>` ``, then resume.
+- **`## Related ADRs`** lists the **Proposed** ADRs this work depends on. Every Proposed ADR must map to the phase that implements it — cite it in that phase's `### Changes` (e.g. `docs/adr/adrNNN-slug.md — implements this decision`). Flag any Proposed ADR with no implementing phase.
+- Use the canonical terms from `CONTEXT.md` throughout the plan — phase names, file paths, identifiers.
+
 ## Template
 
     # <Feature> Implementation Plan
@@ -49,6 +57,8 @@ Produce a complete, actionable plan at `thoughts/plans/YYYY-MM-DD-ENG-XXXX-descr
 
     ## References
     - Ticket: <path/URL>
+    - Design doc: <path> (carries `## Related ADRs`)
+    - ADRs: `docs/adr/adrNNN-slug.md` (Proposed) — implemented by Phase N
     - Related: `file:line`, prior plan, research doc
 
 ## Rules
@@ -59,3 +69,4 @@ Produce a complete, actionable plan at `thoughts/plans/YYYY-MM-DD-ENG-XXXX-descr
 - Refactors include characterization tests before the behaviour change.
 - Every reference to existing code includes `file:line`.
 - Non-trivial test work follows the TDD vertical-slice loop — one test → one impl → repeat. See the `tdd` skill.
+- Plans built from a design doc resolve its `## ADR Candidates` / `## Terminology TODO` via `/domain_model` first, then map each resulting Proposed ADR to an implementing phase.

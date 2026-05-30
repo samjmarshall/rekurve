@@ -27,6 +27,7 @@ Before writing code, scan the plan for these risks and state findings in a short
 2. **CI trigger scope** — for any workflow change, state the trigger. `repository_dispatch`, `schedule`, and `workflow_dispatch` run from the default branch; changes on a feature branch take no effect until merged.
 3. **Env vars** — list new variables and where to set them (local + deployment).
 4. **Test data** — identify external records the plan creates and confirm each spec cleans them up in `afterAll`.
+5. **Proposed ADRs** — list every ADR cited by the plan (`## References` → `ADRs:`) or the design doc's `## Related ADRs` that's still `Proposed`/`In Progress`. These are the decisions this plan exists to prove out; you'll resolve their status as their phases land (see "Resolving ADRs").
 
 Wait for approval before editing files. If the plan has zero risks, say so and proceed.
 
@@ -72,6 +73,16 @@ After implementing a phase:
 - Update checkboxes in the plan file using Edit as items are verified
 
 Don't let verification interrupt your flow - batch it at natural stopping points.
+
+## Resolving ADRs
+
+This plan may implement decisions captured as **Proposed** ADRs in `docs/adr/` (see `## References` → `ADRs:`, or the design doc's `## Related ADRs`). **You own the Proposed → Accepted/Rejected transition.** Resolve each ADR as its phase lands, per `.claude/skills/domain-model/ADR-FORMAT.md`:
+
+- **Decision held** — the implementation bears it out: set Status to `Accepted` and bump `Date`.
+- **Decision changed or dropped** — you took a different path: set the old ADR to `Rejected`, or write a replacement ADR and mark the old one `Superseded by [ADRNNN](adrNNN-slug.md)`. Never silently mutate an already-Accepted/Rejected decision.
+- Leave an ADR `Proposed` only if its phase is genuinely incomplete — `/validate_plan` backstops anything left unresolved.
+
+Use canonical terms from `CONTEXT.md` in all code, identifiers, and comments.
 
 ## UI/Frontend Phases
 

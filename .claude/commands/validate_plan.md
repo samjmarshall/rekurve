@@ -67,6 +67,13 @@ The new plan template requires every code reference to include `file:line`. Vali
 - Confirm each file exists and the cited line is still a plausible anchor for the described change (line drift of ±10 is fine; a vanished symbol is not)
 - Flag any anchor that's become stale — the plan may need iterating before validation can finish
 
+**ADR & terminology backstop (do this once):**
+
+`/implement_plan` resolves Proposed ADRs as it builds, but validation is the last line of defence — no ADR tied to this work may remain unresolved once validation passes.
+
+- For every ADR cited by the plan (`## References` → `ADRs:`) or the design doc's `## Related ADRs` still in `Proposed`/`In Progress`: resolve it per `.claude/skills/domain-model/ADR-FORMAT.md`. Set `Accepted` if the shipped code reflects the decision; set `Rejected` (or `Superseded by [ADRNNN](...)`) if the code took another path. Cite the `file:line` evidence in the report.
+- Confirm each `## Terminology TODO` resolution actually landed in `CONTEXT.md` and that the code uses the canonical term, not the old/fuzzy one. Flag drift.
+
 For each phase in the plan:
 
 1. **Check completion status**:
@@ -119,6 +126,11 @@ Create comprehensive validation summary:
 ✓ Unit tests: `make test`
 ✗ E2E: `make test_e2e` (1 failing spec — see below)
 ✓ Design review: `/design_review` clean (UI phases only)
+
+### ADR & Terminology
+✓ adr013 Accepted — code at `src/...:NN` matches the decision
+✗ adr014 still Proposed — no implementing code found (recommend Reject)
+✓ CONTEXT.md term "Lead" persisted and used consistently in code
 
 ### Code Review Findings
 
@@ -176,6 +188,8 @@ Always verify:
 - [ ] Error handling is robust
 - [ ] Documentation updated if needed
 - [ ] Manual test steps are clear
+- [ ] No ADR tied to this work remains `Proposed`/`In Progress`
+- [ ] `## Terminology TODO` resolutions present in `CONTEXT.md` and used in code
 
 ## Relationship to Other Commands
 

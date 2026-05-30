@@ -23,6 +23,7 @@ Interview me relentlessly about every aspect of this design until we reach a sha
    - **@agent-codebase-pattern-finder** - To find similar features we can model after
    - **@agent-thoughts-locator** - To find any research, plans, or decisions about this area
    - **@agent-thoughts-analyzer** - To extract key insights from the most relevant documents
+- **Read the project glossary if present.** Check for `CONTEXT.md` (or `CONTEXT-MAP.md`) at the repo root or in the relevant subdirectory. During the session, challenge terminology that conflicts with the glossary and propose canonical terms when the user uses fuzzy or overloaded ones. **Do not write to `CONTEXT.md`** — that's `/domain_model`'s job. Brainstorm output stays transient; the glossary stays durable.
 - **ALWAYS use @agent-web-lookup or @agent-web-research** for web research - NEVER call WebSearch or WebFetch directly. Use `web-lookup` for single-fact queries (fast); use `web-research` for multi-source synthesis or conflict resolution (deep).
 - **If a question can be answered by exploring the codebase, explore instead of asking.**
 
@@ -46,7 +47,16 @@ Interview me relentlessly about every aspect of this design until we reach a sha
 - Use writing-clearly-and-concisely skill if available
 - **You must always write to file** - never just present the design in chat without saving it
 
-**STOP after writing the design document. Do NOT:**
+**ADR candidates (before STOP):**
+- Scan the session for decisions that pass the 3-gate test (see `.claude/skills/domain-model/ADR-FORMAT.md`).
+- If any pass, append an `## ADR Candidates` section to the design doc. Lead with one line pointing at the persist command: ``Run `/domain_model <this-design-doc-path>` to capture these as Proposed ADRs.`` Then list each candidate with a one-line decision summary and a one-line why-it-passes.
+- If none pass, skip this section entirely.
+
+**Closing handoff (before STOP):**
+- If terminology was sharpened against `CONTEXT.md` during the session, append a `## Terminology TODO` section to the design doc. Lead with one line pointing at the persist command: ``Run `/domain_model <this-design-doc-path>` to persist these to `CONTEXT.md`.`` Then list each sharpened term with a one-line note on the resolution.
+- If no terms were sharpened, skip this section entirely.
+
+**STOP after the documentation and (optional) harvest steps. Do NOT:**
 - Write any code or implementation
 - Create any files in `src/`
 - Edit any existing source files

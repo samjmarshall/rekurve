@@ -10,6 +10,15 @@ Ask the questions one at a time, waiting for feedback on each question before co
 
 If a question can be answered by exploring the codebase, explore the codebase instead.
 
+## Pre-filtered work from /brainstorm
+
+If invoked against a brainstorm design doc, read these appendix sections before grilling:
+
+- `## ADR Candidates` — pre-filtered decisions from the brainstorm session. Offer each as a Proposed ADR candidate; act on the user's selections per the regular ADR writing rules below.
+- `## Terminology TODO` — terms sharpened during the brainstorm. Update `CONTEXT.md` per the rules below.
+
+As each entry is resolved, remove it from its appendix section. For resolved ADR candidates, append a link to the new ADR under a `## Related ADRs` footer in the design doc. Drop the appendix heading when its section is empty. Then continue with a normal grilling pass — the brainstorm may have missed candidates.
+
 ## Domain awareness
 
 During codebase exploration, also look for existing documentation:
@@ -24,7 +33,7 @@ Most repos have a single context:
 ├── docs/
 │   └── adr/
 │       ├── adr001-event-sourced-orders.md
-│       └── adr002-postgres-for-write-model.md
+│       └── adr000-postgres-for-write-model.md
 └── src/
 ```
 

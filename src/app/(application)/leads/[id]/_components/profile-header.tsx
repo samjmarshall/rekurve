@@ -117,6 +117,25 @@ export function ProfileHeader({
           >
             {stageLabel(lead.leadStage)}
           </Badge>
+          {lead.hubspotContactId ? (
+            <a
+              href={`https://app.hubspot.com/contacts/${lead.hubspotContactId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground text-xs underline underline-offset-2 hover:text-foreground"
+              data-testid="lead-profile-hubspot-link"
+            >
+              View in HubSpot
+            </a>
+          ) : (
+            <Badge
+              variant="outline"
+              className="px-3 py-1 text-xs"
+              data-testid="lead-profile-hubspot-syncing"
+            >
+              Syncing to HubSpot…
+            </Badge>
+          )}
         </div>
       </div>
     </header>

@@ -9,6 +9,26 @@ import { env } from "~/env";
 const isPreview = process.env.VERCEL_ENV === "preview";
 const isDev = env.NODE_ENV === "development";
 
+// The lead-profile "Syncing → linked" badge subscribes to Inngest Realtime over
+// a WebSocket. That socket targets the Inngest server's origin (the local dev
+// server in dev/E2E, Inngest Cloud in prod) — a different origin than the app,
+// so CSP `connect-src` must list it or the browser silently blocks the upgrade
+// and the badge never flips. Derive the ws(s):// origin from the same base URL
+// the SDK uses (INNGEST_BASE_URL locally; Inngest Cloud's default otherwise).
+const inngestWsOrigin = (() => {
+  const base =
+    process.env.INNGEST_BASE_URL ??
+    process.env.INNGEST_API_BASE_URL ??
+    "https://api.inngest.com";
+  try {
+    const url = new URL(base);
+    const scheme = url.protocol === "http:" ? "ws:" : "wss:";
+    return `${scheme}//${url.host}`;
+  } catch {
+    return "wss://api.inngest.com";
+  }
+})();
+
 const config: NextConfig = {
   skipTrailingSlashRedirect: true,
   headers: async () => [
@@ -49,7 +69,7 @@ const config: NextConfig = {
           value: [
             "default-src 'none';",
             "base-uri 'none';",
-            `connect-src 'self'${isPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""};`,
+            `connect-src 'self' ${inngestWsOrigin}${isPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""};`,
             // next/font/google self-hosts all fonts at build time — no runtime requests to fonts.gstatic.com
             "font-src 'self';",
             "frame-ancestors 'none';",

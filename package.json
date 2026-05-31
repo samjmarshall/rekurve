@@ -15,6 +15,7 @@
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "preview": "next build && next start",
+    "preview:inngest": "inngest dev -u http://localhost:3000/api/inngest",
     "porless:get": "portless get",
     "start": "next start",
     "test:e2e": "playwright test",

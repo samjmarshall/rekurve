@@ -101,6 +101,28 @@ export async function waitForPendingMessage(
   );
 }
 
+/**
+ * Poll for the active nurture sequence on a lead. The DB-first intake cutover
+ * (#258) moved sequence auto-start off the request path and into the
+ * lead-hubspot-sync worker, so the row appears asynchronously after capture.
+ */
+export async function waitForActiveSequence(
+  leadId: string,
+  opts?: { intervalMs?: number; timeoutMs?: number },
+): Promise<{ id: string; sequenceType: string; nextStepAt: Date | null }> {
+  const intervalMs = opts?.intervalMs ?? 1_000;
+  const timeoutMs = opts?.timeoutMs ?? 10_000;
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const seq = await getActiveSequenceByLead(leadId);
+    if (seq) return seq;
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
+  throw new Error(
+    `Timed out waiting for active sequence for lead ${leadId} (${timeoutMs}ms)`,
+  );
+}
+
 export async function cleanupSequences(ids: string[]): Promise<void> {
   if (ids.length === 0) return;
   await sql()`DELETE FROM "nurture_sequences" WHERE id = ANY(${ids}::uuid[])`;

@@ -18,7 +18,10 @@ export class LeadProfileSection {
   readonly phoneLink: Locator;
   readonly emailLink: Locator;
   readonly scoreBadge: Locator;
+  readonly scoreValue: Locator;
   readonly stageBadge: Locator;
+  readonly hubspotSyncing: Locator;
+  readonly hubspotLink: Locator;
   readonly lastContacted: Locator;
 
   readonly editButton: Locator;
@@ -42,7 +45,14 @@ export class LeadProfileSection {
     this.phoneLink = page.locator('[data-testid="lead-profile-phone"]');
     this.emailLink = page.locator('[data-testid="lead-profile-email"]');
     this.scoreBadge = page.locator('[data-testid="lead-profile-score-badge"]');
+    this.scoreValue = page.locator('[data-testid="lead-profile-score-value"]');
     this.stageBadge = page.locator('[data-testid="lead-profile-stage"]');
+    this.hubspotSyncing = page.locator(
+      '[data-testid="lead-profile-hubspot-syncing"]',
+    );
+    this.hubspotLink = page.locator(
+      '[data-testid="lead-profile-hubspot-link"]',
+    );
     this.lastContacted = page.locator(
       '[data-testid="lead-profile-last-contacted"]',
     );

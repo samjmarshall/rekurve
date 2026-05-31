@@ -21,11 +21,21 @@ If you would like help with building, implementing or simply discovering problem
 >
 > I'm sure you can still get good results from copy/pasting this exact Harness. I'm simply highlighting my recommendation to study it instead. Test it, then apply what is relevant to you. Building up a Harness molded to you and your specific use cases, not the other way around.
 
-### Workflow
+### Primary Workflow
 
 ![Claude Code Workflow](./claude-code-workflow.png)
 
 Not every task uses every step. Small fixes can skip straight to Implement → Commit. The full flow is available when needed.
+
+#### Workflow w/ ADRs
+
+> [!IMPORTANT]
+> The Architecture Decision Record (ADR) workflow below supplements the [Primary Workflow](#primary-workflow) above when a genuine "1-way door" decision is made or at least 2-3 of the following are true:
+> 1. **Hard to reverse** — The cost of changing your mind later is meaningful
+> 2. **Surprising without context** — A future reader will wonder "why did they do it this way?"
+> 3. **The result of a real trade-off** — There were genuine alternatives and you picked one for specific reasons
+
+![Claude Code ADR Workflow](./claude-code-adr-workflow.png)
 
 ### Interactive Claude Skills/Commands
 
@@ -215,6 +225,7 @@ Point-in-time architecture decisions — why we chose X over Y — live in [`doc
 | [014](adr/adr014-outbox-pattern-for-inngest-delivery.md) | Transactional outbox for at-least-once delivery to Inngest |
 | [015](adr/adr015-upstash-rate-limit-for-otp-send.md) | Upstash rate-limit for OTP-send, email-keyed, via better-auth before-hook |
 | [016](adr/adr016-trpc-ai-procedure-rate-limit.md) | tRPC AI procedure rate limit via `aiProcedure` building block, per-user, fail-open |
+| [017](adr/adr017-atomic-outbox-writes-via-neon-http-batch.md) | Atomic outbox writes via `neon-http` `db.batch()`, rejecting `neon-serverless` interactive-transaction swap |
 
 ## Prerequisites
 

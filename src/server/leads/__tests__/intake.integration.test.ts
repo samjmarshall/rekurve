@@ -4,85 +4,67 @@ import "dotenv/config";
 import { afterAll, beforeEach, describe, expect, rs, test } from "@rstest/core";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray } from "drizzle-orm";
-import { toContactProperties } from "~/server/hubspot/properties";
 
-// Unique per-run prefix keeps test data isolated across concurrent runs
 const RUN_ID = `${Date.now()}.${Math.random().toString(36).slice(2)}`;
 
 describe.skipIf(!process.env.INTEGRATION_DB)(
   "captureLead / updateLead integration",
   () => {
     const createdLeadIds: string[] = [];
-
-    let mockFindExisting: ReturnType<typeof rs.fn>;
-    let mockCreateContact: ReturnType<typeof rs.fn>;
-    let mockUpdateContact: ReturnType<typeof rs.fn>;
-    let mockStartOrUpdateSequence: ReturnType<typeof rs.fn>;
+    const createdOutboxIds: string[] = [];
 
     beforeEach(() => {
       rs.resetModules();
 
-      mockFindExisting = rs.fn().mockResolvedValue(null);
-      mockCreateContact = rs.fn().mockResolvedValue({
-        id: `hs-default-${RUN_ID}`,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-      mockUpdateContact = rs.fn().mockResolvedValue({
-        id: `hs-default-${RUN_ID}`,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-      mockStartOrUpdateSequence = rs.fn().mockResolvedValue(undefined);
-
-      // toContactProperties is captured before resetModules so we get the real fn
+      // HubSpot must not be called — mock it to throw if invoked
       rs.doMock("~/server/hubspot", () => ({
-        findExistingContact: mockFindExisting,
-        createContact: mockCreateContact,
-        updateContact: mockUpdateContact,
-        toContactProperties,
+        findExistingContact: rs
+          .fn()
+          .mockRejectedValue(
+            new Error("HubSpot must not be called in DB-first mode"),
+          ),
+        createContact: rs
+          .fn()
+          .mockRejectedValue(
+            new Error("HubSpot must not be called in DB-first mode"),
+          ),
+        updateContact: rs
+          .fn()
+          .mockRejectedValue(
+            new Error("HubSpot must not be called in DB-first mode"),
+          ),
+        toContactProperties: rs.fn().mockReturnValue({}),
       }));
 
-      // Always mock the scheduler — doMock registrations persist across
-      // resetModules() calls, so a test-body doMock would leak into later tests.
-      // Behaviour is configured per-test via mockStartOrUpdateSequence.
+      // Mock inngest.send so sendPostCommit doesn't actually send
+      rs.doMock("~/inngest/client", () => ({
+        inngest: { send: rs.fn().mockResolvedValue(undefined) },
+      }));
+
       rs.doMock("~/server/nurture/scheduler", () => ({
-        startOrUpdateSequence: mockStartOrUpdateSequence,
+        startOrUpdateSequence: rs.fn().mockResolvedValue(undefined),
       }));
     });
 
     afterAll(async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
+      const { outbox } = await import("~/server/db/schema/outbox");
       if (createdLeadIds.length > 0) {
         await db.delete(leads).where(inArray(leads.id, createdLeadIds));
+      }
+      if (createdOutboxIds.length > 0) {
+        await db.delete(outbox).where(inArray(outbox.id, createdOutboxIds));
       }
     });
 
     // ---- captureLead ----
 
-    test("captureLead — new contact, no existing HubSpot match", async () => {
+    test("returns row with null hubspotContactId and scoring fields set", async () => {
       const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
       const { captureLead } = await import("~/server/leads/intake");
 
       const email = `intake.${RUN_ID}.t1@test.example`;
-      const hsId = `hs-t1-${RUN_ID}`;
-      mockCreateContact.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-      mockUpdateContact.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-
       const input = {
         firstName: "Integration",
         lastName: "Test",
@@ -98,318 +80,172 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
       const lead = await captureLead(db, input, {
         db,
-        userId: "integration-test",
+        userId: `user-${RUN_ID}`,
       });
       createdLeadIds.push(lead.id);
 
-      expect(mockCreateContact).toHaveBeenCalledOnce();
-      expect(mockCreateContact).toHaveBeenCalledWith(
-        expect.objectContaining({ firstname: "Integration" }),
-      );
-      expect(mockUpdateContact).toHaveBeenCalledWith(
-        hsId,
-        expect.objectContaining({
-          lead_score: expect.any(String),
-          lead_stage: expect.any(String),
-        }),
-      );
-
-      const row = await db.query.leads.findFirst({
-        where: eq(leads.id, lead.id),
-      });
-      expect(row).toBeDefined();
-      expect(row!.hubspotContactId).toBe(hsId);
-      expect(row!.leadScore).toBeGreaterThan(0);
-      expect(row!.leadStage).not.toBe("unqualified");
-      expect(row!.scoreMetadata).not.toBeNull();
-
-      expect(mockStartOrUpdateSequence).toHaveBeenCalledWith(
-        expect.anything(),
-        lead.id,
-        expect.any(String),
-      );
+      expect(lead.hubspotContactId).toBeNull();
+      expect(lead.leadScore).toBeGreaterThan(0);
+      expect(lead.leadStage).not.toBe("unqualified");
+      expect(lead.scoreMetadata).not.toBeNull();
     });
 
-    test("captureLead — existing HubSpot match", async () => {
+    test("writes lead row and outbox row atomically (both present after call)", async () => {
       const { db } = await import("~/server/db");
+      const { leads } = await import("~/server/db/schema");
+      const { outbox } = await import("~/server/db/schema/outbox");
       const { captureLead } = await import("~/server/leads/intake");
 
+      const userId = `user-atomic-${RUN_ID}`;
       const email = `intake.${RUN_ID}.t2@test.example`;
-      const hsId = `hs-t2-existing-${RUN_ID}`;
-      mockFindExisting.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-      mockUpdateContact.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
 
       const lead = await captureLead(
         db,
-        { firstName: "Existing", lastName: "Contact", email },
-        { db, userId: "integration-test" },
+        { firstName: "Atomic", lastName: "Test", email },
+        { db, userId },
       );
       createdLeadIds.push(lead.id);
 
-      expect(mockCreateContact).not.toHaveBeenCalled();
-      // updateContact called twice: once for data push, once for score sync
-      expect(mockUpdateContact).toHaveBeenCalledTimes(2);
-      expect(lead.hubspotContactId).toBe(hsId);
+      // Both rows present immediately after the call
+      const leadRow = await db.query.leads.findFirst({
+        where: eq(leads.id, lead.id),
+      });
+      expect(leadRow).toBeDefined();
+      expect(leadRow!.hubspotContactId).toBeNull();
+
+      const outboxRows = await db
+        .select()
+        .from(outbox)
+        .where(eq(outbox.eventName, "lead.captured"));
+      const ourRow = outboxRows.find(
+        (r) =>
+          (r.payload as Record<string, unknown>).leadId === lead.id &&
+          (r.payload as Record<string, unknown>).userId === userId,
+      );
+      expect(ourRow).toBeDefined();
+      createdOutboxIds.push(ourRow!.id);
     });
 
-    test("captureLead — webhook-conflict resolve (onConflictDoUpdate)", async () => {
+    test("same-email re-capture updates in place (upsert preserved)", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
       const { captureLead } = await import("~/server/leads/intake");
 
-      const hsId = `hs-t3-conflict-${RUN_ID}`;
-      // Simulate webhook landing first — placeholder row already exists
-      const [placeholder] = await db
-        .insert(leads)
-        .values({
-          firstName: "Placeholder",
-          lastName: "Row",
-          hubspotContactId: hsId,
-        })
-        .returning();
-      createdLeadIds.push(placeholder!.id);
-
-      mockCreateContact.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-      mockUpdateContact.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-
       const email = `intake.${RUN_ID}.t3@test.example`;
-      const lead = await captureLead(
+      const userId = `user-upsert-${RUN_ID}`;
+
+      const first = await captureLead(
         db,
-        { firstName: "Real", lastName: "Person", email, hasLand: true },
-        { db, userId: "integration-test" },
+        { firstName: "First", lastName: "Capture", email },
+        { db, userId },
+      );
+      createdLeadIds.push(first.id);
+
+      const second = await captureLead(
+        db,
+        { firstName: "Second", lastName: "Capture", email },
+        { db, userId },
       );
 
-      // onConflictDoUpdate updates the placeholder in-place — same row, not a new one
-      expect(lead.id).toBe(placeholder!.id);
-      expect(lead.firstName).toBe("Real");
-      expect(lead.email).toBe(email);
-      expect(lead.scoreMetadata).not.toBeNull();
+      // Same row updated, not a new row
+      expect(second.id).toBe(first.id);
+      expect(second.firstName).toBe("Second");
 
       const rows = await db
         .select({ id: leads.id })
         .from(leads)
-        .where(eq(leads.hubspotContactId, hsId));
+        .where(eq(leads.email, email));
       expect(rows).toHaveLength(1);
     });
 
-    test("captureLead — HubSpot dedup failure propagates, no row inserted", async () => {
-      const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
-      const { captureLead } = await import("~/server/leads/intake");
-
-      mockFindExisting.mockRejectedValue(new Error("HubSpot 500"));
-      const email = `intake.${RUN_ID}.t4@test.example`;
-
-      await expect(
-        captureLead(
-          db,
-          { firstName: "Fail", lastName: "Test", email },
-          { db, userId: "integration-test" },
-        ),
-      ).rejects.toThrow("HubSpot 500");
-
-      const notCreated = await db.query.leads.findFirst({
-        where: eq(leads.email, email),
-      });
-      expect(notCreated).toBeUndefined();
-    });
-
-    test("captureLead — post-write HubSpot score sync failure is swallowed", async () => {
+    test("makes no synchronous HubSpot calls (mocks would throw if called)", async () => {
       const { db } = await import("~/server/db");
       const { captureLead } = await import("~/server/leads/intake");
 
-      const email = `intake.${RUN_ID}.t5@test.example`;
-      const hsId = `hs-t5-${RUN_ID}`;
-      mockCreateContact.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-      mockUpdateContact.mockRejectedValue(new Error("score sync failed"));
-
-      const consoleSpy = rs
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
-
+      // If HubSpot is called the mock throws — this just needs to resolve
       const lead = await captureLead(
         db,
-        { firstName: "Score", lastName: "SyncFail", email },
-        { db, userId: "integration-test" },
+        { firstName: "NoHubspot", lastName: "Test" },
+        { db, userId: `user-${RUN_ID}` },
       );
       createdLeadIds.push(lead.id);
 
-      expect(lead).toBeDefined();
-      expect(lead.hubspotContactId).toBe(hsId);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining(
-          "[intake.captureLead] HubSpot score sync failed",
-        ),
-        expect.anything(),
-      );
-
-      consoleSpy.mockRestore();
-    });
-
-    test("captureLead — nurture-start failure is swallowed", async () => {
-      // Configure the always-registered scheduler mock to reject for this test
-      mockStartOrUpdateSequence.mockRejectedValue(new Error("nurture failed"));
-
-      const { db } = await import("~/server/db");
-      const { captureLead } = await import("~/server/leads/intake");
-
-      const email = `intake.${RUN_ID}.t6@test.example`;
-      const hsId = `hs-t6-${RUN_ID}`;
-      mockCreateContact.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-      mockUpdateContact.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-
-      const consoleSpy = rs
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
-
-      const lead = await captureLead(
-        db,
-        { firstName: "Nurture", lastName: "Fail", email },
-        { db, userId: "integration-test" },
-      );
-      createdLeadIds.push(lead.id);
-
-      expect(lead).toBeDefined();
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining(
-          "[intake.captureLead] nurture sequence start failed",
-        ),
-        expect.anything(),
-      );
-
-      consoleSpy.mockRestore();
+      expect(lead.hubspotContactId).toBeNull();
     });
 
     // ---- updateLead ----
 
-    test("updateLead — non-qualification field change does not re-score", async () => {
+    test("qualifying edit re-scores and writes lead.updated outbox row", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
+      const { outbox } = await import("~/server/db/schema/outbox");
       const { updateLead } = await import("~/server/leads/intake");
-
-      const hsId = `hs-t7-${RUN_ID}`;
-      mockUpdateContact.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
-
-      const [lead] = await db
-        .insert(leads)
-        .values({
-          firstName: "Notes",
-          lastName: "Test",
-          hubspotContactId: hsId,
-          leadScore: 20,
-          leadStage: "nurture",
-        })
-        .returning();
-      createdLeadIds.push(lead!.id);
-
-      const updated = await updateLead(
-        db,
-        lead!.id,
-        { notes: "meeting notes" },
-        { db, userId: "integration-test" },
-      );
-
-      expect(updated.notes).toBe("meeting notes");
-      expect(updated.leadScore).toBe(20);
-      expect(updated.leadStage).toBe("nurture");
-
-      // updateContact called once for data push only — no score sync
-      expect(mockUpdateContact).toHaveBeenCalledOnce();
-      expect(mockUpdateContact).toHaveBeenCalledWith(
-        hsId,
-        expect.objectContaining({ notes: "meeting notes" }),
-      );
-      expect(mockStartOrUpdateSequence).not.toHaveBeenCalled();
-    });
-
-    test("updateLead — qualification field change re-scores and fires nurture", async () => {
-      const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
-      const { updateLead } = await import("~/server/leads/intake");
-
-      const hsId = `hs-t8-${RUN_ID}`;
-      mockUpdateContact.mockResolvedValue({
-        id: hsId,
-        properties: {},
-        createdAt: "",
-        updatedAt: "",
-      });
 
       const [lead] = await db
         .insert(leads)
         .values({
           firstName: "Rescore",
           lastName: "Test",
-          hubspotContactId: hsId,
           leadScore: 0,
           leadStage: "unqualified",
         })
         .returning();
       createdLeadIds.push(lead!.id);
 
+      const userId = `user-rescore-${RUN_ID}`;
       const before = new Date();
       const updated = await updateLead(
         db,
         lead!.id,
         { landSizeSqm: "800", landRegistered: true, hasLand: true },
-        { db, userId: "integration-test" },
+        { db, userId },
       );
 
-      expect(updated.landSizeSqm).toBe("800");
       expect(updated.leadScore).toBeGreaterThan(0);
       expect(updated.scoreMetadata).not.toBeNull();
       expect(
         new Date(updated.scoreMetadata!.scoredAt).getTime(),
       ).toBeGreaterThanOrEqual(before.getTime());
 
-      // updateContact: once for data, once for score sync
-      expect(mockUpdateContact).toHaveBeenCalledTimes(2);
-
-      expect(mockStartOrUpdateSequence).toHaveBeenCalledWith(
-        expect.anything(),
-        lead!.id,
-        expect.any(String),
+      const outboxRows = await db
+        .select()
+        .from(outbox)
+        .where(eq(outbox.eventName, "lead.updated"));
+      const ourRow = outboxRows.find(
+        (r) =>
+          (r.payload as Record<string, unknown>).leadId === lead!.id &&
+          (r.payload as Record<string, unknown>).userId === userId,
       );
+      expect(ourRow).toBeDefined();
+      createdOutboxIds.push(ourRow!.id);
+    });
+
+    test("non-qualifying edit still writes lead.updated outbox row", async () => {
+      const { db } = await import("~/server/db");
+      const { leads } = await import("~/server/db/schema");
+      const { outbox } = await import("~/server/db/schema/outbox");
+      const { updateLead } = await import("~/server/leads/intake");
+
+      const [lead] = await db
+        .insert(leads)
+        .values({ firstName: "Notes", lastName: "Test" })
+        .returning();
+      createdLeadIds.push(lead!.id);
+
+      const userId = `user-notes-${RUN_ID}`;
+      await updateLead(db, lead!.id, { notes: "just a note" }, { db, userId });
+
+      const outboxRows = await db
+        .select()
+        .from(outbox)
+        .where(eq(outbox.eventName, "lead.updated"));
+      const ourRow = outboxRows.find(
+        (r) =>
+          (r.payload as Record<string, unknown>).leadId === lead!.id &&
+          (r.payload as Record<string, unknown>).userId === userId,
+      );
+      expect(ourRow).toBeDefined();
+      createdOutboxIds.push(ourRow!.id);
     });
 
     test("updateLead — not found throws NOT_FOUND", async () => {
@@ -421,39 +257,13 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
           db,
           crypto.randomUUID(),
           { notes: "ghost" },
-          { db, userId: "integration-test" },
+          { db, userId: "user-ghost" },
         );
         expect.unreachable("Should have thrown");
       } catch (e) {
         expect(e).toBeInstanceOf(TRPCError);
         expect((e as InstanceType<typeof TRPCError>).code).toBe("NOT_FOUND");
       }
-    });
-
-    test("updateLead — no HubSpot link skips updateContact", async () => {
-      const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
-      const { updateLead } = await import("~/server/leads/intake");
-
-      const [unlinked] = await db
-        .insert(leads)
-        .values({ firstName: "Unlinked", lastName: "Lead" })
-        .returning();
-      createdLeadIds.push(unlinked!.id);
-
-      await updateLead(
-        db,
-        unlinked!.id,
-        { notes: "no hubspot" },
-        { db, userId: "integration-test" },
-      );
-
-      expect(mockUpdateContact).not.toHaveBeenCalled();
-
-      const row = await db.query.leads.findFirst({
-        where: eq(leads.id, unlinked!.id),
-      });
-      expect(row!.notes).toBe("no hubspot");
     });
   },
 );

@@ -42,16 +42,34 @@ export default defineConfig({
       : {},
   },
 
-  // In CI, test against the deployed URL — no local server needed
+  // In CI, test against the deployed URL — no local server needed (the
+  // deployed app uses cloud Inngest). Locally we run two servers and wait for
+  // both: the Next app and an Inngest dev server, mirroring `yarn dev` minus
+  // portless. INNGEST_DEV=1 puts the app's SDK in dev mode (no signing key)
+  // and INNGEST_BASE_URL points event sends at the local dev server, so the
+  // outbox worker fires and stamps hubspotContactId during E2E.
   webServer: isCI
     ? undefined
-    : {
-        command: "rm -rf .next/ && yarn db:migrate && yarn preview",
-        stdout: "pipe",
-        url: baseURL,
-        timeout: 120_000,
-        reuseExistingServer: true,
-      },
+    : [
+        {
+          command: "rm -rf .next/ && yarn db:migrate && yarn preview",
+          stdout: "pipe",
+          url: baseURL,
+          timeout: 120_000,
+          reuseExistingServer: true,
+          env: {
+            INNGEST_DEV: "1",
+            INNGEST_BASE_URL: "http://localhost:8288",
+          },
+        },
+        {
+          command: "yarn preview:inngest",
+          stdout: "pipe",
+          url: "http://localhost:8288",
+          timeout: 60_000,
+          reuseExistingServer: true,
+        },
+      ],
 
   projects: [
     {

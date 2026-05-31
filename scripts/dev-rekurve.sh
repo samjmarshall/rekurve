@@ -13,4 +13,13 @@ export INNGEST_BASE_URL="${PORTLESS_URL/rekurve.localhost/inngest.rekurve.localh
 # INNGEST_BASE_URL only overrides the URL — it does not flip the mode.
 export INNGEST_DEV=1
 
+# Tell the SDK which origin to report to the dev server at sync time. Without
+# this, the SDK derives the URL from `NextRequest.url` (https://localhost:$PORT)
+# or the forwarded Host header — both of which portless rewrites to the internal
+# `localhost:$PORT`, so the dev server calls back over HTTPS to a plain-HTTP port
+# and the TLS handshake fails ("server gave HTTP response to HTTPS client").
+# INNGEST_SERVE_ORIGIN overrides unconditionally via reqUrl(), so the dev server
+# always invokes steps through the portless URL.
+export INNGEST_SERVE_ORIGIN="$PORTLESS_URL"
+
 exec next dev --turbo

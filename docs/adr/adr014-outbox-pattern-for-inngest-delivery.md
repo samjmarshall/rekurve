@@ -1,7 +1,7 @@
 ---
-Status: 'Proposed'
+Status: 'Accepted'
 Deciders: 'Sam Marshall'
-Date: '2026-05-05'
+Date: '2026-05-31'
 # prettier-ignore
 ---
 
@@ -113,4 +113,5 @@ Treat the outbox as transient: insert, attempt `inngest.send`, delete the row on
 
 - Enables: [adr013](adr013-local-db-canonical-for-lead-data.md) — the canonical-store decision this pattern makes safe
 - Consumer: [adr010](adr010-inngest-source-of-truth-for-followup-plan.md) — Inngest as source of truth for Follow-up plan run state; `lead.captured` events from this outbox feed the plan runner
+- Atomicity mechanism refined by: [adr017](adr017-atomic-outbox-writes-via-neon-http-batch.md) — `db.batch()` over `neon-http` as the implementation of the "same transaction" requirement
 - Runbook (TBD): BetterStack alert rules for stuck outbox rows (`processed_at IS NULL AND attempts > N`) and persistent `inngest.send` failures

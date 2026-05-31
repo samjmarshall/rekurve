@@ -96,8 +96,8 @@ When a phase modifies UI components, pages, or styles in `src/`:
 After all phases are complete, update docs so the next engineer picks up cold:
 
 - **`docs/README.md`** — update when the plan adds an env var, integration, scheduled job, ADR, or Make target. Skip otherwise.
-- **`/document-feature {slug}`** — run for user-visible features (new route, flow, or integration). Take `{slug}` from the ticket title. Skip for infra, refactors, bug fixes, or test-only changes.
-- **`/domain-model`** — run when the plan adds or restructures a domain concept or entity boundary. Skip otherwise.
+- **`/document_feature {slug}`** — run for user-visible features (new route, flow, or integration). Take `{slug}` from the ticket title. Skip for infra, refactors, bug fixes, or test-only changes.
+- **`/domain_model`** — run when the plan adds or restructures a domain concept or entity boundary. Skip otherwise.
 
 If a skill is unavailable, flag it in your summary. Don't hand-write the artefact.
 

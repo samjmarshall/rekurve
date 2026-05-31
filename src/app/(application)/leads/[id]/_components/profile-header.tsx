@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Mail, Phone } from "lucide-react";
+import { ArrowLeft, ExternalLink, Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
@@ -96,7 +96,7 @@ export function ProfileHeader({
           </p>
         </div>
 
-        <div className="flex items-center gap-3" aria-live="polite">
+        <div className="flex items-center gap-3">
           <div
             className={cn(
               "flex size-20 flex-col items-center justify-center rounded-full border-2 text-center",
@@ -117,25 +117,30 @@ export function ProfileHeader({
           >
             {stageLabel(lead.leadStage)}
           </Badge>
-          {lead.hubspotContactId ? (
-            <a
-              href={`https://app.hubspot.com/contacts/${lead.hubspotContactId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground text-xs underline underline-offset-2 hover:text-foreground"
-              data-testid="lead-profile-hubspot-link"
-            >
-              View in HubSpot
-            </a>
-          ) : (
-            <Badge
-              variant="outline"
-              className="px-3 py-1 text-xs"
-              data-testid="lead-profile-hubspot-syncing"
-            >
-              Syncing to HubSpot…
-            </Badge>
-          )}
+          <span aria-live="polite" className="contents">
+            {lead.hubspotContactId ? (
+              <a
+                href={`https://app.hubspot.com/contacts/${lead.hubspotContactId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-muted-foreground text-xs underline underline-offset-4 hover:text-foreground"
+                aria-label={`View ${fullName} in HubSpot`}
+                data-testid="lead-profile-hubspot-link"
+              >
+                <ExternalLink className="size-3" aria-hidden="true" />
+                View in HubSpot
+              </a>
+            ) : (
+              <Badge
+                variant="outline"
+                className="border-border px-3 py-1 text-sm text-muted-foreground"
+                title="HubSpot sync is processing — typically completes in under a minute"
+                data-testid="lead-profile-hubspot-syncing"
+              >
+                Syncing to HubSpot…
+              </Badge>
+            )}
+          </span>
         </div>
       </div>
     </header>

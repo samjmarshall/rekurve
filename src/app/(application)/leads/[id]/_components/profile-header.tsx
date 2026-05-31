@@ -133,7 +133,7 @@ export function ProfileHeader({
             ) : (
               <Badge
                 variant="outline"
-                className="border-border px-3 py-1 text-sm text-muted-foreground"
+                className="border-border px-3 py-1 text-muted-foreground text-sm"
                 title="HubSpot sync is processing — typically completes in under a minute"
                 data-testid="lead-profile-hubspot-syncing"
               >

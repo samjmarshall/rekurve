@@ -105,7 +105,10 @@ export function ProfileHeader({
             data-testid="lead-profile-score-badge"
             aria-label={`Lead score ${lead.leadScore ?? 0} out of 100`}
           >
-            <span className="font-bold text-2xl text-foreground tabular-nums">
+            <span
+              className="font-bold text-2xl text-foreground tabular-nums"
+              data-testid="lead-profile-score-value"
+            >
               {lead.leadScore ?? 0}
             </span>
             <span className="text-muted-foreground text-xs">/ 100</span>

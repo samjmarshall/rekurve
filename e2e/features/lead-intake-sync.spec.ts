@@ -96,7 +96,7 @@ test.describe("Lead Intake — DB-first + Realtime sync", () => {
 
     // Score badge is present immediately (DB-first — scored synchronously)
     await expect(profile.scoreBadge).toBeVisible();
-    const scoreText = await profile.scoreBadge.textContent();
+    const scoreText = await profile.scoreValue.textContent();
     expect(Number(scoreText?.trim())).toBeGreaterThan(0);
 
     // HubSpot link starts as "Syncing…" (hubspotContactId is null at capture)

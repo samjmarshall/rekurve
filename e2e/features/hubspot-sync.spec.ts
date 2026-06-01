@@ -12,6 +12,7 @@ import {
   createTestContact,
   findContactByEmail,
   getLeadHubSpotId,
+  getTestContactById,
   updateTestContact,
   waitForLeadDeletion,
   waitForLeadField,
@@ -175,16 +176,19 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
     // Lead sync is now async — wait for the hubspotContactId stamp
     await waitForLeadHubSpotId(testEmail);
 
-    // Verify: the seeded contact was UPDATED, not a new one created
-    const contact = await findContactByEmail(testEmail);
-    expect(contact).not.toBeNull();
-    expect(contact!.id).toBe(seeded.id); // Same contact ID — not a duplicate
-    expect(contact!.properties.firstname).toBe("Updated");
-    expect(contact!.properties.lastname).toBe(`Dedup ${uniqueId}`);
-
-    // Verify: local lead references the same HubSpot contact
+    // Verify: the app linked the lead to the EXISTING contact (dedup) instead
+    // of creating a duplicate — the local lead now carries the seeded id.
     const hubspotId = await getLeadHubSpotId(testEmail);
     expect(hubspotId).toBe(seeded.id);
+
+    // Verify: that existing contact was UPDATED in place. Read by id — getById
+    // is read-after-write consistent, whereas findContactByEmail's Search API
+    // lags ~30s re-indexing the changed firstname and returns the stale
+    // "Existing" value (the seed's original name), failing this assertion even
+    // though the contact record was already patched server-side.
+    const contact = await getTestContactById(seeded.id);
+    expect(contact.properties.firstname).toBe("Updated");
+    expect(contact.properties.lastname).toBe(`Dedup ${uniqueId}`);
   });
 });
 

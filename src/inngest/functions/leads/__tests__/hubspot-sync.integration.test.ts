@@ -69,7 +69,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
       const { runLeadHubspotSync } = await import(
-        "~/server/leads/hubspot-sync"
+        "~/inngest/functions/leads/hubspot-sync"
       );
 
       const [lead] = await db
@@ -110,7 +110,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       const { db } = await import("~/server/db");
       const { leads, nurtureSequences } = await import("~/server/db/schema");
       const { runLeadHubspotSync } = await import(
-        "~/server/leads/hubspot-sync"
+        "~/inngest/functions/leads/hubspot-sync"
       );
 
       const [lead] = await db
@@ -137,7 +137,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
       const { runLeadHubspotSync } = await import(
-        "~/server/leads/hubspot-sync"
+        "~/inngest/functions/leads/hubspot-sync"
       );
 
       const [lead] = await db
@@ -178,7 +178,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
       const { runLeadHubspotSync } = await import(
-        "~/server/leads/hubspot-sync"
+        "~/inngest/functions/leads/hubspot-sync"
       );
 
       const [lead] = await db
@@ -218,7 +218,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
       const { runLeadHubspotSync } = await import(
-        "~/server/leads/hubspot-sync"
+        "~/inngest/functions/leads/hubspot-sync"
       );
 
       const existingHsId = `hs-linked-${RUN_ID}`;

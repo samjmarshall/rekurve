@@ -1,8 +1,7 @@
 import type { InngestFunction } from "inngest";
-
-import { leadHubspotSync } from "~/server/leads/hubspot-sync";
-import { outboxPrune } from "~/server/outbox/prune";
-import { outboxSweep } from "~/server/outbox/sweep";
+import { leadHubspotSync } from "./leads/hubspot-sync";
+import { outboxPrune } from "./outbox/prune";
+import { outboxSweep } from "./outbox/sweep";
 
 export const functions: InngestFunction.Like[] = [
   outboxSweep,

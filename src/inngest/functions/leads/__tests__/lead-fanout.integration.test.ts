@@ -7,7 +7,7 @@ import { eq, inArray } from "drizzle-orm";
 const RUN_ID = `${Date.now()}.${Math.random().toString(36).slice(2)}`;
 
 describe.skipIf(!process.env.INTEGRATION_DB)(
-  "leadHubspotSync integration",
+  "runLeadCapturedFanout integration",
   () => {
     const createdLeadIds: string[] = [];
 
@@ -68,8 +68,8 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("capture-flow: stamps hubspotContactId, calls createContact, publishes", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { runLeadHubspotSync } = await import(
-        "~/inngest/functions/leads/hubspot-sync"
+      const { runLeadCapturedFanout } = await import(
+        "~/inngest/functions/leads/lead-fanout"
       );
 
       const [lead] = await db
@@ -86,7 +86,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
         updatedAt: "",
       });
 
-      await runLeadHubspotSync(
+      await runLeadCapturedFanout(
         { data: { leadId: lead!.id, userId: "user-sync" } },
         makeStep(),
       );
@@ -109,8 +109,8 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("starts a nurture sequence for the lead's stage", async () => {
       const { db } = await import("~/server/db");
       const { leads, nurtureSequences } = await import("~/server/db/schema");
-      const { runLeadHubspotSync } = await import(
-        "~/inngest/functions/leads/hubspot-sync"
+      const { runLeadCapturedFanout } = await import(
+        "~/inngest/functions/leads/lead-fanout"
       );
 
       const [lead] = await db
@@ -119,7 +119,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
         .returning();
       createdLeadIds.push(lead!.id);
 
-      await runLeadHubspotSync(
+      await runLeadCapturedFanout(
         { data: { leadId: lead!.id, userId: "user-sync" } },
         makeStep(),
       );
@@ -136,8 +136,8 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("dedup-flow: uses updateContact when existing HubSpot contact found", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { runLeadHubspotSync } = await import(
-        "~/inngest/functions/leads/hubspot-sync"
+      const { runLeadCapturedFanout } = await import(
+        "~/inngest/functions/leads/lead-fanout"
       );
 
       const [lead] = await db
@@ -160,7 +160,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
         updatedAt: "",
       });
 
-      await runLeadHubspotSync(
+      await runLeadCapturedFanout(
         { data: { leadId: lead!.id, userId: "user-sync" } },
         makeStep(),
       );
@@ -177,8 +177,8 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("idempotency: createContact called once on double-run", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { runLeadHubspotSync } = await import(
-        "~/inngest/functions/leads/hubspot-sync"
+      const { runLeadCapturedFanout } = await import(
+        "~/inngest/functions/leads/lead-fanout"
       );
 
       const [lead] = await db
@@ -202,8 +202,8 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       });
 
       const event = { data: { leadId: lead!.id, userId: "user-sync" } };
-      await runLeadHubspotSync(event, makeStep());
-      await runLeadHubspotSync(event, makeStep());
+      await runLeadCapturedFanout(event, makeStep());
+      await runLeadCapturedFanout(event, makeStep());
 
       // First run creates; second run sees the stamp and patches instead
       expect(mockCreateContact).toHaveBeenCalledOnce();
@@ -214,11 +214,64 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       expect(row!.hubspotContactId).toBe(hsId);
     });
 
+    test("hubspotSync:false — nurture runs and publish fires, but createContact/updateContact not called", async () => {
+      const { db } = await import("~/server/db");
+      const { leads } = await import("~/server/db/schema");
+      const { runLeadCapturedFanout } = await import(
+        "~/inngest/functions/leads/lead-fanout"
+      );
+
+      const [lead] = await db
+        .insert(leads)
+        .values({ firstName: "SkipHS", lastName: "Test" })
+        .returning();
+      createdLeadIds.push(lead!.id);
+
+      await runLeadCapturedFanout(
+        { data: { leadId: lead!.id, userId: "user-sync", hubspotSync: false } },
+        makeStep(),
+      );
+
+      expect(mockCreateContact).not.toHaveBeenCalled();
+      expect(mockUpdateContact).not.toHaveBeenCalled();
+      expect(mockPublish).toHaveBeenCalledOnce();
+    });
+
+    test("hubspotSync absent (default true) — existing create/patch behaviour preserved", async () => {
+      const { db } = await import("~/server/db");
+      const { leads } = await import("~/server/db/schema");
+      const { runLeadCapturedFanout } = await import(
+        "~/inngest/functions/leads/lead-fanout"
+      );
+
+      const [lead] = await db
+        .insert(leads)
+        .values({ firstName: "DefaultSync", lastName: "Test" })
+        .returning();
+      createdLeadIds.push(lead!.id);
+
+      const hsId = `hs-default-flag-${RUN_ID}`;
+      mockCreateContact.mockResolvedValue({
+        id: hsId,
+        properties: {},
+        createdAt: "",
+        updatedAt: "",
+      });
+
+      await runLeadCapturedFanout(
+        { data: { leadId: lead!.id, userId: "user-sync" } },
+        makeStep(),
+      );
+
+      expect(mockCreateContact).toHaveBeenCalledOnce();
+      expect(mockPublish).toHaveBeenCalledOnce();
+    });
+
     test("linked lead.updated: skips dedup/create, only patches HubSpot", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { runLeadHubspotSync } = await import(
-        "~/inngest/functions/leads/hubspot-sync"
+      const { runLeadCapturedFanout } = await import(
+        "~/inngest/functions/leads/lead-fanout"
       );
 
       const existingHsId = `hs-linked-${RUN_ID}`;
@@ -239,7 +292,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
         updatedAt: "",
       });
 
-      await runLeadHubspotSync(
+      await runLeadCapturedFanout(
         { data: { leadId: lead!.id, userId: "user-sync" } },
         makeStep(),
       );

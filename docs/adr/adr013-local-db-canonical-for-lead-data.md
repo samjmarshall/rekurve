@@ -104,6 +104,16 @@ Each field gets a canonical home: identity fields (name, email, phone, address) 
 - Bad, because a split canonical store is harder to reason about than either pure option; the dual-source-of-truth bug pattern adr003 was written to avoid simply gets moved to the field-mapping layer.
 - Bad, because the mutation has to write to both stores in some order to keep a coherent Lead view — putting the latency floor back on the consultant's request path for the identity fields, exactly what option 1 is designed to avoid.
 
+## Consequence update (2026-06-01, #259)
+
+Line 44 of the Positive Consequences section states: "the local row's creation does not insert an outbox row for HubSpot push (the contact already exists in HubSpot — the worker just finds it)." That wording assumed a separate HubSpot-push-only event would exist. The #258 implementation coalesced HubSpot-push and follow-up-plan start into a **single** `lead.captured` → `leadHubspotSync` worker — there is no push-only event in `OUTBOX_EVENTS`. An outbox row **must** be inserted to drive nurture start.
+
+Therefore HubSpot-origin ingest (#259) emits `lead.captured` with `hubspotSync: false` in the payload. The worker's `leadHubspotSync` function reads this flag: nurture start and realtime publish still run unconditionally, but the HubSpot create/dedup/patch block is skipped when `hubspotSync` is `false`.
+
+**This honours line 44's intent** (no redundant HubSpot echo — the contact already exists) while **amending its letter** (an outbox row is inserted to drive the worker).
+
+**Guardrail:** `hubspotSync: false` is acceptable only as a one-directional, single-write-site echo-suppressor for contacts that already exist in HubSpot at ingest time. It must **never** be used to gate *applying* an inbound HubSpot edit to the local DB — that pattern is the rejected option 4 (bidirectional sync with loop guard) and remains out of scope pre-PMF.
+
 ## Links
 
 - Superseded by this ADR: [adr003](adr003-hubspot-source-of-truth-for-contacts.md) — the original HubSpot-canonical posture this ADR flips

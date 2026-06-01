@@ -1,5 +1,6 @@
 {
   "enableAllProjectMcpServers": false,
+  "disableWorkflows": true,
   "hooks": {
     "PreToolUse": [
       {

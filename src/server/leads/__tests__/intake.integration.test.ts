@@ -248,6 +248,66 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       createdOutboxIds.push(ourRow!.id);
     });
 
+    // ---- captureLeadFromHubspot ----
+
+    test("captureLeadFromHubspot writes scored lead row with hubspotContactId and outbox row with hubspotSync:false", async () => {
+      const { db } = await import("~/server/db");
+      const { leads } = await import("~/server/db/schema");
+      const { outbox } = await import("~/server/db/schema/outbox");
+      const { captureLeadFromHubspot } = await import("~/server/leads/intake");
+
+      const hubspotContactId = `hs-${RUN_ID}`;
+      const userId = `user-hs-${RUN_ID}`;
+      const properties = {
+        firstName: "HubSpot",
+        lastName: "Origin",
+        hasLand: true,
+        landRegistered: true,
+        landSizeSqm: "450",
+        seenBroker: true,
+        constructionTimeline: "ready_now" as const,
+        budget: "$650000",
+        propertyType: "first_home_buyer" as const,
+      };
+
+      const lead = await captureLeadFromHubspot(
+        db,
+        hubspotContactId,
+        properties,
+        {
+          db,
+          userId,
+        },
+      );
+      createdLeadIds.push(lead.id);
+
+      // Lead row has hubspotContactId stamped and is scored
+      const leadRow = await db.query.leads.findFirst({
+        where: eq(leads.id, lead.id),
+      });
+      expect(leadRow).toBeDefined();
+      expect(leadRow!.hubspotContactId).toBe(hubspotContactId);
+      expect(leadRow!.leadScore).toBeGreaterThan(0);
+      expect(leadRow!.leadStage).not.toBe("unqualified");
+      expect(leadRow!.scoreMetadata).not.toBeNull();
+
+      // Outbox row has hubspotSync: false
+      const outboxRows = await db
+        .select()
+        .from(outbox)
+        .where(eq(outbox.eventName, "lead.captured"));
+      const ourRow = outboxRows.find(
+        (r) =>
+          (r.payload as Record<string, unknown>).leadId === lead.id &&
+          (r.payload as Record<string, unknown>).userId === userId,
+      );
+      expect(ourRow).toBeDefined();
+      expect((ourRow!.payload as Record<string, unknown>).hubspotSync).toBe(
+        false,
+      );
+      createdOutboxIds.push(ourRow!.id);
+    });
+
     test("updateLead — not found throws NOT_FOUND", async () => {
       const { db } = await import("~/server/db");
       const { updateLead } = await import("~/server/leads/intake");

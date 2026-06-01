@@ -1,7 +1,7 @@
 ---
 description: Iterate on existing implementation plans with thorough research and updates
 model: opus
-effort: ultracode
+effort: max
 ---
 
 # Iterate Implementation Plan

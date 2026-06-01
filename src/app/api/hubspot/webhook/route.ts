@@ -10,6 +10,8 @@ import {
   getContact,
   getEmailEngagement,
 } from "~/server/hubspot";
+import { captureLeadFromHubspot } from "~/server/leads/intake";
+import { resolveLeadOwnerUserId } from "~/server/leads/owner";
 
 interface WebhookEvent {
   subscriptionType: string;
@@ -82,13 +84,11 @@ async function processEvent(event: WebhookEvent): Promise<void> {
     case "contact.creation":
       return handleContactCreation(hubspotId);
     case "contact.propertyChange":
-      return handlePropertyChange(
-        hubspotId,
-        event.propertyName!,
-        event.propertyValue!,
-      );
     case "contact.deletion":
-      return handleContactDeletion(hubspotId);
+      console.warn(
+        `[HubSpot Webhook] Dropping ${event.subscriptionType} for contact ${hubspotId} — local DB is canonical (ADR-013); inbound HubSpot edits are not honoured pre-PMF`,
+      );
+      return;
     case "object.creation":
       if (event.objectTypeId === HUBSPOT_EMAIL_OBJECT_TYPE_ID) {
         return handleEmailCreation(hubspotId);
@@ -105,44 +105,10 @@ async function processEvent(event: WebhookEvent): Promise<void> {
 }
 
 async function handleContactCreation(hubspotId: string): Promise<void> {
-  // Fetch full contact from HubSpot (creation events don't include properties)
   const contact = await getContact(hubspotId);
-
-  const mapped = fromContactProperties(contact.properties);
-  const record = {
-    hubspotContactId: hubspotId,
-    ...mapped,
-    firstName: mapped.firstName ?? "Unknown",
-    lastName: mapped.lastName ?? "Unknown",
-    updatedAt: new Date(),
-  };
-
-  // Upsert: insert or update if hubspotContactId already exists
-  await db
-    .insert(leads)
-    .values(record as typeof leads.$inferInsert)
-    .onConflictDoUpdate({
-      target: leads.hubspotContactId,
-      set: record as Partial<typeof leads.$inferInsert>,
-    });
-}
-
-async function handlePropertyChange(
-  hubspotId: string,
-  propertyName: string,
-  propertyValue: string,
-): Promise<void> {
-  const updates = fromContactProperties({ [propertyName]: propertyValue });
-  if (Object.keys(updates).length === 0) return;
-
-  await db
-    .update(leads)
-    .set({ ...updates, updatedAt: new Date() })
-    .where(eq(leads.hubspotContactId, hubspotId));
-}
-
-async function handleContactDeletion(hubspotId: string): Promise<void> {
-  await db.delete(leads).where(eq(leads.hubspotContactId, hubspotId));
+  const properties = fromContactProperties(contact.properties);
+  const userId = await resolveLeadOwnerUserId(db);
+  await captureLeadFromHubspot(db, hubspotId, properties, { db, userId });
 }
 
 async function handleEmailCreation(emailObjectId: string): Promise<void> {

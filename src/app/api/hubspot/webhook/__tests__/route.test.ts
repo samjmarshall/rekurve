@@ -4,7 +4,7 @@ let mockIsValid: ReturnType<typeof rs.fn>;
 let mockGetContact: ReturnType<typeof rs.fn>;
 let mockGetEmailEngagement: ReturnType<typeof rs.fn>;
 let mockFindContactIdForEmail: ReturnType<typeof rs.fn>;
-let mockInsert: ReturnType<typeof rs.fn>;
+let mockCaptureFromHubspot: ReturnType<typeof rs.fn>;
 let mockUpdate: ReturnType<typeof rs.fn>;
 let mockDbDelete: ReturnType<typeof rs.fn>;
 let mockLeadsFindFirst: ReturnType<typeof rs.fn>;
@@ -18,6 +18,7 @@ beforeEach(() => {
   mockFindContactIdForEmail = rs.fn();
   mockLeadsFindFirst = rs.fn();
   mockConversationsFindFirst = rs.fn();
+  mockCaptureFromHubspot = rs.fn().mockResolvedValue(undefined);
 
   rs.doMock("~/env", () => ({
     env: {
@@ -53,11 +54,15 @@ beforeEach(() => {
     }),
   }));
 
-  // Mock db with chainable methods
-  const onConflictDoUpdate = rs.fn().mockResolvedValue(undefined);
-  const insertValues = rs.fn().mockReturnValue({ onConflictDoUpdate });
-  mockInsert = rs.fn().mockReturnValue({ values: insertValues });
+  rs.doMock("~/server/leads/intake", () => ({
+    captureLeadFromHubspot: mockCaptureFromHubspot,
+  }));
 
+  rs.doMock("~/server/leads/owner", () => ({
+    resolveLeadOwnerUserId: rs.fn().mockResolvedValue("owner-1"),
+  }));
+
+  // Mock db — only update/delete/query needed (insert no longer used for contact.creation)
   const updateWhere = rs.fn().mockResolvedValue(undefined);
   const updateSet = rs.fn().mockReturnValue({ where: updateWhere });
   mockUpdate = rs.fn().mockReturnValue({ set: updateSet });
@@ -67,7 +72,6 @@ beforeEach(() => {
 
   rs.doMock("~/server/db", () => ({
     db: {
-      insert: mockInsert,
       update: mockUpdate,
       delete: mockDbDelete,
       query: {
@@ -156,7 +160,7 @@ describe("POST /api/hubspot/webhook", () => {
 });
 
 describe("Webhook event processing", () => {
-  test("contact.creation fetches contact and upserts local lead", async () => {
+  test("contact.creation fetches contact and calls captureLeadFromHubspot", async () => {
     mockIsValid.mockReturnValue(true);
     mockGetContact.mockResolvedValue({
       id: "456",
@@ -186,11 +190,17 @@ describe("Webhook event processing", () => {
 
     expect(response.status).toBe(200);
     expect(mockGetContact).toHaveBeenCalledWith("456");
-    expect(mockInsert).toHaveBeenCalled();
+    expect(mockCaptureFromHubspot).toHaveBeenCalledWith(
+      expect.anything(),
+      "456",
+      expect.any(Object),
+      expect.objectContaining({ userId: "owner-1" }),
+    );
   });
 
-  test("contact.propertyChange updates mapped field on local lead", async () => {
+  test("contact.propertyChange returns 200 with no DB writes and a console.warn", async () => {
     mockIsValid.mockReturnValue(true);
+    const warnSpy = rs.spyOn(console, "warn").mockImplementation(() => {});
 
     const { POST } = await import("../route");
     const response = await POST(
@@ -210,11 +220,16 @@ describe("Webhook event processing", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mockUpdate).toHaveBeenCalled();
+    expect(mockUpdate).not.toHaveBeenCalled();
+    expect(mockCaptureFromHubspot).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledOnce();
+    expect(warnSpy.mock.calls[0]?.[0]).toContain("contact.propertyChange");
+    expect(warnSpy.mock.calls[0]?.[0]).toContain("ADR-013");
   });
 
-  test("contact.propertyChange ignores unmapped properties", async () => {
+  test("contact.propertyChange ignores unmapped properties (still no DB write)", async () => {
     mockIsValid.mockReturnValue(true);
+    const warnSpy = rs.spyOn(console, "warn").mockImplementation(() => {});
 
     const { POST } = await import("../route");
     const response = await POST(
@@ -235,10 +250,12 @@ describe("Webhook event processing", () => {
 
     expect(response.status).toBe(200);
     expect(mockUpdate).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledOnce();
   });
 
-  test("contact.deletion deletes local lead", async () => {
+  test("contact.deletion returns 200 with no DB writes and a console.warn", async () => {
     mockIsValid.mockReturnValue(true);
+    const warnSpy = rs.spyOn(console, "warn").mockImplementation(() => {});
 
     const { POST } = await import("../route");
     const response = await POST(
@@ -256,19 +273,24 @@ describe("Webhook event processing", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mockDbDelete).toHaveBeenCalled();
+    expect(mockDbDelete).not.toHaveBeenCalled();
+    expect(mockCaptureFromHubspot).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledOnce();
+    expect(warnSpy.mock.calls[0]?.[0]).toContain("contact.deletion");
+    expect(warnSpy.mock.calls[0]?.[0]).toContain("ADR-013");
   });
 
-  test("processing failure for one event does not block others", async () => {
+  test("processing failure for one event does not block others (always-200)", async () => {
     mockIsValid.mockReturnValue(true);
-    mockGetContact
-      .mockRejectedValueOnce(new Error("HubSpot API down"))
-      .mockResolvedValueOnce({
-        id: "789",
-        properties: { firstname: "Ok", lastname: "Lead" },
-        createdAt: "2026-01-01T00:00:00.000Z",
-        updatedAt: "2026-01-01T00:00:00.000Z",
-      });
+    mockGetContact.mockResolvedValue({
+      id: "789",
+      properties: { firstname: "Ok", lastname: "Lead" },
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    });
+    mockCaptureFromHubspot
+      .mockRejectedValueOnce(new Error("capture failed"))
+      .mockResolvedValueOnce(undefined);
 
     const { POST } = await import("../route");
     const response = await POST(
@@ -295,6 +317,7 @@ describe("Webhook event processing", () => {
     // Should return 200 even though first event failed
     expect(response.status).toBe(200);
     expect(mockGetContact).toHaveBeenCalledTimes(2);
+    expect(mockCaptureFromHubspot).toHaveBeenCalledTimes(2);
   });
 });
 

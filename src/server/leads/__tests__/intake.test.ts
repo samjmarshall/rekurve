@@ -181,6 +181,170 @@ describe("captureLead — unit", () => {
   });
 });
 
+describe("captureLeadFromHubspot — unit", () => {
+  let mockBatch: ReturnType<typeof rs.fn>;
+  let mockFindFirst: ReturnType<typeof rs.fn>;
+  let mockDb: Record<string, unknown>;
+
+  const HS_ID = "hs-contact-abc123";
+
+  beforeEach(() => {
+    rs.resetModules();
+
+    rs.doMock("~/env", () => ({
+      env: {
+        DATABASE_URL: "postgres://mock",
+        HUBSPOT_ACCESS_TOKEN: "mock-token",
+        HUBSPOT_CLIENT_SECRET: "mock-secret",
+      },
+    }));
+
+    const mockLead = {
+      id: LEAD_ID,
+      firstName: "Jane",
+      lastName: "Doe",
+      hubspotContactId: HS_ID,
+      leadScore: 50,
+      leadStage: "nurture",
+      scoreMetadata: {},
+    };
+
+    mockBatch = rs.fn().mockResolvedValue([[mockLead], []]);
+    mockFindFirst = rs.fn().mockResolvedValue(undefined);
+
+    mockDb = {
+      batch: mockBatch,
+      insert: rs.fn().mockReturnValue({
+        values: rs.fn().mockReturnValue({
+          onConflictDoUpdate: rs.fn().mockReturnValue({ returning: rs.fn() }),
+        }),
+      }),
+      query: { leads: { findFirst: mockFindFirst } },
+    };
+
+    rs.doMock("~/server/db", () => ({ db: mockDb }));
+
+    rs.doMock("~/server/scoring", () => ({
+      qualifyAndScore: rs.fn().mockReturnValue({
+        score: 50,
+        stage: "nurture",
+        breakdown: {
+          land: { score: 0, maxScore: 30, reasoning: "" },
+          finance: { score: 0, maxScore: 25, reasoning: "" },
+          timeline: { score: 0, maxScore: 20, reasoning: "" },
+          budget: { score: 0, maxScore: 10, reasoning: "" },
+          propertyType: { score: 0, maxScore: 10, reasoning: "" },
+          engagement: { score: 0, maxScore: 5, reasoning: "" },
+        },
+        gaps: [],
+        nextQuestion: "",
+      }),
+    }));
+
+    rs.doMock("~/server/outbox", () => ({
+      OUTBOX_EVENTS: {
+        LEAD_CAPTURED: "lead.captured",
+        LEAD_UPDATED: "lead.updated",
+      },
+      buildOutboxEvent: rs.fn().mockReturnValue({
+        id: "outbox-hs-1",
+        eventName: "lead.captured",
+        payload: { leadId: LEAD_ID, userId: USER_ID, hubspotSync: false },
+        query: {},
+      }),
+      sendPostCommit: rs.fn().mockResolvedValue(undefined),
+    }));
+
+    rs.doMock("~/server/hubspot", () => ({
+      findExistingContact: rs.fn(),
+      createContact: rs.fn(),
+      updateContact: rs.fn(),
+      toContactProperties: rs.fn(),
+    }));
+
+    rs.doMock("~/server/nurture/scheduler", () => ({
+      startOrUpdateSequence: rs.fn().mockResolvedValue(undefined),
+    }));
+  });
+
+  test("calls db.batch with two statements (lead upsert + outbox insert)", async () => {
+    const { captureLeadFromHubspot } = await import("~/server/leads/intake");
+
+    await captureLeadFromHubspot(
+      mockDb as never,
+      HS_ID,
+      { firstName: "Jane", lastName: "Doe" },
+      { db: mockDb as never, userId: USER_ID },
+    );
+
+    expect(mockBatch).toHaveBeenCalledOnce();
+    const [batchArgs] = mockBatch.mock.calls[0] as [[unknown, unknown]];
+    expect(Array.isArray(batchArgs)).toBe(true);
+    expect(batchArgs).toHaveLength(2);
+  });
+
+  test("calls buildOutboxEvent with hubspotSync: false", async () => {
+    const { captureLeadFromHubspot } = await import("~/server/leads/intake");
+    const { buildOutboxEvent } = await import("~/server/outbox");
+
+    await captureLeadFromHubspot(
+      mockDb as never,
+      HS_ID,
+      { firstName: "Jane", lastName: "Doe" },
+      { db: mockDb as never, userId: USER_ID },
+    );
+
+    expect(buildOutboxEvent).toHaveBeenCalledWith(
+      "lead.captured",
+      expect.objectContaining({ hubspotSync: false }),
+    );
+  });
+
+  test("passes hubspotContactId and scored fields in the upsert record", async () => {
+    const { captureLeadFromHubspot } = await import("~/server/leads/intake");
+    const { qualifyAndScore } = await import("~/server/scoring");
+
+    const lead = await captureLeadFromHubspot(
+      mockDb as never,
+      HS_ID,
+      { firstName: "Jane", lastName: "Doe" },
+      { db: mockDb as never, userId: USER_ID },
+    );
+
+    expect(qualifyAndScore).toHaveBeenCalledOnce();
+    expect(lead.hubspotContactId).toBe(HS_ID);
+    expect(lead.leadScore).toBe(50);
+    expect(lead.leadStage).toBe("nurture");
+  });
+
+  test("uses existing leadId when lead already exists by hubspotContactId", async () => {
+    const existingId = "cccccccc-0000-0000-0000-000000000003";
+    mockFindFirst.mockResolvedValue({ id: existingId });
+
+    const mockLead = {
+      id: existingId,
+      firstName: "Jane",
+      lastName: "Doe",
+      hubspotContactId: HS_ID,
+      leadScore: 50,
+      leadStage: "nurture",
+      scoreMetadata: {},
+    };
+    mockBatch.mockResolvedValue([[mockLead], []]);
+
+    const { captureLeadFromHubspot } = await import("~/server/leads/intake");
+
+    const lead = await captureLeadFromHubspot(
+      mockDb as never,
+      HS_ID,
+      { firstName: "Jane", lastName: "Doe" },
+      { db: mockDb as never, userId: USER_ID },
+    );
+
+    expect(lead.id).toBe(existingId);
+  });
+});
+
 describe("updateLead — unit", () => {
   let mockBatch: ReturnType<typeof rs.fn>;
   let mockFindFirst: ReturnType<typeof rs.fn>;

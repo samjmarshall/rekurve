@@ -53,3 +53,14 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
     },
   }),
 });
+
+// Stamp every E2E-originated event with an `is_e2e` super property. register()
+// persists this client-side and auto-attaches it to ALL subsequent captures, so
+// a PostHog alert destination can exclude test traffic with a single
+// `is_e2e is not true` filter — keeping events ingesting (the console bridge
+// above still asserts them) while preventing sales/support alerts from firing
+// for Playwright runs against the production host. Must run AFTER posthog.init()
+// or it is a no-op (persistence isn't initialized yet).
+if (isE2E) {
+  posthog.register({ is_e2e: true });
+}

@@ -72,6 +72,7 @@ describe("cleanup-whitelist", () => {
       "Persist", // leads-crud.spec.ts — form persistence test, never submitted
       "Bad", // leads-crud.spec.ts — validation test, submission blocked by error
       "Conv", // lead-profile.spec.ts (conversation history) — seedLead, no HubSpot sync
+      "Intake", // lead-intake-sync.spec.ts — tracked by phone via cleanupTestLeadsByPhone
     ]);
 
     const specFiles = readdirSync(specsDir).filter((f) =>

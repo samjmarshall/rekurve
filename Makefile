@@ -5,7 +5,13 @@ build: clean install
 	yarn build
 
 start: install
+	yarn run portless proxy start
+	yarn run portless trust
 	yarn dev
+
+stop:
+	yarn run portless proxy stop
+	yarn run portless prune
 
 check:
 	yarn check
@@ -74,3 +80,4 @@ clean:
 	rm -rf .next/ next-env.d.ts tsconfig.tsbuildinfo \
 		node_modules .yarn/cache .yarn/install-state.gz \
 		test-results playwright-report .playwright-mcp
+	yarn run portless clean

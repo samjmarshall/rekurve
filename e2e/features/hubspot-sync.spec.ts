@@ -15,6 +15,7 @@ import {
   updateTestContact,
   waitForLeadDeletion,
   waitForLeadField,
+  waitForLeadHubSpotId,
 } from "../utils/hubspot-helper";
 import { getSessionCookie } from "../utils/session-cookie";
 
@@ -99,6 +100,9 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
     await form.clickSubmit();
     await form.expectSuccess(`HubSpot Sync ${uniqueId}`);
 
+    // Lead sync is now async (DB-first outbox worker) — wait for the stamp
+    await waitForLeadHubSpotId(testEmail);
+
     // Verify: contact exists in HubSpot with correct properties
     const contact = await findContactByEmail(testEmail);
     expect(contact).not.toBeNull();
@@ -168,6 +172,9 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
     await form.clickSubmit();
     await form.expectSuccess(`Updated Dedup ${uniqueId}`);
 
+    // Lead sync is now async — wait for the hubspotContactId stamp
+    await waitForLeadHubSpotId(testEmail);
+
     // Verify: the seeded contact was UPDATED, not a new one created
     const contact = await findContactByEmail(testEmail);
     expect(contact).not.toBeNull();
@@ -230,8 +237,8 @@ test.describe("HubSpot Inbound Sync — E2E", () => {
     await form.clickSubmit();
     await form.expectSuccess(`Inbound Phone ${uniqueId}`);
 
-    // Step 2: Get the hubspotContactId from the local DB
-    const hubspotId = await getLeadHubSpotId(testEmail);
+    // Step 2: Wait for the outbox worker to stamp hubspotContactId
+    const hubspotId = await waitForLeadHubSpotId(testEmail);
     expect(hubspotId).not.toBeNull();
 
     // Step 3: Update the contact's phone in HubSpot directly
@@ -274,8 +281,8 @@ test.describe("HubSpot Inbound Sync — E2E", () => {
     await form.clickSubmit();
     await form.expectSuccess(`Inbound Delete ${uniqueId}`);
 
-    // Step 2: Get the hubspotContactId
-    const hubspotId = await getLeadHubSpotId(testEmail);
+    // Step 2: Wait for the outbox worker to stamp hubspotContactId
+    const hubspotId = await waitForLeadHubSpotId(testEmail);
     expect(hubspotId).not.toBeNull();
 
     // Step 3: Archive the contact in HubSpot

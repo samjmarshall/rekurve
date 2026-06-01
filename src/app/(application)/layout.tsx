@@ -10,6 +10,7 @@ import { ThemeProvider } from "~/providers/ThemeProvider";
 import { TRPCReactProvider } from "~/trpc/react";
 import { AppSidebar } from "./_components/app-sidebar";
 import { BottomNav } from "./_components/bottom-nav";
+import { LeadRealtimeBridge } from "./_realtime/lead-realtime-bridge";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -59,6 +60,7 @@ export default async function ApplicationLayout({
         >
           <AnalyticsProvider>
             <TRPCReactProvider>
+              <LeadRealtimeBridge />
               <ToastProvider>
                 <div className="flex min-h-screen">
                   <AppSidebar

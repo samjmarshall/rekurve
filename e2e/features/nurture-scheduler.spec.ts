@@ -17,8 +17,8 @@ import {
   cleanupDueActiveSequences,
   cleanupSequences,
   cronRequestContext,
-  getActiveSequenceByLead,
   seedActiveSequence,
+  waitForActiveSequence,
   waitForPendingMessage,
 } from "../utils/nurture-helper";
 import { getSessionCookie } from "../utils/session-cookie";
@@ -79,18 +79,19 @@ test.describe("Nurture scheduler", () => {
     const leadId = await getLeadIdByPhone(phone);
     leadIds.push(leadId);
 
-    const sequence = await getActiveSequenceByLead(leadId);
-    expect(sequence).not.toBeNull();
-    expect(sequence!.sequenceType).toBe("discovery");
+    // Auto-start is now async — the lead-hubspot-sync worker creates the
+    // sequence after capture (DB-first cutover, #258). Poll for it.
+    const sequence = await waitForActiveSequence(leadId);
+    expect(sequence.sequenceType).toBe("discovery");
 
     // nextStepAt should be within ±1 minute of now + 3 days
     const expectedAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
     const diffMs = Math.abs(
-      sequence!.nextStepAt!.getTime() - expectedAt.getTime(),
+      sequence.nextStepAt!.getTime() - expectedAt.getTime(),
     );
     expect(diffMs).toBeLessThan(60_000);
 
-    sequenceIds.push(sequence!.id);
+    sequenceIds.push(sequence.id);
   });
 
   test.describe("cron → action queue", () => {

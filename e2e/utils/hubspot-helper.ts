@@ -298,3 +298,31 @@ export async function getLeadHubSpotId(email: string): Promise<string | null> {
     ? (rows[0]!.hubspot_contact_id as string | null)
     : null;
 }
+
+/**
+ * Poll the local DB until hubspot_contact_id is stamped by the outbox worker.
+ * Lead sync is now async (DB-first, worker runs post-commit) — callers must wait
+ * before making HubSpot assertions.
+ */
+export async function waitForLeadHubSpotId(
+  email: string,
+  timeoutMs = 45_000,
+): Promise<string> {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const id = await getLeadHubSpotId(email);
+    if (id) return id;
+    await new Promise((r) => setTimeout(r, 2_000));
+  }
+  throw new Error(
+    `Timed out waiting for hubspotContactId to be stamped (email: ${email})`,
+  );
+}
+
+/** Read the local DB id for a lead by email. */
+export async function getLeadIdByEmail(email: string): Promise<string | null> {
+  const rows = await sql()`
+    SELECT id FROM "leads" WHERE email = ${email} LIMIT 1
+  `;
+  return rows.length > 0 ? (rows[0]!.id as string) : null;
+}

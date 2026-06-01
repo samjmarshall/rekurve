@@ -16,12 +16,8 @@ const isDev = env.NODE_ENV === "development";
 // and the badge never flips. Derive the ws(s):// origin from the same base URL
 // the SDK uses (INNGEST_BASE_URL locally; Inngest Cloud's default otherwise).
 const inngestWsOrigin = (() => {
-  const base =
-    process.env.INNGEST_BASE_URL ??
-    process.env.INNGEST_API_BASE_URL ??
-    "https://api.inngest.com";
   try {
-    const url = new URL(base);
+    const url = new URL(env.INNGEST_BASE_URL);
     const scheme = url.protocol === "http:" ? "ws:" : "wss:";
     return `${scheme}//${url.host}`;
   } catch {

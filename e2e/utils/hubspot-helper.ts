@@ -77,6 +77,25 @@ export async function findContactByEmail(
   };
 }
 
+/**
+ * Fetch a contact by HubSpot ID. Unlike {@link findContactByEmail} (Search
+ * API — eventually consistent, lags ~30s re-indexing an updated property),
+ * `getById` is read-after-write consistent and reflects an update made moments
+ * earlier. Use it to assert on freshly-updated contact properties.
+ */
+export async function getTestContactById(
+  hubspotId: string,
+): Promise<TestContact> {
+  const response = await hubspot().crm.contacts.basicApi.getById(
+    hubspotId,
+    ALL_PROPERTIES,
+  );
+  return {
+    id: response.id,
+    properties: response.properties as Record<string, string | null>,
+  };
+}
+
 /** Create a contact in HubSpot for test seeding. */
 export async function createTestContact(
   properties: Record<string, string>,

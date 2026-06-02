@@ -10,9 +10,17 @@ You are tasked with implementing an approved technical plan from `thoughts/plans
 ## Getting Started
 
 When given a plan path:
-- Read the plan completely and check for any existing checkmarks (- [x])
-- Read the ticket linked under `## References` and every `file:line` anchor cited in `## Current State` and each phase's `### Changes` — these are load-bearing; the plan assumes you've seen them
-- **Read files fully** - never use limit/offset parameters, you need complete context
+- Read the plan completely and note any existing checkmarks (- [x])
+- Read the linked ticket under `## References` for intent and acceptance criteria
+- **Delegate the file-anchor sweep — don't read the cited files inline.** The `file:line` anchors in `## Current State` and each phase's `### Changes`, plus the ADRs under `## References`, are load-bearing, but reading them all in full floods the context before you write any code. Spawn a `codebase-analyzer` agent with the plan path and this prompt:
+
+  > Build a reference digest for the plan at `<plan-path>`. Cover every anchor in `## Current State` and every phase's `### Changes` — including the Phase 3/4 delete-targets and files the plan creates, not just the early phases.
+  > - `file:line` anchor → the cited lines ±10 of context plus a 1–2 line note on what matters.
+  > - Path with no line number (a file to delete or create) → confirm whether it exists today and what it holds, or mark it "(to create)".
+  > - Each ADR under `## References` → its Status and the Decision Outcome section only (first ~2 paragraphs).
+  > - Flag any anchor that doesn't resolve, and any `## Current State` claim the live code already contradicts — the plan may be stale.
+
+  Work from the digest. You never edit ADRs or `## Current State` files, so it is final for those. For a file you'll edit, the digest is only a map: read it in full at its phase (Edit requires a prior read anyway) — never edit from a summary, never use limit/offset on a file you're changing.
 - Think deeply about how the pieces fit together
 - Create a todo list mirroring the plan's phases and per-phase `### Changes` entries
 - Run the Pre-flight risk scan (next section) before writing code.

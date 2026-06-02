@@ -43,6 +43,9 @@ audit:
 db_generate: install
 	yarn db:generate
 
+db_custom: install
+	yarn db:custom --name=$(name)
+
 db_migrate: install
 	yarn db:migrate
 

@@ -11,7 +11,6 @@ import {
   toContactProperties,
   updateContact,
 } from "~/server/hubspot";
-import { startOrUpdateSequence } from "~/server/nurture/scheduler";
 import { OUTBOX_EVENTS } from "~/server/outbox";
 
 type Step = {
@@ -42,14 +41,6 @@ export async function runLeadCapturedFanout(
     db.query.leads.findFirst({ where: eq(leads.id, leadId) }),
   );
   if (!lead) return;
-
-  // Auto-start / re-align the nurture sequence for this lead's stage. The
-  // DB-first intake cutover (#258) moved this off the request path; the worker
-  // now owns it. Idempotent (startOrUpdateSequence no-ops when the active
-  // sequence already matches the stage), so step memoisation + retries are safe.
-  await step.run("start-nurture", () =>
-    startOrUpdateSequence(db, leadId, lead.leadStage),
-  );
 
   let { hubspotContactId } = lead;
 

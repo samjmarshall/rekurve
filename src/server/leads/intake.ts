@@ -12,6 +12,23 @@ import {
 import type { ScoreMetadata } from "~/server/scoring";
 import { qualifyAndScore } from "~/server/scoring";
 
+type LeadStage = "unqualified" | "nurture" | "warm" | "hot";
+
+function buildStageChangedEvent(
+  leadId: string,
+  userId: string,
+  fromStage: LeadStage | null,
+  toStage: LeadStage,
+) {
+  if (fromStage === toStage) return null;
+  return buildOutboxEvent(OUTBOX_EVENTS.LEAD_STAGE_CHANGED, {
+    leadId,
+    userId,
+    fromStage,
+    toStage,
+  });
+}
+
 export async function captureLeadFromHubspot(
   db: Db,
   hubspotContactId: string,
@@ -20,7 +37,7 @@ export async function captureLeadFromHubspot(
 ): Promise<typeof leads.$inferSelect> {
   const existing = await db.query.leads.findFirst({
     where: eq(leads.hubspotContactId, hubspotContactId),
-    columns: { id: true },
+    columns: { id: true, leadStage: true },
   });
   const leadId = existing?.id ?? crypto.randomUUID();
 
@@ -45,11 +62,18 @@ export async function captureLeadFromHubspot(
     updatedAt: new Date(),
   };
 
-  const evt = buildOutboxEvent(OUTBOX_EVENTS.LEAD_CAPTURED, {
+  const capturedEvt = buildOutboxEvent(OUTBOX_EVENTS.LEAD_CAPTURED, {
     leadId,
     userId: ctx.userId,
     hubspotSync: false,
   });
+
+  const stageEvt = buildStageChangedEvent(
+    leadId,
+    ctx.userId,
+    existing?.leadStage ?? null,
+    scoreResult.stage,
+  );
 
   const stmt = db
     .insert(leads)
@@ -60,10 +84,22 @@ export async function captureLeadFromHubspot(
     })
     .returning();
 
-  const [[lead]] = await db.batch([stmt, evt.query]);
-  await sendPostCommit([
-    { id: evt.id, name: evt.eventName, data: evt.payload },
-  ]);
+  const batchItems: Parameters<typeof db.batch>[0] = stageEvt
+    ? [stmt, capturedEvt.query, stageEvt.query]
+    : [stmt, capturedEvt.query];
+  const [[lead]] = await db.batch(batchItems);
+
+  const postCommitEvents = [
+    {
+      id: capturedEvt.id,
+      name: capturedEvt.eventName,
+      data: capturedEvt.payload,
+    },
+    ...(stageEvt
+      ? [{ id: stageEvt.id, name: stageEvt.eventName, data: stageEvt.payload }]
+      : []),
+  ];
+  await sendPostCommit(postCommitEvents);
   return lead!;
 }
 
@@ -94,7 +130,7 @@ export async function captureLead(
   const existing = input.email
     ? await db.query.leads.findFirst({
         where: eq(leads.email, input.email),
-        columns: { id: true },
+        columns: { id: true, leadStage: true },
       })
     : undefined;
 
@@ -121,15 +157,40 @@ export async function captureLead(
         .values({ id: leadId, ...input, ...scoreFields })
         .returning();
 
-  const evt = buildOutboxEvent(OUTBOX_EVENTS.LEAD_CAPTURED, {
+  const capturedEvt = buildOutboxEvent(OUTBOX_EVENTS.LEAD_CAPTURED, {
     leadId,
     userId: ctx.userId,
   });
 
-  const [[lead]] = await db.batch([stmt, evt.query]);
-  await sendPostCommit([
-    { id: evt.id, name: evt.eventName, data: evt.payload },
-  ]);
+  const stageEvt = buildStageChangedEvent(
+    leadId,
+    ctx.userId,
+    existing?.leadStage ?? null,
+    scoreResult.stage,
+  );
+
+  const batchItems: Parameters<typeof db.batch>[0] = stageEvt
+    ? [stmt, capturedEvt.query, stageEvt.query]
+    : [stmt, capturedEvt.query];
+  const [[lead]] = await db.batch(batchItems);
+
+  const postCommitEvents = [
+    {
+      id: capturedEvt.id,
+      name: capturedEvt.eventName,
+      data: capturedEvt.payload,
+    },
+    ...(stageEvt
+      ? [
+          {
+            id: stageEvt.id,
+            name: stageEvt.eventName,
+            data: stageEvt.payload,
+          },
+        ]
+      : []),
+  ];
+  await sendPostCommit(postCommitEvents);
 
   return lead!;
 }
@@ -150,9 +211,11 @@ export async function updateLead(
   );
 
   let scoreFields: Partial<typeof leads.$inferInsert> = {};
+  let newStage: LeadStage | undefined;
   if (hasQualificationChange) {
     const merged = { ...existing, ...input };
     const result = qualifyAndScore(merged as typeof existing);
+    newStage = result.stage;
     scoreFields = {
       leadScore: result.score,
       leadStage: result.stage,
@@ -160,27 +223,58 @@ export async function updateLead(
     };
   }
 
-  const evt = buildOutboxEvent(OUTBOX_EVENTS.LEAD_UPDATED, {
+  const updatedEvt = buildOutboxEvent(OUTBOX_EVENTS.LEAD_UPDATED, {
     leadId: id,
     userId: ctx.userId,
   });
 
-  const [[updated]] = await db.batch([
-    db
-      .update(leads)
-      .set({ ...input, ...scoreFields, updatedAt: new Date() })
-      .where(eq(leads.id, id))
-      .returning(),
-    evt.query,
-  ]);
+  const stageEvt =
+    newStage !== undefined
+      ? buildStageChangedEvent(id, ctx.userId, existing.leadStage, newStage)
+      : null;
+
+  const batchItems: Parameters<typeof db.batch>[0] = stageEvt
+    ? [
+        db
+          .update(leads)
+          .set({ ...input, ...scoreFields, updatedAt: new Date() })
+          .where(eq(leads.id, id))
+          .returning(),
+        updatedEvt.query,
+        stageEvt.query,
+      ]
+    : [
+        db
+          .update(leads)
+          .set({ ...input, ...scoreFields, updatedAt: new Date() })
+          .where(eq(leads.id, id))
+          .returning(),
+        updatedEvt.query,
+      ];
+
+  const [[updated]] = await db.batch(batchItems);
 
   if (!updated) {
     throw new TRPCError({ code: "NOT_FOUND", message: "Lead not found" });
   }
 
-  await sendPostCommit([
-    { id: evt.id, name: evt.eventName, data: evt.payload },
-  ]);
+  const postCommitEvents = [
+    {
+      id: updatedEvt.id,
+      name: updatedEvt.eventName,
+      data: updatedEvt.payload,
+    },
+    ...(stageEvt
+      ? [
+          {
+            id: stageEvt.id,
+            name: stageEvt.eventName,
+            data: stageEvt.payload,
+          },
+        ]
+      : []),
+  ];
+  await sendPostCommit(postCommitEvents);
 
   return updated;
 }

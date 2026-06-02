@@ -16,14 +16,10 @@ beforeEach(() => {
     },
   }));
 
-  // Mock db — minimal shape for the stub queries below
+  // Mock db — minimal shape for any stub queries
   rs.doMock("~/server/db", () => ({
     db: {
-      query: {
-        nurtureSequences: {
-          findMany: rs.fn().mockResolvedValue([]),
-        },
-      },
+      query: {},
     },
   }));
 
@@ -64,11 +60,6 @@ describe("tRPC — Authenticated", () => {
   // leads and messages routers have dedicated tests in *-router.test.ts
   const stubs = [
     { name: "lots.getAll", call: (c: Caller) => c.lots.getAll(), expected: [] },
-    {
-      name: "nurture.listActive",
-      call: (c: Caller) => c.nurture.listActive(),
-      expected: [],
-    },
     {
       name: "ai.healthCheck",
       call: (c: Caller) => c.ai.healthCheck(),

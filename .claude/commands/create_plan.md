@@ -9,7 +9,12 @@ Produce a complete, actionable plan at `thoughts/plans/YYYY-MM-DD-ENG-XXXX-descr
 
 ## Workflow
 
-1. **Explore.** Read the ticket and cited files. For non-trivial scope, launch `Explore` subagents in parallel to find affected files, existing patterns, and test conventions. Capture `file:line` references. Reuse existing helpers before writing new ones.
+1. **Explore.** Read the ticket and cited files. For non-trivial scope, launch the research agents in parallel and capture `file:line` references throughout:
+   - **@agent-codebase-locator** — map every affected file (server and UI), grouped by role
+   - **@agent-codebase-analyzer** — trace how the current code works and the contracts a change must honor, with precise `file:line`
+   - **@agent-codebase-pattern-finder** — find the patterns and test conventions to model the new work after
+
+   Reuse existing helpers before writing new ones.
 2. **Align.** Share a 2–4 bullet design sketch and get explicit agreement. Ask only what code cannot answer.
 3. **Write.** Save the plan to the path above using the template below and stop. The final plan must have zero open questions — resolve them before writing.
 

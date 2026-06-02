@@ -4,18 +4,23 @@ import type { DraftMessageInput, DraftMessageOutput } from "~/server/ai/schema";
 
 export type DraftFn = (input: DraftMessageInput) => Promise<DraftMessageOutput>;
 
-export function resolveDraftFn(req: Request): DraftFn | undefined {
-  if (req.headers.get("x-ai-stub") !== "1") return undefined;
-  return async ({ lead }: DraftMessageInput): Promise<DraftMessageOutput> => {
-    const channel = selectChannel(lead);
-    const url = new URL(req.url);
-    console.info(`[ai-stub] route=${url.pathname} leadId=${lead.id}`);
-    return {
-      channel,
-      subject: channel === "sms" ? null : "[ai-stub] subject",
-      body: `[ai-stub] body for ${lead.id}`,
-      aiReasoning: "[ai-stub]",
-      priority: computePriority(lead),
-    };
+export function stubDraft({ lead }: DraftMessageInput): DraftMessageOutput {
+  const channel = selectChannel(lead);
+  return {
+    channel,
+    subject: channel === "sms" ? null : "[ai-stub] subject",
+    body: `[ai-stub] body for ${lead.id}`,
+    aiReasoning: "[ai-stub]",
+    priority: computePriority(lead),
+  };
+}
+
+export function resolveWorkerDraftFn(): DraftFn {
+  if (process.env.NODE_ENV !== "production" && process.env.AI_STUB === "1") {
+    return (input) => Promise.resolve(stubDraft(input));
+  }
+  return async (input) => {
+    const { draftMessage } = await import("~/server/ai/draft-message");
+    return draftMessage(input);
   };
 }

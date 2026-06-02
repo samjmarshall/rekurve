@@ -8,28 +8,17 @@ import {
 } from "../utils/auth-helper";
 import { cleanupTestLeadsByPhone } from "../utils/hubspot-helper";
 import { getLeadIdByPhone } from "../utils/leads-helper";
-import {
-  cleanupLeads,
-  cleanupMessages,
-  seedLead,
-} from "../utils/messages-helper";
-import {
-  cleanupDueActiveSequences,
-  cleanupSequences,
-  cronRequestContext,
-  seedActiveSequence,
-  waitForActiveSequence,
-  waitForPendingMessage,
-} from "../utils/nurture-helper";
+import { cleanupLeads, cleanupMessages } from "../utils/messages-helper";
+import { waitForPendingMessage } from "../utils/nurture-helper";
 import { getSessionCookie } from "../utils/session-cookie";
 
-test.describe("Nurture scheduler", () => {
-  test.skip(!process.env.CRON_SECRET, "CRON_SECRET required");
+test.describe("Nurture plan runner", () => {
+  test.skip(!process.env.NURTURE_TEST_RHYTHM, "NURTURE_TEST_RHYTHM required");
+  test.describe.configure({ mode: "serial" });
 
   let session: TestSession;
   const phones: string[] = [];
   const leadIds: string[] = [];
-  const sequenceIds: string[] = [];
   const messageIds: string[] = [];
 
   test.beforeAll(async () => {
@@ -38,13 +27,12 @@ test.describe("Nurture scheduler", () => {
 
   test.afterAll(async () => {
     await cleanupMessages(messageIds);
-    await cleanupSequences(sequenceIds);
     await cleanupTestLeadsByPhone(phones);
     await cleanupLeads(leadIds);
     await deleteTestSession(session.userId);
   });
 
-  test("auto-starts a sequence on lead create (migration gate)", async ({
+  test("runner drafts a pending message after rhythm timeout", async ({
     page,
     context,
     baseURL,
@@ -52,120 +40,53 @@ test.describe("Nurture scheduler", () => {
     await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
 
     const phone = uniquePhone();
+    const email = `e2e-nurture-${randomUUID()}@test.rekurve.dev`;
     phones.push(phone);
-    const email = `e2e-${randomUUID()}@test.rekurve.dev`;
 
     await page.goto("/leads/new");
 
     // Step 1 — Contact details
     await page.getByTestId("lead-form-first-name").fill("Nurture");
-    await page.getByTestId("lead-form-last-name").fill("AutoStart");
+    await page.getByTestId("lead-form-last-name").fill("Runner");
     await page.getByTestId("lead-form-phone").fill(phone);
     await page.getByTestId("lead-form-email").fill(email);
     await page.getByTestId("lead-form-next-btn").click();
 
-    // Step 2 — Land (no required fields, skip through)
+    // Step 2 — Land (no required fields)
     await page.getByTestId("lead-form-next-btn").click();
 
-    // Step 3 — Build (no required fields, skip through)
+    // Step 3 — Build (no required fields)
     await page.getByTestId("lead-form-next-btn").click();
 
-    // Step 4 — More / submit
+    // Step 4 — Submit
     await page.getByTestId("lead-form-submit-btn").click();
-
-    // Wait for success screen
     await expect(page.getByTestId("lead-form-success")).toBeVisible();
 
     const leadId = await getLeadIdByPhone(phone);
     leadIds.push(leadId);
 
-    // Auto-start is now async — the lead-hubspot-sync worker creates the
-    // sequence after capture (DB-first cutover, #258). Poll for it.
-    const sequence = await waitForActiveSequence(leadId);
-    expect(sequence.sequenceType).toBe("discovery");
-
-    // nextStepAt should be within ±1 minute of now + 3 days
-    const expectedAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-    const diffMs = Math.abs(
-      sequence.nextStepAt!.getTime() - expectedAt.getTime(),
-    );
-    expect(diffMs).toBeLessThan(60_000);
-
-    sequenceIds.push(sequence.id);
+    // NURTURE_TEST_RHYTHM=5s → the runner fires after ~5s. Allow extra time for
+    // the outbox sweep, Inngest dev server scheduling, and DB insert.
+    const msg = await waitForPendingMessage(leadId, { timeoutMs: 20_000 });
+    expect(msg.body).toMatch(/^\[ai-stub\]/);
+    expect(msg.status).toBe("pending");
+    messageIds.push(msg.id);
   });
 
-  test.describe("cron → action queue", () => {
-    test.describe.configure({ mode: "serial" });
+  test("action queue renders the drafted message", async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    const msgId = messageIds[0];
+    if (!msgId) return;
 
-    let seededLeadId: string;
-    let draftedMessageId: string;
+    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
+    await page.goto("/dashboard");
 
-    // The Neon preview branch is reused across runs; a prior aborted run can
-    // leave an active+due sequence behind that the cron will also draft,
-    // breaking the strict `drafted: 1` assertion below. Wipe due sequences
-    // here so only the freshly-seeded one is in scope. Safe vs the parallel
-    // "auto-starts" test (its sequence is dated 3 days out).
-    test.beforeAll(async () => {
-      await cleanupDueActiveSequences();
-    });
-
-    test("cron drafts a pending message", async ({ baseURL }) => {
-      const lead = await seedLead({
-        firstName: "Nurture",
-        lastName: "Cron",
-        leadStage: "nurture",
-        phone: uniquePhone(),
-      });
-      seededLeadId = lead.id;
-      leadIds.push(lead.id);
-
-      // Seed with nextStepAt already in the past so the scheduler picks it up
-      // (the dev-advance route is production-gated and unavailable here)
-      const seq = await seedActiveSequence({
-        leadId: seededLeadId,
-        sequenceType: "nurture",
-        nextStepAt: new Date(Date.now() - 60_000),
-      });
-      sequenceIds.push(seq.id);
-
-      // Invoke cron with AI stub header
-      const cronCtx = await cronRequestContext(baseURL!);
-      try {
-        const cronRes = await cronCtx.get("/api/cron/nurture-scheduler");
-        expect(cronRes.status()).toBe(200);
-        const body = (await cronRes.json()) as {
-          drafted: number;
-          failed: number;
-        };
-        expect(body).toEqual({ drafted: 1, failed: 0 });
-      } finally {
-        await cronCtx.dispose();
-      }
-
-      // Poll until the pending message appears in the DB
-      const msg = await waitForPendingMessage(seededLeadId);
-      expect(msg.body).toMatch(/^\[ai-stub\]/);
-      expect(msg.status).toBe("pending");
-      draftedMessageId = msg.id;
-      messageIds.push(msg.id);
-    });
-
-    test("action queue renders the drafted message", async ({
-      page,
-      context,
-      baseURL,
-    }) => {
-      await context.addCookies([
-        getSessionCookie(session.signedToken, baseURL!),
-      ]);
-      await page.goto("/dashboard");
-
-      await expect(
-        page.getByTestId(`queue-row-${draftedMessageId}`),
-      ).toBeVisible();
-      await expect(
-        page.getByTestId(`queue-row-body-${draftedMessageId}`),
-      ).toContainText("[ai-stub]");
-    });
+    await expect(page.getByTestId(`queue-row-${msgId}`)).toBeVisible();
+    await expect(page.getByTestId(`queue-row-body-${msgId}`)).toContainText(
+      "[ai-stub]",
+    );
   });
 });

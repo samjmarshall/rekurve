@@ -106,33 +106,6 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       );
     });
 
-    test("starts a nurture sequence for the lead's stage", async () => {
-      const { db } = await import("~/server/db");
-      const { leads, nurtureSequences } = await import("~/server/db/schema");
-      const { runLeadCapturedFanout } = await import(
-        "~/inngest/functions/leads/lead-fanout"
-      );
-
-      const [lead] = await db
-        .insert(leads)
-        .values({ firstName: "Nurture", lastName: "Worker" })
-        .returning();
-      createdLeadIds.push(lead!.id);
-
-      await runLeadCapturedFanout(
-        { data: { leadId: lead!.id, userId: "user-sync" } },
-        makeStep(),
-      );
-
-      const seq = await db.query.nurtureSequences.findFirst({
-        where: eq(nurtureSequences.leadId, lead!.id),
-      });
-      expect(seq).toBeTruthy();
-      // Default stage is "unqualified" → "discovery" sequence.
-      expect(seq!.sequenceType).toBe("discovery");
-      expect(seq!.status).toBe("active");
-    });
-
     test("dedup-flow: uses updateContact when existing HubSpot contact found", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");

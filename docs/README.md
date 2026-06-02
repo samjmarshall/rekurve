@@ -157,7 +157,6 @@ graph TD
     NextJS --> Twilio["Twilio — SMS relay to consultant"]
     NextJS --> PostHog[PostHog — analytics]
 
-    Cron["Vercel Cron — daily nurture tick"] -->|CRON_SECRET| API
     HubSpot -.->|webhook| API
 
     GitHub[GitHub Actions] -->|CI/CD| Vercel
@@ -271,8 +270,7 @@ cp .env.example .env
 | `HUBSPOT_ACCESS_TOKEN` | HubSpot | Private app access token |
 | `HUBSPOT_CLIENT_SECRET` | HubSpot | Private app client secret (webhook validation) |
 | `HUBSPOT_BCC_ADDRESS` | HubSpot | Portal-specific `bcc-NNNNN@bcc.hubspot.com` for outbound email reconciliation |
-| `ANTHROPIC_API_KEY` | AI | Claude API key — used by message drafting and nurture scheduler |
-| `CRON_SECRET` | Cron | Shared secret (≥16 chars) — gates `/api/cron/*` routes from Vercel Cron |
+| `ANTHROPIC_API_KEY` | AI | Claude API key — used by message drafting and nurture |
 | `MS_GRAPH_CLIENT_ID` | Outlook | Microsoft Graph app client ID (Outlook send-on-behalf) |
 | `MS_GRAPH_CLIENT_SECRET` | Outlook | Microsoft Graph app client secret |
 | `MS_GRAPH_REDIRECT_URI` | Outlook | OAuth redirect URI for Microsoft Graph consent flow |

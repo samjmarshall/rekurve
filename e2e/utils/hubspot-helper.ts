@@ -110,14 +110,6 @@ export async function createTestContact(
   };
 }
 
-/** Update a contact's property in HubSpot. */
-export async function updateTestContact(
-  hubspotId: string,
-  properties: Record<string, string>,
-): Promise<void> {
-  await hubspot().crm.contacts.basicApi.update(hubspotId, { properties });
-}
-
 /** Archive (soft-delete) a contact in HubSpot. */
 export async function archiveTestContact(hubspotId: string): Promise<void> {
   await hubspot().crm.contacts.basicApi.archive(hubspotId);
@@ -262,50 +254,6 @@ export async function cleanupTestLeadsByPhone(phones: string[]): Promise<void> {
   }
 
   await sql()`DELETE FROM "leads" WHERE phone = ANY(${phones})`;
-}
-
-/**
- * Poll the local DB until a lead matching the email has the expected value,
- * or until the timeout expires. For verifying inbound webhook processing.
- */
-export async function waitForLeadField(
-  email: string,
-  field: string,
-  expected: string,
-  timeoutMs = 30_000,
-): Promise<void> {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    const rows = await sql()`
-      SELECT * FROM "leads" WHERE email = ${email} LIMIT 1
-    `;
-    if (rows.length > 0 && String(rows[0]![field]) === expected) {
-      return;
-    }
-    await new Promise((r) => setTimeout(r, 2_000));
-  }
-  throw new Error(
-    `Timed out waiting for leads.${field} = "${expected}" (email: ${email})`,
-  );
-}
-
-/**
- * Poll the local DB until a lead matching the email no longer exists.
- * For verifying inbound webhook deletion.
- */
-export async function waitForLeadDeletion(
-  email: string,
-  timeoutMs = 30_000,
-): Promise<void> {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    const rows = await sql()`
-      SELECT id FROM "leads" WHERE email = ${email} LIMIT 1
-    `;
-    if (rows.length === 0) return;
-    await new Promise((r) => setTimeout(r, 2_000));
-  }
-  throw new Error(`Timed out waiting for lead deletion (email: ${email})`);
 }
 
 /**

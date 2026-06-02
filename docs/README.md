@@ -6,7 +6,7 @@ Hi, I'm Sam and this is an AI sales assistant I built for my wife, a Sales Consu
 
 The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC. To do this properly, I chose to solve a real-world problem with a real commercial need.
 
-This is my sandbox project; where I get to test, tweak and tune my AI Agent coding harness, and try new technologies. Typically the learnings I have on this project, transfer to my career/professional life once proven.
+This is my sandbox project; where I get to test, tweak and tune my AI Agent coding harness, and try new technologies.
 
 If you're interested in seeing how I use Claude Code for this project, see the `CLAUDE.md` and `.claude/` config folder. Try it out for yourself. More details on how it all works are roughly documented in the [Claude Code Harness Overview](#claude-code-harness-overview) section below.
 

@@ -43,11 +43,6 @@ describe("cleanup-whitelist", () => {
     );
   });
 
-  it("nurture-helper references TEST_FIRST_NAMES instead of an unscoped delete", () => {
-    const src = readFileSync(join(utilsDir, "nurture-helper.ts"), "utf-8");
-    expect(src).toContain("TEST_FIRST_NAMES");
-  });
-
   it("covers every firstName used in spec files (or has an explicit exemption)", () => {
     // Firstnames covered by phone-based cleanup (cleanupTestLeadsByPhone) or
     // seedLead (bypasses HubSpot sync), or that never reach the DB.

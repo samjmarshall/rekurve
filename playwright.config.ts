@@ -60,6 +60,8 @@ export default defineConfig({
           env: {
             INNGEST_DEV: "1",
             INNGEST_BASE_URL: "http://localhost:8288",
+            AI_STUB: "1",
+            NURTURE_TEST_RHYTHM: "5s",
           },
         },
         {

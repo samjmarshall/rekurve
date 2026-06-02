@@ -43,6 +43,13 @@
       "when": 1777982256179,
       "tag": "0005_rapid_sentinel",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780325781094,
+      "tag": "0006_slimy_dagger",
+      "breakpoints": true
     }
   ]
 }

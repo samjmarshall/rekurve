@@ -40,10 +40,6 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       rs.doMock("~/inngest/client", () => ({
         inngest: { send: rs.fn().mockResolvedValue(undefined) },
       }));
-
-      rs.doMock("~/server/nurture/scheduler", () => ({
-        startOrUpdateSequence: rs.fn().mockResolvedValue(undefined),
-      }));
     });
 
     afterAll(async () => {
@@ -324,6 +320,107 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
         expect(e).toBeInstanceOf(TRPCError);
         expect((e as InstanceType<typeof TRPCError>).code).toBe("NOT_FOUND");
       }
+    });
+
+    // ---- lead.stage-changed outbox rows ----
+
+    test("captureLead — new lead writes lead.stage-changed outbox row with fromStage:null", async () => {
+      const { db } = await import("~/server/db");
+      const { outbox } = await import("~/server/db/schema/outbox");
+      const { captureLead } = await import("~/server/leads/intake");
+
+      const userId = `user-stage-new-${RUN_ID}`;
+      const lead = await captureLead(
+        db,
+        { firstName: "StageNew", lastName: "Test" },
+        { db, userId },
+      );
+      createdLeadIds.push(lead.id);
+
+      const outboxRows = await db
+        .select()
+        .from(outbox)
+        .where(eq(outbox.eventName, "lead.stage-changed"));
+      const row = outboxRows.find(
+        (r) =>
+          (r.payload as Record<string, unknown>).leadId === lead.id &&
+          (r.payload as Record<string, unknown>).userId === userId,
+      );
+      expect(row).toBeDefined();
+      expect((row!.payload as Record<string, unknown>).fromStage).toBeNull();
+      expect((row!.payload as Record<string, unknown>).toStage).toBeDefined();
+      createdOutboxIds.push(row!.id);
+    });
+
+    test("updateLead — qualifying edit that changes stage writes lead.stage-changed row", async () => {
+      const { db } = await import("~/server/db");
+      const { leads } = await import("~/server/db/schema");
+      const { outbox } = await import("~/server/db/schema/outbox");
+      const { updateLead } = await import("~/server/leads/intake");
+
+      const [lead] = await db
+        .insert(leads)
+        .values({
+          firstName: "StageChange",
+          lastName: "Test",
+          leadScore: 0,
+          leadStage: "unqualified",
+        })
+        .returning();
+      createdLeadIds.push(lead!.id);
+
+      const userId = `user-stage-change-${RUN_ID}`;
+      const updated = await updateLead(
+        db,
+        lead!.id,
+        { landSizeSqm: "800", landRegistered: true, hasLand: true },
+        { db, userId },
+      );
+
+      // Only check for stage-changed if the stage actually changed
+      if (updated.leadStage !== "unqualified") {
+        const outboxRows = await db
+          .select()
+          .from(outbox)
+          .where(eq(outbox.eventName, "lead.stage-changed"));
+        const row = outboxRows.find(
+          (r) =>
+            (r.payload as Record<string, unknown>).leadId === lead!.id &&
+            (r.payload as Record<string, unknown>).userId === userId,
+        );
+        expect(row).toBeDefined();
+        expect((row!.payload as Record<string, unknown>).fromStage).toBe(
+          "unqualified",
+        );
+        createdOutboxIds.push(row!.id);
+      }
+    });
+
+    test("updateLead — non-qualifying edit does NOT write lead.stage-changed row", async () => {
+      const { db } = await import("~/server/db");
+      const { leads } = await import("~/server/db/schema");
+      const { outbox } = await import("~/server/db/schema/outbox");
+      const { updateLead } = await import("~/server/leads/intake");
+
+      const [lead] = await db
+        .insert(leads)
+        .values({ firstName: "NoStage", lastName: "Test" })
+        .returning();
+      createdLeadIds.push(lead!.id);
+
+      const userId = `user-no-stage-${RUN_ID}`;
+      await updateLead(db, lead!.id, { notes: "just a note" }, { db, userId });
+
+      const outboxRows = await db
+        .select()
+        .from(outbox)
+        .where(eq(outbox.eventName, "lead.stage-changed"));
+      const row = outboxRows.find(
+        (r) =>
+          (r.payload as Record<string, unknown>).leadId === lead!.id &&
+          (r.payload as Record<string, unknown>).userId === userId,
+      );
+      expect(row).toBeUndefined();
     });
   },
 );

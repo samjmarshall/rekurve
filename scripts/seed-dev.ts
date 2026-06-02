@@ -8,7 +8,6 @@ import { seed as seedLeads } from "~/server/db/seed/fixtures/leads";
 import { seed as seedLotMatches } from "~/server/db/seed/fixtures/lot-matches";
 import { seed as seedLots } from "~/server/db/seed/fixtures/lots";
 import { seed as seedMessageQueue } from "~/server/db/seed/fixtures/message-queue";
-import { seed as seedNurtureSequences } from "~/server/db/seed/fixtures/nurture-sequences";
 import { seed as seedOutbox } from "~/server/db/seed/fixtures/outbox";
 import { seed as seedUser } from "~/server/db/seed/fixtures/user";
 import { assertSafeToSeed } from "~/server/db/seed/guards";
@@ -44,7 +43,7 @@ async function main() {
   console.log(`[seed] Starting with seed=${seedNum}…`);
 
   await db.execute(
-    sql`TRUNCATE nurture_sequences, message_queue, conversations, lot_matches, lots, leads, "user", outbox RESTART IDENTITY CASCADE`,
+    sql`TRUNCATE message_queue, conversations, lot_matches, lots, leads, "user", outbox RESTART IDENTITY CASCADE`,
   );
   console.log("[seed] Tables truncated");
 
@@ -65,9 +64,6 @@ async function main() {
 
   await seedMessageQueue(db, faker, leads);
   console.log("[seed] message_queue: inserted");
-
-  await seedNurtureSequences(db, faker, leads);
-  console.log("[seed] nurture_sequences: inserted");
 
   await seedOutbox(db, faker);
   console.log("[seed] outbox: 0 rows (event-driven, not seeded)");

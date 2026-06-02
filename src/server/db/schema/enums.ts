@@ -84,17 +84,3 @@ export const deliveryMethodEnum = pgEnum("delivery_method", [
   "sms",
   "email",
 ]);
-
-// Nurture Sequences
-export const sequenceTypeEnum = pgEnum("sequence_type", [
-  "discovery",
-  "nurture",
-  "warm_progression",
-  "lot_alert",
-]);
-
-export const sequenceStatusEnum = pgEnum("sequence_status", [
-  "active",
-  "paused",
-  "completed",
-]);

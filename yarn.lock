@@ -2173,6 +2173,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@inngest/test@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@inngest/test@npm:1.0.0"
+  dependencies:
+    tinyspy: ^3.0.2
+    ulid: ^2.3.0
+  peerDependencies:
+    inngest: ^4.0.0
+  checksum: 3befe2c3b7d25049c8d80a3704187328798bec76c36cfd67f429d951e0263e909621447b3baad88c553736f073e3f679d1af37d1c37bcdab606b7dcfb647d2d7
+  languageName: node
+  linkType: hard
+
 "@inquirer/ansi@npm:^2.0.5":
   version: 2.0.5
   resolution: "@inquirer/ansi@npm:2.0.5"
@@ -13235,6 +13247,7 @@ __metadata:
     "@faker-js/faker": ^9
     "@hookform/resolvers": 5.2.2
     "@hubspot/api-client": 13.5.0
+    "@inngest/test": ^1.0.0
     "@microsoft/microsoft-graph-client": ^3
     "@neondatabase/serverless": 1.1.0
     "@opentelemetry/api": ^1.9.1
@@ -14689,6 +14702,13 @@ __metadata:
   version: 2.1.0
   resolution: "tinypool@npm:2.1.0"
   checksum: f45eafaecb602509301716e70344d6532f20d29a38c2bd163de849fc0bfa3536090fcb7fc92b42b62698e586680cf45813f8b98c3995b63e2c9deb844da87ef4
+  languageName: node
+  linkType: hard
+
+"tinyspy@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "tinyspy@npm:3.0.2"
+  checksum: 5db671b2ff5cd309de650c8c4761ca945459d7204afb1776db9a04fb4efa28a75f08517a8620c01ee32a577748802231ad92f7d5b194dc003ee7f987a2a06337
   languageName: node
   linkType: hard
 

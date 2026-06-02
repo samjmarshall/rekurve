@@ -7,6 +7,7 @@ import { outbox } from "~/server/db/schema/outbox";
 export const OUTBOX_EVENTS = {
   LEAD_CAPTURED: "lead.captured",
   LEAD_UPDATED: "lead.updated",
+  LEAD_STAGE_CHANGED: "lead.stage-changed",
 } as const;
 
 export type OutboxEventName =

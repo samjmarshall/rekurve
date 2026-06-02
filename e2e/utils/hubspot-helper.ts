@@ -308,6 +308,37 @@ export async function waitForLeadDeletion(
   throw new Error(`Timed out waiting for lead deletion (email: ${email})`);
 }
 
+/**
+ * Poll HubSpot until a contact's property reaches the expected value, or until
+ * the timeout expires. Reads by id ({@link getTestContactById}) so it is
+ * read-after-write consistent — it observes the genuine end-state, not the
+ * eventually-consistent Search index.
+ *
+ * Use this to gate on an OUTBOUND HubSpot patch landing (e.g. the dedup
+ * fan-out updating a seeded contact). It is the correct signal where
+ * {@link waitForLeadHubSpotId} is not: in prod, seeding a contact fires a real
+ * `contact.creation` webhook that ingests a lead with `hubspotContactId`
+ * pre-stamped (hubspotSync:false), which satisfies the id gate before the
+ * outbound patch runs.
+ */
+export async function waitForContactProperty(
+  hubspotId: string,
+  property: string,
+  expected: string,
+  timeoutMs = 45_000,
+): Promise<void> {
+  const start = Date.now();
+  let last: string | null = null;
+  while (Date.now() - start < timeoutMs) {
+    last = (await getTestContactById(hubspotId)).properties[property] ?? null;
+    if (last === expected) return;
+    await new Promise((r) => setTimeout(r, 2_000));
+  }
+  throw new Error(
+    `Timed out waiting for contact ${hubspotId}.${property} = "${expected}" (last: "${last}")`,
+  );
+}
+
 /** Read the hubspot_contact_id for a lead from the local DB. */
 export async function getLeadHubSpotId(email: string): Promise<string | null> {
   const rows = await sql()`

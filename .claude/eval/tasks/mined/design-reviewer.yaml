@@ -1,0 +1,231 @@
+agent: design-reviewer
+_generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
+_needs_review: true
+_note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/design-reviewer.yaml alongside
+  golden + adversarial buckets.
+_mined_available: 1
+_mined_emitted: 1
+execution:
+- id: mined-design-reviewer-exec-1
+  kind: execution
+  prompt: "You are reviewing a specific UI change on the `feat/258-lead-outbox-cutover` branch of a Next.js\
+    \ app called Rekurve. The app runs at https://rekurve.localhost via Vercel Portless.\n\n## What changed\n\
+    \n`src/app/(application)/leads/[id]/_components/profile-header.tsx` added a conditional HubSpot-sync\
+    \ status element after the lead's stage badge:\n\n```tsx\n{lead.hubspotContactId ? (\n  <a\n    href={`https://app.hubspot.com/contacts/${lead.hubspotContactId}`}\n\
+    \    target=\"_blank\"\n    rel=\"noopener noreferrer\"\n    className=\"text-muted-foreground text-xs\
+    \ underline underline-offset-2 hover:text-foreground\"\n    data-testid=\"lead-profile-hubspot-link\"\
+    \n  >\n    View in HubSpot\n  </a>\n) : (\n  <Badge\n    variant=\"outline\"\n    className=\"px-3\
+    \ py-1 text-xs\"\n    data-testid=\"lead-profile-hubspot-syncing\"\n  >\n    Syncing to HubSpot…\n\
+    \  </Badge>\n)}\n```\n\nThe badge sits inside a flex row alongside the score circle (a 80×80px circle\
+    \ with the numeric score) and the stage badge (e.g. \"Warm\", \"Hot\"). This element is the UI manifestation\
+    \ of a DB-first architecture change: leads are now captured locally first (hubspotContactId=null),\
+    \ with HubSpot sync happening asynchronously via an Inngest worker.\n\n## Context on the host component\n\
+    \nThe score circle and stage badge are wrapped in:\n```tsx\n<div className=\"flex items-center gap-3\"\
+    \ aria-live=\"polite\">\n  {/* 80x80 score circle */}\n  {/* stage badge */}\n  {/* NEW: hubspot sync\
+    \ element */}\n</div>\n```\n\nThe profile header also has contact details (phone, email, last contacted)\
+    \ on the left side.\n\n## Your task\n\n1. Navigate to https://rekurve.localhost and log in (the app\
+    \ should have a session or redirect to login — if login is required, report that and do your review\
+    \ statically from the code).\n2. Navigate to any lead profile page (try /leads, then click a lead,\
+    \ or try /pipeline to find a lead).\n3. Review the \"Syncing to HubSpot…\" badge state (most leads\
+    \ that were recently captured will show this since the cutover is new).\n4. Review both states if\
+    \ possible:\n   - **Syncing state**: Badge with \"Syncing to HubSpot…\" text (variant=\"outline\"\
+    , text-xs)\n   - **Linked state**: \"View in HubSpot\" link (text-muted-foreground text-xs underline)\n\
+    5. If you can only see one state, review it thoroughly and note what the other state would look like\
+    \ based on the code.\n\n## What to evaluate\n\n- **Visual hierarchy**: Does the sync status compete\
+    \ with or complement the score circle and stage badge?\n- **Readability**: Is \"Syncing to HubSpot…\"\
+    \ copy clear? Does it communicate the right level of urgency/patience?\n- **Sizing and spacing**:\
+    \ Is the badge appropriately sized relative to the 80px score circle and stage badge? Does `gap-3`\
+    \ give enough breathing room?\n- **Color and contrast**: Does `variant=\"outline\"` Badge with `text-xs`\
+    \ have sufficient contrast? Does the \"View in HubSpot\" link use `text-muted-foreground` appropriately\
+    \ (de-emphasized but still accessible)?\n- **Hover state**: Does the link hover (`hover:text-foreground`)\
+    \ feel correct? Is `underline-offset-2` the right choice?\n- **Loading/transition feel**: Does a Badge\
+    \ feel like the right affordance for an async-loading state vs. a spinner, progress indicator, or\
+    \ subtle text?\n- **Mobile responsiveness**: The parent flex container uses `sm:flex-row sm:items-center\
+    \ sm:justify-between` — does the new element wrap correctly on mobile?\n- **Accessibility**: Is `aria-live=\"\
+    polite\"` on the parent sufficient for announcing the state change when the Realtime bridge triggers\
+    \ a refetch? Is the link's accessible text (\"View in HubSpot\") descriptive enough for screen readers?\n\
+    - **Brand fit**: Does this match the existing design system used elsewhere in the app (Badges, muted\
+    \ text, underline links)?\n\nProduce a structured design review report in markdown with:\n- An overall\
+    \ verdict (Approved / Approved with minor suggestions / Changes requested)\n- Findings by category\
+    \ (Visual Hierarchy, Copy, Spacing & Sizing, Color & Contrast, Accessibility, Mobile, Brand Fit)\n\
+    - Specific line-level suggestions with the exact className or copy change\n- Screenshots or descriptions\
+    \ of what you observed in the browser (or note if the browser was inaccessible)"
+  provenance:
+    agent_id: abf2b5279c37dfb20
+    session_id: 16f6a097-9981-465a-848e-9a863661d3ae
+    model: claude-sonnet-4-6
+    latency_s: 85.56
+    tokens_total: 600682
+    n_tool_uses: 16
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/16f6a097-9981-465a-848e-9a863661d3ae/subagents/agent-abf2b5279c37dfb20.jsonl
+  sample_output_excerpt: 'I now have all the context I need for a thorough static code review. The dev
+    server is not running, so I''ll note that and deliver a complete analysis based on the source code.
+
+
+    ---
+
+
+    ### Design Review Summary
+
+
+    The dev server was not reachable at `https://rekurve.localhost` during this review, so all findings
+    are based on static code analysis of the component, its dependencies (`Badge.tsx`, `display …'
+routing:
+  positives:
+  - id: mined-design-reviewer-route-pos-1
+    kind: routing
+    expect_invoke: true
+    prompt: "You are reviewing a specific UI change on the `feat/258-lead-outbox-cutover` branch of a\
+      \ Next.js app called Rekurve. The app runs at https://rekurve.localhost via Vercel Portless.\n\n\
+      ## What changed\n\n`src/app/(application)/leads/[id]/_components/profile-header.tsx` added a conditional\
+      \ HubSpot-sync status element after the lead's stage badge:\n\n```tsx\n{lead.hubspotContactId ?\
+      \ (\n  <a\n    href={`https://app.hubspot.com/contacts/${lead.hubspotContactId}`}\n    target=\"\
+      _blank\"\n    rel=\"noopener noreferrer\"\n    className=\"text-muted-foreground text-xs underline\
+      \ underline-offset-2 hover:text-foreground\"\n    data-testid=\"lead-profile-hubspot-link\"\n  >\n\
+      \    View in HubSpot\n  </a>\n) : (\n  <Badge\n    variant=\"outline\"\n    className=\"px-3 py-1\
+      \ text-xs\"\n    data-testid=\"lead-profile-hubspot-syncing\"\n  >\n    Syncing to HubSpot…\n  </Badge>\n\
+      )}\n```\n\nThe badge sits inside a flex row alongside the score circle (a 80×80px circle with the\
+      \ numeric score) and the stage badge (e.g. \"Warm\", \"Hot\"). This element is the UI manifestation\
+      \ of a DB-first architecture change: leads are now captured locally first (hubspotContactId=null),\
+      \ with HubSpot sync happening asynchronously via an Inngest worker.\n\n## Context on the host component\n\
+      \nThe score circle and stage badge are wrapped in:\n```tsx\n<div className=\"flex items-center gap-3\"\
+      \ aria-live=\"polite\">\n  {/* 80x80 score circle */}\n  {/* stage badge */}\n  {/* NEW: hubspot\
+      \ sync element */}\n</div>\n```\n\nThe profile header also has contact details (phone, email, last\
+      \ contacted) on the left side.\n\n## Your task\n\n1. Navigate to https://rekurve.localhost and log\
+      \ in (the app should have a session or redirect to login — if login is required, report that and\
+      \ do your review statically from the code).\n2. Navigate to any lead profile page (try /leads, then\
+      \ click a lead, or try /pipeline to find a lead).\n3. Review the \"Syncing to HubSpot…\" badge state\
+      \ (most leads that were recently captured will show this since the cutover is new).\n4. Review both\
+      \ states if possible:\n   - **Syncing state**: Badge with \"Syncing to HubSpot…\" text (variant=\"\
+      outline\", text-xs)\n   - **Linked state**: \"View in HubSpot\" link (text-muted-foreground text-xs\
+      \ underline)\n5. If you can only see one state, review it thoroughly and note what the other state\
+      \ would look like based on the code.\n\n## What to evaluate\n\n- **Visual hierarchy**: Does the\
+      \ sync status compete with or complement the score circle and stage badge?\n- **Readability**: Is\
+      \ \"Syncing to HubSpot…\" copy clear? Does it communicate the right level of urgency/patience?\n\
+      - **Sizing and spacing**: Is the badge appropriately sized relative to the 80px score circle and\
+      \ stage badge? Does `gap-3` give enough breathing room?\n- **Color and contrast**: Does `variant=\"\
+      outline\"` Badge with `text-xs` have sufficient contrast? Does the \"View in HubSpot\" link use\
+      \ `text-muted-foreground` appropriately (de-emphasized but still accessible)?\n- **Hover state**:\
+      \ Does the link hover (`hover:text-foreground`) feel correct? Is `underline-offset-2` the right\
+      \ choice?\n- **Loading/transition feel**: Does a Badge feel like the right affordance for an async-loading\
+      \ state vs. a spinner, progress indicator, or subtle text?\n- **Mobile responsiveness**: The parent\
+      \ flex container uses `sm:flex-row sm:items-center sm:justify-between` — does the new element wrap\
+      \ correctly on mobile?\n- **Accessibility**: Is `aria-live=\"polite\"` on the parent sufficient\
+      \ for announcing the state change when the Realtime bridge triggers a refetch? Is the link's accessible\
+      \ text (\"View in HubSpot\") descriptive enough for screen readers?\n- **Brand fit**: Does this\
+      \ match the existing design system used elsewhere in the app (Badges, muted text, underline links)?\n\
+      \nProduce a structured design review report in markdown with:\n- An overall verdict (Approved /\
+      \ Approved with minor suggestions / Changes requested)\n- Findings by category (Visual Hierarchy,\
+      \ Copy, Spacing & Sizing, Color & Contrast, Accessibility, Mobile, Brand Fit)\n- Specific line-level\
+      \ suggestions with the exact className or copy change\n- Screenshots or descriptions of what you\
+      \ observed in the browser (or note if the browser was inaccessible)"
+  negatives:
+  - id: mined-design-reviewer-route-neg-1
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-locator
+    confusability: 0.097
+    prompt: 'I''m debugging an e2e test about HubSpot outbound sync dedup behavior. I need to locate all
+      code involved in syncing a lead to HubSpot — specifically the path that creates a contact OR, when
+      a contact with the same email already exists, deduplicates/links to the existing contact.
+
+
+      Find and report file paths (with brief descriptions) for:
+
+      1. The outbox worker/processor that syncs leads to HubSpot (mentioned as "DB-first outbox worker"
+      / "outbox cutover"). Look in src/server/outbox/ and src/inngest/.
+
+      2. The HubSpot client wrapper that does create/update/upsert of contacts (search by email, create
+      contact, update contact, handle 409 duplicate conflicts).
+
+      3. The lead intake logic (src/server/leads/intake.ts).
+
+      4. Any code that handles HubSpot duplicate-email conflicts (409 errors) and extracts the existing
+      contact ID.
+
+      5. The recently-changed files from PR #288 "drop edit arms; ingest contact.creation via scored outbox"
+      — likely a hubspot-webhook handler.
+
+
+      For each relevant file, give the path and a one-line description of what it does. Do NOT analyze
+      deeply — just locate and map the files.'
+  - id: mined-design-reviewer-route-neg-2
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-locator
+    confusability: 0.086
+    prompt: 'I''m debugging a failing E2E test about HubSpot outbound sync. I need to find ALL the code
+      that syncs a newly-created lead OUT to HubSpot (creating or updating a HubSpot contact from a lead).
+
+
+      Specifically locate:
+
+      1. The "lead outbox worker" / outbox processor that was recently introduced (PR called "lead-outbox-cutover").
+      Where leads are picked up and pushed to HubSpot.
+
+      2. The HubSpot API client wrapper functions that create or update a contact — anything that calls
+      HubSpot''s contacts create/update/upsert/search APIs. Look for terms like `basicApi.create`, `basicApi.update`,
+      `searchApi.doSearch`, `idProperty`, `createOrUpdate`, `upsert`, `hubspotContactId`.
+
+      3. The mapping from a lead''s fields (firstName, lastName, email, phone) to HubSpot contact properties
+      (firstname, lastname, email, phone).
+
+      4. Any logic that handles the case where a HubSpot contact ALREADY EXISTS for a given email (dedup
+      by email) — does it update the existing contact''s properties or just link to it?
+
+
+      The relevant code is under src/ (likely src/server, src/inngest, or src/lib). Report exact file
+      paths and the key function names/line numbers for each. Do not analyze deeply yet — just locate
+      and give me a precise map of the relevant files and functions.'
+  - id: mined-design-reviewer-route-neg-3
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-verification
+    confusability: 0.084
+    prompt: 'Run the Playwright E2E suite for this repo and report results compactly.
+
+
+      IMPORTANT context before you run:
+
+      - This branch (`feat/258-lead-outbox-cutover`) cut lead intake over to DB-first via an outbox +
+      Inngest worker. E2E now needs TWO local servers: the Next app on :3000 and an Inngest dev server
+      on :8288. The `playwright.config.ts` `webServer` is already configured as an array of both, so `make
+      test_e2e` should boot both automatically. The app server is started with env `INNGEST_DEV=1` and
+      `INNGEST_BASE_URL=http://localhost:8288`.
+
+      - The Inngest dev server is launched via `yarn preview:inngest` (`inngest dev -u http://localhost:3000/api/inngest`).
+      Confirm the `inngest` CLI is resolvable (devDependency `inngest-cli` is installed) — if the dev
+      server fails to boot, that''s a top-priority finding.
+
+
+      PREREQUISITE CHECK (do this FIRST, before running the suite):
+
+      1. Confirm `HUBSPOT_ACCESS_TOKEN` is present in the environment Playwright will inherit. Check `.env.local`
+      for a non-empty `HUBSPOT_ACCESS_TOKEN=` line. The HubSpot-touching specs (`e2e/features/hubspot-sync.spec.ts`
+      and `e2e/features/lead-intake-sync.spec.ts`) SELF-SKIP when it''s absent — a green run that actually
+      skipped them is a FALSE PASS and must be reported as such, not as success.
+
+      2. Report whether the token is present.
+
+
+      THEN run the suite: `make test_e2e` (do NOT use yarn/npx directly; use the make target).
+
+
+      REPORT BACK (compact):
+
+      - Whether HUBSPOT_ACCESS_TOKEN was present.
+
+      - Whether both webServers (app :3000 and inngest :8288) booted. If the Inngest dev server logged
+      an app-sync (look for `PUT /api/inngest` 200 / "apps synced" / function registration for `lead-hubspot-sync`),
+      say so.
+
+      - Overall pass/fail counts and how many specs SKIPPED.
+
+      - For EACH failing spec: the spec file + test name, and the extracted error block (assertion message,
+      timeout, or stack — keep it tight, ~10-20 lines per failure).
+
+      - Pay special attention to `e2e/features/lead-intake-sync.spec.ts` (new) and `e2e/features/hubspot-sync.spec.ts`
+      (modified) — these exercise the async outbox→worker→HubSpot path and are the highest-risk specs.
+
+
+      Do not attempt to fix anything. Just run and report.'

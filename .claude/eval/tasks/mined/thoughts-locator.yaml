@@ -1,0 +1,162 @@
+agent: thoughts-locator
+_generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
+_needs_review: true
+_note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/thoughts-locator.yaml alongside
+  golden + adversarial buckets.
+_mined_available: 1
+_mined_emitted: 1
+execution:
+- id: mined-thoughts-locator-exec-1
+  kind: execution
+  prompt: Locate the sub-agent evaluation pipeline design document and any related research notes or iteration
+    transcripts in the thoughts/ directory. Return the file paths grouped by type (design / research /
+    transcript).
+  provenance:
+    agent_id: a461ecdb25f5a83ff
+    session_id: e41b13d1-0f46-41ab-8013-d23578205889
+    model: claude-sonnet-4-6
+    latency_s: 18.39
+    tokens_total: 38748
+    n_tool_uses: 2
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/e41b13d1-0f46-41ab-8013-d23578205889/subagents/agent-a461ecdb25f5a83ff.jsonl
+  sample_output_excerpt: 'Now I have a clear picture. The directly relevant files are identifiable from
+    the filenames alone — no need to grep further.
+
+
+    ## Thought Documents about Sub-Agent Evaluation Pipeline
+
+
+    ### Design
+
+
+    - `/Users/sam/workspace/rekurve/rekurve/thoughts/designs/2026-04-21-sub-agent-eval-pipeline.md` -
+    Sub-agent evaluation pipeline design document (2026-04-21)
+
+
+    ### Research / Transcripts
+
+
+    - `/Users/sam/work …'
+routing:
+  positives:
+  - id: mined-thoughts-locator-route-pos-1
+    kind: routing
+    expect_invoke: true
+    prompt: Locate the sub-agent evaluation pipeline design document and any related research notes or
+      iteration transcripts in the thoughts/ directory. Return the file paths grouped by type (design
+      / research / transcript).
+  negatives:
+  - id: mined-thoughts-locator-route-neg-1
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-locator
+    confusability: 0.097
+    prompt: Locate the Drizzle migration SQL file(s) related to the "outbox" table or the outbox-sweep
+      mechanism in this repo, and the directory they live in. Return only verified file paths (no content
+      descriptions).
+  - id: mined-thoughts-locator-route-neg-2
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-locator
+    confusability: 0.051
+    prompt: 'Locate where **lead scoring** lives in this codebase. Return file locations only — do not
+      explain behavior — grouped by purpose:
+
+
+      1. The scoring module''s source files
+
+      2. Every place lead scoring is invoked / called from
+
+      3. The scoring tests
+
+
+      Give full paths from the repo root.'
+  - id: mined-thoughts-locator-route-neg-3
+    kind: routing
+    expect_invoke: false
+    actual_route: web-research
+    confusability: 0.028
+    prompt: 'I need a thorough, current (as of 2026) research report on integrating OpenTelemetry (OTEL)
+      with Claude Code (Anthropic''s CLI coding agent) for LOCAL observability. The goal is to surface
+      real-world sub-agent activity — specifically sub-agent prompts, sub-agent results/outputs, and metrics
+      like latency, token usage, and cost — to build a baseline dataset for evaluating and improving sub-agent
+      prompts.
+
+
+      Please research and answer these specific questions, citing authoritative sources (prefer official
+      Anthropic/Claude Code docs at docs.claude.com or docs.anthropic.com, the Claude Code GitHub repo,
+      and OpenTelemetry official docs):
+
+
+      ## 1. Claude Code''s built-in OTEL / telemetry support
+
+      - Does Claude Code have native OpenTelemetry support? What environment variables enable it (e.g.
+      CLAUDE_CODE_ENABLE_TELEMETRY)?
+
+      - What is the FULL list of metrics Claude Code exports via OTEL? (e.g. token usage, cost, session
+      count, lines of code, API request duration/latency, etc.) Give exact metric names if documented.
+
+      - What logs/events does Claude Code export? Is there an events/logs exporter separate from metrics?
+
+      - CRITICAL: Does Claude Code''s OTEL telemetry capture the actual CONTENT of prompts and AI responses/outputs?
+      Is there a setting like OTEL_LOG_USER_PROMPTS or similar that controls whether prompt text is included?
+      What about the assistant''s output text?
+
+      - CRITICAL FOR OUR USE CASE: Does Claude Code''s telemetry distinguish or specifically capture SUB-AGENT
+      (Task tool / subagent) activity? When a main agent spawns a sub-agent, are the sub-agent''s prompt,
+      output, token usage, and latency captured as distinct telemetry events/spans/attributes? Is there
+      any agent-type or agent-id attribute on the events? Be precise about what is and isn''t captured
+      at the sub-agent granularity — this is the single most important question.
+
+      - Does Claude Code emit OTEL traces/spans (not just metrics and logs)? If so, what spans, and do
+      tool calls / sub-agent invocations appear as spans?
+
+
+      ## 2. Local OTEL collector + storage + visualization stack
+
+      - What is the recommended way to run a local OpenTelemetry Collector (otelcol / otelcol-contrib)
+      to receive Claude Code''s telemetry?
+
+      - What configuration (OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_PROTOCOL grpc vs http/protobuf,
+      OTEL_METRICS_EXPORTER, OTEL_LOGS_EXPORTER) does Claude Code need to point at a local collector?
+
+      - What are the recommended local storage backends for each signal type: metrics (Prometheus?), logs/events
+      (Loki? ClickHouse?), traces (Jaeger? Tempo?)?
+
+      - What is the recommended local visualization layer (Grafana?)? Are there prebuilt Claude Code dashboards
+      published by Anthropic or the community?
+
+      - Is there a known docker-compose / one-command setup (official or community, e.g. a "claude-code-otel"
+      project on GitHub) that stands up collector + storage + Grafana locally? Name specific repos if
+      they exist.
+
+
+      ## 3. Capturing prompt/output CONTENT for evaluation (not just metrics)
+
+      - Since the core goal is capturing actual sub-agent prompt text and output text to build an eval
+      dataset, clarify: does the OTEL events/logs path actually carry the full text, or is it truncated/redacted?
+      Are there length limits?
+
+      - If Claude Code''s OTEL does NOT capture full sub-agent prompt+output content, what are the ALTERNATIVE
+      local interception approaches? Specifically research: (a) the Claude Code OTEL logs exporter content,
+      (b) hooks (PreToolUse/PostToolUse/SubagentStop hooks) and what data they receive, (c) reading the
+      local session transcript / .jsonl files Claude Code writes, (d) an LLM-proxy / man-in-the-middle
+      approach (e.g. LiteLLM proxy, or a custom Anthropic API proxy) to capture full request/response
+      bodies. Compare these on completeness of captured content.
+
+      - Specifically: is there a SubagentStop hook, and does it provide access to the sub-agent''s full
+      transcript/output?
+
+
+      ## 4. Practical recommendation
+
+      - Summarize the simplest local setup that would capture sub-agent prompts, outputs, latency, and
+      cost.
+
+      - Flag any gaps where OTEL alone is insufficient and a complementary approach (hooks, transcript
+      parsing, proxy) is needed.
+
+
+      Please be concrete and cite versions/dates where possible. Distinguish clearly between what is officially
+      documented vs community/experimental. Note that as of 2026 Claude Code is actively developed, so
+      prefer the most recent sources.'

@@ -13,10 +13,7 @@ import {
   findContactByEmail,
   getLeadHubSpotId,
   getTestContactById,
-  updateTestContact,
   waitForContactProperty,
-  waitForLeadDeletion,
-  waitForLeadField,
   waitForLeadHubSpotId,
 } from "../utils/hubspot-helper";
 import { getSessionCookie } from "../utils/session-cookie";
@@ -200,107 +197,9 @@ test.describe("HubSpot Outbound Sync — E2E", () => {
   });
 });
 
-test.describe("HubSpot Inbound Sync — E2E", () => {
-  test.skip(
-    !process.env.HUBSPOT_ACCESS_TOKEN || !process.env.HUBSPOT_WEBHOOK_ACTIVE,
-    "Requires HUBSPOT_ACCESS_TOKEN and HUBSPOT_WEBHOOK_ACTIVE — only against production (webhook target is production-only)",
-  );
-
-  let session: TestSession;
-  const phones: string[] = [];
-
-  test.beforeAll(async () => {
-    session = await createTestSession();
-  });
-
-  test.afterAll(async () => {
-    await cleanupTestLeadsByPhone(phones);
-    await deleteTestSession(session.userId);
-  });
-
-  test("editing a contact's phone in HubSpot updates the local lead", async ({
-    context,
-    page,
-    baseURL,
-  }) => {
-    test.setTimeout(60_000); // Webhook latency
-
-    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
-
-    const uniqueId = Date.now().toString(36);
-    const testEmail = `e2e-${uniqueId}@test.rekurve.dev`;
-    const testPhone = uniquePhone();
-    phones.push(testPhone);
-
-    // Step 1: Create a lead via the app (establishes the HubSpot link)
-    await page.goto("/leads/new");
-    const form = new LeadFormSection(page);
-    await form.fillStep1({
-      firstName: "Inbound",
-      lastName: `Phone ${uniqueId}`,
-      phone: testPhone,
-      email: testEmail,
-    });
-    await form.clickNext();
-    await form.selectSegmented("Has land", "No");
-    await form.clickNext();
-    await form.selectSegmented("Property type", "First Home Buyer");
-    await form.clickNext();
-    await form.clickSubmit();
-    await form.expectSuccess(`Inbound Phone ${uniqueId}`);
-
-    // Step 2: Wait for the outbox worker to stamp hubspotContactId
-    const hubspotId = await waitForLeadHubSpotId(testEmail);
-    expect(hubspotId).not.toBeNull();
-
-    // Step 3: Update the contact's phone in HubSpot directly
-    const updatedPhone = "0499999999";
-    phones.push(updatedPhone);
-    await updateTestContact(hubspotId!, { phone: updatedPhone });
-
-    // Step 4: Wait for the webhook to update the local lead
-    await waitForLeadField(testEmail, "phone", updatedPhone);
-  });
-
-  test("deleting a contact in HubSpot removes the local lead", async ({
-    context,
-    page,
-    baseURL,
-  }) => {
-    test.setTimeout(60_000); // Webhook latency
-
-    await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
-
-    const uniqueId = Date.now().toString(36);
-    const testEmail = `e2e-${uniqueId}@test.rekurve.dev`;
-    const testPhone = uniquePhone();
-    phones.push(testPhone);
-
-    // Step 1: Create a lead via the app
-    await page.goto("/leads/new");
-    const form = new LeadFormSection(page);
-    await form.fillStep1({
-      firstName: "Inbound",
-      lastName: `Delete ${uniqueId}`,
-      phone: testPhone,
-      email: testEmail,
-    });
-    await form.clickNext();
-    await form.selectSegmented("Has land", "No");
-    await form.clickNext();
-    await form.selectSegmented("Property type", "First Home Buyer");
-    await form.clickNext();
-    await form.clickSubmit();
-    await form.expectSuccess(`Inbound Delete ${uniqueId}`);
-
-    // Step 2: Wait for the outbox worker to stamp hubspotContactId
-    const hubspotId = await waitForLeadHubSpotId(testEmail);
-    expect(hubspotId).not.toBeNull();
-
-    // Step 3: Archive the contact in HubSpot
-    await archiveTestContact(hubspotId!);
-
-    // Step 4: Wait for the webhook to delete the local lead
-    await waitForLeadDeletion(testEmail);
-  });
-});
+// Inbound HubSpot → local sync (contact.propertyChange / contact.deletion) is
+// intentionally NOT honoured: the local DB is canonical and those webhook arms
+// were dropped in #288 (ADR-013). The drop is covered deterministically by the
+// webhook unit tests (src/app/api/hubspot/webhook/__tests__/route.test.ts:
+// "contact.propertyChange/deletion returns 200 with no DB writes"). The E2E
+// tests that asserted the old inbound-edit/-delete behaviour were removed here.

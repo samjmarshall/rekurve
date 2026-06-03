@@ -80,11 +80,18 @@ function judgePrompt(task, output) {
     + 'Score each criterion (see schema). Penalties are true when the bad thing happened. Put the paths/refs you checked in `verification`, 1-3 sentences in `rationale`. Be harsh on grounding.'
 }
 
-// Run matrix: variance-control the deciding (analyze) axis; locates are low-variance.
+// Run matrix: variance-control the DECIDING archetype(s) — the axis whose quality drives the
+// model decision — at >=3 runs x >=2 judges; everything else is a low-variance 1x1 scout.
+// Set DECIDING_KINDS to whatever archetype THIS agent serves, NOT literally 'analyze':
+// a pattern-finder's deciding axis is 'pattern', a locator-only agent's is 'locate'. Copying
+// `=== 'analyze'` verbatim silently gives a third archetype 1x1 cells and breaks the n>=3 rule
+// (a cold-follow run for codebase-pattern-finder hit exactly this, 2026-06-03).
+const DECIDING_KINDS = ['analyze']                           // «FILL» the model-deciding archetype(s) for this agent
 const work = []
 for (const t of TASKS) for (const c of CANDS) {
-  const runs = t.kind === 'analyze' ? 3 : 1
-  const nJudges = t.kind === 'analyze' ? 2 : 1
+  const deciding = DECIDING_KINDS.includes(t.kind)
+  const runs = deciding ? 3 : 1
+  const nJudges = deciding ? 2 : 1
   for (let r = 0; r < runs; r++) work.push({ task:t, cand:c, run:r, nJudges })
 }
 log(`${work.length} candidate runs; registered=${SPECIALIST_REGISTERED}.`)
@@ -119,7 +126,7 @@ function meanOver(kind, candId) {
 // AND the deciding axis is variance-controlled (>=3 runs). A single run can fabricate and flip
 // the rule to opus on noise (the `ln` incident, 2026-06-03 smoke) — never promote from an n<3 cell.
 const decision = {}
-for (const kind of ['locate','analyze']) {
+for (const kind of DECIDING_KINDS) {
   const sonnet = meanOver(kind,'specialist-sonnet'), opus = meanOver(kind,'specialist-opus'), base = meanOver(kind,'explore-haiku')
   const decidingN = Math.min(Infinity, ...cells.filter(c => runs.find(r=>r.taskId===c.taskId&&r.kind===kind)).map(c=>c.nRuns))
   const promote = opus!=null && sonnet!=null && opus-sonnet>=0.05

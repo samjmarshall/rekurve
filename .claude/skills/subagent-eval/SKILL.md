@@ -20,15 +20,16 @@ This is a multi-agent `Workflow` (opt-in — it spends real tokens). Say "use a 
 
 1. **Frame & pick entry mode.** State the agent(s) under test and the decision to make (ship this prompt? which model?). For create, do AUTHORING.md first.
 2. **Build the benchmark.** Per archetype the agent serves (e.g. locate / analyze):
-   - Mine real prompts: `python3 .claude/eval/mine_subagents.py --print` → pull from `.claude/eval/mined/corpus.jsonl` (shape rows into tasks with `shape_tasks.py`).
+   - Mine real prompts: `python3 .claude/eval/mine_subagents.py --print` → pull from `.claude/eval/mined/corpus.jsonl` (shape rows into tasks with `shape_tasks.py`). Read-only context? `shape_tasks.py` writes YAML into the repo by default — pass `--dry-run`, or read `corpus.jsonl` rows directly (count by exact `agent ==` field, not a substring `grep -c`, which over-counts routing fields).
    - Add a **golden** task (hand-written, clear oracle) and an **adversarial** task (zero-match / trap).
    - Write a **verified oracle** for each — confirm every expected path/value against the tree *now*.
    - ☐ Include at least one HARD task with headroom. Near-ceiling tasks don't discriminate — a well-curated repo makes even `Explore@haiku` score ~1.0 (see `docs-*` example).
 3. **Run the head-to-head.** Adapt **[harness-template.js](harness-template.js)** and launch via `Workflow`. Candidates per task: native baseline (`Explore` @ its production model, usually haiku), specialist @ `sonnet`, specialist @ `opus`.
-   - ☐ **Variance-control the deciding axis**: ≥3 runs × ≥2 judges per cell for any model decision. 1 run scouts a locate, but never flip a model from a single-run cell — a lone run can fabricate (the `ln` incident) and swing the mean; the harness now flags an n<3 promotion as inconclusive.
+   - ☐ **Variance-control the deciding axis**: ≥3 runs × ≥2 judges per cell for any model decision. 1 run scouts a locate, but never flip a model from a single-run cell — a lone run can fabricate (the `ln` incident) and swing the mean; the harness now flags an n<3 promotion as inconclusive. Set the harness `DECIDING_KINDS` to THIS agent's archetype — **not literally `analyze`**; a third archetype (e.g. `pattern`) also needs per-agent **contract discriminators** added to the judge (REFERENCE.md "Scoring a new agent's contract").
    - ☐ Judges are **blinded** (no candidate id) and **verify every claimed path/Status/citation against the tree** before scoring. See REFERENCE.md.
    - ☐ Registry gotcha: a just-created agent is NOT in the session's hot registry — either restart to register, or use the harness's adopt-on-disk bootstrap. See REFERENCE.md.
    - ☐ Script placement: paste the harness inline (or keep it in `/tmp`); never save an adapted copy under `.claude/eval/` — its top-level `return` trips Biome and blocks the husky pre-commit. See REFERENCE.md.
+   - ☐ **Dry-run first (zero agents)**: validate the harness logic with stubbed hooks before launching — see REFERENCE.md "Validate the harness before launch". Re-run after every harness edit; it's free and catches syntax + aggregation bugs.
 4. **Decide each model quality-first.** Default `sonnet`. Adopt `opus` for an agent ONLY if `mean(opus) ≥ mean(sonnet) + 0.05` AND it isn't dragged by over-templating. Model choice is **task-shaped, not class-shaped** — see REFERENCE.md § Model decision.
 5. **Wire routing** (if creating/changing an agent's role). Add it to the command fan-outs (`create_plan.md`, `brainstorm.md`, `iterate_plan.md`) and tighten reciprocal when-not redirects in sibling agents' descriptions.
 6. **Verify + safety.**

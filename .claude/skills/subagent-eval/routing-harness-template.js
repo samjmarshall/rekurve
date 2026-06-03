@@ -22,13 +22,20 @@ const ROOT = '«/abs/path/to/repo»'                          // «FILL» repo r
 // «FILL» the routing pool — the agents the planner chooses among. Judges READ each file's
 // `description:` frontmatter this run (no inlined/stale text). 'none' is always an implicit
 // option = no specialist should claim it (a general-purpose/Explore agent handles it).
+// Default = the full file-backed routing surface (all 11). The richer the pool, the more
+// cross-family overlap a description has to survive. Trim to the agents you changed if you want.
 const POOL = [
-  { name: 'docs-locator',      file: '.claude/agents/docs-locator.md' },
-  { name: 'docs-analyzer',     file: '.claude/agents/docs-analyzer.md' },
-  { name: 'thoughts-locator',  file: '.claude/agents/thoughts-locator.md' },
-  { name: 'thoughts-analyzer', file: '.claude/agents/thoughts-analyzer.md' },
-  { name: 'codebase-locator',  file: '.claude/agents/codebase-locator.md' },
-  { name: 'codebase-analyzer', file: '.claude/agents/codebase-analyzer.md' },
+  { name: 'docs-locator',            file: '.claude/agents/docs-locator.md' },
+  { name: 'docs-analyzer',           file: '.claude/agents/docs-analyzer.md' },
+  { name: 'thoughts-locator',        file: '.claude/agents/thoughts-locator.md' },
+  { name: 'thoughts-analyzer',       file: '.claude/agents/thoughts-analyzer.md' },
+  { name: 'codebase-locator',        file: '.claude/agents/codebase-locator.md' },
+  { name: 'codebase-analyzer',       file: '.claude/agents/codebase-analyzer.md' },
+  { name: 'codebase-pattern-finder', file: '.claude/agents/codebase-pattern-finder.md' },
+  { name: 'web-lookup',              file: '.claude/agents/web-lookup.md' },
+  { name: 'web-research',            file: '.claude/agents/web-research.md' },
+  { name: 'design-reviewer',         file: '.claude/agents/design-reviewer.md' },
+  { name: 'codebase-verification',   file: '.claude/agents/codebase-verification.md' },
 ]
 
 // «FILL» labelled probes. `expected` ∈ a POOL name or 'none'. Cover, per agent:
@@ -38,19 +45,30 @@ const POOL = [
 // Verify every `expected` against the tree NOW (the oracle is the routing decision a correct
 // description set produces). Examples below are verified against this repo 2026-06-03.
 const PROBES = [
-  // positives — one per agent
-  { id: 'POS-docs-loc',  prompt: 'Which ADR governs the transactional outbox + Inngest-delivery design?', expected: 'docs-locator' },
-  { id: 'POS-docs-an',   prompt: 'Using docs/adr/adr013-local-db-canonical-for-lead-data.md, what did we decide and what is its recorded Status?', expected: 'docs-analyzer' },
-  { id: 'POS-thx-loc',   prompt: 'Find the design doc and any research notes on the sub-agent evaluation pipeline.', expected: 'thoughts-locator' },
-  { id: 'POS-thx-an',    prompt: 'From thoughts/designs/2026-04-21-sub-agent-eval-pipeline.md, extract the key decisions and whether they still hold.', expected: 'thoughts-analyzer' },
-  { id: 'POS-code-loc',  prompt: 'Where in the code does the outbox sweep cron live?', expected: 'codebase-locator' },
-  { id: 'POS-code-an',   prompt: 'Walk through how the outbox sweep delivers events to Inngest, with file:line refs.', expected: 'codebase-analyzer' },
-  // reciprocal-redirect traps — the headline test (authoritative vs speculative boundary)
+  // positives — one per agent (baseline correct-invoke)
+  { id: 'POS-docs-loc',    prompt: 'Which ADR governs the transactional outbox + Inngest-delivery design?', expected: 'docs-locator' },
+  { id: 'POS-docs-an',     prompt: 'Using docs/adr/adr013-local-db-canonical-for-lead-data.md, what did we decide and what is its recorded Status?', expected: 'docs-analyzer' },
+  { id: 'POS-thx-loc',     prompt: 'Find the design doc and any research notes on the sub-agent evaluation pipeline.', expected: 'thoughts-locator' },
+  { id: 'POS-thx-an',      prompt: 'From thoughts/designs/2026-04-21-sub-agent-eval-pipeline.md, extract the key decisions and whether they still hold.', expected: 'thoughts-analyzer' },
+  { id: 'POS-code-loc',    prompt: 'Where in the code does the outbox sweep cron live?', expected: 'codebase-locator' },
+  { id: 'POS-code-an',     prompt: 'Walk through how the outbox sweep delivers events to Inngest, with file:line refs.', expected: 'codebase-analyzer' },
+  { id: 'POS-code-pat',    prompt: 'Show me an existing example of a Drizzle pgTable schema that uses a partial index, so I can copy the pattern for a new table.', expected: 'codebase-pattern-finder' },
+  { id: 'POS-web-lookup',  prompt: "What is the default behaviour of Zod v4's .trim() on z.string() — before or after the other validations run? Quote the official docs.", expected: 'web-lookup' },
+  { id: 'POS-web-research',prompt: 'Survey the current best practices for implementing the transactional-outbox pattern, comparing the main approaches across multiple sources.', expected: 'web-research' },
+  { id: 'POS-design',      prompt: 'Review the front-end changes on this branch for visual consistency, accessibility, and responsive behaviour across viewports.', expected: 'design-reviewer' },
+  { id: 'POS-verify',      prompt: 'Run the build, lint/typecheck, and unit tests, and report whether they pass or fail.', expected: 'codebase-verification' },
+  // reciprocal-redirect traps — authoritative docs/ vs speculative thoughts/
   { id: 'TRAP-ship-vs-spec', prompt: 'What did we decide and SHIP about Lead data being the canonical store, and is that decision still current?', expected: 'docs-analyzer' },   // executed decision (adr013) → NOT thoughts-analyzer
   { id: 'TRAP-spec-vs-ship', prompt: 'Distil the PROPOSED sub-agent eval design and whether the proposal still holds.', expected: 'thoughts-analyzer' },                          // speculative design → NOT docs-analyzer
   { id: 'TRAP-loc-spec',     prompt: 'Find the speculative design/plan docs about the sub-agent eval pipeline.', expected: 'thoughts-locator' },                                    // thoughts/ not docs/
   { id: 'TRAP-loc-decision', prompt: 'Which ADR is the system-of-record for the outbox-delivery decision?', expected: 'docs-locator' },                                            // docs/ not thoughts/
-  // negatives — no specialist should claim these
+  // codebase-sibling disambiguation — find-example vs locate
+  { id: 'CDIS-loc-vs-pat',   prompt: 'Find a working example of an Inngest function with a cron schedule that I can model a new cron job on.', expected: 'codebase-pattern-finder' },// copyable example → NOT codebase-locator
+  // cross-family code-vs-web traps — our code vs external library docs
+  { id: 'TRAP-web-vs-code',  prompt: 'Where is the default request timeout configured for our HubSpot client?', expected: 'codebase-locator' },                                     // OUR code → NOT web-lookup
+  { id: 'TRAP-code-vs-web',  prompt: "What is the default retry behaviour of the Inngest SDK's step.run, according to the Inngest documentation?", expected: 'web-lookup' },         // external library docs → NOT codebase
+  { id: 'TRAP-lookup-vs-research', prompt: 'Compare the trade-offs between Drizzle and Prisma for our stack, synthesising across multiple sources and benchmarks.', expected: 'web-research' }, // synthesis → NOT web-lookup
+  // negatives — no read-only specialist should claim these
   { id: 'NEG-commit', prompt: 'Write a conventional-commit message for the staged changes.', expected: 'none' },
   { id: 'NEG-impl',   prompt: 'Refactor the outbox sweep to batch deliveries in groups of 50.', expected: 'none' },
 ]

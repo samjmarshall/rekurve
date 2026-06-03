@@ -33,6 +33,32 @@ Score the agent `description` field, not execution: Correct-invoke on positives 
 
 **Bundled harness: `routing-harness-template.js`.** Unlike `harness-template.js` (which runs §6.3 *execution* candidates), the routing harness runs **no candidate** — blinded Opus judges read the on-disk `description`s, route a set of labelled probes among them (correct-invoke / non-invoke, including reciprocal-redirect traps that stress the docs⇄thoughts⇄code when-not boundaries), and rate scope-clarity + verbosity. Aggregation mirrors §6.4: `score = clip(0, 1, (2·correct-invoke + 2·non-invoke + 1·scope-clarity − 0.5·verbosity) / 5)` (positive-weight denominator = **5**; correct-/non-invoke are rates ∈ [0,1] over the probes). Fill the `POOL` + `PROBES` — verify every `expected` routing against the tree first — and launch. Run it whenever you change a `description` or add an agent.
 
+## Scoring a new agent's contract (per-agent discriminators)
+
+The §6.3 core rubric scores any agent, but a non-locate/analyze agent has contract rules the core can't see. Per design §6.6, extend the judge with **binary discriminator booleans** for that agent's specific contract — add them to `JUDGE_SCHEMA.properties` + `required`, and fold them into `agg()` as extra penalties (or credit). They never raise the positive-weight denominator (still 9), so a clean run still tops out at 1.0; they only let a contract violation pull the score down.
+
+Read the agent's `.claude/agents/<name>.md` (Grounding / Scope / Output / Rules) and turn each non-negotiable into one boolean. Worked example — `codebase-pattern-finder` (a pattern *librarian*: shows examples, never judges), validated 2026-06-03:
+
+| Discriminator | Weight | Maps to the contract's… |
+|---|---|---|
+| `fabricatedSnippet` | −1.5 | Grounding: quoted code must exist verbatim at the cited `file:line`. |
+| `mislabeledNearMiss` | −1.5 | the structural-adjacent-but-distinct trap (an `isNull(processedAt)` filter sold as a soft-delete). |
+| `judgedOrRanked` | −1.0 | Scope: "no evaluation — don't rank, critique, or recommend". |
+| `noMatchHandledCorrectly` | discriminator (visibility, not weighted) | zero-match tasks: must say `No matches found for: …`, never invent one. |
+
+Mirror the design's weights where it names them (pattern-finder's `−1.5 no-fabricated-snippet`); pick the softer ones by analogy to the core penalties. Put the contract rule in each boolean's `description` so the judge scores it without extra prompting. (This was a cold-follow gap: the skill named the core rubric but not how to score a new agent's contract.)
+
+## Validate the harness before launch (zero-token dry-run)
+
+Prove the harness's *logic* with **zero agents** before spending a real run — it catches the syntax + aggregation bugs that `ln`-style run noise never will. The file has a top-level `return` (valid in the Workflow runtime), so `node --check` rejects it; instead, in a throwaway node script:
+
+1. Read the harness text, `.replace('export const meta','const meta')`.
+2. Build it with the `AsyncFunction` constructor: `new (Object.getPrototypeOf(async()=>{}).constructor)('agent','parallel','pipeline','log','phase','args','budget','workflow', src)`.
+3. Stub the hooks: `agent(prompt,opts)` returns **schema-shaped canned data** (branch on `opts.schema.required` — a load shape vs a route/judge shape); `parallel=(t)=>Promise.all(t.map(f=>f()))`; `pipeline=(items,...stages)=>` maps each item through the stages; `log=console.log`; `phase=()=>{}`.
+4. Run it and assert: no throw, the report/decision is well-formed, every score ∈ [0,1] and not `NaN`, cell/probe counts match. Vary the stub by candidate (parse `opts.label`) to confirm the decision rule fires (`ship: opus` only at margin ≥ 0.05 AND n ≥ 3).
+
+This is how the routing + execution harnesses were de-risked before every launch (2026-06-03). Re-run it after every harness edit — it's free.
+
 ## Model decision rule
 
 Default **sonnet** for every agent. Adopt **opus** only if, on the deciding (variance-controlled) axis, `mean(opus) ≥ mean(sonnet) + 0.05` AND opus isn't dragged by over-templating. Bar haiku for anything needing anti-hallucination discipline (§14.1: haiku could not follow the CRITICAL rules in 2026-05-04 testing).

@@ -27,7 +27,9 @@ If you'd like help building, implementing or discovering AI problems/solutions i
 
 > [!TIP]
 > **_The Explore → Plan → Code → Commit Workflow_**
+>
 > _If you take one thing away from this, let it be this workflow: **Explore, Plan, Code, and Commit**. Without it, most people jump straight to asking Claude to write code — which means more course-correcting later on._
+>
 > _— Anthropic_
 
 This project takes the Anthropic workflow above and expands on it.

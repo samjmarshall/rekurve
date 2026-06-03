@@ -23,6 +23,15 @@ If you would like help with building, implementing or simply discovering problem
 
 ### Primary Workflow
 
+![Explore, Plan, Code, Commit](./explore-plan-code-commit.png)
+
+> [!TIP]
+> **_The Explore → Plan → Code → Commit Workflow_**
+> _If you take one thing away from this, let it be this workflow: **Explore, Plan, Code, and Commit**. Without it, most people jump straight to asking Claude to write code — which means more course-correcting later on._
+> _— Anthropic_
+
+This project takes the Anthropic workflow above and expands on it.
+
 ![Claude Code Workflow](./claude-code-workflow.png)
 
 Not every task uses every step. Small fixes can skip straight to Implement → Commit. The full flow is available when needed.

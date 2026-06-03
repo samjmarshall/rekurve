@@ -13,7 +13,8 @@ Produce a complete, actionable plan at `thoughts/plans/YYYY-MM-DD-ENG-XXXX-descr
    - **Where code lives** → `codebase-locator`
    - **How it works** (data flow, signatures, call paths) → `codebase-analyzer`
    - **Prior art to mirror** (patterns, conventions, test setups) → `codebase-pattern-finder`
-   - **Broad or cross-cutting scope** the three don't fit → `Explore`
+   - **Prior decisions & context** (designs, plans, research in `thoughts/`) → `thoughts-locator` to find, then `thoughts-analyzer` to distil one
+   - **Broad or cross-cutting scope** the others don't fit → `Explore`
 
    Demand `file:line` for every claim. Reuse existing helpers before writing new ones.
 2. **Align.** Share a 2–4 bullet design sketch and get explicit agreement. Ask only what code cannot answer.

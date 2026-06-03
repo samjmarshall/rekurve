@@ -34,7 +34,11 @@ If you'd like help building, implementing or discovering AI problems/solutions i
 
 This project takes the Anthropic workflow above and expands on it.
 
-![Claude Code Workflow](./claude-code-workflow.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./workflow-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./workflow.png">
+  <img alt="Claude Code Workflow" src="./workflow.png">
+</picture>
 
 Not every task uses every step. Small fixes can skip straight to Implement → Commit. The full flow is available when needed.
 
@@ -46,7 +50,11 @@ Not every task uses every step. Small fixes can skip straight to Implement → C
 > 2. **Surprising without context** — A future reader will wonder "why did they do it this way?"
 > 3. **The result of a real trade-off** — There were genuine alternatives and you picked one for specific reasons
 
-![Claude Code ADR Workflow](./claude-code-adr-workflow.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./adr-workflow-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./adr-workflow.png">
+  <img alt="Claude Code ADR Workflow" src="./adr-workflow.png">
+</picture>
 
 ### Interactive Claude Skills/Commands
 

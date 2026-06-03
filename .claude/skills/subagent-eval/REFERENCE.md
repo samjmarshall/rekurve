@@ -31,6 +31,8 @@ Positive-weight denominator = **9** (2+2+2+1+1+1), so a clean run scores exactly
 
 Score the agent `description` field, not execution: Correct-invoke on positives (+2), Non-invoke on negatives (+2), Scope-clarity what/when/when-not (0/0.5/1.0), Verbosity penalty if >60 words without routing value (−0.5). Run this as a separate pass when you change descriptions.
 
+**Bundled harness: `routing-harness-template.js`.** Unlike `harness-template.js` (which runs §6.3 *execution* candidates), the routing harness runs **no candidate** — blinded Opus judges read the on-disk `description`s, route a set of labelled probes among them (correct-invoke / non-invoke, including reciprocal-redirect traps that stress the docs⇄thoughts⇄code when-not boundaries), and rate scope-clarity + verbosity. Aggregation mirrors §6.4: `score = clip(0, 1, (2·correct-invoke + 2·non-invoke + 1·scope-clarity − 0.5·verbosity) / 5)` (positive-weight denominator = **5**; correct-/non-invoke are rates ∈ [0,1] over the probes). Fill the `POOL` + `PROBES` — verify every `expected` routing against the tree first — and launch. Run it whenever you change a `description` or add an agent.
+
 ## Model decision rule
 
 Default **sonnet** for every agent. Adopt **opus** only if, on the deciding (variance-controlled) axis, `mean(opus) ≥ mean(sonnet) + 0.05` AND opus isn't dragged by over-templating. Bar haiku for anything needing anti-hallucination discipline (§14.1: haiku could not follow the CRITICAL rules in 2026-05-04 testing).
@@ -55,16 +57,21 @@ A sub-agent file created **this session** is NOT in the harness's hot agent regi
 
 The native baseline (`Explore`) is always registered, so the comparison stays fair either way.
 
+## Harness placement — the commit trap
+
+Keep an adapted harness **inline** (paste it as the Workflow `script`) or in **`/tmp`**. Never save it under `.claude/eval/` or any other Biome-linted path: a top-level `return` (valid in the Workflow runtime) is a **Biome parse error**, and the husky pre-commit runs `make check` → Biome over `**`, so the bad parse **blocks every commit in the repo** until the file is moved. `.claude/skills/` is the one `.claude/` path Biome excludes (`biome.json`: `!.claude/skills`) — which is why the bundled `*-harness-template.js` files live there safely. To iterate, edit the copy the Workflow tool persists to the session dir (it returns the path), not a repo file.
+
 ## Safety review (mandatory after any multi-agent run)
 
 - ☐ `git status --porcelain` — every change is inside the intended seam (the agent file(s), command wiring, research doc). `thoughts/` is gitignored, so the research doc won't appear — confirm it's on disk separately.
-- ☐ `ls .claude/agents/*.md | wc -l` — roster count unchanged (catch a stray deletion).
-- ☐ `git restore` / remove anything a sub-agent wrote outside the seam.
-- The agents' read-only-`Bash` Grounding fence is the structural mitigation; verify after the fact regardless.
+- ☐ `ls .claude/agents/*.md | wc -l` — roster count unchanged.
+- ☐ `git restore` / remove anything written outside the seam.
+- **Verify provenance before blaming a sub-agent.** If the working tree shifted mid-run, check `git reflog` + commit author first — it's usually the operator's own concurrent commit/branch switch, not a sub-agent. The registered agents' read-only-`Bash` fence makes a destructive sub-agent write unlikely; judges run with default tools, so still verify the seam.
 
-## Lessons from the three runs
+## Lessons from the runs
 
-- **Need headroom to discriminate.** A well-curated repo (explicit Status frontmatter, clear titles, cross-links) lets even `Explore@haiku` hit ~1.0 on analyze tasks — so the specialist *ties* rather than beats. Build at least one hard/adversarial task, and report ties honestly. The specialist's edge often lives in LOCATE + routing discipline, not analyze accuracy.
+- **Need headroom to discriminate.** A well-curated repo (explicit Status frontmatter, clear titles, cross-links) lets even `Explore@haiku` hit ~1.0 on analyze tasks — so the specialist *ties* rather than beats (confirmed four times, incl. the codebase webhook smoke). Build at least one hard/adversarial task, and report ties honestly. The specialist's edge often lives in LOCATE + routing discipline, not analyze accuracy.
 - **Real-tool-invocation is a proxy** in a Workflow (no transcript `tool_uses` mid-run) — the judge's path-verification covers the fabricated-path case.
-- **Variance is large** on prose tasks — a single run swings; the ≥3×≥2 control is what makes the model decision trustworthy.
+- **Variance is large — on locates too, not just prose.** A single run swings: one `codebase-locator@sonnet` run fabricated an `ln` naming scheme (2026-06-03 smoke) and flipped the decision rule to opus. The ≥3×≥2 control is what makes ANY model decision trustworthy — never decide from an n<3 cell.
+- **A verify-first judge can be more correct than the oracle.** In the smoke the panel flagged the oracle's own PRODUCERS mislabel (only the enqueuer produces). Trust the tree; fix the oracle when the judge is right.
 - **Corpus grows itself** — the `SubagentStop` harvest hook appends real runs to `corpus.jsonl`; mine before each eval to benchmark on real prompts.

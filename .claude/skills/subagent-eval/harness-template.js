@@ -115,13 +115,17 @@ function meanOver(kind, candId) {
   const cs = cells.filter(c => runs.find(r=>r.taskId===c.taskId&&r.kind===kind) && c.candidateId===candId)
   return cs.length ? Number((cs.reduce((a,c)=>a+c.meanScore,0)/cs.length).toFixed(3)) : null
 }
-// Decision rule: default sonnet; adopt opus only if mean(opus) >= mean(sonnet)+0.05.
+// Decision rule: default sonnet; adopt opus only if mean(opus) >= mean(sonnet)+0.05
+// AND the deciding axis is variance-controlled (>=3 runs). A single run can fabricate and flip
+// the rule to opus on noise (the `ln` incident, 2026-06-03 smoke) — never promote from an n<3 cell.
 const decision = {}
 for (const kind of ['locate','analyze']) {
   const sonnet = meanOver(kind,'specialist-sonnet'), opus = meanOver(kind,'specialist-opus'), base = meanOver(kind,'explore-haiku')
-  decision[kind] = { baseline:base, sonnet, opus, beatsBaseline: sonnet!=null && base!=null && sonnet>base,
-                     ship: (opus!=null && sonnet!=null && opus-sonnet>=0.05) ? 'opus' : 'sonnet' }
-  log(`${kind}: baseline=${base} sonnet=${sonnet} opus=${opus} -> ship ${decision[kind].ship}`)
+  const decidingN = Math.min(Infinity, ...cells.filter(c => runs.find(r=>r.taskId===c.taskId&&r.kind===kind)).map(c=>c.nRuns))
+  const promote = opus!=null && sonnet!=null && opus-sonnet>=0.05
+  decision[kind] = { baseline:base, sonnet, opus, decidingN, beatsBaseline: sonnet!=null && base!=null && sonnet>base,
+                     ship: promote ? (decidingN>=3 ? 'opus' : `inconclusive: opus>sonnet but deciding axis n=${decidingN}<3 — re-run >=3x>=2 before promoting`) : 'sonnet' }
+  log(`${kind}: baseline=${base} sonnet=${sonnet} opus=${opus} n=${decidingN} -> ${decision[kind].ship}`)
 }
 
 return { decision, cells, runs }

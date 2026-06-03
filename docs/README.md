@@ -4,7 +4,7 @@
 
 Hi, I'm Sam and this is an AI sales assistant I built for my wife, a Sales Consultant for a new home builder in Brisbane, Australia.
 
-The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC. To do this properly, I chose to solve a real-world problem with a real commercial need.
+The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC). To do this properly, I chose to solve a real-world problem with a real commercial need.
 
 This is my sandbox project; where I get to test, tweak and tune my AI Agent coding harness, and try new technologies.
 

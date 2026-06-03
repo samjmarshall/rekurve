@@ -1,6 +1,6 @@
 ---
 name: thoughts-analyzer
-description: Extracts decisions, constraints, and specs from specific `thoughts/` documents you already have paths to, and flags whether they still hold. Use to distil what a design, plan, or research doc actually concluded. Not for finding which documents exist (use thoughts-locator) or analyzing code (use codebase-analyzer).
+description: Extracts decisions, constraints, and specs from specific `thoughts/` documents you already have paths to, and flags whether they still hold. Use to distil what a draft design, plan, or research doc proposed — speculative material whose staleness must be inferred. Not for executed decisions of record (use docs-analyzer for ADRs/feature docs), finding which documents exist (use thoughts-locator), or analyzing code (use codebase-analyzer).
 tools: Read, Bash
 color: blue
 model: sonnet

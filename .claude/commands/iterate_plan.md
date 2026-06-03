@@ -77,6 +77,8 @@ If the user's feedback requires understanding new code patterns or validating as
    **For historical context:**
    - **@agent-thoughts-locator** - To find related research or decisions
    - **@agent-thoughts-analyzer** - To extract insights from documents
+   - **@agent-docs-locator** - To find ADRs / feature docs of record in `docs/`
+   - **@agent-docs-analyzer** - To distil an ADR's decision + recorded Status, or a feature doc as shipped
 
 3. **Read any new files identified by research**:
    - Read them FULLY into the main context

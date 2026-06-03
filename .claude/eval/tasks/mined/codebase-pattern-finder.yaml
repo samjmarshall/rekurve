@@ -1,0 +1,342 @@
+agent: codebase-pattern-finder
+_generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
+_needs_review: true
+_note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/codebase-pattern-finder.yaml
+  alongside golden + adversarial buckets.
+_mined_available: 3
+_mined_emitted: 3
+execution:
+- id: mined-codebase-pattern-finder-exec-1
+  kind: execution
+  prompt: 'Find the existing patterns and test conventions for adding a lead-intake path, with concrete
+    code examples and `file:line` references.
+
+
+    Specifically:
+
+    1. How the existing intake functions are structured — signature, validation, transaction/batch write,
+    post-commit event emission.
+
+    2. How outbox events are emitted from intake.
+
+    3. How intake is tested — both the unit-test patterns and the integration-test patterns (setup, env
+    gating, cleanup, assertions).
+
+
+    Show representative snippets a new intake path can be modeled after. At the end, report roughly how
+    many files you examined.'
+  provenance:
+    agent_id: a4059781affb048fd
+    session_id: 567ba076-897a-4b05-a1a2-692d7b2a538f
+    model: claude-sonnet-4-6
+    latency_s: 113.44
+    tokens_total: 733991
+    n_tool_uses: 23
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/567ba076-897a-4b05-a1a2-692d7b2a538f/subagents/agent-a4059781affb048fd.jsonl
+  sample_output_excerpt: 'I now have a thorough picture of all the patterns. Here is the full catalog.
+
+
+    ---
+
+
+    ## Pattern Examples: Lead Intake Path
+
+
+    ---
+
+
+    ### 1. Intake Function Signature and Structure
+
+
+    **Found in**: `/Users/sam/workspace/rekurve/rekurve/src/server/leads/intake.ts:106-196`
+
+
+    The shared context type is declared at the bottom of the file and passed as the last argument to every
+    intake function:
+
+
+    ```typescript
+
+    / …'
+- id: mined-codebase-pattern-finder-exec-2
+  kind: execution
+  prompt: I'm about to add a **Stripe payment sync job** and want to mirror any existing **watermark-based
+    incremental sync** pattern already in this codebase (reads a last-synced cursor/timestamp, fetches
+    only records changed since it, persists the new cursor after a successful run). Find that prior-art
+    pattern and quote the concrete code (with `file:line`) I should model on.
+  provenance:
+    agent_id: a061c5af4ee982c84
+    session_id: 3ce642ee-8f35-4ce0-b441-721b7230e513
+    model: claude-sonnet-4-6
+    latency_s: 76.39
+    tokens_total: 513558
+    n_tool_uses: 23
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/3ce642ee-8f35-4ce0-b441-721b7230e513/subagents/agent-a061c5af4ee982c84.jsonl
+  sample_output_excerpt: 'I now have a complete view of the codebase. Here is the finding:
+
+
+    ---
+
+
+    ## Pattern Examples: Incremental / Watermark-Based Sync
+
+
+    **There is no watermark-based incremental sync pattern in this codebase yet.** Every scheduled job
+    here uses one of two alternative strategies. Both are documented below so you can see what prior art
+    exists to anchor your Stripe job against.
+
+
+    ---
+
+
+    ### Pattern 1: Time-wind …'
+- id: mined-codebase-pattern-finder-exec-3
+  kind: execution
+  prompt: 'I''m planning integration + unit tests for new Inngest worker functions in issue #261 (email
+    dispatch worker with `step.run` and `step.waitForEvent` + a timeout path). I need existing test patterns
+    to mirror.
+
+
+    Find and show concrete code examples (with `file:line`) for:
+
+
+    1. **Inngest function unit/integration tests** — how existing Inngest functions are tested in this
+    repo. Look for tests that construct a function and invoke it with mocked `step` (`step.run`, `step.waitForEvent`,
+    `step.sendEvent`), or that use an Inngest test harness. Show the full setup: how `step` is mocked/stubbed,
+    how `event.data` is passed, how assertions are made on DB state afterward. The nurture/Follow-up plan
+    Inngest functions (recently migrated in #295, commit df21fdd) are the best candidates — show their
+    tests.
+
+
+    2. **`step.waitForEvent` timeout testing** — any test that exercises a timeout/virtual-time path on
+    an Inngest function. If none exists, say so explicitly and show the closest analog.
+
+
+    3. **Outbox integration tests** — tests that assert an outbox row was inserted with a given event
+    name + payload after a mutation, and/or tests that exercise the outbox sweep. Show the DB-assertion
+    idiom (these hit real Neon branches per CLAUDE.md — show how they set up and tear down).
+
+
+    4. **tRPC mutation integration tests** — how `messages.approve` / `messages.editAndApprove` or sibling
+    mutations are tested today (the caller/context setup, how they seed a `message_queue` row, how they
+    assert post-mutation DB state).
+
+
+    5. **MS Graph / HubSpot SDK mocking** — how existing tests mock or stub the Microsoft Graph client
+    and the HubSpot client, so I can assert "Graph `/me/sendMail` was called with `internetMessageId ===
+    messageId`" without hitting real services.
+
+
+    6. **E2E test structure** for the dashboard approve→send flow, if any exists — the Playwright spec
+    that approves a queued message, and how it cleans up (per-spec cleanup by phone/email per CLAUDE.md).
+
+
+    For each, give the file path, line numbers, and a representative snippet. Prioritize the Rstest unit/integration
+    idiom (the repo uses Rstest, not Jest/Vitest). If a pattern genuinely doesn''t exist yet, say so clearly
+    rather than inventing one.'
+  provenance:
+    agent_id: aa992bc2954a97d9a
+    session_id: 6ea3af65-da4f-498d-a372-653fa064a7a8
+    model: claude-sonnet-4-6
+    latency_s: 137.12
+    tokens_total: 857084
+    n_tool_uses: 22
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/6ea3af65-da4f-498d-a372-653fa064a7a8/subagents/agent-aa992bc2954a97d9a.jsonl
+  sample_output_excerpt: 'I have all the patterns needed. Here is a complete reference for each area you
+    asked about.
+
+
+    ---
+
+
+    ## Pattern Examples: Inngest / Outbox / tRPC / Graph Mocking / E2E
+
+
+    ---
+
+
+    ### 1. Inngest Function Unit Tests — hand-rolled step mocks
+
+
+    **Found in**: `/Users/sam/workspace/rekurve/rekurve/src/inngest/functions/nurture/__tests__/nurture-plan-runner.test.ts:20-182`
+
+
+    The dominant pattern: `rs.resetModules( …'
+routing:
+  positives:
+  - id: mined-codebase-pattern-finder-route-pos-1
+    kind: routing
+    expect_invoke: true
+    prompt: 'Find the existing patterns and test conventions for adding a lead-intake path, with concrete
+      code examples and `file:line` references.
+
+
+      Specifically:
+
+      1. How the existing intake functions are structured — signature, validation, transaction/batch write,
+      post-commit event emission.
+
+      2. How outbox events are emitted from intake.
+
+      3. How intake is tested — both the unit-test patterns and the integration-test patterns (setup,
+      env gating, cleanup, assertions).
+
+
+      Show representative snippets a new intake path can be modeled after. At the end, report roughly
+      how many files you examined.'
+  - id: mined-codebase-pattern-finder-route-pos-2
+    kind: routing
+    expect_invoke: true
+    prompt: I'm about to add a **Stripe payment sync job** and want to mirror any existing **watermark-based
+      incremental sync** pattern already in this codebase (reads a last-synced cursor/timestamp, fetches
+      only records changed since it, persists the new cursor after a successful run). Find that prior-art
+      pattern and quote the concrete code (with `file:line`) I should model on.
+  - id: mined-codebase-pattern-finder-route-pos-3
+    kind: routing
+    expect_invoke: true
+    prompt: 'I''m planning integration + unit tests for new Inngest worker functions in issue #261 (email
+      dispatch worker with `step.run` and `step.waitForEvent` + a timeout path). I need existing test
+      patterns to mirror.
+
+
+      Find and show concrete code examples (with `file:line`) for:
+
+
+      1. **Inngest function unit/integration tests** — how existing Inngest functions are tested in this
+      repo. Look for tests that construct a function and invoke it with mocked `step` (`step.run`, `step.waitForEvent`,
+      `step.sendEvent`), or that use an Inngest test harness. Show the full setup: how `step` is mocked/stubbed,
+      how `event.data` is passed, how assertions are made on DB state afterward. The nurture/Follow-up
+      plan Inngest functions (recently migrated in #295, commit df21fdd) are the best candidates — show
+      their tests.
+
+
+      2. **`step.waitForEvent` timeout testing** — any test that exercises a timeout/virtual-time path
+      on an Inngest function. If none exists, say so explicitly and show the closest analog.
+
+
+      3. **Outbox integration tests** — tests that assert an outbox row was inserted with a given event
+      name + payload after a mutation, and/or tests that exercise the outbox sweep. Show the DB-assertion
+      idiom (these hit real Neon branches per CLAUDE.md — show how they set up and tear down).
+
+
+      4. **tRPC mutation integration tests** — how `messages.approve` / `messages.editAndApprove` or sibling
+      mutations are tested today (the caller/context setup, how they seed a `message_queue` row, how they
+      assert post-mutation DB state).
+
+
+      5. **MS Graph / HubSpot SDK mocking** — how existing tests mock or stub the Microsoft Graph client
+      and the HubSpot client, so I can assert "Graph `/me/sendMail` was called with `internetMessageId
+      === messageId`" without hitting real services.
+
+
+      6. **E2E test structure** for the dashboard approve→send flow, if any exists — the Playwright spec
+      that approves a queued message, and how it cleans up (per-spec cleanup by phone/email per CLAUDE.md).
+
+
+      For each, give the file path, line numbers, and a representative snippet. Prioritize the Rstest
+      unit/integration idiom (the repo uses Rstest, not Jest/Vitest). If a pattern genuinely doesn''t
+      exist yet, say so clearly rather than inventing one.'
+  negatives:
+  - id: mined-codebase-pattern-finder-route-neg-1
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-analyzer
+    confusability: 0.175
+    prompt: 'I''m planning issue #261 which adds new Inngest worker functions fed by the transactional
+      outbox (ADR-014/ADR-017). I need to understand the EXISTING outbox + Inngest infrastructure so my
+      new functions mirror it exactly.
+
+
+      Report with `file:line` for every claim:
+
+
+      1. The `outbox` table schema — full column list, types, the id type (uuid?), `processedAt`, `attempts`,
+      `lastError`, `createdAt`, and the event-name/payload columns. Where is it defined?
+
+
+      2. How outbox rows are inserted inside a transaction. ADR-017 mentions `db.batch()` over neon-http.
+      Find a concrete write site (e.g. the recent nurture migration #295, or the leads cutover #286/#288,
+      or contact.creation) that does: open transaction → canonical DB write → insert outbox row → commit
+      → post-commit `inngest.send`. Show the full pattern including the helper (is there an `outbox.publish(tx,
+      event, payload)` helper, or is it inline?).
+
+
+      3. The cron sweep that delivers outbox rows — `outbox-sweep`. Where it lives, the SQL query, how
+      it sets `processedAt` / increments `attempts`, and how it uses the outbox row id as the Inngest
+      idempotency key.
+
+
+      4. The Inngest client and event-type definitions. Where are event names and payload types declared
+      (e.g. a typed `EventSchemas` / `Events` map)? Show how an event like `message.approval-requested`,
+      `hubspot.email.engagement-created`, `hubspot.engagement-missed` would be (or are) declared. Are
+      any of these three events already declared?
+
+
+      5. The MOST RECENT Inngest worker as the canonical pattern to mirror — the nurture migration from
+      commit df21fdd (#295) "migrate Follow-up plans to Inngest". Show: the full `inngest.createFunction(...)`
+      definition, how it declares `{ id, name }`, the `{ event: "..." }` trigger, any `if`/filter on event
+      data, the `step.run(...)` calls, and any `step.waitForEvent(...)` usage anywhere in the codebase.
+      I need the exact import surface and idiom.
+
+
+      6. How Inngest functions are registered/served — the `serve()` endpoint (likely `src/app/api/inngest/route.ts`
+      or similar) and the array of functions it exports. I need to know where to add my new functions.
+
+
+      7. Concurrency/idempotency config on existing functions — do they set `idempotency`, `concurrency`,
+      or `retries` in the createFunction options? Show an example.
+
+
+      Report exact paths, line numbers, signatures, and code snippets. Describe only what exists; do not
+      propose changes.'
+  - id: mined-codebase-pattern-finder-route-neg-2
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-locator
+    confusability: 0.151
+    prompt: 'Locate every file involved in the lead-intake / lead-creation flow, for planning a new public
+      web-form intake path (a third path alongside HubSpot webhook ingestion and manual capture).
+
+
+      Include and group by role:
+
+      - the intake logic itself
+
+      - the lead database schema
+
+      - the outbox / domain-event plumbing intake uses
+
+      - the API / route layer that calls intake
+
+      - all unit + integration test files covering intake
+
+
+      Give paths and the key exported symbols in each. At the end, report roughly how many files you found.'
+  - id: mined-codebase-pattern-finder-route-neg-3
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-locator
+    confusability: 0.118
+    prompt: 'I''m debugging a failing E2E test about HubSpot outbound sync. I need to find ALL the code
+      that syncs a newly-created lead OUT to HubSpot (creating or updating a HubSpot contact from a lead).
+
+
+      Specifically locate:
+
+      1. The "lead outbox worker" / outbox processor that was recently introduced (PR called "lead-outbox-cutover").
+      Where leads are picked up and pushed to HubSpot.
+
+      2. The HubSpot API client wrapper functions that create or update a contact — anything that calls
+      HubSpot''s contacts create/update/upsert/search APIs. Look for terms like `basicApi.create`, `basicApi.update`,
+      `searchApi.doSearch`, `idProperty`, `createOrUpdate`, `upsert`, `hubspotContactId`.
+
+      3. The mapping from a lead''s fields (firstName, lastName, email, phone) to HubSpot contact properties
+      (firstname, lastname, email, phone).
+
+      4. Any logic that handles the case where a HubSpot contact ALREADY EXISTS for a given email (dedup
+      by email) — does it update the existing contact''s properties or just link to it?
+
+
+      The relevant code is under src/ (likely src/server, src/inngest, or src/lib). Report exact file
+      paths and the key function names/line numbers for each. Do not analyze deeply yet — just locate
+      and give me a precise map of the relevant files and functions.'

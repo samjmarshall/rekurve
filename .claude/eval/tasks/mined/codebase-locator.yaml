@@ -1,0 +1,419 @@
+agent: codebase-locator
+_generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
+_needs_review: true
+_note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/codebase-locator.yaml alongside
+  golden + adversarial buckets.
+_mined_available: 5
+_mined_emitted: 5
+execution:
+- id: mined-codebase-locator-exec-1
+  kind: execution
+  prompt: 'Locate every file involved in the lead-intake / lead-creation flow, for planning a new public
+    web-form intake path (a third path alongside HubSpot webhook ingestion and manual capture).
+
+
+    Include and group by role:
+
+    - the intake logic itself
+
+    - the lead database schema
+
+    - the outbox / domain-event plumbing intake uses
+
+    - the API / route layer that calls intake
+
+    - all unit + integration test files covering intake
+
+
+    Give paths and the key exported symbols in each. At the end, report roughly how many files you found.'
+  provenance:
+    agent_id: ac8157da7f9fdaf56
+    session_id: 567ba076-897a-4b05-a1a2-692d7b2a538f
+    model: claude-sonnet-4-6
+    latency_s: 76.86
+    tokens_total: 436964
+    n_tool_uses: 31
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/567ba076-897a-4b05-a1a2-692d7b2a538f/subagents/agent-ac8157da7f9fdaf56.jsonl
+  sample_output_excerpt: "Now I have everything needed for a complete picture.\n\n---\n\n## File Locations\
+    \ for Lead Intake / Lead-Creation Flow\n\n### Intake Logic (core)\n\n- `/Users/sam/workspace/rekurve/rekurve/src/server/leads/intake.ts`\n\
+    \  Exported symbols: `captureLeadFromHubspot`, `captureLead`, `updateLead`, `IntakeCtx`\n\n- `/Users/sam/workspace/rekurve/rekurve/src/server/leads/owner.ts`\n\
+    \  Exported symbol: `resolveLeadOwnerU …"
+- id: mined-codebase-locator-exec-2
+  kind: execution
+  prompt: 'I''m debugging a failing E2E test about HubSpot outbound sync. I need to find ALL the code
+    that syncs a newly-created lead OUT to HubSpot (creating or updating a HubSpot contact from a lead).
+
+
+    Specifically locate:
+
+    1. The "lead outbox worker" / outbox processor that was recently introduced (PR called "lead-outbox-cutover").
+    Where leads are picked up and pushed to HubSpot.
+
+    2. The HubSpot API client wrapper functions that create or update a contact — anything that calls
+    HubSpot''s contacts create/update/upsert/search APIs. Look for terms like `basicApi.create`, `basicApi.update`,
+    `searchApi.doSearch`, `idProperty`, `createOrUpdate`, `upsert`, `hubspotContactId`.
+
+    3. The mapping from a lead''s fields (firstName, lastName, email, phone) to HubSpot contact properties
+    (firstname, lastname, email, phone).
+
+    4. Any logic that handles the case where a HubSpot contact ALREADY EXISTS for a given email (dedup
+    by email) — does it update the existing contact''s properties or just link to it?
+
+
+    The relevant code is under src/ (likely src/server, src/inngest, or src/lib). Report exact file paths
+    and the key function names/line numbers for each. Do not analyze deeply yet — just locate and give
+    me a precise map of the relevant files and functions.'
+  provenance:
+    agent_id: ad6655c5ea5512eac
+    session_id: 09b668e2-eb3e-4ca5-bf9c-e3168c9f0ad1
+    model: claude-sonnet-4-6
+    latency_s: 86.51
+    tokens_total: 424469
+    n_tool_uses: 25
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/09b668e2-eb3e-4ca5-bf9c-e3168c9f0ad1/subagents/agent-ad6655c5ea5512eac.jsonl
+  sample_output_excerpt: 'Here is the complete map of all relevant files and key function/line references:
+
+
+    ---
+
+
+    ## File Locations for HubSpot Outbound Sync
+
+
+    ### 1. Lead Outbox Worker (the "lead-outbox-cutover" path)
+
+
+    **Outbox schema (DB table):**
+
+    - `/Users/sam/workspace/rekurve/rekurve/src/server/db/schema/outbox.ts` — `outbox` table definition
+    (columns: `id`, `eventName`, `payload`, `processedAt`, `attempts`, `lastError` …'
+- id: mined-codebase-locator-exec-3
+  kind: execution
+  prompt: 'I''m debugging an e2e test about HubSpot outbound sync dedup behavior. I need to locate all
+    code involved in syncing a lead to HubSpot — specifically the path that creates a contact OR, when
+    a contact with the same email already exists, deduplicates/links to the existing contact.
+
+
+    Find and report file paths (with brief descriptions) for:
+
+    1. The outbox worker/processor that syncs leads to HubSpot (mentioned as "DB-first outbox worker"
+    / "outbox cutover"). Look in src/server/outbox/ and src/inngest/.
+
+    2. The HubSpot client wrapper that does create/update/upsert of contacts (search by email, create
+    contact, update contact, handle 409 duplicate conflicts).
+
+    3. The lead intake logic (src/server/leads/intake.ts).
+
+    4. Any code that handles HubSpot duplicate-email conflicts (409 errors) and extracts the existing
+    contact ID.
+
+    5. The recently-changed files from PR #288 "drop edit arms; ingest contact.creation via scored outbox"
+    — likely a hubspot-webhook handler.
+
+
+    For each relevant file, give the path and a one-line description of what it does. Do NOT analyze deeply
+    — just locate and map the files.'
+  provenance:
+    agent_id: a11d5e4259ab55ed7
+    session_id: b973838c-28e9-4842-9e08-7dfb3fb043d1
+    model: claude-sonnet-4-6
+    latency_s: 44.86
+    tokens_total: 168765
+    n_tool_uses: 12
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/b973838c-28e9-4842-9e08-7dfb3fb043d1/subagents/agent-a11d5e4259ab55ed7.jsonl
+  sample_output_excerpt: 'Here is the complete map of all files involved in the HubSpot outbound sync
+    path:
+
+
+    ---
+
+
+    ## File Locations for HubSpot Lead Sync / Dedup
+
+
+    ### 1. Outbox Worker / Processor (DB-first outbox pattern)
+
+
+    - `/Users/sam/workspace/rekurve/rekurve/src/inngest/functions/outbox/sweep.ts` — Inngest function
+    that sweeps the outbox and dispatches pending sync jobs to HubSpot
+
+    - `/Users/sam/workspace/rekurve/rekurv …'
+- id: mined-codebase-locator-exec-4
+  kind: execution
+  prompt: 'Locate where **lead scoring** lives in this codebase. Return file locations only — do not explain
+    behavior — grouped by purpose:
+
+
+    1. The scoring module''s source files
+
+    2. Every place lead scoring is invoked / called from
+
+    3. The scoring tests
+
+
+    Give full paths from the repo root.'
+  provenance:
+    agent_id: a9468283edc33132f
+    session_id: 3ce642ee-8f35-4ce0-b441-721b7230e513
+    model: claude-sonnet-4-6
+    latency_s: 51.07
+    tokens_total: 141300
+    n_tool_uses: 11
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/3ce642ee-8f35-4ce0-b441-721b7230e513/subagents/agent-a9468283edc33132f.jsonl
+  sample_output_excerpt: '## File Locations for Lead Scoring
+
+
+    ### 1. Scoring Module Source Files
+
+
+    - `/Users/sam/workspace/rekurve/rekurve/src/server/scoring/index.ts` (module entry point)
+
+    - `/Users/sam/workspace/rekurve/rekurve/src/server/scoring/qualify-and-score.ts` (matches `qualify-and-score`
+    pattern)
+
+    - `/Users/sam/workspace/rekurve/rekurve/src/server/scoring/schema.ts` (schema definitions)
+
+    - `/Users/sam/workspace/reku …'
+- id: mined-codebase-locator-exec-5
+  kind: execution
+  prompt: Locate the Drizzle migration SQL file(s) related to the "outbox" table or the outbox-sweep mechanism
+    in this repo, and the directory they live in. Return only verified file paths (no content descriptions).
+  provenance:
+    agent_id: ac39e0b4e425dd62f
+    session_id: e41b13d1-0f46-41ab-8013-d23578205889
+    model: claude-sonnet-4-6
+    latency_s: 83.16
+    tokens_total: 71572
+    n_tool_uses: 6
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/e41b13d1-0f46-41ab-8013-d23578205889/subagents/agent-ac39e0b4e425dd62f.jsonl
+  sample_output_excerpt: 'The results reveal the outbox table is named `ln` in the database. The relevant
+    migration files are confirmed.
+
+
+    ## File Locations for Outbox / Outbox-Sweep Migration
+
+
+    ### Migration SQL Files (in `/Users/sam/workspace/rekurve/rekurve/drizzle/`)
+
+
+    - `/Users/sam/workspace/rekurve/rekurve/drizzle/0005_rapid_sentinel.sql` — contains `CREATE TABLE
+    "ln"` and `CREATE INDEX "ln_unprocessed_idx"` (the outbox …'
+routing:
+  positives:
+  - id: mined-codebase-locator-route-pos-1
+    kind: routing
+    expect_invoke: true
+    prompt: 'Locate every file involved in the lead-intake / lead-creation flow, for planning a new public
+      web-form intake path (a third path alongside HubSpot webhook ingestion and manual capture).
+
+
+      Include and group by role:
+
+      - the intake logic itself
+
+      - the lead database schema
+
+      - the outbox / domain-event plumbing intake uses
+
+      - the API / route layer that calls intake
+
+      - all unit + integration test files covering intake
+
+
+      Give paths and the key exported symbols in each. At the end, report roughly how many files you found.'
+  - id: mined-codebase-locator-route-pos-2
+    kind: routing
+    expect_invoke: true
+    prompt: 'I''m debugging a failing E2E test about HubSpot outbound sync. I need to find ALL the code
+      that syncs a newly-created lead OUT to HubSpot (creating or updating a HubSpot contact from a lead).
+
+
+      Specifically locate:
+
+      1. The "lead outbox worker" / outbox processor that was recently introduced (PR called "lead-outbox-cutover").
+      Where leads are picked up and pushed to HubSpot.
+
+      2. The HubSpot API client wrapper functions that create or update a contact — anything that calls
+      HubSpot''s contacts create/update/upsert/search APIs. Look for terms like `basicApi.create`, `basicApi.update`,
+      `searchApi.doSearch`, `idProperty`, `createOrUpdate`, `upsert`, `hubspotContactId`.
+
+      3. The mapping from a lead''s fields (firstName, lastName, email, phone) to HubSpot contact properties
+      (firstname, lastname, email, phone).
+
+      4. Any logic that handles the case where a HubSpot contact ALREADY EXISTS for a given email (dedup
+      by email) — does it update the existing contact''s properties or just link to it?
+
+
+      The relevant code is under src/ (likely src/server, src/inngest, or src/lib). Report exact file
+      paths and the key function names/line numbers for each. Do not analyze deeply yet — just locate
+      and give me a precise map of the relevant files and functions.'
+  - id: mined-codebase-locator-route-pos-3
+    kind: routing
+    expect_invoke: true
+    prompt: 'I''m debugging an e2e test about HubSpot outbound sync dedup behavior. I need to locate all
+      code involved in syncing a lead to HubSpot — specifically the path that creates a contact OR, when
+      a contact with the same email already exists, deduplicates/links to the existing contact.
+
+
+      Find and report file paths (with brief descriptions) for:
+
+      1. The outbox worker/processor that syncs leads to HubSpot (mentioned as "DB-first outbox worker"
+      / "outbox cutover"). Look in src/server/outbox/ and src/inngest/.
+
+      2. The HubSpot client wrapper that does create/update/upsert of contacts (search by email, create
+      contact, update contact, handle 409 duplicate conflicts).
+
+      3. The lead intake logic (src/server/leads/intake.ts).
+
+      4. Any code that handles HubSpot duplicate-email conflicts (409 errors) and extracts the existing
+      contact ID.
+
+      5. The recently-changed files from PR #288 "drop edit arms; ingest contact.creation via scored outbox"
+      — likely a hubspot-webhook handler.
+
+
+      For each relevant file, give the path and a one-line description of what it does. Do NOT analyze
+      deeply — just locate and map the files.'
+  - id: mined-codebase-locator-route-pos-4
+    kind: routing
+    expect_invoke: true
+    prompt: 'Locate where **lead scoring** lives in this codebase. Return file locations only — do not
+      explain behavior — grouped by purpose:
+
+
+      1. The scoring module''s source files
+
+      2. Every place lead scoring is invoked / called from
+
+      3. The scoring tests
+
+
+      Give full paths from the repo root.'
+  - id: mined-codebase-locator-route-pos-5
+    kind: routing
+    expect_invoke: true
+    prompt: Locate the Drizzle migration SQL file(s) related to the "outbox" table or the outbox-sweep
+      mechanism in this repo, and the directory they live in. Return only verified file paths (no content
+      descriptions).
+  negatives:
+  - id: mined-codebase-locator-route-neg-1
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-pattern-finder
+    confusability: 0.151
+    prompt: 'Find the existing patterns and test conventions for adding a lead-intake path, with concrete
+      code examples and `file:line` references.
+
+
+      Specifically:
+
+      1. How the existing intake functions are structured — signature, validation, transaction/batch write,
+      post-commit event emission.
+
+      2. How outbox events are emitted from intake.
+
+      3. How intake is tested — both the unit-test patterns and the integration-test patterns (setup,
+      env gating, cleanup, assertions).
+
+
+      Show representative snippets a new intake path can be modeled after. At the end, report roughly
+      how many files you examined.'
+  - id: mined-codebase-locator-route-neg-2
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-analyzer
+    confusability: 0.136
+    prompt: 'I''m planning issue #261 which adds new Inngest worker functions fed by the transactional
+      outbox (ADR-014/ADR-017). I need to understand the EXISTING outbox + Inngest infrastructure so my
+      new functions mirror it exactly.
+
+
+      Report with `file:line` for every claim:
+
+
+      1. The `outbox` table schema — full column list, types, the id type (uuid?), `processedAt`, `attempts`,
+      `lastError`, `createdAt`, and the event-name/payload columns. Where is it defined?
+
+
+      2. How outbox rows are inserted inside a transaction. ADR-017 mentions `db.batch()` over neon-http.
+      Find a concrete write site (e.g. the recent nurture migration #295, or the leads cutover #286/#288,
+      or contact.creation) that does: open transaction → canonical DB write → insert outbox row → commit
+      → post-commit `inngest.send`. Show the full pattern including the helper (is there an `outbox.publish(tx,
+      event, payload)` helper, or is it inline?).
+
+
+      3. The cron sweep that delivers outbox rows — `outbox-sweep`. Where it lives, the SQL query, how
+      it sets `processedAt` / increments `attempts`, and how it uses the outbox row id as the Inngest
+      idempotency key.
+
+
+      4. The Inngest client and event-type definitions. Where are event names and payload types declared
+      (e.g. a typed `EventSchemas` / `Events` map)? Show how an event like `message.approval-requested`,
+      `hubspot.email.engagement-created`, `hubspot.engagement-missed` would be (or are) declared. Are
+      any of these three events already declared?
+
+
+      5. The MOST RECENT Inngest worker as the canonical pattern to mirror — the nurture migration from
+      commit df21fdd (#295) "migrate Follow-up plans to Inngest". Show: the full `inngest.createFunction(...)`
+      definition, how it declares `{ id, name }`, the `{ event: "..." }` trigger, any `if`/filter on event
+      data, the `step.run(...)` calls, and any `step.waitForEvent(...)` usage anywhere in the codebase.
+      I need the exact import surface and idiom.
+
+
+      6. How Inngest functions are registered/served — the `serve()` endpoint (likely `src/app/api/inngest/route.ts`
+      or similar) and the array of functions it exports. I need to know where to add my new functions.
+
+
+      7. Concurrency/idempotency config on existing functions — do they set `idempotency`, `concurrency`,
+      or `retries` in the createFunction options? Show an example.
+
+
+      Report exact paths, line numbers, signatures, and code snippets. Describe only what exists; do not
+      propose changes.'
+  - id: mined-codebase-locator-route-neg-3
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-pattern-finder
+    confusability: 0.118
+    prompt: 'I''m planning integration + unit tests for new Inngest worker functions in issue #261 (email
+      dispatch worker with `step.run` and `step.waitForEvent` + a timeout path). I need existing test
+      patterns to mirror.
+
+
+      Find and show concrete code examples (with `file:line`) for:
+
+
+      1. **Inngest function unit/integration tests** — how existing Inngest functions are tested in this
+      repo. Look for tests that construct a function and invoke it with mocked `step` (`step.run`, `step.waitForEvent`,
+      `step.sendEvent`), or that use an Inngest test harness. Show the full setup: how `step` is mocked/stubbed,
+      how `event.data` is passed, how assertions are made on DB state afterward. The nurture/Follow-up
+      plan Inngest functions (recently migrated in #295, commit df21fdd) are the best candidates — show
+      their tests.
+
+
+      2. **`step.waitForEvent` timeout testing** — any test that exercises a timeout/virtual-time path
+      on an Inngest function. If none exists, say so explicitly and show the closest analog.
+
+
+      3. **Outbox integration tests** — tests that assert an outbox row was inserted with a given event
+      name + payload after a mutation, and/or tests that exercise the outbox sweep. Show the DB-assertion
+      idiom (these hit real Neon branches per CLAUDE.md — show how they set up and tear down).
+
+
+      4. **tRPC mutation integration tests** — how `messages.approve` / `messages.editAndApprove` or sibling
+      mutations are tested today (the caller/context setup, how they seed a `message_queue` row, how they
+      assert post-mutation DB state).
+
+
+      5. **MS Graph / HubSpot SDK mocking** — how existing tests mock or stub the Microsoft Graph client
+      and the HubSpot client, so I can assert "Graph `/me/sendMail` was called with `internetMessageId
+      === messageId`" without hitting real services.
+
+
+      6. **E2E test structure** for the dashboard approve→send flow, if any exists — the Playwright spec
+      that approves a queued message, and how it cleans up (per-spec cleanup by phone/email per CLAUDE.md).
+
+
+      For each, give the file path, line numbers, and a representative snippet. Prioritize the Rstest
+      unit/integration idiom (the repo uses Rstest, not Jest/Vitest). If a pattern genuinely doesn''t
+      exist yet, say so clearly rather than inventing one.'

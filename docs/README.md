@@ -10,7 +10,7 @@ This is my sandbox project; where I get to test, tweak and tune my AI Agent codi
 
 If you're interested in seeing how I use Claude Code for this project, see the `CLAUDE.md` and `.claude/` config folder. Try it out for yourself. More details on how it all works are roughly documented in the [Claude Code Harness Overview](#claude-code-harness-overview) section below.
 
-If you would like help with building, implementing or simply discovering problems/solutions for AI to solve in your Enterprise, reach out to me on [Linkedin](https://www.linkedin.com/in/sam-j-marshall/) or get in touch with the [V2 AI](https://www.v2.ai/contact?utm_source=github&utm_medium=referral&utm_campaign=rekurve&utm_content=readme-contact-cta) team.
+If you'd like help building, implementing or discovering AI problems/solutions in your Enterprise, reach out to me on [Linkedin](https://www.linkedin.com/in/sam-j-marshall/) or get in touch with the [V2 AI](https://www.v2.ai/contact?utm_source=github&utm_medium=referral&utm_campaign=rekurve&utm_content=readme-contact-cta) team (V2 AI is an official partner with Anthropic in the Claude Partner Network).
 
 ## Claude Code Harness Overview
 
@@ -22,6 +22,15 @@ If you would like help with building, implementing or simply discovering problem
 > I'm sure you can still get good results from copy/pasting this exact Harness. I'm simply highlighting my recommendation to study it instead. Test it, then apply what is relevant to you. Building up a Harness molded to you and your specific use cases, not the other way around.
 
 ### Primary Workflow
+
+![Explore, Plan, Code, Commit](./explore-plan-code-commit.png)
+
+> [!TIP]
+> **_The Explore → Plan → Code → Commit Workflow_**
+> _If you take one thing away from this, let it be this workflow: **Explore, Plan, Code, and Commit**. Without it, most people jump straight to asking Claude to write code — which means more course-correcting later on._
+> _— Anthropic_
+
+This project takes the Anthropic workflow above and expands on it.
 
 ![Claude Code Workflow](./claude-code-workflow.png)
 

@@ -21,8 +21,10 @@ Interview me relentlessly about every aspect of this design until we reach a sha
    - **@agent-codebase-locator** - To find more specific files (e.g., "find all files that handle [specific component]")
    - **@agent-codebase-analyzer** - To understand implementation details (e.g., "analyze how [system] works")
    - **@agent-codebase-pattern-finder** - To find similar features we can model after
-   - **@agent-thoughts-locator** - To find any research, plans, or decisions about this area
-   - **@agent-thoughts-analyzer** - To extract key insights from the most relevant documents
+   - **@agent-thoughts-locator** - To find prior designs, plans, research, or decisions about this area
+   - **@agent-thoughts-analyzer** - To distil the decisions and constraints from the most relevant documents
+   - **@agent-docs-locator** - To find authoritative decisions of record (ADRs, feature docs in `docs/`) governing this area
+   - **@agent-docs-analyzer** - To distil an ADR's decision + recorded Status, or a feature doc's shipped behaviour
 - **Read the project glossary if present.** Check for `CONTEXT.md` (or `CONTEXT-MAP.md`) at the repo root or in the relevant subdirectory. During the session, challenge terminology that conflicts with the glossary and propose canonical terms when the user uses fuzzy or overloaded ones. **Do not write to `CONTEXT.md`** — that's `/domain_model`'s job. Brainstorm output stays transient; the glossary stays durable.
 - **ALWAYS use @agent-web-lookup or @agent-web-research** for web research - NEVER call WebSearch or WebFetch directly. Use `web-lookup` for single-fact queries (fast); use `web-research` for multi-source synthesis or conflict resolution (deep).
 - **If a question can be answered by exploring the codebase, explore instead of asking.**

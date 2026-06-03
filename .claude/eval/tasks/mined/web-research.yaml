@@ -1,0 +1,601 @@
+agent: web-research
+_generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
+_needs_review: true
+_note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/web-research.yaml alongside
+  golden + adversarial buckets.
+_mined_available: 4
+_mined_emitted: 4
+execution:
+- id: mined-web-research-exec-1
+  kind: execution
+  prompt: 'I''m implementing browser realtime updates in a Next.js 15 (App Router) + React 19 app that
+    already uses Inngest v4.2.6 (package "inngest@4.2.6"). I need authoritative, current details on **Inngest
+    Realtime** (the `@inngest/realtime` package) — the feature that lets a browser subscribe to events/channels
+    and receive them over a WebSocket.
+
+
+    Please research and report, with citations and version numbers, on the OFFICIAL Inngest docs (inngest.com/docs)
+    and the @inngest/realtime npm/GitHub:
+
+
+    1. **Package & version**: What is the current `@inngest/realtime` package, its latest version, and
+    what version of the core `inngest` package does it require as a peer dependency? Is `inngest@4.2.6`
+    compatible, or is an upgrade required? Is `@inngest/realtime` still beta/experimental as of early
+    2026?
+
+
+    2. **Server setup**: How do you define a channel and topic on the server? Show the exact API: `channel()`,
+    `topic()`, `realtimeMiddleware()`. How is the middleware added to the Inngest client (`new Inngest({
+    id, middleware: [realtimeMiddleware()] })`)? How does an Inngest function `publish()` to a channel/topic?
+
+
+    3. **Subscribe tokens (auth)**: How do you generate a subscription token server-side with `getSubscriptionToken()`,
+    scoped to a specific channel + topic? This is the auth boundary — I want to scope a per-user channel
+    so a user only receives their own events. Show the server-side token-generation code (e.g. in a Next.js
+    server action or route handler) and how channel names can be parameterized per-user (e.g. `channel(`user:${userId}`)`).
+
+
+    4. **Client subscription**: Show the exact React hook `useInngestSubscription` from `@inngest/realtime/hooks`
+    — its arguments (token, refreshToken, enabled), what it returns (data, latestData, state), and a full
+    working example of a client component subscribing and reacting to messages. Also show the non-React
+    `subscribe()` API.
+
+
+    5. **Does it work on Vercel serverless?** The functions are served via `inngest/next` `serve()` on
+    Vercel. Confirm that Realtime publish works from functions on serverless and that the browser connects
+    directly to Inngest''s WebSocket (not to our server). Any gotchas with Vercel?
+
+
+    6. **Env/keys**: What environment variables or keys are required for Realtime to work in production
+    (signing key, event key, anything Realtime-specific)?
+
+
+    Prefer official Inngest documentation and the @inngest/realtime GitHub README. Quote exact code snippets
+    and cite the doc URLs and version numbers. If the API changed across versions, note which version
+    introduced the current shape.'
+  provenance:
+    agent_id: ae696f17480a43824
+    session_id: be00031d-a0ac-46eb-9486-4150781a5a8b
+    model: claude-opus-4-8
+    latency_s: 1976.47
+    tokens_total: 1866831
+    n_tool_uses: 59
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/be00031d-a0ac-46eb-9486-4150781a5a8b/subagents/agent-ae696f17480a43824.jsonl
+  sample_output_excerpt: I now have comprehensive, verified coverage of all six questions, including the
+    legacy v3 API the user explicitly asked about and the current v4 replacement. The deprecated package
+    README is just a stub (183 bytes pointing to the new package), which itself confirms the deprecation.
+    I have enough to write the report. This is a 6-section technical survey, so the length budget is raised
+    accordingly. …
+- id: mined-web-research-exec-2
+  kind: execution
+  prompt: "I need a thorough, well-cited research synthesis on running the **Neon serverless Postgres\
+    \ driver (`@neondatabase/serverless`) with Drizzle ORM on AWS Lambda / Vercel serverless functions**\
+    \ — specifically the tradeoff between the HTTP driver and the WebSocket Pool driver, and connection-pooling\
+    \ pitfalls. This is for a critical architecture decision (an ADR) about whether to introduce interactive\
+    \ transactions.\n\nContext: Next.js app on Vercel (which runs on AWS Lambda). Currently using `drizzle-orm/neon-http`\
+    \ (the `neon()` HTTP driver) — stateless, no pooling. We need to commit two table writes (a row +\
+    \ an \"outbox\" event row) **atomically**. We're deciding between: (a) staying on the HTTP driver\
+    \ and using an atomic multi-statement batch/array-transaction, vs (b) switching to `drizzle-orm/neon-serverless`\
+    \ (the WebSocket `Pool`) to get interactive `db.transaction(async tx => {...})`.\n\nResearch and report,\
+    \ with citations + dates, on:\n\n1. **HTTP driver (`neon()` over HTTPS) transaction capabilities**:\
+    \ The `@neondatabase/serverless` HTTP client exposes a `sql.transaction([q1, q2, ...])` array form.\
+    \ Confirm: does it execute all statements in a SINGLE atomic Postgres transaction (BEGIN…COMMIT) in\
+    \ ONE HTTP round-trip? What are its documented LIMITATIONS — specifically, can it do INTERACTIVE transactions\
+    \ (read a result, then decide the next query within the same transaction)? Quote Neon's docs on \"\
+    interactive transactions are not supported over HTTP.\"\n\n2. **WebSocket Pool driver on AWS Lambda\
+    \ — the pooling problem**: This is the crux. Research the known issues with using `Pool` from `@neondatabase/serverless`\
+    \ (or node-postgres `Pool` generally) in AWS Lambda / serverless:\n   - Why does a module-scope `Pool`\
+    \ behave badly across Lambda freeze/thaw cycles? (frozen event loop, dead sockets on thaw, idle-timeout\
+    \ disconnects)\n   - The \"connection multiplication\" problem: each concurrent Lambda execution environment\
+    \ has its own pool → max_connections × concurrency can exhaust Postgres connection limits.\n   - What\
+    \ does Neon OFFICIALLY recommend for the WebSocket driver in serverless? (e.g., create a `Pool`/`Client`\
+    \ per-request and `await pool.end()` in a finally block? use `ctx.waitUntil`? avoid Pool entirely?)\
+    \ Quote their docs/guidance.\n   - Does Neon's connection pooler (PgBouncer, the `-pooler` host) change\
+    \ this calculus?\n\n3. **Vercel-specific guidance**: What does Vercel and/or Neon recommend for Postgres\
+    \ connections in Vercel Functions specifically? Is the HTTP driver the recommended default for serverless,\
+    \ with WebSocket reserved for sessions/interactive transactions? Cite the Neon \"Vercel\" and \"serverless\
+    \ driver\" docs.\n\n4. **Drizzle `db.batch()` over neon-http**: Does `drizzle-orm/neon-http` support\
+    \ a `db.batch([...])` API, and does it map to Neon's atomic array-transaction (single transaction,\
+    \ single round-trip)? Cite the Drizzle \"Batch API\" docs and note which drivers support it (LibSQL,\
+    \ Neon, D1…). Does `.returning()` work inside a batch?\n\n5. **Interactive transactions over neon-serverless**:\
+    \ Confirm `drizzle-orm/neon-serverless` (`Pool`) supports full interactive `db.transaction(async (tx)\
+    \ => {...})`, and that `drizzle-orm/neon-http` does NOT (it throws / is limited). \n\n6. **Recommendation\
+    \ framing**: Summarize the decision factors a team should weigh: serverless-friendliness (no connection\
+    \ lifecycle) vs the need for interactive (read-then-write) transactions. When is the HTTP+batch approach\
+    \ sufficient, and when is the WebSocket Pool genuinely required?\n\nPrefer official sources: Neon\
+    \ docs (neon.tech/docs, especially \"serverless driver\", \"Neon on Vercel\", \"connection pooling\"\
+    ), the `@neondatabase/serverless` GitHub README, Drizzle ORM docs (orm.drizzle.team — \"batch\", \"\
+    neon\" sections), and Vercel docs. Quote exact passages and cite URLs + dates. Note any version-specific\
+    \ behavior. Be thorough and adversarial — if sources conflict on whether Pool is safe on Lambda, surface\
+    \ the conflict."
+  provenance:
+    agent_id: a46828e7d8aae69bf
+    session_id: be00031d-a0ac-46eb-9486-4150781a5a8b
+    model: claude-opus-4-8
+    latency_s: 269.32
+    tokens_total: 983751
+    n_tool_uses: 46
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/be00031d-a0ac-46eb-9486-4150781a5a8b/subagents/agent-a46828e7d8aae69bf.jsonl
+  sample_output_excerpt: I have comprehensive material from all official sources. The one remaining gap
+    is a verbatim quote of Drizzle's exact `neon-http` transaction error string. I've used 5 WebSearch
+    + 8 WebFetch (at budget on both). I have a corroborating Drizzle docs quote ("Querying over HTTP is
+    faster for single, non-interactive transactions") plus the repo's own confirmation that neon-http
+    transactions are non-int …
+- id: mined-web-research-exec-3
+  kind: execution
+  prompt: 'I need a thorough, current (as of 2026) research report on integrating OpenTelemetry (OTEL)
+    with Claude Code (Anthropic''s CLI coding agent) for LOCAL observability. The goal is to surface real-world
+    sub-agent activity — specifically sub-agent prompts, sub-agent results/outputs, and metrics like latency,
+    token usage, and cost — to build a baseline dataset for evaluating and improving sub-agent prompts.
+
+
+    Please research and answer these specific questions, citing authoritative sources (prefer official
+    Anthropic/Claude Code docs at docs.claude.com or docs.anthropic.com, the Claude Code GitHub repo,
+    and OpenTelemetry official docs):
+
+
+    ## 1. Claude Code''s built-in OTEL / telemetry support
+
+    - Does Claude Code have native OpenTelemetry support? What environment variables enable it (e.g. CLAUDE_CODE_ENABLE_TELEMETRY)?
+
+    - What is the FULL list of metrics Claude Code exports via OTEL? (e.g. token usage, cost, session
+    count, lines of code, API request duration/latency, etc.) Give exact metric names if documented.
+
+    - What logs/events does Claude Code export? Is there an events/logs exporter separate from metrics?
+
+    - CRITICAL: Does Claude Code''s OTEL telemetry capture the actual CONTENT of prompts and AI responses/outputs?
+    Is there a setting like OTEL_LOG_USER_PROMPTS or similar that controls whether prompt text is included?
+    What about the assistant''s output text?
+
+    - CRITICAL FOR OUR USE CASE: Does Claude Code''s telemetry distinguish or specifically capture SUB-AGENT
+    (Task tool / subagent) activity? When a main agent spawns a sub-agent, are the sub-agent''s prompt,
+    output, token usage, and latency captured as distinct telemetry events/spans/attributes? Is there
+    any agent-type or agent-id attribute on the events? Be precise about what is and isn''t captured at
+    the sub-agent granularity — this is the single most important question.
+
+    - Does Claude Code emit OTEL traces/spans (not just metrics and logs)? If so, what spans, and do tool
+    calls / sub-agent invocations appear as spans?
+
+
+    ## 2. Local OTEL collector + storage + visualization stack
+
+    - What is the recommended way to run a local OpenTelemetry Collector (otelcol / otelcol-contrib) to
+    receive Claude Code''s telemetry?
+
+    - What configuration (OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_PROTOCOL grpc vs http/protobuf,
+    OTEL_METRICS_EXPORTER, OTEL_LOGS_EXPORTER) does Claude Code need to point at a local collector?
+
+    - What are the recommended local storage backends for each signal type: metrics (Prometheus?), logs/events
+    (Loki? ClickHouse?), traces (Jaeger? Tempo?)?
+
+    - What is the recommended local visualization layer (Grafana?)? Are there prebuilt Claude Code dashboards
+    published by Anthropic or the community?
+
+    - Is there a known docker-compose / one-command setup (official or community, e.g. a "claude-code-otel"
+    project on GitHub) that stands up collector + storage + Grafana locally? Name specific repos if they
+    exist.
+
+
+    ## 3. Capturing prompt/output CONTENT for evaluation (not just metrics)
+
+    - Since the core goal is capturing actual sub-agent prompt text and output text to build an eval dataset,
+    clarify: does the OTEL events/logs path actually carry the full text, or is it truncated/redacted?
+    Are there length limits?
+
+    - If Claude Code''s OTEL does NOT capture full sub-agent prompt+output content, what are the ALTERNATIVE
+    local interception approaches? Specifically research: (a) the Claude Code OTEL logs exporter content,
+    (b) hooks (PreToolUse/PostToolUse/SubagentStop hooks) and what data they receive, (c) reading the
+    local session transcript / .jsonl files Claude Code writes, (d) an LLM-proxy / man-in-the-middle approach
+    (e.g. LiteLLM proxy, or a custom Anthropic API proxy) to capture full request/response bodies. Compare
+    these on completeness of captured content.
+
+    - Specifically: is there a SubagentStop hook, and does it provide access to the sub-agent''s full
+    transcript/output?
+
+
+    ## 4. Practical recommendation
+
+    - Summarize the simplest local setup that would capture sub-agent prompts, outputs, latency, and cost.
+
+    - Flag any gaps where OTEL alone is insufficient and a complementary approach (hooks, transcript parsing,
+    proxy) is needed.
+
+
+    Please be concrete and cite versions/dates where possible. Distinguish clearly between what is officially
+    documented vs community/experimental. Note that as of 2026 Claude Code is actively developed, so prefer
+    the most recent sources.'
+  provenance:
+    agent_id: aee8fdac3ec98454f
+    session_id: e41b13d1-0f46-41ab-8013-d23578205889
+    model: claude-opus-4-8
+    latency_s: 975.2
+    tokens_total: 829453
+    n_tool_uses: 17
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/e41b13d1-0f46-41ab-8013-d23578205889/subagents/agent-aee8fdac3ec98454f.jsonl
+  sample_output_excerpt: I have a clear, well-sourced picture. The official reference page is paginated/truncated
+    on fetch and didn't surface the `agent_transcript_path`/`last_assistant_message` fields directly,
+    so I'll attribute those to the community sources that documented them verbatim (and flag the version
+    `v2.1.145`) while noting the official reference confirms `agent_id`/`agent_type`/`transcript_path`
+    exist. The Gi …
+- id: mined-web-research-exec-4
+  kind: execution
+  prompt: 'Research and synthesise across ≥3 sources how teams in production customise / extend BetterAuth''s
+    built-in rate-limiter using `secondaryStorage` (Redis-backed). I want to understand the practical
+    patterns, gotchas, and limits — not just the API.
+
+
+    Specifically:
+
+
+    1. **Per-endpoint custom rules** — how do teams structure `customRules` for things like: OTP-request
+    endpoints (per-phone *and* per-IP), signup, password-reset, generic auth endpoints? Is there a way
+    to key by *both* IP and identifier (e.g. phone+IP composite)? Or do you need to call a separate limiter
+    manually inside a hook?
+
+
+    2. **Beyond auth endpoints** — can BetterAuth''s rate-limit be invoked from *non-auth* code (e.g.
+    a tRPC procedure for AI calls)? Or is it strictly scoped to BetterAuth''s own endpoints? If it''s
+    scoped, what''s the recommended pattern for reusing the same secondaryStorage + Redis backend for
+    an app-level limiter (e.g. expose a helper that uses the same client)?
+
+
+    3. **secondaryStorage gotchas** — what are common pitfalls when wiring up `secondaryStorage`? (e.g.
+    ttl unit confusion — seconds vs ms; serialization; key collisions between rate-limit and sessions
+    if both are enabled; cold-start latency with Upstash REST vs ioredis on Vercel).
+
+
+    4. **Sessions side-effect** — if you enable `secondaryStorage` only for rate-limit but BetterAuth
+    *also* starts using it for sessions, is that desirable? Any cost / consistency implications?
+
+
+    5. **Migration patterns** — are there documented stories of teams migrating from a custom limiter
+    (e.g. their own Upstash-backed limiter) to BetterAuth''s built-in one? Any pitfalls/regrets?
+
+
+    Sources to consider: BetterAuth official docs, BetterAuth GitHub issues/discussions, blog posts from
+    Next.js / Vercel community, dev.to articles, any Reddit threads in r/nextjs.
+
+
+    Report under 800 words. Lead with the answer to "can a single BetterAuth `rateLimit` config truly
+    replace a heterogeneous custom limiter that''s used both inside *and* outside auth flows", then back
+    it up with evidence. Cite each source inline.'
+  provenance:
+    agent_id: af97501e2f917c762
+    session_id: 50865961-fb4a-4b8b-bb7b-c479a0a93c0a
+    model: claude-opus-4-7
+    latency_s: 117.1
+    tokens_total: 411741
+    n_tool_uses: 15
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/50865961-fb4a-4b8b-bb7b-c479a0a93c0a/subagents/agent-af97501e2f917c762.jsonl
+  sample_output_excerpt: 'Repo is on `better-auth@1.6.9` — newer than every cited issue (1.2.4–1.3.7).
+    Both #4472 (TTL bug) and #4497 (global-vs-route scope) are closed and fixed. Issue #1891 (OTP not
+    rate-limited) closed "not planned" at 1.2.4 — likely superseded by 1.5''s hardened defaults.
+
+
+    ---
+
+
+    ## Summary
+
+
+    **No — a single BetterAuth `rateLimit` config cannot fully replace a heterogeneous custom limiter
+    that''s used outsi …'
+routing:
+  positives:
+  - id: mined-web-research-route-pos-1
+    kind: routing
+    expect_invoke: true
+    prompt: 'I''m implementing browser realtime updates in a Next.js 15 (App Router) + React 19 app that
+      already uses Inngest v4.2.6 (package "inngest@4.2.6"). I need authoritative, current details on
+      **Inngest Realtime** (the `@inngest/realtime` package) — the feature that lets a browser subscribe
+      to events/channels and receive them over a WebSocket.
+
+
+      Please research and report, with citations and version numbers, on the OFFICIAL Inngest docs (inngest.com/docs)
+      and the @inngest/realtime npm/GitHub:
+
+
+      1. **Package & version**: What is the current `@inngest/realtime` package, its latest version, and
+      what version of the core `inngest` package does it require as a peer dependency? Is `inngest@4.2.6`
+      compatible, or is an upgrade required? Is `@inngest/realtime` still beta/experimental as of early
+      2026?
+
+
+      2. **Server setup**: How do you define a channel and topic on the server? Show the exact API: `channel()`,
+      `topic()`, `realtimeMiddleware()`. How is the middleware added to the Inngest client (`new Inngest({
+      id, middleware: [realtimeMiddleware()] })`)? How does an Inngest function `publish()` to a channel/topic?
+
+
+      3. **Subscribe tokens (auth)**: How do you generate a subscription token server-side with `getSubscriptionToken()`,
+      scoped to a specific channel + topic? This is the auth boundary — I want to scope a per-user channel
+      so a user only receives their own events. Show the server-side token-generation code (e.g. in a
+      Next.js server action or route handler) and how channel names can be parameterized per-user (e.g.
+      `channel(`user:${userId}`)`).
+
+
+      4. **Client subscription**: Show the exact React hook `useInngestSubscription` from `@inngest/realtime/hooks`
+      — its arguments (token, refreshToken, enabled), what it returns (data, latestData, state), and a
+      full working example of a client component subscribing and reacting to messages. Also show the non-React
+      `subscribe()` API.
+
+
+      5. **Does it work on Vercel serverless?** The functions are served via `inngest/next` `serve()`
+      on Vercel. Confirm that Realtime publish works from functions on serverless and that the browser
+      connects directly to Inngest''s WebSocket (not to our server). Any gotchas with Vercel?
+
+
+      6. **Env/keys**: What environment variables or keys are required for Realtime to work in production
+      (signing key, event key, anything Realtime-specific)?
+
+
+      Prefer official Inngest documentation and the @inngest/realtime GitHub README. Quote exact code
+      snippets and cite the doc URLs and version numbers. If the API changed across versions, note which
+      version introduced the current shape.'
+  - id: mined-web-research-route-pos-2
+    kind: routing
+    expect_invoke: true
+    prompt: "I need a thorough, well-cited research synthesis on running the **Neon serverless Postgres\
+      \ driver (`@neondatabase/serverless`) with Drizzle ORM on AWS Lambda / Vercel serverless functions**\
+      \ — specifically the tradeoff between the HTTP driver and the WebSocket Pool driver, and connection-pooling\
+      \ pitfalls. This is for a critical architecture decision (an ADR) about whether to introduce interactive\
+      \ transactions.\n\nContext: Next.js app on Vercel (which runs on AWS Lambda). Currently using `drizzle-orm/neon-http`\
+      \ (the `neon()` HTTP driver) — stateless, no pooling. We need to commit two table writes (a row\
+      \ + an \"outbox\" event row) **atomically**. We're deciding between: (a) staying on the HTTP driver\
+      \ and using an atomic multi-statement batch/array-transaction, vs (b) switching to `drizzle-orm/neon-serverless`\
+      \ (the WebSocket `Pool`) to get interactive `db.transaction(async tx => {...})`.\n\nResearch and\
+      \ report, with citations + dates, on:\n\n1. **HTTP driver (`neon()` over HTTPS) transaction capabilities**:\
+      \ The `@neondatabase/serverless` HTTP client exposes a `sql.transaction([q1, q2, ...])` array form.\
+      \ Confirm: does it execute all statements in a SINGLE atomic Postgres transaction (BEGIN…COMMIT)\
+      \ in ONE HTTP round-trip? What are its documented LIMITATIONS — specifically, can it do INTERACTIVE\
+      \ transactions (read a result, then decide the next query within the same transaction)? Quote Neon's\
+      \ docs on \"interactive transactions are not supported over HTTP.\"\n\n2. **WebSocket Pool driver\
+      \ on AWS Lambda — the pooling problem**: This is the crux. Research the known issues with using\
+      \ `Pool` from `@neondatabase/serverless` (or node-postgres `Pool` generally) in AWS Lambda / serverless:\n\
+      \   - Why does a module-scope `Pool` behave badly across Lambda freeze/thaw cycles? (frozen event\
+      \ loop, dead sockets on thaw, idle-timeout disconnects)\n   - The \"connection multiplication\"\
+      \ problem: each concurrent Lambda execution environment has its own pool → max_connections × concurrency\
+      \ can exhaust Postgres connection limits.\n   - What does Neon OFFICIALLY recommend for the WebSocket\
+      \ driver in serverless? (e.g., create a `Pool`/`Client` per-request and `await pool.end()` in a\
+      \ finally block? use `ctx.waitUntil`? avoid Pool entirely?) Quote their docs/guidance.\n   - Does\
+      \ Neon's connection pooler (PgBouncer, the `-pooler` host) change this calculus?\n\n3. **Vercel-specific\
+      \ guidance**: What does Vercel and/or Neon recommend for Postgres connections in Vercel Functions\
+      \ specifically? Is the HTTP driver the recommended default for serverless, with WebSocket reserved\
+      \ for sessions/interactive transactions? Cite the Neon \"Vercel\" and \"serverless driver\" docs.\n\
+      \n4. **Drizzle `db.batch()` over neon-http**: Does `drizzle-orm/neon-http` support a `db.batch([...])`\
+      \ API, and does it map to Neon's atomic array-transaction (single transaction, single round-trip)?\
+      \ Cite the Drizzle \"Batch API\" docs and note which drivers support it (LibSQL, Neon, D1…). Does\
+      \ `.returning()` work inside a batch?\n\n5. **Interactive transactions over neon-serverless**: Confirm\
+      \ `drizzle-orm/neon-serverless` (`Pool`) supports full interactive `db.transaction(async (tx) =>\
+      \ {...})`, and that `drizzle-orm/neon-http` does NOT (it throws / is limited). \n\n6. **Recommendation\
+      \ framing**: Summarize the decision factors a team should weigh: serverless-friendliness (no connection\
+      \ lifecycle) vs the need for interactive (read-then-write) transactions. When is the HTTP+batch\
+      \ approach sufficient, and when is the WebSocket Pool genuinely required?\n\nPrefer official sources:\
+      \ Neon docs (neon.tech/docs, especially \"serverless driver\", \"Neon on Vercel\", \"connection\
+      \ pooling\"), the `@neondatabase/serverless` GitHub README, Drizzle ORM docs (orm.drizzle.team —\
+      \ \"batch\", \"neon\" sections), and Vercel docs. Quote exact passages and cite URLs + dates. Note\
+      \ any version-specific behavior. Be thorough and adversarial — if sources conflict on whether Pool\
+      \ is safe on Lambda, surface the conflict."
+  - id: mined-web-research-route-pos-3
+    kind: routing
+    expect_invoke: true
+    prompt: 'I need a thorough, current (as of 2026) research report on integrating OpenTelemetry (OTEL)
+      with Claude Code (Anthropic''s CLI coding agent) for LOCAL observability. The goal is to surface
+      real-world sub-agent activity — specifically sub-agent prompts, sub-agent results/outputs, and metrics
+      like latency, token usage, and cost — to build a baseline dataset for evaluating and improving sub-agent
+      prompts.
+
+
+      Please research and answer these specific questions, citing authoritative sources (prefer official
+      Anthropic/Claude Code docs at docs.claude.com or docs.anthropic.com, the Claude Code GitHub repo,
+      and OpenTelemetry official docs):
+
+
+      ## 1. Claude Code''s built-in OTEL / telemetry support
+
+      - Does Claude Code have native OpenTelemetry support? What environment variables enable it (e.g.
+      CLAUDE_CODE_ENABLE_TELEMETRY)?
+
+      - What is the FULL list of metrics Claude Code exports via OTEL? (e.g. token usage, cost, session
+      count, lines of code, API request duration/latency, etc.) Give exact metric names if documented.
+
+      - What logs/events does Claude Code export? Is there an events/logs exporter separate from metrics?
+
+      - CRITICAL: Does Claude Code''s OTEL telemetry capture the actual CONTENT of prompts and AI responses/outputs?
+      Is there a setting like OTEL_LOG_USER_PROMPTS or similar that controls whether prompt text is included?
+      What about the assistant''s output text?
+
+      - CRITICAL FOR OUR USE CASE: Does Claude Code''s telemetry distinguish or specifically capture SUB-AGENT
+      (Task tool / subagent) activity? When a main agent spawns a sub-agent, are the sub-agent''s prompt,
+      output, token usage, and latency captured as distinct telemetry events/spans/attributes? Is there
+      any agent-type or agent-id attribute on the events? Be precise about what is and isn''t captured
+      at the sub-agent granularity — this is the single most important question.
+
+      - Does Claude Code emit OTEL traces/spans (not just metrics and logs)? If so, what spans, and do
+      tool calls / sub-agent invocations appear as spans?
+
+
+      ## 2. Local OTEL collector + storage + visualization stack
+
+      - What is the recommended way to run a local OpenTelemetry Collector (otelcol / otelcol-contrib)
+      to receive Claude Code''s telemetry?
+
+      - What configuration (OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_PROTOCOL grpc vs http/protobuf,
+      OTEL_METRICS_EXPORTER, OTEL_LOGS_EXPORTER) does Claude Code need to point at a local collector?
+
+      - What are the recommended local storage backends for each signal type: metrics (Prometheus?), logs/events
+      (Loki? ClickHouse?), traces (Jaeger? Tempo?)?
+
+      - What is the recommended local visualization layer (Grafana?)? Are there prebuilt Claude Code dashboards
+      published by Anthropic or the community?
+
+      - Is there a known docker-compose / one-command setup (official or community, e.g. a "claude-code-otel"
+      project on GitHub) that stands up collector + storage + Grafana locally? Name specific repos if
+      they exist.
+
+
+      ## 3. Capturing prompt/output CONTENT for evaluation (not just metrics)
+
+      - Since the core goal is capturing actual sub-agent prompt text and output text to build an eval
+      dataset, clarify: does the OTEL events/logs path actually carry the full text, or is it truncated/redacted?
+      Are there length limits?
+
+      - If Claude Code''s OTEL does NOT capture full sub-agent prompt+output content, what are the ALTERNATIVE
+      local interception approaches? Specifically research: (a) the Claude Code OTEL logs exporter content,
+      (b) hooks (PreToolUse/PostToolUse/SubagentStop hooks) and what data they receive, (c) reading the
+      local session transcript / .jsonl files Claude Code writes, (d) an LLM-proxy / man-in-the-middle
+      approach (e.g. LiteLLM proxy, or a custom Anthropic API proxy) to capture full request/response
+      bodies. Compare these on completeness of captured content.
+
+      - Specifically: is there a SubagentStop hook, and does it provide access to the sub-agent''s full
+      transcript/output?
+
+
+      ## 4. Practical recommendation
+
+      - Summarize the simplest local setup that would capture sub-agent prompts, outputs, latency, and
+      cost.
+
+      - Flag any gaps where OTEL alone is insufficient and a complementary approach (hooks, transcript
+      parsing, proxy) is needed.
+
+
+      Please be concrete and cite versions/dates where possible. Distinguish clearly between what is officially
+      documented vs community/experimental. Note that as of 2026 Claude Code is actively developed, so
+      prefer the most recent sources.'
+  - id: mined-web-research-route-pos-4
+    kind: routing
+    expect_invoke: true
+    prompt: 'Research and synthesise across ≥3 sources how teams in production customise / extend BetterAuth''s
+      built-in rate-limiter using `secondaryStorage` (Redis-backed). I want to understand the practical
+      patterns, gotchas, and limits — not just the API.
+
+
+      Specifically:
+
+
+      1. **Per-endpoint custom rules** — how do teams structure `customRules` for things like: OTP-request
+      endpoints (per-phone *and* per-IP), signup, password-reset, generic auth endpoints? Is there a way
+      to key by *both* IP and identifier (e.g. phone+IP composite)? Or do you need to call a separate
+      limiter manually inside a hook?
+
+
+      2. **Beyond auth endpoints** — can BetterAuth''s rate-limit be invoked from *non-auth* code (e.g.
+      a tRPC procedure for AI calls)? Or is it strictly scoped to BetterAuth''s own endpoints? If it''s
+      scoped, what''s the recommended pattern for reusing the same secondaryStorage + Redis backend for
+      an app-level limiter (e.g. expose a helper that uses the same client)?
+
+
+      3. **secondaryStorage gotchas** — what are common pitfalls when wiring up `secondaryStorage`? (e.g.
+      ttl unit confusion — seconds vs ms; serialization; key collisions between rate-limit and sessions
+      if both are enabled; cold-start latency with Upstash REST vs ioredis on Vercel).
+
+
+      4. **Sessions side-effect** — if you enable `secondaryStorage` only for rate-limit but BetterAuth
+      *also* starts using it for sessions, is that desirable? Any cost / consistency implications?
+
+
+      5. **Migration patterns** — are there documented stories of teams migrating from a custom limiter
+      (e.g. their own Upstash-backed limiter) to BetterAuth''s built-in one? Any pitfalls/regrets?
+
+
+      Sources to consider: BetterAuth official docs, BetterAuth GitHub issues/discussions, blog posts
+      from Next.js / Vercel community, dev.to articles, any Reddit threads in r/nextjs.
+
+
+      Report under 800 words. Lead with the answer to "can a single BetterAuth `rateLimit` config truly
+      replace a heterogeneous custom limiter that''s used both inside *and* outside auth flows", then
+      back it up with evidence. Cite each source inline.'
+  negatives:
+  - id: mined-web-research-route-neg-1
+    kind: routing
+    expect_invoke: false
+    actual_route: web-lookup
+    confusability: 0.192
+    prompt: "Fetch the current BetterAuth docs for two features and report their exact API + capabilities.\
+      \ Use Context7 (library id likely `/better-auth/better-auth` or similar — resolve first) and the\
+      \ official docs at https://better-auth.com/docs/reference/options.\n\n1. `rateLimit` config option\
+      \ — https://better-auth.com/docs/reference/options#ratelimit\n   - All sub-fields (enabled, window,\
+      \ max, storage, customRules, modelName, etc.)\n   - The full shape and semantics of `customRules`\
+      \ — can you set per-endpoint window/max? Per-endpoint key derivation? Can you disable the limit\
+      \ for some endpoints?\n   - Default behaviour when `enabled: true` and no `customRules` (what's\
+      \ rate-limited, by what key, with what limits)\n   - How the limit key is derived by default (IP\
+      \ from `x-forwarded-for`? Cookie? Session?)\n   - What status code / error shape the client sees\
+      \ on a 429\n   - Whether there's a way to plug in custom logic *before* or *after* the limit check\
+      \ (hooks)\n\n2. `secondaryStorage` config option — https://better-auth.com/docs/reference/options#secondarystorage\n\
+      \   - Exact `get`/`set`/`delete` signatures (including ttl arg type/units)\n   - What BetterAuth\
+      \ uses secondaryStorage *for* — just rate-limit? Or also sessions? Be explicit\n   - Whether using\
+      \ `secondaryStorage` for sessions has any implication if we only want it for rate-limit (e.g. is\
+      \ there a way to scope it to rate-limit only?)\n   - Recommended Redis client patterns (ioredis\
+      \ vs Upstash REST vs @vercel/kv)\n\n3. Report the latest stable BetterAuth version that supports\
+      \ these features and whether the API has changed in recent minors.\n\nReport in under 600 words,\
+      \ with verbatim type signatures where possible and links to the source docs sections. Include code\
+      \ snippets for `customRules` and `secondaryStorage`."
+  - id: mined-web-research-route-neg-2
+    kind: routing
+    expect_invoke: false
+    actual_route: web-lookup
+    confusability: 0.164
+    prompt: 'I''m implementing PostHog Error Tracking + Insight alerts in a Next.js 15 app deployed on
+      Vercel. I need authoritative, up-to-date info on:
+
+
+      1. **Server-only PostHog config** — design doc says `POSTHOG_KEY` and `POSTHOG_HOST` must be server-only
+      (never exposed to client). But the standard PostHog Next.js setup uses `NEXT_PUBLIC_POSTHOG_KEY`
+      for the client SDK because the project key is *publicly safe to expose* (it''s not a write-API secret).
+      Can `posthog-js` (browser SDK) be initialized without exposing the key to the client? What''s the
+      current PostHog recommendation for Next.js 15 App Router as of late 2025/2026? Resolve the tension.
+
+
+      2. **PostHog Vercel Integration for source maps** — how is this set up? Is it a one-click marketplace
+      install, or does it require any code/config changes (e.g., `next.config.ts` setting)? What env vars
+      does it inject? Does it conflict with us managing `POSTHOG_KEY` manually?
+
+
+      3. **Error tracking + alerts** — confirm PostHog Error Tracking is GA and supports webhook destinations
+      for alerts. What''s the alert configuration UI/API like — can it be done purely in the PostHog dashboard,
+      or via config-as-code?
+
+
+      4. **`posthog-js` vs `posthog-node` setup for Next.js App Router** — what''s the canonical 2026
+      setup with `instrumentation.ts`, root layout, server components, and route handlers? Include code
+      snippets.
+
+
+      Quote the PostHog docs directly where possible, cite URLs, note version dates. Use context7 if useful.
+      Aim for ~500 words, include code snippets.'
+  - id: mined-web-research-route-neg-3
+    kind: routing
+    expect_invoke: false
+    actual_route: web-lookup
+    confusability: 0.137
+    prompt: 'I need to know precisely how transactions work in Drizzle ORM with the `neon-http` driver
+      (not `neon-serverless`).
+
+
+      Context: The project uses `drizzle(sql, { schema })` from `drizzle-orm/neon-http` with Neon''s HTTP
+      serverless driver (`import { neon } from "@neondatabase/serverless"`).
+
+
+      I need to know:
+
+
+      1. Does `db.transaction(async (tx) => { ... })` work with `neon-http`? If yes, with what restrictions?
+
+      2. What is the type of `tx` inside the callback? I''m trying to figure out how to type a function
+      parameter like `tx: ???`.
+
+      3. Can you do conditional async logic inside the transaction callback (await one query, decide based
+      on result, run next), or does it only support pre-batched queries?
+
+      4. Within a `neon-http` transaction, does the second query see the results of the first? E.g. INSERT
+      then `findFirst` reading the row back.
+
+      5. Is there a "type alias" pattern people use for the transaction type — e.g. `type Tx = Parameters<typeof
+      db.transaction>[0]` or similar?
+
+
+      Please cite Drizzle''s neon-http transaction docs (Context7 will have them, search "drizzle orm"
+      library and look at neon-http transactions). Report the exact type signature and any limitations.
+
+
+      Under 400 words.'

@@ -10,7 +10,7 @@ This is my sandbox project; where I get to test, tweak and tune my AI Agent codi
 
 If you're interested in seeing how I use Claude Code for this project, see the `CLAUDE.md` and `.claude/` config folder. Try it out for yourself. More details on how it all works are roughly documented in the [Claude Code Harness Overview](#claude-code-harness-overview) section below.
 
-If you would like help with building, implementing or simply discovering problems/solutions for AI to solve in your Enterprise, reach out to me on [Linkedin](https://www.linkedin.com/in/sam-j-marshall/) or get in touch with the [V2 AI](https://www.v2.ai/contact?utm_source=github&utm_medium=referral&utm_campaign=rekurve&utm_content=readme-contact-cta) team.
+If you'd like help building, implementing or discovering AI problems/solutions in your Enterprise, reach out to me on [Linkedin](https://www.linkedin.com/in/sam-j-marshall/) or get in touch with the [V2 AI](https://www.v2.ai/contact?utm_source=github&utm_medium=referral&utm_campaign=rekurve&utm_content=readme-contact-cta) team (V2 AI is an official partner with Anthropic in the Claude Partner Network).
 
 ## Claude Code Harness Overview
 

@@ -8,8 +8,12 @@ import {
 } from "~/server/api/schemas/messages";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { leads, messageQueue, msGraphTokens } from "~/server/db/schema";
-import { dispatchEmail } from "~/server/dispatch/email-dispatch";
 import { dispatchSms } from "~/server/dispatch/sms-dispatch";
+import {
+  buildOutboxEvent,
+  MESSAGE_EVENTS,
+  sendPostCommit,
+} from "~/server/outbox";
 
 /**
  * Fetch a message_queue row and assert its status permits a user action.
@@ -145,9 +149,34 @@ export const messagesRouter = createTRPCRouter({
       );
 
       if (message.channel === "email") {
+        // Synchronous fast-fail so the consultant still sees "Connect your
+        // Microsoft account" immediately. The Graph send moves to the
+        // dispatch-email worker (#261), fed by the outbox row below.
         await checkEmailPreconditions(ctx.db, ctx.session.user.id, lead);
-        await dispatchEmail({ db: ctx.db, ctx, message, lead });
-      } else if (message.channel === "sms" && !input.skipDispatch) {
+
+        const updateStmt = ctx.db
+          .update(messageQueue)
+          .set({ status: "approved", approvedAt: new Date() })
+          .where(eq(messageQueue.id, input.id))
+          .returning();
+
+        const evt = buildOutboxEvent(MESSAGE_EVENTS.APPROVAL_REQUESTED, {
+          messageId: input.id,
+          correlationId: input.id,
+          channel: "email",
+          body: message.body,
+          leadId: lead.id,
+        });
+
+        const [[updated]] = await ctx.db.batch([updateStmt, evt.query]);
+        await sendPostCommit([
+          { id: evt.id, name: evt.eventName, data: evt.payload },
+        ]);
+        return updated!;
+      }
+
+      // SMS path unchanged: synchronous dispatch + status write.
+      if (message.channel === "sms" && !input.skipDispatch) {
         await dispatchSms({ db: ctx.db, message });
       }
 
@@ -177,13 +206,35 @@ export const messagesRouter = createTRPCRouter({
 
       if (existing.channel === "email") {
         await checkEmailPreconditions(ctx.db, ctx.session.user.id, lead);
-        await dispatchEmail({
-          db: ctx.db,
-          ctx,
-          message: { ...existing, body: input.body },
-          lead,
+
+        const updateStmt = ctx.db
+          .update(messageQueue)
+          .set({
+            status: "edited_and_approved",
+            body: input.body,
+            originalBody: existing.originalBody ?? existing.body,
+            approvedAt: new Date(),
+          })
+          .where(eq(messageQueue.id, input.id))
+          .returning();
+
+        const evt = buildOutboxEvent(MESSAGE_EVENTS.APPROVAL_REQUESTED, {
+          messageId: input.id,
+          correlationId: input.id,
+          channel: "email",
+          body: input.body,
+          leadId: lead.id,
         });
-      } else if (existing.channel === "sms" && !input.skipDispatch) {
+
+        const [[updated]] = await ctx.db.batch([updateStmt, evt.query]);
+        await sendPostCommit([
+          { id: evt.id, name: evt.eventName, data: evt.payload },
+        ]);
+        return updated!;
+      }
+
+      // SMS path unchanged: synchronous dispatch + status write.
+      if (existing.channel === "sms" && !input.skipDispatch) {
         await dispatchSms({
           db: ctx.db,
           message: { ...existing, body: input.body },

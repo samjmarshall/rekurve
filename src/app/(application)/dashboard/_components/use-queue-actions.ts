@@ -106,7 +106,7 @@ export function useApproveAction({ onRequestSmsShare }: SmsShareOptions) {
       onMutate: ({ id }) => optimistic.snapshot(id),
       onSuccess: (data) => {
         if (data.channel === "email") {
-          toast.add({ title: "Sent via email" });
+          toast.add({ title: "Email queued to send" });
         } else {
           toast.add({ title: "Draft approved" });
         }
@@ -184,7 +184,7 @@ export function useEditAndApproveAction({
       onSuccess: (data) => {
         if (data.channel === "email") {
           toast.add({
-            title: "Sent via email",
+            title: "Email queued to send",
             description: "Your edits were saved.",
           });
         } else {

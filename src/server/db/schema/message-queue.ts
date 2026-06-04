@@ -27,6 +27,9 @@ export const messageQueue = pgTable(
     originalBody: text("original_body"),
     approvedAt: timestamp("approved_at", { withTimezone: true }),
     sentAt: timestamp("sent_at", { withTimezone: true }),
+    // Fence stamped by the dispatch-email worker immediately before each Graph
+    // send, guarding the dismiss-during-dispatch race (#261).
+    dispatchingAt: timestamp("dispatching_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),

@@ -1,12 +1,12 @@
 # Rekurve
 
-> A Claude Code harness example for Real Engineers with a Real Project
+> A Claude Code harness example for Real Engineers with a Real Project; as Matt Pocock would say "Skills for Real Engineers"
 
 Hi, I'm Sam and this is an AI sales assistant I built for my wife, a Sales Consultant for a new home builder in Brisbane, Australia.
 
-The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC); as Matt Pocock would say "Skills for Real Engineers". To do this properly, I chose to solve a real-world problem with a real commercial need.
+The purpose of this project is to showcase the workflow and results of my personal AI enabled Software/Product Development Life Cycle (SDLC / PDLC). To do this properly, I chose to solve a real-world problem with a real commercial need.
 
-This is my sandbox project; where I get to test, tweak and tune my AI Agent coding harness, and try new technologies. Learnings that transfer to my career/professional life once proven.
+This is my sandbox project; where I get to test, tweak and tune my AI Agent coding harness, and try new technologies.
 
 If you're interested in seeing how I use Claude Code for this project, see the `CLAUDE.md` and `.claude/` config folder. Try it out for yourself. More details on how it all works are roughly documented in the [Claude Code Harness Overview](#claude-code-harness-overview) section below.
 
@@ -27,12 +27,18 @@ If you'd like help building, implementing or discovering AI problems/solutions i
 
 > [!TIP]
 > **_The Explore → Plan → Code → Commit Workflow_**
+>
 > _If you take one thing away from this, let it be this workflow: **Explore, Plan, Code, and Commit**. Without it, most people jump straight to asking Claude to write code — which means more course-correcting later on._
+>
 > _— Anthropic_
 
 This project takes the Anthropic workflow above and expands on it.
 
-![Claude Code Workflow](./claude-code-workflow.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./workflow-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./workflow.png">
+  <img alt="Claude Code Workflow" src="./workflow.png">
+</picture>
 
 Not every task uses every step. Small fixes can skip straight to Implement → Commit. The full flow is available when needed.
 
@@ -44,7 +50,11 @@ Not every task uses every step. Small fixes can skip straight to Implement → C
 > 2. **Surprising without context** — A future reader will wonder "why did they do it this way?"
 > 3. **The result of a real trade-off** — There were genuine alternatives and you picked one for specific reasons
 
-![Claude Code ADR Workflow](./claude-code-adr-workflow.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./adr-workflow-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./adr-workflow.png">
+  <img alt="Claude Code ADR Workflow" src="./adr-workflow.png">
+</picture>
 
 ### Interactive Claude Skills/Commands
 

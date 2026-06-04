@@ -8,9 +8,9 @@ The suite is organised as locator/analyzer pairs, one family per source-of-truth
 
 | Family | Source of truth | Locator | Analyzer | Altitude |
 |---|---|---|---|---|
-| `codebase-*` | code | red / sonnet | orange / **opus** (code tracing) | ~63 / ~78 lines |
+| `codebase-*` | code | red / **opus** (anti-fabrication) | orange / **opus** (code tracing) | ~63 / ~78 lines |
 | `thoughts-*` | transient designs/plans (speculative — infer staleness) | blue / sonnet | blue / sonnet | ~59 / ~68 lines |
-| `docs-*` | authoritative ADRs/feature docs (report recorded Status) | green / sonnet | green / sonnet | ~60 / ~66 lines |
+| `docs-*` | authoritative ADRs/feature docs (report recorded Status) | green / sonnet | green / sonnet | ~60 / ~59 lines |
 
 Pick by *what the agent reads* and *whether that source is speculative or authoritative* — that choice drives the analyzer's core stance (infer-staleness vs report-recorded-status).
 

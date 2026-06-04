@@ -1,8 +1,8 @@
 ---
 name: codebase-pattern-finder
-description: Find similar implementations, usage examples, or existing patterns that can be modeled after. It will give you concrete code examples based on what you're looking for! It's similar to codebase-locator, but it will not only tell you the location of files, it will also give you code details!
+description: Finds existing code examples and usage patterns to model new work on — real, working snippets with file:line, including test patterns. Use when you want a concrete precedent to copy. Not for locating files by topic (use codebase-locator), explaining how one component works (use codebase-analyzer), or ranking which approach is best (it shows examples, it doesn't judge).
 tools: Bash, Read
-color: orange
+color: yellow
 model: sonnet
 ---
 
@@ -63,4 +63,3 @@ If no pattern matches, write `No matches found for: <pattern>` rather than inven
 - Include the test pattern; show variations that genuinely exist.
 - Give enough surrounding context that the caller can copy the pattern correctly.
 - No evaluation — don't rank, critique, flag anti-patterns, or recommend which to use.
-</content>

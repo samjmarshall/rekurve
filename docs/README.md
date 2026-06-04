@@ -12,6 +12,22 @@ If you're interested in seeing how I use Claude Code for this project, see the `
 
 If you'd like help building, implementing or discovering AI problems/solutions in your Enterprise, reach out to me on [Linkedin](https://www.linkedin.com/in/sam-j-marshall/) or get in touch with the [V2 AI](https://www.v2.ai/contact?utm_source=github&utm_medium=referral&utm_campaign=rekurve&utm_content=readme-contact-cta) team (V2 AI is an official partner with Anthropic in the Claude Partner Network).
 
+## Claude Code "Quick tips"
+
+1. Run the Claude Code native slash command `/terminal-setup` - Install **Shift + Enter** key binding for newlines, allows multi-line prompts.
+2. Configure Status line UI. This allows you to see the current model, effort and number of tokens in the main context window:
+   - My personal recommendation: https://github.com/sirmalloc/ccstatusline
+    ![ccstatusline](./ccstatusline.png)
+   - Alternative - The official Claude Code statusline via `/statusline` command and [official customization docs](https://code.claude.com/docs/en/statusline).
+
+Remember, when the main context window goes over ~120k tokens, deep reasoning and thinking quality falls off a cliff, or as Matt Pocock calls it; "Entering the dumb zone".
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./context-window-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./context-window.png">
+  <img alt="Context Window" src="./context-window.png">
+</picture>
+
 ## Claude Code Harness Overview
 
 > [!CAUTION]

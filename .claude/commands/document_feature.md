@@ -2,7 +2,7 @@
 skills: writing-clearly-and-concisely
 argument-hint: '<feature-name>'
 model: opus
-effort: max
+effort: high
 ---
 
 # Document Feature

@@ -2,6 +2,8 @@
 name: document-feature
 description: Interview a developer to produce a living feature doc at docs/feature/{slug}.md, capturing user value, architecture (with ADR links), and data/user flow with at least one Mermaid diagram. Use when the user says "document this feature", "write a feature doc", "create docs/feature/X", "explain feature X for new devs", or asks to onboard future engineers onto a shipped feature. Different from /create_plan (forward-looking design) and Epics (scope/sprint planning) — this is the present-tense "what does this thing do today" doc for engineers reading the codebase cold.
 disable-model-invocation: true
+model: sonnet
+effort: high
 ---
 
 # document-feature

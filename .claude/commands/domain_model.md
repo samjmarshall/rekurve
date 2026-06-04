@@ -1,7 +1,7 @@
 ---
 argument-hint: '<plan-path>'
 model: opus
-effort: max
+effort: xhigh
 ---
 
 # Domain Model

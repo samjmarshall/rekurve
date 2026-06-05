@@ -139,6 +139,10 @@ Native macOS scripting via `osascript` to send messages through the Messages app
 - [ ] Determine whether to retain Twilio as a fallback for device-offline scenarios or accept delayed delivery
 - [ ] Investigate Texting Blue's track record / uptime history / company stability
 
+## Implementation Notes
+
+A channel-filtered `dispatch-imessage` Inngest subscriber placeholder now exists (`src/inngest/functions/messages/dispatch-imessage.ts`, #262). It shares the `verify-still-approved` cancellation step with `dispatch-email` and `dispatch-sms` but throws "not implemented" in its send step. It is unreachable until the four Open Questions above are resolved and this ADR is Accepted.
+
 ## Links
 
 - Design doc: [AI Sales Assistant for New Home Builders](../../thoughts/designs/2026-03-27-ai-sales-assistant-new-home-builders.md)

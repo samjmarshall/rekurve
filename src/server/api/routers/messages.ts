@@ -8,7 +8,6 @@ import {
 } from "~/server/api/schemas/messages";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { leads, messageQueue, msGraphTokens } from "~/server/db/schema";
-import { dispatchSms } from "~/server/dispatch/sms-dispatch";
 import {
   buildOutboxEvent,
   MESSAGE_EVENTS,
@@ -175,23 +174,38 @@ export const messagesRouter = createTRPCRouter({
         return updated!;
       }
 
-      // SMS path unchanged: synchronous dispatch + status write.
-      if (message.channel === "sms" && !input.skipDispatch) {
-        await dispatchSms({ db: ctx.db, message });
+      // SMS path (channel is "sms" here — email returned above).
+      // skipDispatch (native-share): stamp sentAt inline, no outbox event.
+      if (input.skipDispatch) {
+        const [updated] = await ctx.db
+          .update(messageQueue)
+          .set({
+            status: "approved",
+            approvedAt: new Date(),
+            sentAt: new Date(),
+          })
+          .where(eq(messageQueue.id, input.id))
+          .returning();
+        return updated!;
       }
 
-      const [updated] = await ctx.db
+      // Flag-on path: enqueue via the transactional outbox (dispatch-sms worker).
+      const updateStmt = ctx.db
         .update(messageQueue)
-        .set({
-          status: "approved",
-          approvedAt: new Date(),
-          ...(message.channel === "sms" && input.skipDispatch
-            ? { sentAt: new Date() }
-            : {}),
-        })
+        .set({ status: "approved", approvedAt: new Date() })
         .where(eq(messageQueue.id, input.id))
         .returning();
-
+      const evt = buildOutboxEvent(MESSAGE_EVENTS.APPROVAL_REQUESTED, {
+        messageId: input.id,
+        correlationId: input.id,
+        channel: "sms",
+        body: message.body,
+        leadId: lead.id,
+      });
+      const [[updated]] = await ctx.db.batch([updateStmt, evt.query]);
+      await sendPostCommit([
+        { id: evt.id, name: evt.eventName, data: evt.payload },
+      ]);
       return updated!;
     }),
 
@@ -233,28 +247,45 @@ export const messagesRouter = createTRPCRouter({
         return updated!;
       }
 
-      // SMS path unchanged: synchronous dispatch + status write.
-      if (existing.channel === "sms" && !input.skipDispatch) {
-        await dispatchSms({
-          db: ctx.db,
-          message: { ...existing, body: input.body },
-        });
+      // SMS path (channel is "sms" here — email returned above).
+      // skipDispatch (native-share): stamp sentAt inline, no outbox event.
+      if (input.skipDispatch) {
+        const [updated] = await ctx.db
+          .update(messageQueue)
+          .set({
+            status: "edited_and_approved",
+            body: input.body,
+            originalBody: existing.originalBody ?? existing.body,
+            approvedAt: new Date(),
+            sentAt: new Date(),
+          })
+          .where(eq(messageQueue.id, input.id))
+          .returning();
+        return updated!;
       }
 
-      const [updated] = await ctx.db
+      // Flag-on path: enqueue via the transactional outbox (dispatch-sms worker).
+      const updateStmt = ctx.db
         .update(messageQueue)
         .set({
           status: "edited_and_approved",
           body: input.body,
           originalBody: existing.originalBody ?? existing.body,
           approvedAt: new Date(),
-          ...(existing.channel === "sms" && input.skipDispatch
-            ? { sentAt: new Date() }
-            : {}),
         })
         .where(eq(messageQueue.id, input.id))
         .returning();
-
+      const evt = buildOutboxEvent(MESSAGE_EVENTS.APPROVAL_REQUESTED, {
+        messageId: input.id,
+        correlationId: input.id,
+        channel: "sms",
+        body: input.body,
+        leadId: lead.id,
+      });
+      const [[updated]] = await ctx.db.batch([updateStmt, evt.query]);
+      await sendPostCommit([
+        { id: evt.id, name: evt.eventName, data: evt.payload },
+      ]);
       return updated!;
     }),
 

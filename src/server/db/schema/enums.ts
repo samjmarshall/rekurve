@@ -66,7 +66,7 @@ export const outreachStatusEnum = pgEnum("outreach_status", [
 ]);
 
 // Message Queue
-export const channelEnum = pgEnum("channel", ["sms", "email"]);
+export const channelEnum = pgEnum("channel", ["sms", "email", "imessage"]);
 
 export const messageStatusEnum = pgEnum("message_status", [
   "pending",

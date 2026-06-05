@@ -17,7 +17,7 @@ const ICON_MAP = {
 
 interface ConversationItemProps {
   id: string;
-  channel: "sms" | "email";
+  channel: "sms" | "email" | "imessage";
   direction: "inbound" | "outbound";
   subject: string | null;
   body: string;

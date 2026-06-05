@@ -5,9 +5,9 @@ export function directionLabel(
 }
 
 export function channelIcon(
-  channel: "sms" | "email",
+  channel: "sms" | "email" | "imessage",
 ): "MessageSquare" | "Mail" {
-  return channel === "sms" ? "MessageSquare" : "Mail";
+  return channel === "email" ? "Mail" : "MessageSquare";
 }
 
 export function wasEdited({

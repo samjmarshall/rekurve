@@ -64,6 +64,13 @@
       "when": 1780551343282,
       "tag": "0008_condemned_marrow",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1780655505644,
+      "tag": "0009_handy_anthem",
+      "breakpoints": true
     }
   ]
 }

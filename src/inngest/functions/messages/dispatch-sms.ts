@@ -37,15 +37,9 @@ export async function runDispatchSms(
 
   // 1. Re-read the row. Exit unless it's still an approved, unsent SMS —
   // this is the cancellation (dismiss-during-dispatch) and re-entry fence.
-  const message = await step.run("verify-still-approved", async () => {
-    const entry = await db.query.messageQueue.findFirst({
-      where: eq(messageQueue.id, messageId),
-    });
-    if (!entry) {
-      throw new Error(`Message queue entry not found: ${messageId}`);
-    }
-    return entry;
-  });
+  const message = await step.run("verify-still-approved", () =>
+    db.query.messageQueue.findFirst({ where: eq(messageQueue.id, messageId) }),
+  );
 
   if (
     !message ||
@@ -57,18 +51,7 @@ export async function runDispatchSms(
   }
   const { body, leadId, subject } = message;
 
-  // 2. Check if a conversation already exists.
-  const existing = await step.run("check-conversation", async () => {
-    const result = await db
-      .select({ id: conversations.id })
-      .from(conversations)
-      .where(eq(conversations.messageQueueId, messageId))
-      .limit(1);
-    return result;
-  });
-  const conversationExists = existing.length > 0;
-
-  // 3. Stamp the dispatching_at fence, then send via Twilio with status callback.
+  // 2. Stamp the dispatching_at fence, then send via Twilio with status callback.
   const smsResult = await step.run("send-sms", async () => {
     await db
       .update(messageQueue)
@@ -80,23 +63,27 @@ export async function runDispatchSms(
     return result;
   });
 
-  // 4. Idempotent conversation write — only insert if it doesn't exist.
-  if (!conversationExists) {
-    await step.run("write-conversation", async () => {
-      await db.insert(conversations).values({
-        leadId,
-        messageQueueId: messageId,
-        channel: "sms",
-        direction: "outbound",
-        deliveryMethod: "sms",
-        subject,
-        body,
-        twilioMessageSid: smsResult.sid,
-        deliveryStatus: smsResult.status,
-        hubspotActivityId: null,
-      });
+  // 3. Idempotent conversation write — check-then-insert (no unique index yet).
+  await step.run("write-conversation", async () => {
+    const existing = await db
+      .select({ id: conversations.id })
+      .from(conversations)
+      .where(eq(conversations.messageQueueId, messageId))
+      .limit(1);
+    if (existing.length > 0) return;
+    await db.insert(conversations).values({
+      leadId,
+      messageQueueId: messageId,
+      channel: "sms",
+      direction: "outbound",
+      deliveryMethod: "sms",
+      subject,
+      body,
+      twilioMessageSid: smsResult.sid,
+      deliveryStatus: smsResult.status,
+      hubspotActivityId: null,
     });
-  }
+  });
 
   // 5. Stamp sentAt — the send is now durably recorded.
   await step.run("update-message-status", () =>

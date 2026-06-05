@@ -125,6 +125,16 @@ describe("runDispatchSms — unit", () => {
     );
   });
 
+  test("missing row → silent no-op, no Twilio call, no insert", async () => {
+    mockMsgFindFirst.mockResolvedValue(undefined);
+    const { runDispatchSms } = await import("../dispatch-sms");
+    const step = fakeStep();
+
+    await expect(runDispatchSms(event, step as never)).resolves.toBeUndefined();
+    expect(mockSendSmsToConsultant).not.toHaveBeenCalled();
+    expect(mockInsertValues).not.toHaveBeenCalled();
+  });
+
   test("cancellation race: dismissed row → no Twilio call, no insert", async () => {
     mockMsgFindFirst.mockResolvedValue({ ...approvedSms, status: "dismissed" });
     const { runDispatchSms } = await import("../dispatch-sms");

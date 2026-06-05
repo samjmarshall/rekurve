@@ -197,8 +197,8 @@ Recommended workflow:
 1. `/implement_plan` - Execute the implementation
 2. `/commit` - Create atomic commits for changes
 3. `/validate_plan` - Verify implementation correctness
-4. `/document_feature {slug}` - Run for user-visible features (new route, flow, or integration). Take `{slug}` from the ticket title. Skip for infra, refactors, bug fixes, or test-only changes.
-5. `/domain_model` - Run when the plan adds or restructures a domain concept or entity boundary. Skip otherwise.
+4. `/document-feature {slug}` - Run for user-visible features (new route, flow, or integration). Take `{slug}` from the ticket title. Skip for infra, refactors, bug fixes, or test-only changes.
+5. `/domain-model` - Run when the plan adds or restructures a domain concept or entity boundary. Skip otherwise.
 6. `/pull_request` - Generate a PR
 
 The validation works best after commits are made, as it can analyze the git history to understand what was implemented.

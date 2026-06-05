@@ -1,17 +1,20 @@
 import { Signature } from "@hubspot/api-client";
-import { and, eq, gte, isNull, lte } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { conversations, leads } from "~/server/db/schema";
+import { extractCorrelationId } from "~/server/dispatch/correlation";
 import {
-  findContactIdForEmail,
   fromContactProperties,
   getContact,
   getEmailEngagement,
 } from "~/server/hubspot";
 import { captureLeadFromHubspot } from "~/server/leads/intake";
 import { resolveLeadOwnerUserId } from "~/server/leads/owner";
+import {
+  buildOutboxEvent,
+  HUBSPOT_EMAIL_EVENTS,
+  sendPostCommit,
+} from "~/server/outbox";
 
 interface WebhookEvent {
   subscriptionType: string;
@@ -118,42 +121,26 @@ async function handleEmailCreation(emailObjectId: string): Promise<void> {
   // Outbound only — "EMAIL" is HubSpot's enum for outbound, "INCOMING_EMAIL" for inbound
   if (engagement.direction !== "EMAIL") return;
 
-  const hubspotContactId = await findContactIdForEmail(emailObjectId);
-  if (!hubspotContactId) return;
-
-  const lead = await db.query.leads.findFirst({
-    where: eq(leads.hubspotContactId, hubspotContactId),
-  });
-  if (!lead) return;
-
-  const timestamp = engagement.timestamp ?? new Date();
-  const fiveMin = 5 * 60 * 1000;
-  const minTime = new Date(timestamp.getTime() - fiveMin);
-  const maxTime = new Date(timestamp.getTime() + fiveMin);
-
-  const matched = await db.query.conversations.findFirst({
-    where: and(
-      eq(conversations.leadId, lead.id),
-      eq(conversations.deliveryMethod, "email"),
-      eq(conversations.direction, "outbound"),
-      isNull(conversations.hubspotActivityId),
-      gte(conversations.createdAt, minTime),
-      lte(conversations.createdAt, maxTime),
-      ...(engagement.subject
-        ? [eq(conversations.subject, engagement.subject)]
-        : []),
-    ),
-  });
-
-  if (!matched) {
+  // Deterministic correlation (#261): pull our X-Rekurve-Correlation-Id back off
+  // the engagement headers. Absent → not one of ours (or a mailto/draft send we
+  // can't stamp); nothing to reconcile.
+  const correlationId = extractCorrelationId(engagement.headers);
+  if (!correlationId) {
     console.log(
-      `[HubSpot Webhook] No matching conversation for email.creation ${emailObjectId}`,
+      `[HubSpot Webhook] No correlation id on email.creation ${emailObjectId}; skipping`,
     );
     return;
   }
 
-  await db
-    .update(conversations)
-    .set({ hubspotActivityId: emailObjectId })
-    .where(eq(conversations.id, matched.id));
+  // Emit through the outbox (ADR-014: no direct inngest.send from a handler).
+  // The waiting dispatch-email run matches on data.correlationId; the sweep is
+  // the backstop and the 1-h waitForEvent tolerates ≤30 s sweep latency.
+  const evt = buildOutboxEvent(HUBSPOT_EMAIL_EVENTS.ENGAGEMENT_CREATED, {
+    correlationId,
+    hubspotActivityId: emailObjectId,
+  });
+  await evt.query;
+  await sendPostCommit([
+    { id: evt.id, name: evt.eventName, data: evt.payload },
+  ]);
 }

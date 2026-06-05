@@ -9,6 +9,7 @@ import {
 import {
   cleanupLeads,
   cleanupMessages,
+  deleteMsGraphTokens,
   getConversationsForLead,
   getMessageStatus,
   seedEmailQueueItem,
@@ -89,7 +90,7 @@ test.describe("Email Dispatch — E2E", () => {
     expect(await response.json()).toEqual({ received: true });
   });
 
-  test("approving an email-channel message sends email and shows 'Sent via email' toast", async ({
+  test("approving an email-channel message queues the send and shows 'Email queued to send' toast", async ({
     context,
     page,
     baseURL,
@@ -122,10 +123,33 @@ test.describe("Email Dispatch — E2E", () => {
     await expect(queue.row(item.messageId)).toBeVisible();
     await queue.approveButton(item.messageId).click();
 
+    // Row disappears immediately: optimistic removal; status flips to "approved"
     await expect(queue.row(item.messageId)).toBeHidden();
     await expect(
-      page.getByTestId("app-toast").filter({ hasText: /Sent via email/i }),
+      page
+        .getByTestId("app-toast")
+        .filter({ hasText: /Email queued to send/i }),
     ).toBeVisible();
+
+    // DB: status is "approved", dispatch has not happened yet
+    const approved = await getMessageStatus(item.messageId);
+    expect(approved?.status).toBe("approved");
+    expect(approved?.sent_at).toBeNull();
+
+    // Poll until the dispatch-email worker completes: it writes the conversation
+    // row then stamps sentAt. The outbox sweep runs on a 30s cron so allow 60s.
+    await expect
+      .poll(
+        async () => {
+          const status = await getMessageStatus(item.messageId);
+          return status?.sent_at;
+        },
+        {
+          timeout: 60_000,
+          message: "dispatch-email worker did not stamp sentAt within 60s",
+        },
+      )
+      .not.toBeNull();
 
     const convs = await getConversationsForLead(item.leadId);
     expect(convs.length).toBeGreaterThan(0);
@@ -133,7 +157,7 @@ test.describe("Email Dispatch — E2E", () => {
     expect(convs[0]!.delivery_method).toBe("email");
   });
 
-  test("approve fails when MS Graph token is invalid; row stays pending and is retryable", async ({
+  test("approve fails when Microsoft account not connected; row stays pending and is retryable", async ({
     context,
     page,
     baseURL,
@@ -150,11 +174,9 @@ test.describe("Email Dispatch — E2E", () => {
     leadIds.push(item.leadId);
     messageIds.push(item.messageId);
 
-    // Seed an invalid token — token row exists so checkEmailPreconditions passes,
-    // but the Graph call itself will fail with a 401.
-    await seedMsGraphTokens(session.userId, {
-      accessToken: "invalid-token-for-failure-path",
-    });
+    // Ensure no ms_graph_tokens row — checkEmailPreconditions throws synchronously.
+    // A prior test in this suite may have seeded a token for this session user.
+    await deleteMsGraphTokens(session.userId);
 
     await context.addCookies([getSessionCookie(session.signedToken, baseURL!)]);
     await page.goto("/dashboard");
@@ -163,14 +185,14 @@ test.describe("Email Dispatch — E2E", () => {
     await expect(queue.row(item.messageId)).toBeVisible();
     await queue.approveButton(item.messageId).click();
 
-    // Error toast should surface
+    // Synchronous precondition failure: no ms_graph_tokens row
     await expect(
       page
         .getByTestId("app-toast")
-        .filter({ hasText: /Failed to send email/i }),
+        .filter({ hasText: /Microsoft account not connected/i }),
     ).toBeVisible();
 
-    // Row must remain visible — dispatch failure left it pending
+    // Row must remain visible — precondition failure left it pending
     await expect(queue.row(item.messageId)).toBeVisible();
 
     // DB state: status still pending, approvedAt null
@@ -178,7 +200,7 @@ test.describe("Email Dispatch — E2E", () => {
     expect(dbState?.status).toBe("pending");
     expect(dbState?.approved_at).toBeNull();
 
-    // Recovery path: overwrite with a real token and re-approve
+    // Recovery path: seed a real token and re-approve
     test.skip(
       !process.env.MS_GRAPH_TEST_ACCESS_TOKEN,
       "Recovery path requires MS_GRAPH_TEST_ACCESS_TOKEN",
@@ -192,7 +214,9 @@ test.describe("Email Dispatch — E2E", () => {
 
     await expect(queue.row(item.messageId)).toBeHidden();
     await expect(
-      page.getByTestId("app-toast").filter({ hasText: /Sent via email/i }),
+      page
+        .getByTestId("app-toast")
+        .filter({ hasText: /Email queued to send/i }),
     ).toBeVisible();
   });
 });

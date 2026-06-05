@@ -9,6 +9,8 @@ let mockUpdate: ReturnType<typeof rs.fn>;
 let mockDbDelete: ReturnType<typeof rs.fn>;
 let mockLeadsFindFirst: ReturnType<typeof rs.fn>;
 let mockConversationsFindFirst: ReturnType<typeof rs.fn>;
+let mockBuildOutboxEvent: ReturnType<typeof rs.fn>;
+let mockSendPostCommit: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
@@ -19,6 +21,13 @@ beforeEach(() => {
   mockLeadsFindFirst = rs.fn();
   mockConversationsFindFirst = rs.fn();
   mockCaptureFromHubspot = rs.fn().mockResolvedValue(undefined);
+  mockBuildOutboxEvent = rs.fn((eventName: string, payload: unknown) => ({
+    id: "outbox-evt-1",
+    eventName,
+    payload,
+    query: Promise.resolve(undefined),
+  }));
+  mockSendPostCommit = rs.fn().mockResolvedValue(undefined);
 
   rs.doMock("~/env", () => ({
     env: {
@@ -60,6 +69,15 @@ beforeEach(() => {
 
   rs.doMock("~/server/leads/owner", () => ({
     resolveLeadOwnerUserId: rs.fn().mockResolvedValue("owner-1"),
+  }));
+
+  rs.doMock("~/server/outbox", () => ({
+    HUBSPOT_EMAIL_EVENTS: {
+      ENGAGEMENT_CREATED: "hubspot.email.engagement-created",
+      ENGAGEMENT_MISSED: "hubspot.engagement-missed",
+    },
+    buildOutboxEvent: mockBuildOutboxEvent,
+    sendPostCommit: mockSendPostCommit,
   }));
 
   // Mock db — only update/delete/query needed (insert no longer used for contact.creation)
@@ -330,27 +348,21 @@ const EMAIL_CREATION_EVENT = {
   attemptNumber: 0,
 };
 
+const CORRELATION_ID = "msg-uuid-789";
+
 const OUTBOUND_ENGAGEMENT = {
   id: "999",
   subject: "Following up",
   direction: "EMAIL",
   timestamp: new Date("2026-04-25T10:00:00Z"),
   toEmail: "lead@example.com",
+  headers: `X-Rekurve-Correlation-Id: ${CORRELATION_ID}`,
 };
 
 describe("object.creation (EMAIL) webhook events", () => {
-  test("outbound email with matching conversation → sets hubspotActivityId", async () => {
+  test("outbound email with our correlation header → emits engagement-created via outbox", async () => {
     mockIsValid.mockReturnValue(true);
     mockGetEmailEngagement.mockResolvedValue(OUTBOUND_ENGAGEMENT);
-    mockFindContactIdForEmail.mockResolvedValue("hs-contact-123");
-    mockLeadsFindFirst.mockResolvedValue({
-      id: "lead-uuid-1",
-      hubspotContactId: "hs-contact-123",
-    });
-    mockConversationsFindFirst.mockResolvedValue({
-      id: "conv-uuid-1",
-      hubspotActivityId: null,
-    });
 
     const { POST } = await import("../route");
     const response = await POST(
@@ -361,13 +373,57 @@ describe("object.creation (EMAIL) webhook events", () => {
 
     expect(response.status).toBe(200);
     expect(mockGetEmailEngagement).toHaveBeenCalledWith("999");
-    expect(mockFindContactIdForEmail).toHaveBeenCalledWith("999");
-    expect(mockLeadsFindFirst).toHaveBeenCalled();
-    expect(mockConversationsFindFirst).toHaveBeenCalled();
-    expect(mockUpdate).toHaveBeenCalled();
+    // Emits the correlation event keyed by the extracted id, carrying the
+    // engagement object id as the activity id.
+    expect(mockBuildOutboxEvent).toHaveBeenCalledWith(
+      "hubspot.email.engagement-created",
+      { correlationId: CORRELATION_ID, hubspotActivityId: "999" },
+    );
+    expect(mockSendPostCommit).toHaveBeenCalledWith([
+      expect.objectContaining({ name: "hubspot.email.engagement-created" }),
+    ]);
+    // No direct conversation stamp anymore — the worker owns that.
+    expect(mockUpdate).not.toHaveBeenCalled();
   });
 
-  test("inbound email (INCOMING_EMAIL direction) → no DB writes", async () => {
+  test("outbound email without our correlation header → no emit", async () => {
+    mockIsValid.mockReturnValue(true);
+    mockGetEmailEngagement.mockResolvedValue({
+      ...OUTBOUND_ENGAGEMENT,
+      headers: "Subject: Following up\nFrom: someone@else.com",
+    });
+
+    const { POST } = await import("../route");
+    const response = await POST(
+      makeRequest({
+        body: JSON.stringify([EMAIL_CREATION_EVENT]),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
+    expect(mockSendPostCommit).not.toHaveBeenCalled();
+  });
+
+  test("outbound email with null headers → no emit", async () => {
+    mockIsValid.mockReturnValue(true);
+    mockGetEmailEngagement.mockResolvedValue({
+      ...OUTBOUND_ENGAGEMENT,
+      headers: null,
+    });
+
+    const { POST } = await import("../route");
+    const response = await POST(
+      makeRequest({
+        body: JSON.stringify([EMAIL_CREATION_EVENT]),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
+  });
+
+  test("inbound email (INCOMING_EMAIL direction) → no emit", async () => {
     mockIsValid.mockReturnValue(true);
     mockGetEmailEngagement.mockResolvedValue({
       ...OUTBOUND_ENGAGEMENT,
@@ -382,15 +438,13 @@ describe("object.creation (EMAIL) webhook events", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mockLeadsFindFirst).not.toHaveBeenCalled();
-    expect(mockUpdate).not.toHaveBeenCalled();
+    expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
+    expect(mockSendPostCommit).not.toHaveBeenCalled();
   });
 
-  test("unknown hubspotContactId (no lead row) → no DB writes", async () => {
+  test("missing engagement (404 → null) → no emit, returns 200", async () => {
     mockIsValid.mockReturnValue(true);
-    mockGetEmailEngagement.mockResolvedValue(OUTBOUND_ENGAGEMENT);
-    mockFindContactIdForEmail.mockResolvedValue("hs-contact-unknown");
-    mockLeadsFindFirst.mockResolvedValue(null);
+    mockGetEmailEngagement.mockResolvedValue(null);
 
     const { POST } = await import("../route");
     const response = await POST(
@@ -400,51 +454,6 @@ describe("object.creation (EMAIL) webhook events", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mockConversationsFindFirst).not.toHaveBeenCalled();
-    expect(mockUpdate).not.toHaveBeenCalled();
-  });
-
-  test("no matching conversations row → no DB write, returns 200", async () => {
-    mockIsValid.mockReturnValue(true);
-    mockGetEmailEngagement.mockResolvedValue(OUTBOUND_ENGAGEMENT);
-    mockFindContactIdForEmail.mockResolvedValue("hs-contact-123");
-    mockLeadsFindFirst.mockResolvedValue({
-      id: "lead-uuid-1",
-      hubspotContactId: "hs-contact-123",
-    });
-    mockConversationsFindFirst.mockResolvedValue(null);
-
-    const { POST } = await import("../route");
-    const response = await POST(
-      makeRequest({
-        body: JSON.stringify([EMAIL_CREATION_EVENT]),
-      }),
-    );
-
-    expect(response.status).toBe(200);
-    expect(mockUpdate).not.toHaveBeenCalled();
-  });
-
-  test("conversation already has hubspotActivityId (idempotency) → findFirst returns null, no overwrite", async () => {
-    mockIsValid.mockReturnValue(true);
-    mockGetEmailEngagement.mockResolvedValue(OUTBOUND_ENGAGEMENT);
-    mockFindContactIdForEmail.mockResolvedValue("hs-contact-123");
-    mockLeadsFindFirst.mockResolvedValue({
-      id: "lead-uuid-1",
-      hubspotContactId: "hs-contact-123",
-    });
-    // Filter includes isNull(hubspotActivityId), so already-reconciled rows
-    // won't be returned by findFirst — simulate that here:
-    mockConversationsFindFirst.mockResolvedValue(null);
-
-    const { POST } = await import("../route");
-    const response = await POST(
-      makeRequest({
-        body: JSON.stringify([EMAIL_CREATION_EVENT]),
-      }),
-    );
-
-    expect(response.status).toBe(200);
-    expect(mockUpdate).not.toHaveBeenCalled();
+    expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
   });
 });

@@ -2,6 +2,7 @@
 name: commit
 description: git commit code changes with clear messages
 model: sonnet
+effort: medium
 ---
 # Commit Changes
 

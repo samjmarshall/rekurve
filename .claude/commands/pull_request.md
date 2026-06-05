@@ -1,8 +1,9 @@
 ---
 skills: writing-clearly-and-concisely
 argument-hint: '[create|update] [type|#number] [draft]'
+skills: pull-request, writing-clearly-and-concisely
 model: sonnet
-effort: xhigh
+effort: high
 ---
 
 # Pull Request

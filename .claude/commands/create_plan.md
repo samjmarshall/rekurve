@@ -25,7 +25,7 @@ Produce a complete, actionable plan at `thoughts/plans/YYYY-MM-DD-ENG-XXXX-descr
 
 When planning from a `/brainstorm` design doc, reconcile its appendix **before** writing phases:
 
-- **Unresolved `## ADR Candidates` or `## Terminology TODO`** mean `/domain_model` hasn't run. **STOP and do not draft the plan** — those decisions must exist as **Proposed** ADRs (and terms persisted to `CONTEXT.md`) before planning. Tell the user to run `` `/domain_model <design-doc-path>` ``, then resume.
+- **Unresolved `## ADR Candidates` or `## Terminology TODO`** mean `/domain-model` hasn't run. **STOP and do not draft the plan** — those decisions must exist as **Proposed** ADRs (and terms persisted to `CONTEXT.md`) before planning. Tell the user to run `` `/domain-model <design-doc-path>` ``, then resume.
 - **`## Related ADRs`** lists the **Proposed** ADRs this work depends on. Every Proposed ADR must map to the phase that implements it — cite it in that phase's `### Changes` (e.g. `docs/adr/adrNNN-slug.md — implements this decision`). Flag any Proposed ADR with no implementing phase. Use `docs-locator` to confirm each referenced ADR exists and its recorded `Status:`, and `docs-analyzer` to distil an existing **Accepted** ADR the plan must compose with.
 - Use the canonical terms from `CONTEXT.md` throughout the plan — phase names, file paths, identifiers.
 
@@ -77,4 +77,4 @@ When planning from a `/brainstorm` design doc, reconcile its appendix **before**
 - Refactors include characterization tests before the behaviour change.
 - Every reference to existing code includes `file:line`.
 - Non-trivial test work follows the TDD vertical-slice loop — one test → one impl → repeat. See the `tdd` skill.
-- Plans built from a design doc resolve its `## ADR Candidates` / `## Terminology TODO` via `/domain_model` first, then map each resulting Proposed ADR to an implementing phase.
+- Plans built from a design doc resolve its `## ADR Candidates` / `## Terminology TODO` via `/domain-model` first, then map each resulting Proposed ADR to an implementing phase.

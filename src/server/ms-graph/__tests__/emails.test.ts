@@ -133,18 +133,39 @@ describe("sendEmail", () => {
     expect(result.sentAt.getTime()).toBeGreaterThanOrEqual(before.getTime());
   });
 
-  test("returns an internetMessageId string", async () => {
+  test("stamps the X-Rekurve-Correlation-Id header when correlationId is set", async () => {
     const { sendEmail } = await import("../emails");
 
-    const result = await sendEmail({
+    await sendEmail({
+      userId: "user-1",
+      to: "lead@example.com",
+      subject: "Test",
+      body: "Test body",
+      correlationId: "msg-123",
+    });
+
+    const payload = mockApiPost.mock.calls[0]![0] as {
+      message: { internetMessageHeaders?: { name: string; value: string }[] };
+    };
+    expect(payload.message.internetMessageHeaders).toEqual([
+      { name: "X-Rekurve-Correlation-Id", value: "msg-123" },
+    ]);
+  });
+
+  test("omits internetMessageHeaders when no correlationId is given", async () => {
+    const { sendEmail } = await import("../emails");
+
+    await sendEmail({
       userId: "user-1",
       to: "lead@example.com",
       subject: "Test",
       body: "Test body",
     });
 
-    expect(typeof result.internetMessageId).toBe("string");
-    expect(result.internetMessageId.length).toBeGreaterThan(0);
+    const payload = mockApiPost.mock.calls[0]![0] as {
+      message: { internetMessageHeaders?: unknown };
+    };
+    expect(payload.message.internetMessageHeaders).toBeUndefined();
   });
 
   test("propagates Graph SDK errors without swallowing", async () => {

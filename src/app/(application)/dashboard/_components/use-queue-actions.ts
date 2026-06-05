@@ -106,8 +106,12 @@ export function useApproveAction({ onRequestSmsShare }: SmsShareOptions) {
       onMutate: ({ id }) => optimistic.snapshot(id),
       onSuccess: (data) => {
         if (data.channel === "email") {
-          toast.add({ title: "Sent via email" });
+          // Longer timeout: the item disappears immediately (optimistic) but the
+          // send is async — 10s keeps the confirmation on screen until it's underway.
+          toast.add({ title: "Email on its way", timeout: 10_000 });
         } else {
+          // SMS dispatch is synchronous (or native-share); "approved" is accurate.
+          // TODO: align copy when sms-twilio-dispatch flag ships broadly (#262).
           toast.add({ title: "Draft approved" });
         }
       },
@@ -184,8 +188,9 @@ export function useEditAndApproveAction({
       onSuccess: (data) => {
         if (data.channel === "email") {
           toast.add({
-            title: "Sent via email",
-            description: "Your edits were saved.",
+            title: "Email on its way",
+            description: "Your edits were applied before sending.",
+            timeout: 10_000,
           });
         } else {
           toast.add({ title: "Draft approved" });

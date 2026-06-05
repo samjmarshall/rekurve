@@ -44,6 +44,7 @@ const MOCK_EMAIL_RESPONSE = {
     hs_email_direction: "EMAIL",
     hs_timestamp: "1745568000000",
     hs_email_to_email: "lead@example.com",
+    hs_email_headers: "X-Rekurve-Correlation-Id: msg-789",
   },
 };
 
@@ -61,9 +62,10 @@ describe("getEmailEngagement", () => {
     expect(result!.toEmail).toBe("lead@example.com");
     expect(result!.timestamp).toBeInstanceOf(Date);
     expect(result!.timestamp!.getTime()).toBe(1745568000000);
+    expect(result!.headers).toBe("X-Rekurve-Correlation-Id: msg-789");
   });
 
-  test("calls getById with email properties", async () => {
+  test("calls getById with email properties including headers", async () => {
     mockGetById.mockResolvedValue(MOCK_EMAIL_RESPONSE);
 
     const { getEmailEngagement } = await import("../emails");
@@ -75,6 +77,7 @@ describe("getEmailEngagement", () => {
         "hs_email_subject",
         "hs_email_direction",
         "hs_timestamp",
+        "hs_email_headers",
       ]),
     );
   });
@@ -112,6 +115,7 @@ describe("getEmailEngagement", () => {
     expect(result!.direction).toBeNull();
     expect(result!.timestamp).toBeNull();
     expect(result!.toEmail).toBeNull();
+    expect(result!.headers).toBeNull();
   });
 });
 

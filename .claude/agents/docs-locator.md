@@ -2,7 +2,7 @@
 name: docs-locator
 description: Finds and categorizes documents in the authoritative `docs/` tree — ADRs, feature docs, runbooks. Use when a task needs the system-of-record: which decision governs an area, which feature is documented. Returns grouped paths with each ADR's number + recorded Status, not contents. Not for code (use codebase-locator), speculative designs/plans (use thoughts-locator), or distilling one document (use docs-analyzer).
 tools: Bash, Read
-color: green
+color: cyan
 model: sonnet
 ---
 

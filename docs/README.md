@@ -12,12 +12,28 @@ If you're interested in seeing how I use Claude Code for this project, see the `
 
 If you'd like help building, implementing or discovering AI problems/solutions in your Enterprise, reach out to me on [Linkedin](https://www.linkedin.com/in/sam-j-marshall/) or get in touch with the [V2 AI](https://www.v2.ai/contact?utm_source=github&utm_medium=referral&utm_campaign=rekurve&utm_content=readme-contact-cta) team (V2 AI is an official partner with Anthropic in the Claude Partner Network).
 
+## Claude Code "Quick tips"
+
+1. Run the Claude Code native slash command `/terminal-setup` - Install **Shift + Enter** key binding for newlines, allows multi-line prompts.
+2. Configure Status line UI. This allows you to see the current model, effort and number of tokens in the main context window:
+   - My personal recommendation: https://github.com/sirmalloc/ccstatusline
+    ![ccstatusline](./ccstatusline.png)
+   - Alternative - The official Claude Code statusline via `/statusline` command and [official customization docs](https://code.claude.com/docs/en/statusline).
+
+Remember, when the main context window goes over ~120k tokens, deep reasoning and thinking quality falls off a cliff, or as Matt Pocock calls it; "Entering the dumb zone".
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./context-window-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./context-window.png">
+  <img alt="Context Window" src="./context-window.png">
+</picture>
+
 ## Claude Code Harness Overview
 
 > [!CAUTION]
 > The ***BIGGEST*** mistake I see individuals and teams make is copy/pasting someone elses Harness. *Do not do this* unless you're happy with someone elses process & results, assuming they also have a similar tech stack.
 >
-> This AI coding workflow & harness is just an example, a rough template you can test; then pick and chose from. You should _NOT_ blindly copy/paste it! Modifying it for yourself and your specific project context.
+> This AI coding workflow & harness is just an example, a rough template you can test; then pick and chose from. You should _NOT_ blindly copy/paste it! Modify it for yourself and your specific project context.
 >
 > I'm sure you can still get good results from copy/pasting this exact Harness. I'm simply highlighting my recommendation to study it instead. Test it, then apply what is relevant to you. Building up a Harness molded to you and your specific use cases, not the other way around.
 
@@ -73,8 +89,8 @@ These commands are invoked inside [Claude Code](https://claude.ai/code) via slas
 | `/commit` | Structured conventional commit | Ready to commit (follows repo conventions) |
 | `/design_review` | Visual/accessibility/brand review via Playwright | After UI/UX changes, before committing |
 | `/pull_request` | Create or update a PR — generates title (create) and description from diff + template | Before opening or updating a PR |
-| `/document_feature <feature-name>` | Interview-driven living feature doc at `docs/feature/{slug}.md` — present-tense "what does this do today" | After a feature ships — keep the feature reference current |
-| `/domain_model <plan-path>` | Interview-driven domain modeling, sharpen terminology and update `CONTEXT.md`, align language before implementation. Write/update Architecture Decision Records (ADRs) | After brainstorm for drafting domain models / ADRs. After plan implementation for accepting/rejecting drafted ADRs or writing new ADRs when difficult to reverse decisions are made. |
+| `/document-feature <feature-name>` | Interview-driven living feature doc at `docs/feature/{slug}.md` — present-tense "what does this do today" | After a feature ships — keep the feature reference current |
+| `/domain-model <design-doc-path>` | Interview-driven domain modeling, sharpen terminology and update `CONTEXT.md`, align language before implementation. Write/update Architecture Decision Records (ADRs) | After brainstorm for drafting domain models / ADRs. After plan implementation for accepting/rejecting drafted ADRs or writing new ADRs when difficult to reverse decisions are made. |
 
 ### Automated: Ralph Loop
 

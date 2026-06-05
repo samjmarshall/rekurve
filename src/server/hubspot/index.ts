@@ -11,6 +11,7 @@ export {
   type EmailEngagement,
   findContactIdForEmail,
   getEmailEngagement,
+  listEmailEngagementsForContact,
 } from "./emails";
 export {
   ALL_PROPERTIES,

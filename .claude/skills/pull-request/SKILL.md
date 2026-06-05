@@ -1,6 +1,9 @@
 ---
 name: pull-request
 description: Create or update a Pull Request with a description tailored to its conventional-commit type (feat, fix, refactor, chore, perf, or trivial). Auto-detects whether to create or update based on branch state, detects type from branch/commits/issues, fills the matching bundled template, and runs verification only for what CI does not cover. Use when invoking /pull-request, when the user asks to open or update a PR, or after pushing work that needs a PR.
+argument-hint: '[create|update] [type|#number] [draft]'
+model: sonnet
+effort: high
 ---
 
 # Pull Request

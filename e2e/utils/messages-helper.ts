@@ -268,6 +268,10 @@ export async function cleanupConversationsForLead(
   await sql()`DELETE FROM "conversations" WHERE lead_id = ${leadId}`;
 }
 
+export async function deleteMsGraphTokens(userId: string): Promise<void> {
+  await sql()`DELETE FROM "ms_graph_tokens" WHERE user_id = ${userId}`;
+}
+
 export async function seedMsGraphTokens(
   userId: string,
   opts: {

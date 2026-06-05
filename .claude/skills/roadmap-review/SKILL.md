@@ -1,7 +1,6 @@
 ---
 name: roadmap-review
 description: Collaborative review and prioritization of GitHub Project issues for pre-PMF startups. Use when you need to reassess priorities, restructure milestones, or ensure work aligns with validation goals. Especially useful when capacity changes or strategy shifts.
-skills: writing-clearly-and-concisely
 model: opus
 effort: max
 ---

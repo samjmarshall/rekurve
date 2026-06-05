@@ -36,14 +36,12 @@ const baseLead = {
 };
 
 let mockDb: Record<string, unknown>;
-let mockDispatchSms: ReturnType<typeof rs.fn>;
 let mockBuildOutboxEvent: ReturnType<typeof rs.fn>;
 let mockSendPostCommit: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
 
-  mockDispatchSms = rs.fn().mockResolvedValue({ conversationId: "conv-456" });
   mockBuildOutboxEvent = rs.fn((eventName: string, payload: unknown) => ({
     id: "outbox-evt-id",
     eventName,
@@ -75,10 +73,6 @@ beforeEach(() => {
       user: { id: "test-user-id", email: "test@example.com", name: "Test" },
       session: { id: "test-session-id" },
     }),
-  }));
-
-  rs.doMock("~/server/dispatch/sms-dispatch", () => ({
-    dispatchSms: mockDispatchSms,
   }));
 
   rs.doMock("~/server/outbox", () => ({
@@ -225,14 +219,14 @@ describe("messages.approve", () => {
   test("transitions pending → approved and sets approvedAt", async () => {
     (
       mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
-    ).messageQueue.findFirst.mockResolvedValue(baseMessage);
+    ).messageQueue.findFirst.mockResolvedValue(emailMessage);
 
     const approved = {
-      ...baseMessage,
+      ...emailMessage,
       status: "approved" as const,
       approvedAt: new Date(),
     };
-    const { set } = mockUpdateReturning(approved);
+    const { set } = mockEmailEnqueue(approved);
 
     const caller = await getCaller();
     const result = await caller.messages.approve({ id: MSG_ID });
@@ -248,12 +242,12 @@ describe("messages.approve", () => {
   });
 
   test("allows snoozed → approved", async () => {
-    const snoozed = { ...baseMessage, status: "snoozed" as const };
+    const snoozed = { ...emailMessage, status: "snoozed" as const };
     (
       mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
     ).messageQueue.findFirst.mockResolvedValue(snoozed);
 
-    mockUpdateReturning({
+    mockEmailEnqueue({
       ...snoozed,
       status: "approved",
       approvedAt: new Date(),
@@ -317,16 +311,16 @@ describe("messages.editAndApprove", () => {
   test("copies existing body into originalBody and sets new body", async () => {
     (
       mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
-    ).messageQueue.findFirst.mockResolvedValue(baseMessage);
+    ).messageQueue.findFirst.mockResolvedValue(emailMessage);
 
     const edited = {
-      ...baseMessage,
+      ...emailMessage,
       status: "edited_and_approved" as const,
       body: "Rewritten message",
       originalBody: "Original draft body",
       approvedAt: new Date(),
     };
-    const { set } = mockUpdateReturning(edited);
+    const { set } = mockEmailEnqueue(edited);
 
     const caller = await getCaller();
     const result = await caller.messages.editAndApprove({
@@ -348,7 +342,7 @@ describe("messages.editAndApprove", () => {
 
   test("preserves originalBody when row was already edited once", async () => {
     const previouslyEdited = {
-      ...baseMessage,
+      ...emailMessage,
       body: "First edit",
       originalBody: "The true original",
     };
@@ -356,7 +350,7 @@ describe("messages.editAndApprove", () => {
       mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
     ).messageQueue.findFirst.mockResolvedValue(previouslyEdited);
 
-    const { set } = mockUpdateReturning(previouslyEdited);
+    const { set } = mockEmailEnqueue(previouslyEdited);
 
     const caller = await getCaller();
     await caller.messages.editAndApprove({ id: MSG_ID, body: "Second edit" });
@@ -671,7 +665,7 @@ describe("messages.approve — email channel", () => {
     }
   });
 
-  test("sms channel: dispatch runs, then status flips", async () => {
+  test("sms (flag-on path): enqueues approval via outbox, returns approved row, no sync send", async () => {
     (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
       baseMessage,
     );
@@ -680,49 +674,44 @@ describe("messages.approve — email channel", () => {
       status: "approved" as const,
       approvedAt: new Date(),
     };
-    mockUpdateReturning(approved);
+    const { set } = mockEmailEnqueue(approved);
 
     const caller = await getCaller();
     const result = await caller.messages.approve({ id: MSG_ID });
 
     expect(result.status).toBe("approved");
-    expect(mockDispatchSms).toHaveBeenCalledOnce();
-    expect(mockDispatchSms).toHaveBeenCalledWith(
+    // Status flip carried in the batched UPDATE — no sentAt set (worker does that).
+    expect(set).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.objectContaining({
-          id: MSG_ID,
-          body: "Original draft body",
-        }),
+        status: "approved",
+        approvedAt: expect.any(Date),
       }),
     );
-    const dispatchOrder = mockDispatchSms.mock.invocationCallOrder[0]!;
-    const updateOrder = (mockDb.update as ReturnType<typeof rs.fn>).mock
-      .invocationCallOrder[0]!;
-    expect(dispatchOrder).toBeLessThan(updateOrder);
-  });
-
-  test("sms channel: dispatch failure leaves row pending; status update is not called", async () => {
-    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
-      baseMessage,
+    expect(set).not.toHaveBeenCalledWith(
+      expect.objectContaining({ sentAt: expect.any(Date) }),
     );
-    mockDispatchSms.mockRejectedValue(
-      new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to send SMS. Please try again.",
+    // Outbox row enqueued with the sms correlation payload.
+    expect(mockBuildOutboxEvent).toHaveBeenCalledWith(
+      "message.approval-requested",
+      expect.objectContaining({
+        messageId: MSG_ID,
+        correlationId: MSG_ID,
+        channel: "sms",
+        leadId: LEAD_ID,
+        body: baseMessage.body,
       }),
     );
-
-    const caller = await getCaller();
-    try {
-      await caller.messages.approve({ id: MSG_ID });
-      expect.unreachable("Should have thrown");
-    } catch (e) {
-      expect((e as TRPCError).code).toBe("INTERNAL_SERVER_ERROR");
-      expect(mockDb.update).not.toHaveBeenCalled();
-    }
+    // Atomic write: UPDATE + outbox insert co-batched, then post-commit send.
+    expect(mockDb.batch).toHaveBeenCalledOnce();
+    expect(
+      (mockDb.batch as ReturnType<typeof rs.fn>).mock.calls[0]![0],
+    ).toHaveLength(2);
+    expect(mockSendPostCommit).toHaveBeenCalledWith([
+      expect.objectContaining({ name: "message.approval-requested" }),
+    ]);
   });
 
-  test("approve sms + skipDispatch: true → dispatchSms not called, sentAt stamped, status flips", async () => {
+  test("approve sms + skipDispatch: true → no outbox event, sentAt stamped, status flips", async () => {
     (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
       baseMessage,
     );
@@ -741,7 +730,8 @@ describe("messages.approve — email channel", () => {
     });
 
     expect(result.status).toBe("approved");
-    expect(mockDispatchSms).not.toHaveBeenCalled();
+    expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
+    expect(mockDb.batch).not.toHaveBeenCalled();
     expect(set).toHaveBeenCalledWith(
       expect.objectContaining({
         status: "approved",
@@ -753,7 +743,7 @@ describe("messages.approve — email channel", () => {
 });
 
 describe("messages.editAndApprove — sms channel", () => {
-  test("editAndApprove sms + skipDispatch: true → dispatchSms not called, edited body saved, sentAt stamped", async () => {
+  test("editAndApprove sms + skipDispatch: true → no outbox event, edited body saved, sentAt stamped", async () => {
     (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
       baseMessage,
     );
@@ -775,7 +765,8 @@ describe("messages.editAndApprove — sms channel", () => {
     });
 
     expect(result.status).toBe("edited_and_approved");
-    expect(mockDispatchSms).not.toHaveBeenCalled();
+    expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
+    expect(mockDb.batch).not.toHaveBeenCalled();
     expect(set).toHaveBeenCalledWith(
       expect.objectContaining({
         status: "edited_and_approved",
@@ -785,7 +776,7 @@ describe("messages.editAndApprove — sms channel", () => {
     );
   });
 
-  test("dispatches with input.body, not the existing row body", async () => {
+  test("editAndApprove sms: enqueues via outbox with input.body and preserves originalBody", async () => {
     (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
       baseMessage,
     );
@@ -796,37 +787,36 @@ describe("messages.editAndApprove — sms channel", () => {
       originalBody: baseMessage.body,
       approvedAt: new Date(),
     };
-    mockUpdateReturning(edited);
+    const { set } = mockEmailEnqueue(edited);
 
     const caller = await getCaller();
-    await caller.messages.editAndApprove({ id: MSG_ID, body: "Edited body" });
+    const result = await caller.messages.editAndApprove({
+      id: MSG_ID,
+      body: "Edited body",
+    });
 
-    expect(mockDispatchSms).toHaveBeenCalledWith(
+    expect(result.status).toBe("edited_and_approved");
+    expect(set).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.objectContaining({ body: "Edited body" }),
+        status: "edited_and_approved",
+        body: "Edited body",
+        originalBody: baseMessage.body,
       }),
     );
-  });
-
-  test("dispatch failure → body and originalBody are not written", async () => {
-    (mockDb.query as MockQuery).messageQueue.findFirst.mockResolvedValue(
-      baseMessage,
-    );
-    mockDispatchSms.mockRejectedValue(
-      new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to send SMS. Please try again.",
+    expect(mockBuildOutboxEvent).toHaveBeenCalledWith(
+      "message.approval-requested",
+      expect.objectContaining({
+        messageId: MSG_ID,
+        correlationId: MSG_ID,
+        channel: "sms",
+        leadId: LEAD_ID,
+        body: "Edited body",
       }),
     );
-
-    const caller = await getCaller();
-    try {
-      await caller.messages.editAndApprove({ id: MSG_ID, body: "Edited body" });
-      expect.unreachable("Should have thrown");
-    } catch (e) {
-      expect((e as TRPCError).code).toBe("INTERNAL_SERVER_ERROR");
-      expect(mockDb.update).not.toHaveBeenCalled();
-    }
+    expect(mockDb.batch).toHaveBeenCalledOnce();
+    expect(mockSendPostCommit).toHaveBeenCalledWith([
+      expect.objectContaining({ name: "message.approval-requested" }),
+    ]);
   });
 });
 

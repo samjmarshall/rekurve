@@ -3,10 +3,60 @@ _generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
 _needs_review: true
 _note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/design-reviewer.yaml alongside
   golden + adversarial buckets.
-_mined_available: 1
-_mined_emitted: 1
+_mined_available: 3
+_mined_emitted: 3
 execution:
 - id: mined-design-reviewer-exec-1
+  kind: execution
+  prompt: "Conduct a focused design review on a toast copy change in a Next.js dashboard app.\n\n## Context\n\
+    \nThe branch `feat/261-email-dispatch-outbox-migration` changed email approval from synchronous (send\
+    \ happens immediately) to async (send happens in an Inngest background worker). As a result, the success\
+    \ toast copy was updated:\n\n**Before** (implied — synchronous send): toast said something like \"\
+    Draft approved\" or similar  \n**After** (this branch):\n- `approve` for email channel → `toast.add({\
+    \ title: \"Email queued to send\" })`  (`src/app/(application)/dashboard/_components/use-queue-actions.ts:109`)\n\
+    - `editAndApprove` for email channel → `toast.add({ title: \"Email queued to send\", description:\
+    \ \"Your edits were saved.\" })` (line 187)\n- SMS and other channels still show `toast.add({ title:\
+    \ \"Draft approved\" })`\n- Error when MS account not connected → `toast.add({ type: \"error\", title:\
+    \ \"Microsoft account not connected\", description: \"Connect your account to send emails from Outlook.\"\
+    , ... })` with a \"Connect\" action button\n\nThe app is a consultant-facing dashboard. The live preview\
+    \ is at https://rekurve.localhost — note this is a Vercel Portless URL (no port number needed).\n\n\
+    ## What to review\n\n1. **Copy quality** — Is \"Email queued to send\" clear, accurate, and appropriately\
+    \ reassuring? The email won't send for up to ~30s (outbox sweep) after the consultant taps Approve.\
+    \ Does the copy set the right expectation?\n\n2. **Visual rendering** — Navigate to https://rekurve.localhost\
+    \ and attempt to observe the toast component in context. The toast uses `data-testid=\"app-toast\"\
+    `. Look at any existing toasts on the dashboard, or the toast's visual appearance from the component\
+    \ source. Check: font, colour, size, duration, position on screen.\n\n3. **Edit flow copy** — \"Email\
+    \ queued to send\" + description \"Your edits were saved.\" — does adding the description in the edit-and-approve\
+    \ path feel right?\n\n4. **Consistency** — SMS still says \"Draft approved\". Email now says \"Email\
+    \ queued to send\". Is this channel-specific divergence appropriate or jarring?\n\n5. **Accessibility**\
+    \ — Is the toast announced to screen readers? Does the error toast with the \"Connect\" action button\
+    \ meet accessible interactive element standards?\n\n## Key files to read\n\n- `src/app/(application)/dashboard/_components/use-queue-actions.ts`\
+    \ — the changed file (toast calls at lines 109, 187)\n- Look for the toast component implementation\
+    \ (search for `app-toast` data-testid) to understand duration, positioning, and ARIA handling\n\n\
+    Report findings in a structured design review format: what passes, what has concerns, and any recommendations.\
+    \ Be concise — this is a narrow copy-only change, not a full feature review."
+  provenance:
+    agent_id: a406f0077c6e0facb
+    session_id: a76e0a6d-b917-4e91-916d-933195edfbac
+    model: claude-sonnet-4-6
+    latency_s: 222.1
+    tokens_total: 2069061
+    n_tool_uses: 51
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/a76e0a6d-b917-4e91-916d-933195edfbac/subagents/agent-a406f0077c6e0facb.jsonl
+  sample_output_excerpt: 'I now have everything I need for a thorough, evidence-based review. Let me compile
+    the findings.
+
+
+    ---
+
+
+    ### Design Review Summary
+
+
+    This is a narrow, well-scoped change. The implementation is fundamentally sound — the async architecture
+    change is correctly reflected in the UI, and the toast infrastructure (Base UI v1.4.1, Tailwind tokens,
+    brand system) is solid. There are no blockers. A handful of i …'
+- id: mined-design-reviewer-exec-2
   kind: execution
   prompt: "You are reviewing a specific UI change on the `feat/258-lead-outbox-cutover` branch of a Next.js\
     \ app called Rekurve. The app runs at https://rekurve.localhost via Vercel Portless.\n\n## What changed\n\
@@ -70,9 +120,152 @@ execution:
 
     The dev server was not reachable at `https://rekurve.localhost` during this review, so all findings
     are based on static code analysis of the component, its dependencies (`Badge.tsx`, `display …'
+- id: mined-design-reviewer-exec-3
+  kind: execution
+  prompt: 'You are reviewing a specific UX copy change on the Rekurve dashboard. The app is live at https://rekurve.localhost.
+
+
+    ## What changed
+
+
+    In `src/app/(application)/dashboard/_components/use-queue-actions.ts`, the email approval success
+    toast was updated:
+
+
+    **Before:** `toast.add({ title: "Sent via email" })`
+
+    **After:** `toast.add({ title: "Email queued to send" })`
+
+
+    For edit-and-approve specifically:
+
+    **After:** `toast.add({ title: "Email queued to send", description: "Your edits were saved." })`
+
+
+    This copy change reflects a real behaviour change: approving an email no longer sends it immediately.
+    The email is now dispatched asynchronously by an Inngest worker. The UI shows "approved" status instantly
+    and the row disappears from the queue optimistically, but the actual send happens in the background.
+
+
+    ## Full toast copy inventory to review (for consistency)
+
+
+    All current toast titles/descriptions in the app:
+
+    - Email approve success: `"Email queued to send"` (new)
+
+    - Email edit+approve success: `"Email queued to send"` + description `"Your edits were saved."` (new)
+
+    - SMS/other channel approve: `"Draft approved"`
+
+    - Edit+approve (SMS): `"Draft approved"`
+
+    - Dismiss: `"Draft dismissed"`
+
+    - Snooze: `` `Snoozed until ${when}` ``
+
+    - Approve error (MS not connected): title `"Microsoft account not connected"`, description `"Connect
+    your account to send emails from Outlook."` + "Connect" action button
+
+    - Approve error (other): `"Approve failed"`
+
+    - Edit error: `"Edit failed"`
+
+    - Snooze error: `"Snooze failed"`
+
+    - SMS copy failed: title `"Copy failed"`, description `"Could not copy to clipboard. Try another option."`
+
+
+    ## Toast component design
+
+
+    The toast is a `base-ui` Toast component with:
+
+    - `rounded-lg border bg-background p-4 shadow-lg`
+
+    - Title: `font-medium text-sm leading-tight`
+
+    - Description: `text-muted-foreground text-sm`
+
+    - Error variant: `data-[type=error]:border-destructive/30`
+
+    - Positioned bottom-right on desktop (w-96), full-width above bottom nav on mobile
+
+    - Dismiss X button
+
+
+    ## Review tasks
+
+
+    1. **Navigate to the app**: Go to https://rekurve.localhost and take a screenshot of the dashboard.
+
+
+    2. **Assess the copy change semantically**: Does "Email queued to send" accurately reflect what happened?
+    Is it clear to a non-technical consultant (the user is a real estate sales consultant, not a developer)
+    that their email will be sent shortly? Compare against the old "Sent via email" — does the new copy
+    create anxiety ("queued" could imply delay or uncertainty)?
+
+
+    3. **Consistency audit**: Review the full toast inventory above. Does "Email queued to send" fit the
+    pattern of the other success toasts? ("Draft approved", "Draft dismissed", "Snoozed until X")
+
+
+    4. **Check the description field**: The edit+approve path adds `description: "Your edits were saved."`
+    — is this description additive or redundant? Does it make sense alongside the title?
+
+
+    5. **Take a screenshot** of any existing toast if you can trigger one, or screenshot the dashboard
+    UI to show the context.
+
+
+    6. **Assess accessibility**: Does the copy work for screen readers? Is the toast dismissible?
+
+
+    Report your findings as a structured design review with clear PASS/FAIL/SUGGESTION verdicts per criterion.'
+  provenance:
+    agent_id: aabcefed93dc70267
+    session_id: a76e0a6d-b917-4e91-916d-933195edfbac
+    model: claude-sonnet-4-6
+    latency_s: 62.03
+    tokens_total: 418733
+    n_tool_uses: 12
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/a76e0a6d-b917-4e91-916d-933195edfbac/subagents/agent-aabcefed93dc70267.jsonl
+  sample_output_excerpt: I now have everything I need to conduct a thorough code-based review. Let me
+    also check the SMS channel's edit-and-approve path for completeness.
 routing:
   positives:
   - id: mined-design-reviewer-route-pos-1
+    kind: routing
+    expect_invoke: true
+    prompt: "Conduct a focused design review on a toast copy change in a Next.js dashboard app.\n\n##\
+      \ Context\n\nThe branch `feat/261-email-dispatch-outbox-migration` changed email approval from synchronous\
+      \ (send happens immediately) to async (send happens in an Inngest background worker). As a result,\
+      \ the success toast copy was updated:\n\n**Before** (implied — synchronous send): toast said something\
+      \ like \"Draft approved\" or similar  \n**After** (this branch):\n- `approve` for email channel\
+      \ → `toast.add({ title: \"Email queued to send\" })`  (`src/app/(application)/dashboard/_components/use-queue-actions.ts:109`)\n\
+      - `editAndApprove` for email channel → `toast.add({ title: \"Email queued to send\", description:\
+      \ \"Your edits were saved.\" })` (line 187)\n- SMS and other channels still show `toast.add({ title:\
+      \ \"Draft approved\" })`\n- Error when MS account not connected → `toast.add({ type: \"error\",\
+      \ title: \"Microsoft account not connected\", description: \"Connect your account to send emails\
+      \ from Outlook.\", ... })` with a \"Connect\" action button\n\nThe app is a consultant-facing dashboard.\
+      \ The live preview is at https://rekurve.localhost — note this is a Vercel Portless URL (no port\
+      \ number needed).\n\n## What to review\n\n1. **Copy quality** — Is \"Email queued to send\" clear,\
+      \ accurate, and appropriately reassuring? The email won't send for up to ~30s (outbox sweep) after\
+      \ the consultant taps Approve. Does the copy set the right expectation?\n\n2. **Visual rendering**\
+      \ — Navigate to https://rekurve.localhost and attempt to observe the toast component in context.\
+      \ The toast uses `data-testid=\"app-toast\"`. Look at any existing toasts on the dashboard, or the\
+      \ toast's visual appearance from the component source. Check: font, colour, size, duration, position\
+      \ on screen.\n\n3. **Edit flow copy** — \"Email queued to send\" + description \"Your edits were\
+      \ saved.\" — does adding the description in the edit-and-approve path feel right?\n\n4. **Consistency**\
+      \ — SMS still says \"Draft approved\". Email now says \"Email queued to send\". Is this channel-specific\
+      \ divergence appropriate or jarring?\n\n5. **Accessibility** — Is the toast announced to screen\
+      \ readers? Does the error toast with the \"Connect\" action button meet accessible interactive element\
+      \ standards?\n\n## Key files to read\n\n- `src/app/(application)/dashboard/_components/use-queue-actions.ts`\
+      \ — the changed file (toast calls at lines 109, 187)\n- Look for the toast component implementation\
+      \ (search for `app-toast` data-testid) to understand duration, positioning, and ARIA handling\n\n\
+      Report findings in a structured design review format: what passes, what has concerns, and any recommendations.\
+      \ Be concise — this is a narrow copy-only change, not a full feature review."
+  - id: mined-design-reviewer-route-pos-2
     kind: routing
     expect_invoke: true
     prompt: "You are reviewing a specific UI change on the `feat/258-lead-outbox-cutover` branch of a\
@@ -119,37 +312,220 @@ routing:
       \ Copy, Spacing & Sizing, Color & Contrast, Accessibility, Mobile, Brand Fit)\n- Specific line-level\
       \ suggestions with the exact className or copy change\n- Screenshots or descriptions of what you\
       \ observed in the browser (or note if the browser was inaccessible)"
+  - id: mined-design-reviewer-route-pos-3
+    kind: routing
+    expect_invoke: true
+    prompt: 'You are reviewing a specific UX copy change on the Rekurve dashboard. The app is live at
+      https://rekurve.localhost.
+
+
+      ## What changed
+
+
+      In `src/app/(application)/dashboard/_components/use-queue-actions.ts`, the email approval success
+      toast was updated:
+
+
+      **Before:** `toast.add({ title: "Sent via email" })`
+
+      **After:** `toast.add({ title: "Email queued to send" })`
+
+
+      For edit-and-approve specifically:
+
+      **After:** `toast.add({ title: "Email queued to send", description: "Your edits were saved." })`
+
+
+      This copy change reflects a real behaviour change: approving an email no longer sends it immediately.
+      The email is now dispatched asynchronously by an Inngest worker. The UI shows "approved" status
+      instantly and the row disappears from the queue optimistically, but the actual send happens in the
+      background.
+
+
+      ## Full toast copy inventory to review (for consistency)
+
+
+      All current toast titles/descriptions in the app:
+
+      - Email approve success: `"Email queued to send"` (new)
+
+      - Email edit+approve success: `"Email queued to send"` + description `"Your edits were saved."`
+      (new)
+
+      - SMS/other channel approve: `"Draft approved"`
+
+      - Edit+approve (SMS): `"Draft approved"`
+
+      - Dismiss: `"Draft dismissed"`
+
+      - Snooze: `` `Snoozed until ${when}` ``
+
+      - Approve error (MS not connected): title `"Microsoft account not connected"`, description `"Connect
+      your account to send emails from Outlook."` + "Connect" action button
+
+      - Approve error (other): `"Approve failed"`
+
+      - Edit error: `"Edit failed"`
+
+      - Snooze error: `"Snooze failed"`
+
+      - SMS copy failed: title `"Copy failed"`, description `"Could not copy to clipboard. Try another
+      option."`
+
+
+      ## Toast component design
+
+
+      The toast is a `base-ui` Toast component with:
+
+      - `rounded-lg border bg-background p-4 shadow-lg`
+
+      - Title: `font-medium text-sm leading-tight`
+
+      - Description: `text-muted-foreground text-sm`
+
+      - Error variant: `data-[type=error]:border-destructive/30`
+
+      - Positioned bottom-right on desktop (w-96), full-width above bottom nav on mobile
+
+      - Dismiss X button
+
+
+      ## Review tasks
+
+
+      1. **Navigate to the app**: Go to https://rekurve.localhost and take a screenshot of the dashboard.
+
+
+      2. **Assess the copy change semantically**: Does "Email queued to send" accurately reflect what
+      happened? Is it clear to a non-technical consultant (the user is a real estate sales consultant,
+      not a developer) that their email will be sent shortly? Compare against the old "Sent via email"
+      — does the new copy create anxiety ("queued" could imply delay or uncertainty)?
+
+
+      3. **Consistency audit**: Review the full toast inventory above. Does "Email queued to send" fit
+      the pattern of the other success toasts? ("Draft approved", "Draft dismissed", "Snoozed until X")
+
+
+      4. **Check the description field**: The edit+approve path adds `description: "Your edits were saved."`
+      — is this description additive or redundant? Does it make sense alongside the title?
+
+
+      5. **Take a screenshot** of any existing toast if you can trigger one, or screenshot the dashboard
+      UI to show the context.
+
+
+      6. **Assess accessibility**: Does the copy work for screen readers? Is the toast dismissible?
+
+
+      Report your findings as a structured design review with clear PASS/FAIL/SUGGESTION verdicts per
+      criterion.'
   negatives:
   - id: mined-design-reviewer-route-neg-1
     kind: routing
     expect_invoke: false
-    actual_route: codebase-locator
-    confusability: 0.097
-    prompt: 'I''m debugging an e2e test about HubSpot outbound sync dedup behavior. I need to locate all
-      code involved in syncing a lead to HubSpot — specifically the path that creates a contact OR, when
-      a contact with the same email already exists, deduplicates/links to the existing contact.
+    actual_route: codebase-pattern-finder
+    confusability: 0.102
+    prompt: 'I''m planning integration + unit tests for new Inngest worker functions in issue #261 (email
+      dispatch worker with `step.run` and `step.waitForEvent` + a timeout path). I need existing test
+      patterns to mirror.
 
 
-      Find and report file paths (with brief descriptions) for:
-
-      1. The outbox worker/processor that syncs leads to HubSpot (mentioned as "DB-first outbox worker"
-      / "outbox cutover"). Look in src/server/outbox/ and src/inngest/.
-
-      2. The HubSpot client wrapper that does create/update/upsert of contacts (search by email, create
-      contact, update contact, handle 409 duplicate conflicts).
-
-      3. The lead intake logic (src/server/leads/intake.ts).
-
-      4. Any code that handles HubSpot duplicate-email conflicts (409 errors) and extracts the existing
-      contact ID.
-
-      5. The recently-changed files from PR #288 "drop edit arms; ingest contact.creation via scored outbox"
-      — likely a hubspot-webhook handler.
+      Find and show concrete code examples (with `file:line`) for:
 
 
-      For each relevant file, give the path and a one-line description of what it does. Do NOT analyze
-      deeply — just locate and map the files.'
+      1. **Inngest function unit/integration tests** — how existing Inngest functions are tested in this
+      repo. Look for tests that construct a function and invoke it with mocked `step` (`step.run`, `step.waitForEvent`,
+      `step.sendEvent`), or that use an Inngest test harness. Show the full setup: how `step` is mocked/stubbed,
+      how `event.data` is passed, how assertions are made on DB state afterward. The nurture/Follow-up
+      plan Inngest functions (recently migrated in #295, commit df21fdd) are the best candidates — show
+      their tests.
+
+
+      2. **`step.waitForEvent` timeout testing** — any test that exercises a timeout/virtual-time path
+      on an Inngest function. If none exists, say so explicitly and show the closest analog.
+
+
+      3. **Outbox integration tests** — tests that assert an outbox row was inserted with a given event
+      name + payload after a mutation, and/or tests that exercise the outbox sweep. Show the DB-assertion
+      idiom (these hit real Neon branches per CLAUDE.md — show how they set up and tear down).
+
+
+      4. **tRPC mutation integration tests** — how `messages.approve` / `messages.editAndApprove` or sibling
+      mutations are tested today (the caller/context setup, how they seed a `message_queue` row, how they
+      assert post-mutation DB state).
+
+
+      5. **MS Graph / HubSpot SDK mocking** — how existing tests mock or stub the Microsoft Graph client
+      and the HubSpot client, so I can assert "Graph `/me/sendMail` was called with `internetMessageId
+      === messageId`" without hitting real services.
+
+
+      6. **E2E test structure** for the dashboard approve→send flow, if any exists — the Playwright spec
+      that approves a queued message, and how it cleans up (per-spec cleanup by phone/email per CLAUDE.md).
+
+
+      For each, give the file path, line numbers, and a representative snippet. Prioritize the Rstest
+      unit/integration idiom (the repo uses Rstest, not Jest/Vitest). If a pattern genuinely doesn''t
+      exist yet, say so clearly rather than inventing one.'
   - id: mined-design-reviewer-route-neg-2
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-analyzer
+    confusability: 0.087
+    prompt: 'I''m planning a refactor to mirror the email dispatch Inngest pattern for SMS. I need a precise,
+      file:line-cited trace of how the email dispatch worker pattern works end-to-end. Please analyze
+      these files:
+
+
+      - `src/inngest/functions/messages/dispatch-email.ts`
+
+      - `src/inngest/functions/messages/reconcile-missed-engagement.ts`
+
+      - `src/inngest/functions/index.ts` (how functions are registered)
+
+      - `src/inngest/channels.ts` and `src/inngest/client.ts` (event/channel definitions)
+
+      - `src/server/outbox/index.ts` (the MESSAGE_EVENTS / HUBSPOT_EMAIL_EVENTS constants, and any helper
+      to enqueue outbox events)
+
+      - `src/server/api/routers/messages.ts` (the `approve` and `editAndApprove` mutations — how they
+      write the status flip + outbox event atomically)
+
+      - `src/server/db/schema/message-queue.ts` (the schema, including the `dispatching_at` fence column)
+
+
+      For each, report with file:line citations:
+
+
+      1. **dispatch-email worker**: How does it subscribe to the event and filter to `channel === "email"`?
+      What are its discrete `step.run` stages in order (status re-verification / "verify-still-approved",
+      the dispatching_at fence, the provider/Graph call, the conversation row write, the `messageQueue.sentAt`
+      stamp)? How does the cancellation / "verify still approved" step work? How does `step.waitForEvent`
+      work for the engagement reconciliation, and what''s the timeout, and what fires on timeout (reconcile-missed-engagement)?
+
+
+      2. **Event contract**: What is the exact shape of the `message.approval-requested` event payload
+      (all `data` fields)? What does the worker read from it? What is the event name string constant and
+      where is it defined?
+
+
+      3. **Registration**: How is `dispatchEmail` registered in the functions index? What''s the naming/id
+      convention for Inngest function ids?
+
+
+      4. **Router atomic write**: How exactly do `approve` / `editAndApprove` perform the atomic status-flip
+      + outbox enqueue (the `db.batch()` call)? What''s written to the outbox row? Is there anything email-specific
+      in the router, or is it channel-agnostic?
+
+
+      5. **Outbox helpers**: What''s the signature of whatever enqueues an outbox event, and what columns
+      does the outbox row have?
+
+
+      Be exhaustive and precise — quote the key lines. This is for mirroring the exact pattern into a
+      new `dispatch-sms` function.'
+  - id: mined-design-reviewer-route-neg-3
     kind: routing
     expect_invoke: false
     actual_route: codebase-locator
@@ -177,55 +553,3 @@ routing:
       The relevant code is under src/ (likely src/server, src/inngest, or src/lib). Report exact file
       paths and the key function names/line numbers for each. Do not analyze deeply yet — just locate
       and give me a precise map of the relevant files and functions.'
-  - id: mined-design-reviewer-route-neg-3
-    kind: routing
-    expect_invoke: false
-    actual_route: codebase-verification
-    confusability: 0.084
-    prompt: 'Run the Playwright E2E suite for this repo and report results compactly.
-
-
-      IMPORTANT context before you run:
-
-      - This branch (`feat/258-lead-outbox-cutover`) cut lead intake over to DB-first via an outbox +
-      Inngest worker. E2E now needs TWO local servers: the Next app on :3000 and an Inngest dev server
-      on :8288. The `playwright.config.ts` `webServer` is already configured as an array of both, so `make
-      test_e2e` should boot both automatically. The app server is started with env `INNGEST_DEV=1` and
-      `INNGEST_BASE_URL=http://localhost:8288`.
-
-      - The Inngest dev server is launched via `yarn preview:inngest` (`inngest dev -u http://localhost:3000/api/inngest`).
-      Confirm the `inngest` CLI is resolvable (devDependency `inngest-cli` is installed) — if the dev
-      server fails to boot, that''s a top-priority finding.
-
-
-      PREREQUISITE CHECK (do this FIRST, before running the suite):
-
-      1. Confirm `HUBSPOT_ACCESS_TOKEN` is present in the environment Playwright will inherit. Check `.env.local`
-      for a non-empty `HUBSPOT_ACCESS_TOKEN=` line. The HubSpot-touching specs (`e2e/features/hubspot-sync.spec.ts`
-      and `e2e/features/lead-intake-sync.spec.ts`) SELF-SKIP when it''s absent — a green run that actually
-      skipped them is a FALSE PASS and must be reported as such, not as success.
-
-      2. Report whether the token is present.
-
-
-      THEN run the suite: `make test_e2e` (do NOT use yarn/npx directly; use the make target).
-
-
-      REPORT BACK (compact):
-
-      - Whether HUBSPOT_ACCESS_TOKEN was present.
-
-      - Whether both webServers (app :3000 and inngest :8288) booted. If the Inngest dev server logged
-      an app-sync (look for `PUT /api/inngest` 200 / "apps synced" / function registration for `lead-hubspot-sync`),
-      say so.
-
-      - Overall pass/fail counts and how many specs SKIPPED.
-
-      - For EACH failing spec: the spec file + test name, and the extracted error block (assertion message,
-      timeout, or stack — keep it tight, ~10-20 lines per failure).
-
-      - Pay special attention to `e2e/features/lead-intake-sync.spec.ts` (new) and `e2e/features/hubspot-sync.spec.ts`
-      (modified) — these exercise the async outbox→worker→HubSpot path and are the highest-risk specs.
-
-
-      Do not attempt to fix anything. Just run and report.'

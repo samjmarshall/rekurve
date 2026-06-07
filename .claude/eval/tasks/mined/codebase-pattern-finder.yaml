@@ -3,8 +3,8 @@ _generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
 _needs_review: true
 _note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/codebase-pattern-finder.yaml
   alongside golden + adversarial buckets.
-_mined_available: 3
-_mined_emitted: 3
+_mined_available: 4
+_mined_emitted: 4
 execution:
 - id: mined-codebase-pattern-finder-exec-1
   kind: execution
@@ -162,6 +162,63 @@ execution:
 
 
     The dominant pattern: `rs.resetModules( …'
+- id: mined-codebase-pattern-finder-exec-4
+  kind: execution
+  prompt: 'I''m about to write tests for a new `dispatch-sms` Inngest function, mirroring the existing
+    tests for `dispatch-email`. I need concrete, copyable test patterns with file:line citations.
+
+
+    Please analyze these test files and show me the patterns:
+
+    - `src/inngest/functions/messages/__tests__/dispatch-email.test.ts`
+
+    - `src/inngest/functions/messages/__tests__/dispatch-email.integration.test.ts`
+
+    - `src/inngest/functions/messages/__tests__/reconcile-missed-engagement.test.ts`
+
+
+    Also look for any shared Inngest test helpers/utilities (search `src/inngest` and `src/test` or similar
+    for things like `InngestTestEngine`, mock step, virtual time helpers, mocked provider clients).
+
+
+    Report with file:line citations and actual code snippets:
+
+
+    1. **Test harness**: How is an Inngest function invoked in a unit test? Is it `@inngest/test` `InngestTestEngine`,
+    or a hand-rolled mock of the `step` object? Show the exact setup. How are `step.run`, `step.waitForEvent`,
+    and `step.sleep` mocked or driven?
+
+
+    2. **Virtual time**: How is time/timeout handled in tests (the `waitForEvent` timeout, any `step.sleep`)?
+    Show the pattern.
+
+
+    3. **Mocking provider clients**: How is the Graph/email client mocked? How would I analogously mock
+    a Twilio client? Show the mock setup (rstest `rs.mock` / `vi.mock` style — note this project uses
+    Rstest).
+
+
+    4. **DB assertions**: Do these tests hit a real DB (integration) or mock it (unit)? What''s the difference
+    between the `.test.ts` and `.integration.test.ts` files? Show how each sets up/asserts DB state.
+
+
+    5. **Status re-verification & cancellation tests**: How do they test the "verify still approved" cancellation
+    path (message dismissed mid-dispatch)?
+
+
+    Quote real snippets I can adapt. This project uses Rstest (not Vitest/Jest) — note any Rstest-specific
+    API usage.'
+  provenance:
+    agent_id: a84f5a263eaf87b59
+    session_id: 666946b8-d08a-4bee-928e-8bfb018e029d
+    model: claude-sonnet-4-6
+    latency_s: 36.41
+    tokens_total: 700303
+    n_tool_uses: 21
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/666946b8-d08a-4bee-928e-8bfb018e029d/subagents/agent-a84f5a263eaf87b59.jsonl
+  sample_output_excerpt: Now I have everything needed. Let me do one final check to confirm there is no
+    existing `dispatch-sms.ts` Inngest function (versus the server-layer `sms-dispatch.ts`) and to see
+    the rstest config.
 routing:
   positives:
   - id: mined-codebase-pattern-finder-route-pos-1
@@ -236,59 +293,112 @@ routing:
       For each, give the file path, line numbers, and a representative snippet. Prioritize the Rstest
       unit/integration idiom (the repo uses Rstest, not Jest/Vitest). If a pattern genuinely doesn''t
       exist yet, say so clearly rather than inventing one.'
+  - id: mined-codebase-pattern-finder-route-pos-4
+    kind: routing
+    expect_invoke: true
+    prompt: 'I''m about to write tests for a new `dispatch-sms` Inngest function, mirroring the existing
+      tests for `dispatch-email`. I need concrete, copyable test patterns with file:line citations.
+
+
+      Please analyze these test files and show me the patterns:
+
+      - `src/inngest/functions/messages/__tests__/dispatch-email.test.ts`
+
+      - `src/inngest/functions/messages/__tests__/dispatch-email.integration.test.ts`
+
+      - `src/inngest/functions/messages/__tests__/reconcile-missed-engagement.test.ts`
+
+
+      Also look for any shared Inngest test helpers/utilities (search `src/inngest` and `src/test` or
+      similar for things like `InngestTestEngine`, mock step, virtual time helpers, mocked provider clients).
+
+
+      Report with file:line citations and actual code snippets:
+
+
+      1. **Test harness**: How is an Inngest function invoked in a unit test? Is it `@inngest/test` `InngestTestEngine`,
+      or a hand-rolled mock of the `step` object? Show the exact setup. How are `step.run`, `step.waitForEvent`,
+      and `step.sleep` mocked or driven?
+
+
+      2. **Virtual time**: How is time/timeout handled in tests (the `waitForEvent` timeout, any `step.sleep`)?
+      Show the pattern.
+
+
+      3. **Mocking provider clients**: How is the Graph/email client mocked? How would I analogously mock
+      a Twilio client? Show the mock setup (rstest `rs.mock` / `vi.mock` style — note this project uses
+      Rstest).
+
+
+      4. **DB assertions**: Do these tests hit a real DB (integration) or mock it (unit)? What''s the
+      difference between the `.test.ts` and `.integration.test.ts` files? Show how each sets up/asserts
+      DB state.
+
+
+      5. **Status re-verification & cancellation tests**: How do they test the "verify still approved"
+      cancellation path (message dismissed mid-dispatch)?
+
+
+      Quote real snippets I can adapt. This project uses Rstest (not Vitest/Jest) — note any Rstest-specific
+      API usage.'
   negatives:
   - id: mined-codebase-pattern-finder-route-neg-1
     kind: routing
     expect_invoke: false
     actual_route: codebase-analyzer
-    confusability: 0.175
-    prompt: 'I''m planning issue #261 which adds new Inngest worker functions fed by the transactional
-      outbox (ADR-014/ADR-017). I need to understand the EXISTING outbox + Inngest infrastructure so my
-      new functions mirror it exactly.
+    confusability: 0.225
+    prompt: 'I''m planning a refactor to mirror the email dispatch Inngest pattern for SMS. I need a precise,
+      file:line-cited trace of how the email dispatch worker pattern works end-to-end. Please analyze
+      these files:
 
 
-      Report with `file:line` for every claim:
+      - `src/inngest/functions/messages/dispatch-email.ts`
+
+      - `src/inngest/functions/messages/reconcile-missed-engagement.ts`
+
+      - `src/inngest/functions/index.ts` (how functions are registered)
+
+      - `src/inngest/channels.ts` and `src/inngest/client.ts` (event/channel definitions)
+
+      - `src/server/outbox/index.ts` (the MESSAGE_EVENTS / HUBSPOT_EMAIL_EVENTS constants, and any helper
+      to enqueue outbox events)
+
+      - `src/server/api/routers/messages.ts` (the `approve` and `editAndApprove` mutations — how they
+      write the status flip + outbox event atomically)
+
+      - `src/server/db/schema/message-queue.ts` (the schema, including the `dispatching_at` fence column)
 
 
-      1. The `outbox` table schema — full column list, types, the id type (uuid?), `processedAt`, `attempts`,
-      `lastError`, `createdAt`, and the event-name/payload columns. Where is it defined?
+      For each, report with file:line citations:
 
 
-      2. How outbox rows are inserted inside a transaction. ADR-017 mentions `db.batch()` over neon-http.
-      Find a concrete write site (e.g. the recent nurture migration #295, or the leads cutover #286/#288,
-      or contact.creation) that does: open transaction → canonical DB write → insert outbox row → commit
-      → post-commit `inngest.send`. Show the full pattern including the helper (is there an `outbox.publish(tx,
-      event, payload)` helper, or is it inline?).
+      1. **dispatch-email worker**: How does it subscribe to the event and filter to `channel === "email"`?
+      What are its discrete `step.run` stages in order (status re-verification / "verify-still-approved",
+      the dispatching_at fence, the provider/Graph call, the conversation row write, the `messageQueue.sentAt`
+      stamp)? How does the cancellation / "verify still approved" step work? How does `step.waitForEvent`
+      work for the engagement reconciliation, and what''s the timeout, and what fires on timeout (reconcile-missed-engagement)?
 
 
-      3. The cron sweep that delivers outbox rows — `outbox-sweep`. Where it lives, the SQL query, how
-      it sets `processedAt` / increments `attempts`, and how it uses the outbox row id as the Inngest
-      idempotency key.
+      2. **Event contract**: What is the exact shape of the `message.approval-requested` event payload
+      (all `data` fields)? What does the worker read from it? What is the event name string constant and
+      where is it defined?
 
 
-      4. The Inngest client and event-type definitions. Where are event names and payload types declared
-      (e.g. a typed `EventSchemas` / `Events` map)? Show how an event like `message.approval-requested`,
-      `hubspot.email.engagement-created`, `hubspot.engagement-missed` would be (or are) declared. Are
-      any of these three events already declared?
+      3. **Registration**: How is `dispatchEmail` registered in the functions index? What''s the naming/id
+      convention for Inngest function ids?
 
 
-      5. The MOST RECENT Inngest worker as the canonical pattern to mirror — the nurture migration from
-      commit df21fdd (#295) "migrate Follow-up plans to Inngest". Show: the full `inngest.createFunction(...)`
-      definition, how it declares `{ id, name }`, the `{ event: "..." }` trigger, any `if`/filter on event
-      data, the `step.run(...)` calls, and any `step.waitForEvent(...)` usage anywhere in the codebase.
-      I need the exact import surface and idiom.
+      4. **Router atomic write**: How exactly do `approve` / `editAndApprove` perform the atomic status-flip
+      + outbox enqueue (the `db.batch()` call)? What''s written to the outbox row? Is there anything email-specific
+      in the router, or is it channel-agnostic?
 
 
-      6. How Inngest functions are registered/served — the `serve()` endpoint (likely `src/app/api/inngest/route.ts`
-      or similar) and the array of functions it exports. I need to know where to add my new functions.
+      5. **Outbox helpers**: What''s the signature of whatever enqueues an outbox event, and what columns
+      does the outbox row have?
 
 
-      7. Concurrency/idempotency config on existing functions — do they set `idempotency`, `concurrency`,
-      or `retries` in the createFunction options? Show an example.
-
-
-      Report exact paths, line numbers, signatures, and code snippets. Describe only what exists; do not
-      propose changes.'
+      Be exhaustive and precise — quote the key lines. This is for mirroring the exact pattern into a
+      new `dispatch-sms` function.'
   - id: mined-codebase-pattern-finder-route-neg-2
     kind: routing
     expect_invoke: false

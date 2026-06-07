@@ -3,7 +3,7 @@ _generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
 _needs_review: true
 _note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/codebase-analyzer.yaml alongside
   golden + adversarial buckets.
-_mined_available: 15
+_mined_available: 20
 _mined_emitted: 5
 execution:
 - id: mined-codebase-analyzer-exec-1
@@ -55,105 +55,91 @@ execution:
     `nurture→nurture`, `warm→warm_progression`, …'
 - id: mined-codebase-analyzer-exec-2
   kind: execution
-  prompt: 'I''m validating an implementation plan. Please read and analyze the following files and answer
-    the specific questions for each.
+  prompt: 'Read these four files and return their full contents:
 
+    1. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/agent-brief.md
 
-    **File 1**: `/Users/sam/workspace/rekurve/rekurve/src/server/nurture/rhythm.ts`
+    2. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/bug-template.md
 
-    - Does it export `RHYTHM_DAYS` with correct values (unqualified:3, nurture:14, warm:7, hot:null)?
+    3. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/github-publishing.md
 
-    - Does it have a `rhythmForStage` function returning `{ duration: string } | null`?
-
-    - Does it have the `NURTURE_TEST_RHYTHM` env override for non-production?
-
-
-    **File 2**: `/Users/sam/workspace/rekurve/rekurve/src/inngest/functions/nurture/nurture-plan-runner.ts`
-
-    - Does it have `concurrency: [{ key: "event.data.leadId", limit: 1 }]`?
-
-    - Does it have `retries: 8`?
-
-    - Does it have `onFailure` that sends `nurture.plan-paused`?
-
-    - Does the loop use `waitForEvent` with `match: "data.leadId"` and `timeout: rhythm.duration`?
-
-    - Does it exit immediately for `hot` stage?
-
-    - Does it return when superseded (waitForEvent returns a value)?
-
-    - Does it draft + enqueue + emit `nurture.followup-message-drafted` on timeout?
-
-    - Is `NURTURE_EVENTS.FOLLOWUP_DRAFTED` and `NURTURE_EVENTS.PLAN_PAUSED` exported?
-
-
-    **File 3**: `/Users/sam/workspace/rekurve/rekurve/src/inngest/functions/index.ts`
-
-    - Is `nurturePlanRunner` in the functions array?
-
-
-    **File 4**: `/Users/sam/workspace/rekurve/rekurve/src/server/nurture/rhythm.ts`
-
-    - Confirm full file contents
-
-
-    **File 5**: `/Users/sam/workspace/rekurve/rekurve/src/server/ai/stub.ts`
-
-    - Does it export `stubDraft`?
-
-    - Does it export `resolveWorkerDraftFn`?
-
-    - Was the header-based `resolveDraftFn(req)` removed?
-
-
-    **File 6**: `/Users/sam/workspace/rekurve/rekurve/src/inngest/functions/nurture/__tests__/nurture-plan-runner.test.ts`
-
-    - Does it test "drafts on timeout" scenario?
-
-    - Does it test "superseded" scenario?
-
-    - Does it test "hot exits" scenario?
-
-    - Does it test "pause on failure" (onFailure handler)?
-
-
-    **File 7**: `/Users/sam/workspace/rekurve/rekurve/src/inngest/functions/nurture/__tests__/nurture-plan-runner.integration.test.ts`
-
-    - Is it gated by `INTEGRATION_DB`?
-
-    - Does it assert a `message_queue` row with `status:"pending"`?
-
-    - Does it clean up in `afterAll`?
-
-
-    Give exact file:line references for each finding.'
+    4. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/epic-breakdown.md'
   provenance:
-    agent_id: aa4a0fa6c894c7536
-    session_id: 979e6e03-5c74-43cb-9c97-d11b653c77a1
-    model: claude-sonnet-4-6
-    latency_s: 34.39
-    tokens_total: 75335
-    n_tool_uses: 6
-    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/979e6e03-5c74-43cb-9c97-d11b653c77a1/subagents/agent-aa4a0fa6c894c7536.jsonl
-  sample_output_excerpt: 'All files are present and fully readable. Here are the findings:
-
-
-    ---
-
-
-    ## File 1 & 4: `/Users/sam/workspace/rekurve/rekurve/src/server/nurture/rhythm.ts`
-
-
-    **`RHYTHM_DAYS` values correct?** YES.
-
-    - `src/server/nurture/rhythm.ts:3-8` — `unqualified: 3`, `nurture: 14`, `warm: 7`, `hot: null`. All
-    match the plan.
-
-
-    **`rhythmForStage` returns `{ duration: string } | null`?** YES.
-
-    - `src/server/nurture/rh …'
+    agent_id: a3fbb03c35c80e3fa
+    session_id: a76e0a6d-b917-4e91-916d-933195edfbac
+    model: claude-opus-4-8
+    latency_s: 4.26
+    tokens_total: 37948
+    n_tool_uses: 4
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/a76e0a6d-b917-4e91-916d-933195edfbac/subagents/agent-a3fbb03c35c80e3fa.jsonl
+  sample_output_excerpt: I'll read all four files in parallel.
 - id: mined-codebase-analyzer-exec-3
+  kind: execution
+  prompt: 'I''m planning a refactor to mirror the email dispatch Inngest pattern for SMS. I need a precise,
+    file:line-cited trace of how the email dispatch worker pattern works end-to-end. Please analyze these
+    files:
+
+
+    - `src/inngest/functions/messages/dispatch-email.ts`
+
+    - `src/inngest/functions/messages/reconcile-missed-engagement.ts`
+
+    - `src/inngest/functions/index.ts` (how functions are registered)
+
+    - `src/inngest/channels.ts` and `src/inngest/client.ts` (event/channel definitions)
+
+    - `src/server/outbox/index.ts` (the MESSAGE_EVENTS / HUBSPOT_EMAIL_EVENTS constants, and any helper
+    to enqueue outbox events)
+
+    - `src/server/api/routers/messages.ts` (the `approve` and `editAndApprove` mutations — how they write
+    the status flip + outbox event atomically)
+
+    - `src/server/db/schema/message-queue.ts` (the schema, including the `dispatching_at` fence column)
+
+
+    For each, report with file:line citations:
+
+
+    1. **dispatch-email worker**: How does it subscribe to the event and filter to `channel === "email"`?
+    What are its discrete `step.run` stages in order (status re-verification / "verify-still-approved",
+    the dispatching_at fence, the provider/Graph call, the conversation row write, the `messageQueue.sentAt`
+    stamp)? How does the cancellation / "verify still approved" step work? How does `step.waitForEvent`
+    work for the engagement reconciliation, and what''s the timeout, and what fires on timeout (reconcile-missed-engagement)?
+
+
+    2. **Event contract**: What is the exact shape of the `message.approval-requested` event payload (all
+    `data` fields)? What does the worker read from it? What is the event name string constant and where
+    is it defined?
+
+
+    3. **Registration**: How is `dispatchEmail` registered in the functions index? What''s the naming/id
+    convention for Inngest function ids?
+
+
+    4. **Router atomic write**: How exactly do `approve` / `editAndApprove` perform the atomic status-flip
+    + outbox enqueue (the `db.batch()` call)? What''s written to the outbox row? Is there anything email-specific
+    in the router, or is it channel-agnostic?
+
+
+    5. **Outbox helpers**: What''s the signature of whatever enqueues an outbox event, and what columns
+    does the outbox row have?
+
+
+    Be exhaustive and precise — quote the key lines. This is for mirroring the exact pattern into a new
+    `dispatch-sms` function.'
+  provenance:
+    agent_id: abbad834a58ba3952
+    session_id: 666946b8-d08a-4bee-928e-8bfb018e029d
+    model: claude-opus-4-8
+    latency_s: 35.32
+    tokens_total: 565172
+    n_tool_uses: 24
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/666946b8-d08a-4bee-928e-8bfb018e029d/subagents/agent-abbad834a58ba3952.jsonl
+  sample_output_excerpt: 'I now have the complete end-to-end picture. Let me verify two final details
+    for an exact mirror: the `db.batch()` return-shape semantics (the `[[updated]]` destructure) and whether
+    `sendSmsToConsultant` carries a correlation header like email does (to know what the SMS provider
+    call differs on).'
+- id: mined-codebase-analyzer-exec-4
   kind: execution
   prompt: 'Explain how the **inbound HubSpot webhook sync** works end to end. Cover:
 
@@ -191,73 +177,6 @@ execution:
     HubSpot POST payloads arrive at a Next.js route handler, pass a two-stage authentication gate (header
     presence + HMAC-SHA256 signature v3), then each event in the JSON array is dispatched to one of two
     active handlers: `handleContactCreation` or `handleE …'
-- id: mined-codebase-analyzer-exec-4
-  kind: execution
-  prompt: 'I''m planning issue #261 which adds new Inngest worker functions fed by the transactional outbox
-    (ADR-014/ADR-017). I need to understand the EXISTING outbox + Inngest infrastructure so my new functions
-    mirror it exactly.
-
-
-    Report with `file:line` for every claim:
-
-
-    1. The `outbox` table schema — full column list, types, the id type (uuid?), `processedAt`, `attempts`,
-    `lastError`, `createdAt`, and the event-name/payload columns. Where is it defined?
-
-
-    2. How outbox rows are inserted inside a transaction. ADR-017 mentions `db.batch()` over neon-http.
-    Find a concrete write site (e.g. the recent nurture migration #295, or the leads cutover #286/#288,
-    or contact.creation) that does: open transaction → canonical DB write → insert outbox row → commit
-    → post-commit `inngest.send`. Show the full pattern including the helper (is there an `outbox.publish(tx,
-    event, payload)` helper, or is it inline?).
-
-
-    3. The cron sweep that delivers outbox rows — `outbox-sweep`. Where it lives, the SQL query, how it
-    sets `processedAt` / increments `attempts`, and how it uses the outbox row id as the Inngest idempotency
-    key.
-
-
-    4. The Inngest client and event-type definitions. Where are event names and payload types declared
-    (e.g. a typed `EventSchemas` / `Events` map)? Show how an event like `message.approval-requested`,
-    `hubspot.email.engagement-created`, `hubspot.engagement-missed` would be (or are) declared. Are any
-    of these three events already declared?
-
-
-    5. The MOST RECENT Inngest worker as the canonical pattern to mirror — the nurture migration from
-    commit df21fdd (#295) "migrate Follow-up plans to Inngest". Show: the full `inngest.createFunction(...)`
-    definition, how it declares `{ id, name }`, the `{ event: "..." }` trigger, any `if`/filter on event
-    data, the `step.run(...)` calls, and any `step.waitForEvent(...)` usage anywhere in the codebase.
-    I need the exact import surface and idiom.
-
-
-    6. How Inngest functions are registered/served — the `serve()` endpoint (likely `src/app/api/inngest/route.ts`
-    or similar) and the array of functions it exports. I need to know where to add my new functions.
-
-
-    7. Concurrency/idempotency config on existing functions — do they set `idempotency`, `concurrency`,
-    or `retries` in the createFunction options? Show an example.
-
-
-    Report exact paths, line numbers, signatures, and code snippets. Describe only what exists; do not
-    propose changes.'
-  provenance:
-    agent_id: a77dfaf0c0697b282
-    session_id: 6ea3af65-da4f-498d-a372-653fa064a7a8
-    model: claude-opus-4-8
-    latency_s: 112.18
-    tokens_total: 436251
-    n_tool_uses: 21
-    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/6ea3af65-da4f-498d-a372-653fa064a7a8/subagents/agent-a77dfaf0c0697b282.jsonl
-  sample_output_excerpt: 'I have everything needed for a complete report. The search confirms the only
-    two event-name constant maps are `OUTBOX_EVENTS` and `NURTURE_EVENTS`, the DB driver is `neon-http`
-    (confirming `db.batch()` semantics), and migration 0007 shows the SQL-side outbox-insert pattern.
-    None of the three target events exist. Let me compile the findings.
-
-
-    ---
-
-
-    # Existing Outbox + Inngest Infrastructure (for iss …'
 - id: mined-codebase-analyzer-exec-5
   kind: execution
   prompt: 'I''m validating that an implementation plan was correctly executed. The plan required deleting/modifying
@@ -368,79 +287,71 @@ routing:
   - id: mined-codebase-analyzer-route-pos-2
     kind: routing
     expect_invoke: true
-    prompt: 'I''m validating an implementation plan. Please read and analyze the following files and answer
-      the specific questions for each.
+    prompt: 'Read these four files and return their full contents:
 
+      1. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/agent-brief.md
 
-      **File 1**: `/Users/sam/workspace/rekurve/rekurve/src/server/nurture/rhythm.ts`
+      2. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/bug-template.md
 
-      - Does it export `RHYTHM_DAYS` with correct values (unqualified:3, nurture:14, warm:7, hot:null)?
+      3. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/github-publishing.md
 
-      - Does it have a `rhythmForStage` function returning `{ duration: string } | null`?
-
-      - Does it have the `NURTURE_TEST_RHYTHM` env override for non-production?
-
-
-      **File 2**: `/Users/sam/workspace/rekurve/rekurve/src/inngest/functions/nurture/nurture-plan-runner.ts`
-
-      - Does it have `concurrency: [{ key: "event.data.leadId", limit: 1 }]`?
-
-      - Does it have `retries: 8`?
-
-      - Does it have `onFailure` that sends `nurture.plan-paused`?
-
-      - Does the loop use `waitForEvent` with `match: "data.leadId"` and `timeout: rhythm.duration`?
-
-      - Does it exit immediately for `hot` stage?
-
-      - Does it return when superseded (waitForEvent returns a value)?
-
-      - Does it draft + enqueue + emit `nurture.followup-message-drafted` on timeout?
-
-      - Is `NURTURE_EVENTS.FOLLOWUP_DRAFTED` and `NURTURE_EVENTS.PLAN_PAUSED` exported?
-
-
-      **File 3**: `/Users/sam/workspace/rekurve/rekurve/src/inngest/functions/index.ts`
-
-      - Is `nurturePlanRunner` in the functions array?
-
-
-      **File 4**: `/Users/sam/workspace/rekurve/rekurve/src/server/nurture/rhythm.ts`
-
-      - Confirm full file contents
-
-
-      **File 5**: `/Users/sam/workspace/rekurve/rekurve/src/server/ai/stub.ts`
-
-      - Does it export `stubDraft`?
-
-      - Does it export `resolveWorkerDraftFn`?
-
-      - Was the header-based `resolveDraftFn(req)` removed?
-
-
-      **File 6**: `/Users/sam/workspace/rekurve/rekurve/src/inngest/functions/nurture/__tests__/nurture-plan-runner.test.ts`
-
-      - Does it test "drafts on timeout" scenario?
-
-      - Does it test "superseded" scenario?
-
-      - Does it test "hot exits" scenario?
-
-      - Does it test "pause on failure" (onFailure handler)?
-
-
-      **File 7**: `/Users/sam/workspace/rekurve/rekurve/src/inngest/functions/nurture/__tests__/nurture-plan-runner.integration.test.ts`
-
-      - Is it gated by `INTEGRATION_DB`?
-
-      - Does it assert a `message_queue` row with `status:"pending"`?
-
-      - Does it clean up in `afterAll`?
-
-
-      Give exact file:line references for each finding.'
+      4. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/epic-breakdown.md'
   - id: mined-codebase-analyzer-route-pos-3
+    kind: routing
+    expect_invoke: true
+    prompt: 'I''m planning a refactor to mirror the email dispatch Inngest pattern for SMS. I need a precise,
+      file:line-cited trace of how the email dispatch worker pattern works end-to-end. Please analyze
+      these files:
+
+
+      - `src/inngest/functions/messages/dispatch-email.ts`
+
+      - `src/inngest/functions/messages/reconcile-missed-engagement.ts`
+
+      - `src/inngest/functions/index.ts` (how functions are registered)
+
+      - `src/inngest/channels.ts` and `src/inngest/client.ts` (event/channel definitions)
+
+      - `src/server/outbox/index.ts` (the MESSAGE_EVENTS / HUBSPOT_EMAIL_EVENTS constants, and any helper
+      to enqueue outbox events)
+
+      - `src/server/api/routers/messages.ts` (the `approve` and `editAndApprove` mutations — how they
+      write the status flip + outbox event atomically)
+
+      - `src/server/db/schema/message-queue.ts` (the schema, including the `dispatching_at` fence column)
+
+
+      For each, report with file:line citations:
+
+
+      1. **dispatch-email worker**: How does it subscribe to the event and filter to `channel === "email"`?
+      What are its discrete `step.run` stages in order (status re-verification / "verify-still-approved",
+      the dispatching_at fence, the provider/Graph call, the conversation row write, the `messageQueue.sentAt`
+      stamp)? How does the cancellation / "verify still approved" step work? How does `step.waitForEvent`
+      work for the engagement reconciliation, and what''s the timeout, and what fires on timeout (reconcile-missed-engagement)?
+
+
+      2. **Event contract**: What is the exact shape of the `message.approval-requested` event payload
+      (all `data` fields)? What does the worker read from it? What is the event name string constant and
+      where is it defined?
+
+
+      3. **Registration**: How is `dispatchEmail` registered in the functions index? What''s the naming/id
+      convention for Inngest function ids?
+
+
+      4. **Router atomic write**: How exactly do `approve` / `editAndApprove` perform the atomic status-flip
+      + outbox enqueue (the `db.batch()` call)? What''s written to the outbox row? Is there anything email-specific
+      in the router, or is it channel-agnostic?
+
+
+      5. **Outbox helpers**: What''s the signature of whatever enqueues an outbox event, and what columns
+      does the outbox row have?
+
+
+      Be exhaustive and precise — quote the key lines. This is for mirroring the exact pattern into a
+      new `dispatch-sms` function.'
+  - id: mined-codebase-analyzer-route-pos-4
     kind: routing
     expect_invoke: true
     prompt: 'Explain how the **inbound HubSpot webhook sync** works end to end. Cover:
@@ -456,56 +367,6 @@ routing:
 
 
       Cite `file:line` for every step.'
-  - id: mined-codebase-analyzer-route-pos-4
-    kind: routing
-    expect_invoke: true
-    prompt: 'I''m planning issue #261 which adds new Inngest worker functions fed by the transactional
-      outbox (ADR-014/ADR-017). I need to understand the EXISTING outbox + Inngest infrastructure so my
-      new functions mirror it exactly.
-
-
-      Report with `file:line` for every claim:
-
-
-      1. The `outbox` table schema — full column list, types, the id type (uuid?), `processedAt`, `attempts`,
-      `lastError`, `createdAt`, and the event-name/payload columns. Where is it defined?
-
-
-      2. How outbox rows are inserted inside a transaction. ADR-017 mentions `db.batch()` over neon-http.
-      Find a concrete write site (e.g. the recent nurture migration #295, or the leads cutover #286/#288,
-      or contact.creation) that does: open transaction → canonical DB write → insert outbox row → commit
-      → post-commit `inngest.send`. Show the full pattern including the helper (is there an `outbox.publish(tx,
-      event, payload)` helper, or is it inline?).
-
-
-      3. The cron sweep that delivers outbox rows — `outbox-sweep`. Where it lives, the SQL query, how
-      it sets `processedAt` / increments `attempts`, and how it uses the outbox row id as the Inngest
-      idempotency key.
-
-
-      4. The Inngest client and event-type definitions. Where are event names and payload types declared
-      (e.g. a typed `EventSchemas` / `Events` map)? Show how an event like `message.approval-requested`,
-      `hubspot.email.engagement-created`, `hubspot.engagement-missed` would be (or are) declared. Are
-      any of these three events already declared?
-
-
-      5. The MOST RECENT Inngest worker as the canonical pattern to mirror — the nurture migration from
-      commit df21fdd (#295) "migrate Follow-up plans to Inngest". Show: the full `inngest.createFunction(...)`
-      definition, how it declares `{ id, name }`, the `{ event: "..." }` trigger, any `if`/filter on event
-      data, the `step.run(...)` calls, and any `step.waitForEvent(...)` usage anywhere in the codebase.
-      I need the exact import surface and idiom.
-
-
-      6. How Inngest functions are registered/served — the `serve()` endpoint (likely `src/app/api/inngest/route.ts`
-      or similar) and the array of functions it exports. I need to know where to add my new functions.
-
-
-      7. Concurrency/idempotency config on existing functions — do they set `idempotency`, `concurrency`,
-      or `retries` in the createFunction options? Show an example.
-
-
-      Report exact paths, line numbers, signatures, and code snippets. Describe only what exists; do not
-      propose changes.'
   - id: mined-codebase-analyzer-route-pos-5
     kind: routing
     expect_invoke: true
@@ -573,7 +434,89 @@ routing:
     kind: routing
     expect_invoke: false
     actual_route: codebase-pattern-finder
-    confusability: 0.175
+    confusability: 0.225
+    prompt: 'I''m about to write tests for a new `dispatch-sms` Inngest function, mirroring the existing
+      tests for `dispatch-email`. I need concrete, copyable test patterns with file:line citations.
+
+
+      Please analyze these test files and show me the patterns:
+
+      - `src/inngest/functions/messages/__tests__/dispatch-email.test.ts`
+
+      - `src/inngest/functions/messages/__tests__/dispatch-email.integration.test.ts`
+
+      - `src/inngest/functions/messages/__tests__/reconcile-missed-engagement.test.ts`
+
+
+      Also look for any shared Inngest test helpers/utilities (search `src/inngest` and `src/test` or
+      similar for things like `InngestTestEngine`, mock step, virtual time helpers, mocked provider clients).
+
+
+      Report with file:line citations and actual code snippets:
+
+
+      1. **Test harness**: How is an Inngest function invoked in a unit test? Is it `@inngest/test` `InngestTestEngine`,
+      or a hand-rolled mock of the `step` object? Show the exact setup. How are `step.run`, `step.waitForEvent`,
+      and `step.sleep` mocked or driven?
+
+
+      2. **Virtual time**: How is time/timeout handled in tests (the `waitForEvent` timeout, any `step.sleep`)?
+      Show the pattern.
+
+
+      3. **Mocking provider clients**: How is the Graph/email client mocked? How would I analogously mock
+      a Twilio client? Show the mock setup (rstest `rs.mock` / `vi.mock` style — note this project uses
+      Rstest).
+
+
+      4. **DB assertions**: Do these tests hit a real DB (integration) or mock it (unit)? What''s the
+      difference between the `.test.ts` and `.integration.test.ts` files? Show how each sets up/asserts
+      DB state.
+
+
+      5. **Status re-verification & cancellation tests**: How do they test the "verify still approved"
+      cancellation path (message dismissed mid-dispatch)?
+
+
+      Quote real snippets I can adapt. This project uses Rstest (not Vitest/Jest) — note any Rstest-specific
+      API usage.'
+  - id: mined-codebase-analyzer-route-neg-2
+    kind: routing
+    expect_invoke: false
+    actual_route: docs-analyzer
+    confusability: 0.159
+    prompt: 'I''m planning a refactor (GitHub issue #262) to split message dispatch into channel-specific
+      Inngest functions. I need the decisions of record from three ADRs distilled precisely.
+
+
+      Please read and distil:
+
+      1. `docs/adr/adr001-imessage-integration-for-sales-automation.md` — the iMessage device-bridge decision.
+      I specifically need: its recorded **Status**, the chosen option (which device-bridge provider),
+      what the "device-bridge service" is and its interface (webhooks, delivery acks), whether any implementation
+      has shipped, and any checklist of unchecked/incomplete work items in the ADR. This tells me whether
+      a `dispatch-imessage` Inngest worker can be built yet.
+
+
+      2. `docs/adr/adr014-outbox-pattern-for-inngest-delivery.md` — the outbox pattern. I need: the core
+      decision, the relationship between the outbox table and Inngest events, how the outbox-sweep cron
+      delivers events, the at-least-once / idempotency guarantees, and any constraints a new dispatch
+      worker must honor.
+
+
+      3. `docs/adr/adr017-atomic-outbox-writes-via-neon-http-batch.md` — atomic outbox writes. I need:
+      the decision, the `db.batch()` mechanism, why it''s used for the status-flip + outbox-enqueue atomicity,
+      and any constraints.
+
+
+      For each ADR report: the recorded `Status:` field value, the decision in 2-3 sentences, and the
+      specific constraints/interfaces my plan must honor. Quote key lines with file:line citations. Flag
+      explicitly if ADR-001 indicates the iMessage device-bridge is NOT yet implemented.'
+  - id: mined-codebase-analyzer-route-neg-3
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-pattern-finder
+    confusability: 0.145
     prompt: 'I''m planning integration + unit tests for new Inngest worker functions in issue #261 (email
       dispatch worker with `step.run` and `step.waitForEvent` + a timeout path). I need existing test
       patterns to mirror.
@@ -616,54 +559,3 @@ routing:
       For each, give the file path, line numbers, and a representative snippet. Prioritize the Rstest
       unit/integration idiom (the repo uses Rstest, not Jest/Vitest). If a pattern genuinely doesn''t
       exist yet, say so clearly rather than inventing one.'
-  - id: mined-codebase-analyzer-route-neg-2
-    kind: routing
-    expect_invoke: false
-    actual_route: codebase-locator
-    confusability: 0.136
-    prompt: 'I''m debugging a failing E2E test about HubSpot outbound sync. I need to find ALL the code
-      that syncs a newly-created lead OUT to HubSpot (creating or updating a HubSpot contact from a lead).
-
-
-      Specifically locate:
-
-      1. The "lead outbox worker" / outbox processor that was recently introduced (PR called "lead-outbox-cutover").
-      Where leads are picked up and pushed to HubSpot.
-
-      2. The HubSpot API client wrapper functions that create or update a contact — anything that calls
-      HubSpot''s contacts create/update/upsert/search APIs. Look for terms like `basicApi.create`, `basicApi.update`,
-      `searchApi.doSearch`, `idProperty`, `createOrUpdate`, `upsert`, `hubspotContactId`.
-
-      3. The mapping from a lead''s fields (firstName, lastName, email, phone) to HubSpot contact properties
-      (firstname, lastname, email, phone).
-
-      4. Any logic that handles the case where a HubSpot contact ALREADY EXISTS for a given email (dedup
-      by email) — does it update the existing contact''s properties or just link to it?
-
-
-      The relevant code is under src/ (likely src/server, src/inngest, or src/lib). Report exact file
-      paths and the key function names/line numbers for each. Do not analyze deeply yet — just locate
-      and give me a precise map of the relevant files and functions.'
-  - id: mined-codebase-analyzer-route-neg-3
-    kind: routing
-    expect_invoke: false
-    actual_route: codebase-locator
-    confusability: 0.116
-    prompt: 'Locate every file involved in the lead-intake / lead-creation flow, for planning a new public
-      web-form intake path (a third path alongside HubSpot webhook ingestion and manual capture).
-
-
-      Include and group by role:
-
-      - the intake logic itself
-
-      - the lead database schema
-
-      - the outbox / domain-event plumbing intake uses
-
-      - the API / route layer that calls intake
-
-      - all unit + integration test files covering intake
-
-
-      Give paths and the key exported symbols in each. At the end, report roughly how many files you found.'

@@ -3,385 +3,236 @@ _generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
 _needs_review: true
 _note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/codebase-verification.yaml
   alongside golden + adversarial buckets.
-_mined_available: 54
+_mined_available: 75
 _mined_emitted: 5
 execution:
 - id: mined-codebase-verification-exec-1
   kind: execution
-  prompt: Run make test_e2e. The working directory is /Users/sam/workspace/rekurve/rekurve. Report pass/fail.
-    If it fails, include the extracted error block showing which spec/test failed.
+  prompt: 'Run `make check` and `make test` in /Users/sam/workspace/rekurve/rekurve and report STATUS:
+    SUCCESS/FAILURE for each, with the extracted error block if any fail.'
   provenance:
-    agent_id: a295c95c65f241ad5
-    session_id: 2693f729-4ae4-4385-a908-5ceb481266dc
+    agent_id: a7b43afb3139d331b
+    session_id: da810594-c4f1-4650-91d8-500ea5b947a1
     model: claude-haiku-4-5-20251001
-    latency_s: 1201.3
-    tokens_total: 1313583
-    n_tool_uses: 34
-    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/2693f729-4ae4-4385-a908-5ceb481266dc/subagents/agent-a295c95c65f241ad5.jsonl
-  sample_output_excerpt: "Perfect! Now I have the summary. Let me get the complete failure count:\n\n\
-    ```\nSTATUS: FAILURE\nFAILED_TARGET: test_e2e\nEXIT_CODE: 2\nERROR:\nTest timeout of 45000ms exceeded.\n\
-    \nError: locator.click: Test timeout of 45000ms exceeded.\nCall log:\n  - waiting for locator('[data-testid=\"\
-    quick-capture-fab\"]')\n\n   at QuickCaptureSection.open (/Users/sam/workspace/rekurve/rekurve/e2e/pages/sections/quick-captur\
-    \ …"
-- id: mined-codebase-verification-exec-2
-  kind: execution
-  prompt: 'Run the Playwright E2E suite for this repo and report results compactly.
-
-
-    IMPORTANT context before you run:
-
-    - This branch (`feat/258-lead-outbox-cutover`) cut lead intake over to DB-first via an outbox + Inngest
-    worker. E2E now needs TWO local servers: the Next app on :3000 and an Inngest dev server on :8288.
-    The `playwright.config.ts` `webServer` is already configured as an array of both, so `make test_e2e`
-    should boot both automatically. The app server is started with env `INNGEST_DEV=1` and `INNGEST_BASE_URL=http://localhost:8288`.
-
-    - The Inngest dev server is launched via `yarn preview:inngest` (`inngest dev -u http://localhost:3000/api/inngest`).
-    Confirm the `inngest` CLI is resolvable (devDependency `inngest-cli` is installed) — if the dev server
-    fails to boot, that''s a top-priority finding.
-
-
-    PREREQUISITE CHECK (do this FIRST, before running the suite):
-
-    1. Confirm `HUBSPOT_ACCESS_TOKEN` is present in the environment Playwright will inherit. Check `.env.local`
-    for a non-empty `HUBSPOT_ACCESS_TOKEN=` line. The HubSpot-touching specs (`e2e/features/hubspot-sync.spec.ts`
-    and `e2e/features/lead-intake-sync.spec.ts`) SELF-SKIP when it''s absent — a green run that actually
-    skipped them is a FALSE PASS and must be reported as such, not as success.
-
-    2. Report whether the token is present.
-
-
-    THEN run the suite: `make test_e2e` (do NOT use yarn/npx directly; use the make target).
-
-
-    REPORT BACK (compact):
-
-    - Whether HUBSPOT_ACCESS_TOKEN was present.
-
-    - Whether both webServers (app :3000 and inngest :8288) booted. If the Inngest dev server logged an
-    app-sync (look for `PUT /api/inngest` 200 / "apps synced" / function registration for `lead-hubspot-sync`),
-    say so.
-
-    - Overall pass/fail counts and how many specs SKIPPED.
-
-    - For EACH failing spec: the spec file + test name, and the extracted error block (assertion message,
-    timeout, or stack — keep it tight, ~10-20 lines per failure).
-
-    - Pay special attention to `e2e/features/lead-intake-sync.spec.ts` (new) and `e2e/features/hubspot-sync.spec.ts`
-    (modified) — these exercise the async outbox→worker→HubSpot path and are the highest-risk specs.
-
-
-    Do not attempt to fix anything. Just run and report.'
-  provenance:
-    agent_id: a5ca78c1d1b0c98b5
-    session_id: fcb5f608-d07a-40d7-bfaa-ab57281b8f63
-    model: claude-haiku-4-5-20251001
-    latency_s: 1261.43
-    tokens_total: 678459
-    n_tool_uses: 16
-    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/fcb5f608-d07a-40d7-bfaa-ab57281b8f63/subagents/agent-a5ca78c1d1b0c98b5.jsonl
-  sample_output_excerpt: 'Good! The spec does have skip logic. But it failed rather than skipped, which
-    means it got past the skip condition (likely because the env var was partially set during the run,
-    or there was a transient state). Now let me examine the summary for key high-risk specs:
-
-
-    **Summary of findings:**
+    latency_s: 309.53
+    tokens_total: 2982780
+    n_tool_uses: 51
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/da810594-c4f1-4650-91d8-500ea5b947a1/subagents/agent-a7b43afb3139d331b.jsonl
+  sample_output_excerpt: 'Perfect! All tests pass now. Let me verify that both `make check` and `make
+    test` pass:
 
 
     ```
-
-    HUBSPOT_ACCESS_TOKEN: NOT PRESENT in .env.local
-
-
-    WEBSERVER STARTUP:
-
-    ✓ Next.js app: listening on http:// …'
-- id: mined-codebase-verification-exec-3
-  kind: execution
-  prompt: 'Run `make build` (which does `rm -rf .next` + `yarn build`, i.e. a clean Next.js production
-    build). Use timeout up to 400000ms.
-
-
-    I just changed `src/app/(application)/_realtime/token.ts` to import `getClientSubscriptionToken` from
-    `inngest/react` (a "use server" module) instead of `getSubscriptionToken` from `inngest/realtime`,
-    to fix an RSC serialization error ("Only plain objects … can be passed to Client Components").
-
-
-    Report:
-
-    1. Whether the build SUCCEEDED or FAILED.
-
-    2. If it failed: the full verbatim error block, including the file/route and any "Only plain objects"
-    message or import/module-resolution error.
-
-    3. Any warnings mentioning `inngest/react`, "use client"/"use server", or serialization.
-
-
-    Do not fix anything.'
-  provenance:
-    agent_id: afcca3cf8775dbd74
-    session_id: 21e617d7-554b-4d04-9151-e6f7f41caf68
-    model: claude-haiku-4-5-20251001
-    latency_s: 65.4
-    tokens_total: 104428
-    n_tool_uses: 5
-    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/21e617d7-554b-4d04-9151-e6f7f41caf68/subagents/agent-afcca3cf8775dbd74.jsonl
-  sample_output_excerpt: '**Build result: SUCCEEDED**
-
-
-    The clean build completed successfully with no errors or warnings related to your change. The build
-    output shows:
-
-    - ✓ Compiled successfully in 14.0s
-
-    - ✓ Finished TypeScript in 6.6s
-
-    - ✓ All 18 static pages generated
-
-    - No "Only plain objects" errors
-
-    - No module resolution errors for `inngest/react` or `inngest/realtime`
-
-    - No serialization warnings
-
-
-    The change from `getSu …'
-- id: mined-codebase-verification-exec-4
-  kind: execution
-  prompt: 'Verification after a file-move refactor. I relocated `src/server/outbox/{prune,sweep}.ts` and
-    their tests (`__tests__/{prune.test.ts, sweep.test.ts, sweep.integration.test.ts}`) to `src/inngest/functions/outbox/`,
-    and updated import paths in `src/inngest/functions/index.ts`. No logic changed. The moved tests reference
-    their source via relative imports (`../prune`, `../sweep`), so the unit tests exercise that the move
-    resolves correctly.
-
-
-    Run these make targets in order, stopping at the first failure:
-
-    1. `make check`  (lint + typecheck)
-
-    2. `make test`   (Rstest unit tests — integration tests are DB-gated and will skip without INTEGRATION_DB)
-
-
-    Return a one-line success listing the targets that passed, or if something fails, the structured error
-    block (which target, and the extracted error).'
-  provenance:
-    agent_id: ab7043427359417b4
-    session_id: 29b68443-03bd-405a-858a-b273fc82b143
-    model: claude-haiku-4-5-20251001
-    latency_s: 20.99
-    tokens_total: 39540
-    n_tool_uses: 2
-    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/29b68443-03bd-405a-858a-b273fc82b143/subagents/agent-ab7043427359417b4.jsonl
-  sample_output_excerpt: '```
 
     STATUS: SUCCESS
 
     TARGETS: check, test
 
     ```'
+- id: mined-codebase-verification-exec-2
+  kind: execution
+  prompt: 'Run the Playwright E2E suite for this project by running `make test_e2e` (which runs `yarn
+    test:e2e` → `playwright test`).
+
+
+    IMPORTANT context about this run:
+
+    - This branch has a NEW local Playwright config: it starts TWO web servers — the Next app on :3000
+    (with env INNGEST_DEV=1 and INNGEST_BASE_URL=http://localhost:8288) AND an Inngest dev server on :8288
+    (`yarn preview:inngest` → `inngest dev -u http://localhost:3000/api/inngest`). Playwright waits for
+    both before running tests. First run includes a clean Next build (`rm -rf .next/ && yarn db:migrate
+    && yarn preview`), so server startup can take a couple minutes — be patient with the timeout (use
+    up to 600000ms).
+
+    - HUBSPOT_ACCESS_TOKEN is present in `.env` (loaded via dotenv). Two specs (e2e/features/lead-intake-sync.spec.ts
+    and e2e/features/hubspot-sync.spec.ts) self-skip if it''s absent. I need to know whether they actually
+    RAN or SKIPPED — a suite that passes only because HubSpot specs skipped is a FALSE PASS.
+
+
+    What I need back:
+
+    1. Overall pass/fail summary (counts: passed / failed / skipped / flaky).
+
+    2. EXPLICITLY state whether `lead-intake-sync.spec.ts` and `hubspot-sync.spec.ts` ran or were skipped.
+
+    3. For any FAILED spec: the spec file + test name, and the full error block (assertion message, timeout
+    details, stack) — verbatim, not summarized.
+
+    4. If either web server failed to start (app or inngest dev server on :8288), capture that error block
+    too — look for "apps synced", "PUT /api/inngest", "no signing key found", or port/startup errors in
+    the piped server logs.
+
+
+    Run the command and report. Do not attempt to fix anything.'
+  provenance:
+    agent_id: aa5d03cd3b4dc13a5
+    session_id: 21e617d7-554b-4d04-9151-e6f7f41caf68
+    model: claude-haiku-4-5-20251001
+    latency_s: 1150.52
+    tokens_total: 975414
+    n_tool_uses: 18
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/21e617d7-554b-4d04-9151-e6f7f41caf68/subagents/agent-aa5d03cd3b4dc13a5.jsonl
+  sample_output_excerpt: 'Perfect! The servers started successfully. I can see:
+
+    - Next.js app started on port 3000: "Ready in 51ms"
+
+    - Inngest dev server started on port 8288: "starting server","caller":"api","addr":"0.0.0.0:8288"
+
+    - Apps synced: "apps synced, disabling auto-discovery"
+
+
+    Now let me verify the specific counts from the summary. Let me look at a comprehensive count of the
+    failures:
+
+
+    Based on the E2E test run out …'
+- id: mined-codebase-verification-exec-3
+  kind: execution
+  prompt: 'Run `make test` and report the result. If it fails, return only the failing test file names,
+    the failing test names, and their assertion diff output (not the full passing log). Note: any test
+    gated behind INTEGRATION_DB is expected to skip — do not treat skipped tests as failures.'
+  provenance:
+    agent_id: a425145d09a2655cc
+    session_id: 376d002b-e6ca-452d-a83d-edfd7d032fd9
+    model: claude-haiku-4-5-20251001
+    latency_s: 13.66
+    tokens_total: 15863
+    n_tool_uses: 1
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/376d002b-e6ca-452d-a83d-edfd7d032fd9/subagents/agent-a425145d09a2655cc.jsonl
+  sample_output_excerpt: I'll run `make test` for you.
+- id: mined-codebase-verification-exec-4
+  kind: execution
+  prompt: Run only `make db_migrate`. Report pass/fail and show the output including which migration was
+    applied.
+  provenance:
+    agent_id: a10d2d5fd6b7e0667
+    session_id: 3af2785d-be20-410c-9261-cab34a91ddf7
+    model: claude-haiku-4-5-20251001
+    latency_s: 8.87
+    tokens_total: 17809
+    n_tool_uses: 1
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/3af2785d-be20-410c-9261-cab34a91ddf7/subagents/agent-a10d2d5fd6b7e0667.jsonl
+  sample_output_excerpt: '**PASS**
+
+
+    Migration applied successfully. The output shows:
+
+    - The migrations table and schema already exist (notices only, not errors)
+
+    - All pending migrations applied successfully with the checkmark: `[✓] migrations applied successfully!`
+
+
+    The migration that was applied is from the new drizzle files in your working directory:
+
+    - **Migration file**: `drizzle/0006_slimy_dagger.sql` (newly generated …'
 - id: mined-codebase-verification-exec-5
   kind: execution
-  prompt: 'Run `make check` (biome lint + tsc typecheck) for this repo and report the result.
+  prompt: 'Run `make check` (lint + typecheck) and report the result.
 
 
-    Context: I changed two files only:
-
-    - e2e/utils/hubspot-helper.ts — added an exported `getTestContactById(hubspotId): Promise<TestContact>`
-    function that calls `hubspot().crm.contacts.basicApi.getById(hubspotId, ALL_PROPERTIES)`.
-
-    - e2e/features/hubspot-sync.spec.ts — added `getTestContactById` to the import from ../utils/hubspot-helper,
-    and changed one test''s assertions to use it.
+    Context: this change adds two new Claude Code agent definition files (`.claude/agents/docs-locator.md`,
+    `.claude/agents/docs-analyzer.md`) and edits five other markdown files under `.claude/`. No TypeScript/source
+    files in `src/` were touched, so I expect `check` to pass cleanly — I''m running it as a guard to
+    confirm nothing is broken.
 
 
-    I need to confirm there are no lint or type errors. If `make check` fails, return the exact error
-    block (file, line, message). If it passes, return a one-line success.'
+    Return a one-line PASS, or if it fails, the extracted error block.'
   provenance:
-    agent_id: af3990472e4030823
-    session_id: 09b668e2-eb3e-4ca5-bf9c-e3168c9f0ad1
+    agent_id: a59a4ba69aa81fa7c
+    session_id: c485121e-d0ed-417b-a3e4-4538a2ab1a75
     model: claude-haiku-4-5-20251001
-    latency_s: 7.3
-    tokens_total: 22721
+    latency_s: 5.47
+    tokens_total: 16093
     n_tool_uses: 1
-    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/09b668e2-eb3e-4ca5-bf9c-e3168c9f0ad1/subagents/agent-af3990472e4030823.jsonl
-  sample_output_excerpt: '```
-
-    STATUS: SUCCESS
-
-    TARGETS: check
-
-    ```'
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/c485121e-d0ed-417b-a3e4-4538a2ab1a75/subagents/agent-a59a4ba69aa81fa7c.jsonl
+  sample_output_excerpt: I'll run `make check` for you.
 routing:
   positives:
   - id: mined-codebase-verification-route-pos-1
     kind: routing
     expect_invoke: true
-    prompt: Run make test_e2e. The working directory is /Users/sam/workspace/rekurve/rekurve. Report pass/fail.
-      If it fails, include the extracted error block showing which spec/test failed.
+    prompt: 'Run `make check` and `make test` in /Users/sam/workspace/rekurve/rekurve and report STATUS:
+      SUCCESS/FAILURE for each, with the extracted error block if any fail.'
   - id: mined-codebase-verification-route-pos-2
     kind: routing
     expect_invoke: true
-    prompt: 'Run the Playwright E2E suite for this repo and report results compactly.
+    prompt: 'Run the Playwright E2E suite for this project by running `make test_e2e` (which runs `yarn
+      test:e2e` → `playwright test`).
 
 
-      IMPORTANT context before you run:
+      IMPORTANT context about this run:
 
-      - This branch (`feat/258-lead-outbox-cutover`) cut lead intake over to DB-first via an outbox +
-      Inngest worker. E2E now needs TWO local servers: the Next app on :3000 and an Inngest dev server
-      on :8288. The `playwright.config.ts` `webServer` is already configured as an array of both, so `make
-      test_e2e` should boot both automatically. The app server is started with env `INNGEST_DEV=1` and
-      `INNGEST_BASE_URL=http://localhost:8288`.
+      - This branch has a NEW local Playwright config: it starts TWO web servers — the Next app on :3000
+      (with env INNGEST_DEV=1 and INNGEST_BASE_URL=http://localhost:8288) AND an Inngest dev server on
+      :8288 (`yarn preview:inngest` → `inngest dev -u http://localhost:3000/api/inngest`). Playwright
+      waits for both before running tests. First run includes a clean Next build (`rm -rf .next/ && yarn
+      db:migrate && yarn preview`), so server startup can take a couple minutes — be patient with the
+      timeout (use up to 600000ms).
 
-      - The Inngest dev server is launched via `yarn preview:inngest` (`inngest dev -u http://localhost:3000/api/inngest`).
-      Confirm the `inngest` CLI is resolvable (devDependency `inngest-cli` is installed) — if the dev
-      server fails to boot, that''s a top-priority finding.
-
-
-      PREREQUISITE CHECK (do this FIRST, before running the suite):
-
-      1. Confirm `HUBSPOT_ACCESS_TOKEN` is present in the environment Playwright will inherit. Check `.env.local`
-      for a non-empty `HUBSPOT_ACCESS_TOKEN=` line. The HubSpot-touching specs (`e2e/features/hubspot-sync.spec.ts`
-      and `e2e/features/lead-intake-sync.spec.ts`) SELF-SKIP when it''s absent — a green run that actually
-      skipped them is a FALSE PASS and must be reported as such, not as success.
-
-      2. Report whether the token is present.
+      - HUBSPOT_ACCESS_TOKEN is present in `.env` (loaded via dotenv). Two specs (e2e/features/lead-intake-sync.spec.ts
+      and e2e/features/hubspot-sync.spec.ts) self-skip if it''s absent. I need to know whether they actually
+      RAN or SKIPPED — a suite that passes only because HubSpot specs skipped is a FALSE PASS.
 
 
-      THEN run the suite: `make test_e2e` (do NOT use yarn/npx directly; use the make target).
+      What I need back:
+
+      1. Overall pass/fail summary (counts: passed / failed / skipped / flaky).
+
+      2. EXPLICITLY state whether `lead-intake-sync.spec.ts` and `hubspot-sync.spec.ts` ran or were skipped.
+
+      3. For any FAILED spec: the spec file + test name, and the full error block (assertion message,
+      timeout details, stack) — verbatim, not summarized.
+
+      4. If either web server failed to start (app or inngest dev server on :8288), capture that error
+      block too — look for "apps synced", "PUT /api/inngest", "no signing key found", or port/startup
+      errors in the piped server logs.
 
 
-      REPORT BACK (compact):
-
-      - Whether HUBSPOT_ACCESS_TOKEN was present.
-
-      - Whether both webServers (app :3000 and inngest :8288) booted. If the Inngest dev server logged
-      an app-sync (look for `PUT /api/inngest` 200 / "apps synced" / function registration for `lead-hubspot-sync`),
-      say so.
-
-      - Overall pass/fail counts and how many specs SKIPPED.
-
-      - For EACH failing spec: the spec file + test name, and the extracted error block (assertion message,
-      timeout, or stack — keep it tight, ~10-20 lines per failure).
-
-      - Pay special attention to `e2e/features/lead-intake-sync.spec.ts` (new) and `e2e/features/hubspot-sync.spec.ts`
-      (modified) — these exercise the async outbox→worker→HubSpot path and are the highest-risk specs.
-
-
-      Do not attempt to fix anything. Just run and report.'
+      Run the command and report. Do not attempt to fix anything.'
   - id: mined-codebase-verification-route-pos-3
     kind: routing
     expect_invoke: true
-    prompt: 'Run `make build` (which does `rm -rf .next` + `yarn build`, i.e. a clean Next.js production
-      build). Use timeout up to 400000ms.
-
-
-      I just changed `src/app/(application)/_realtime/token.ts` to import `getClientSubscriptionToken`
-      from `inngest/react` (a "use server" module) instead of `getSubscriptionToken` from `inngest/realtime`,
-      to fix an RSC serialization error ("Only plain objects … can be passed to Client Components").
-
-
-      Report:
-
-      1. Whether the build SUCCEEDED or FAILED.
-
-      2. If it failed: the full verbatim error block, including the file/route and any "Only plain objects"
-      message or import/module-resolution error.
-
-      3. Any warnings mentioning `inngest/react`, "use client"/"use server", or serialization.
-
-
-      Do not fix anything.'
+    prompt: 'Run `make test` and report the result. If it fails, return only the failing test file names,
+      the failing test names, and their assertion diff output (not the full passing log). Note: any test
+      gated behind INTEGRATION_DB is expected to skip — do not treat skipped tests as failures.'
   - id: mined-codebase-verification-route-pos-4
     kind: routing
     expect_invoke: true
-    prompt: 'Verification after a file-move refactor. I relocated `src/server/outbox/{prune,sweep}.ts`
-      and their tests (`__tests__/{prune.test.ts, sweep.test.ts, sweep.integration.test.ts}`) to `src/inngest/functions/outbox/`,
-      and updated import paths in `src/inngest/functions/index.ts`. No logic changed. The moved tests
-      reference their source via relative imports (`../prune`, `../sweep`), so the unit tests exercise
-      that the move resolves correctly.
-
-
-      Run these make targets in order, stopping at the first failure:
-
-      1. `make check`  (lint + typecheck)
-
-      2. `make test`   (Rstest unit tests — integration tests are DB-gated and will skip without INTEGRATION_DB)
-
-
-      Return a one-line success listing the targets that passed, or if something fails, the structured
-      error block (which target, and the extracted error).'
+    prompt: Run only `make db_migrate`. Report pass/fail and show the output including which migration
+      was applied.
   - id: mined-codebase-verification-route-pos-5
     kind: routing
     expect_invoke: true
-    prompt: 'Run `make check` (biome lint + tsc typecheck) for this repo and report the result.
+    prompt: 'Run `make check` (lint + typecheck) and report the result.
 
 
-      Context: I changed two files only:
-
-      - e2e/utils/hubspot-helper.ts — added an exported `getTestContactById(hubspotId): Promise<TestContact>`
-      function that calls `hubspot().crm.contacts.basicApi.getById(hubspotId, ALL_PROPERTIES)`.
-
-      - e2e/features/hubspot-sync.spec.ts — added `getTestContactById` to the import from ../utils/hubspot-helper,
-      and changed one test''s assertions to use it.
+      Context: this change adds two new Claude Code agent definition files (`.claude/agents/docs-locator.md`,
+      `.claude/agents/docs-analyzer.md`) and edits five other markdown files under `.claude/`. No TypeScript/source
+      files in `src/` were touched, so I expect `check` to pass cleanly — I''m running it as a guard to
+      confirm nothing is broken.
 
 
-      I need to confirm there are no lint or type errors. If `make check` fails, return the exact error
-      block (file, line, message). If it passes, return a one-line success.'
+      Return a one-line PASS, or if it fails, the extracted error block.'
   negatives:
   - id: mined-codebase-verification-route-neg-1
     kind: routing
     expect_invoke: false
-    actual_route: web-research
-    confusability: 0.109
-    prompt: 'I''m implementing browser realtime updates in a Next.js 15 (App Router) + React 19 app that
-      already uses Inngest v4.2.6 (package "inngest@4.2.6"). I need authoritative, current details on
-      **Inngest Realtime** (the `@inngest/realtime` package) — the feature that lets a browser subscribe
-      to events/channels and receive them over a WebSocket.
+    actual_route: codebase-analyzer
+    confusability: 0.111
+    prompt: 'Read these four files and return their full contents:
 
+      1. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/agent-brief.md
 
-      Please research and report, with citations and version numbers, on the OFFICIAL Inngest docs (inngest.com/docs)
-      and the @inngest/realtime npm/GitHub:
+      2. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/bug-template.md
 
+      3. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/github-publishing.md
 
-      1. **Package & version**: What is the current `@inngest/realtime` package, its latest version, and
-      what version of the core `inngest` package does it require as a peer dependency? Is `inngest@4.2.6`
-      compatible, or is an upgrade required? Is `@inngest/realtime` still beta/experimental as of early
-      2026?
-
-
-      2. **Server setup**: How do you define a channel and topic on the server? Show the exact API: `channel()`,
-      `topic()`, `realtimeMiddleware()`. How is the middleware added to the Inngest client (`new Inngest({
-      id, middleware: [realtimeMiddleware()] })`)? How does an Inngest function `publish()` to a channel/topic?
-
-
-      3. **Subscribe tokens (auth)**: How do you generate a subscription token server-side with `getSubscriptionToken()`,
-      scoped to a specific channel + topic? This is the auth boundary — I want to scope a per-user channel
-      so a user only receives their own events. Show the server-side token-generation code (e.g. in a
-      Next.js server action or route handler) and how channel names can be parameterized per-user (e.g.
-      `channel(`user:${userId}`)`).
-
-
-      4. **Client subscription**: Show the exact React hook `useInngestSubscription` from `@inngest/realtime/hooks`
-      — its arguments (token, refreshToken, enabled), what it returns (data, latestData, state), and a
-      full working example of a client component subscribing and reacting to messages. Also show the non-React
-      `subscribe()` API.
-
-
-      5. **Does it work on Vercel serverless?** The functions are served via `inngest/next` `serve()`
-      on Vercel. Confirm that Realtime publish works from functions on serverless and that the browser
-      connects directly to Inngest''s WebSocket (not to our server). Any gotchas with Vercel?
-
-
-      6. **Env/keys**: What environment variables or keys are required for Realtime to work in production
-      (signing key, event key, anything Realtime-specific)?
-
-
-      Prefer official Inngest documentation and the @inngest/realtime GitHub README. Quote exact code
-      snippets and cite the doc URLs and version numbers. If the API changed across versions, note which
-      version introduced the current shape.'
+      4. /Users/sam/workspace/rekurve/rekurve/.claude/skills/ticket-writer/references/epic-breakdown.md'
   - id: mined-codebase-verification-route-neg-2
     kind: routing
     expect_invoke: false
     actual_route: codebase-pattern-finder
-    confusability: 0.101
+    confusability: 0.098
     prompt: 'I''m planning integration + unit tests for new Inngest worker functions in issue #261 (email
       dispatch worker with `step.run` and `step.waitForEvent` + a timeout path). I need existing test
       patterns to mirror.
@@ -428,27 +279,16 @@ routing:
     kind: routing
     expect_invoke: false
     actual_route: codebase-locator
-    confusability: 0.1
-    prompt: 'I''m debugging a failing E2E test about HubSpot outbound sync. I need to find ALL the code
-      that syncs a newly-created lead OUT to HubSpot (creating or updating a HubSpot contact from a lead).
+    confusability: 0.087
+    prompt: 'Locate where **lead scoring** lives in this codebase. Return file locations only — do not
+      explain behavior — grouped by purpose:
 
 
-      Specifically locate:
+      1. The scoring module''s source files
 
-      1. The "lead outbox worker" / outbox processor that was recently introduced (PR called "lead-outbox-cutover").
-      Where leads are picked up and pushed to HubSpot.
+      2. Every place lead scoring is invoked / called from
 
-      2. The HubSpot API client wrapper functions that create or update a contact — anything that calls
-      HubSpot''s contacts create/update/upsert/search APIs. Look for terms like `basicApi.create`, `basicApi.update`,
-      `searchApi.doSearch`, `idProperty`, `createOrUpdate`, `upsert`, `hubspotContactId`.
-
-      3. The mapping from a lead''s fields (firstName, lastName, email, phone) to HubSpot contact properties
-      (firstname, lastname, email, phone).
-
-      4. Any logic that handles the case where a HubSpot contact ALREADY EXISTS for a given email (dedup
-      by email) — does it update the existing contact''s properties or just link to it?
+      3. The scoring tests
 
 
-      The relevant code is under src/ (likely src/server, src/inngest, or src/lib). Report exact file
-      paths and the key function names/line numbers for each. Do not analyze deeply yet — just locate
-      and give me a precise map of the relevant files and functions.'
+      Give full paths from the repo root.'

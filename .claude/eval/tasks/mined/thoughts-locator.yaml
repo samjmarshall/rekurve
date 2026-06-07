@@ -3,10 +3,34 @@ _generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
 _needs_review: true
 _note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/thoughts-locator.yaml alongside
   golden + adversarial buckets.
-_mined_available: 1
-_mined_emitted: 1
+_mined_available: 2
+_mined_emitted: 2
 execution:
 - id: mined-thoughts-locator-exec-1
+  kind: execution
+  prompt: 'Find all documents in the thoughts/ directory related to monitoring, observability, logging,
+    alerting, metrics, error tracking, uptime monitoring, BetterStack, PostHog, PagerDuty, or incident
+    management.
+
+
+    The team had prior designs and/or plans to implement BetterStack for monitoring and observability
+    (metrics, logs, alerts). I''m looking for those specifically, plus any related research notes, PR
+    write-ups, or decisions.
+
+
+    Return grouped paths with dates and a one-line description of each. Prioritize anything that mentions
+    BetterStack, observability, logging, alerting, or uptime monitoring. Do not analyze contents deeply
+    — just locate and categorize.'
+  provenance:
+    agent_id: a164389296ea06475
+    session_id: 2eabff0a-a1b3-49c8-bfe4-a0e1cc8b85c9
+    model: claude-sonnet-4-6
+    latency_s: 44.47
+    tokens_total: 257076
+    n_tool_uses: 14
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/2eabff0a-a1b3-49c8-bfe4-a0e1cc8b85c9/subagents/agent-a164389296ea06475.jsonl
+  sample_output_excerpt: Good. Now let me get targeted title lines for the most directly relevant files.
+- id: mined-thoughts-locator-exec-2
   kind: execution
   prompt: Locate the sub-agent evaluation pipeline design document and any related research notes or iteration
     transcripts in the thoughts/ directory. Return the file paths grouped by type (design / research /
@@ -42,6 +66,22 @@ routing:
   - id: mined-thoughts-locator-route-pos-1
     kind: routing
     expect_invoke: true
+    prompt: 'Find all documents in the thoughts/ directory related to monitoring, observability, logging,
+      alerting, metrics, error tracking, uptime monitoring, BetterStack, PostHog, PagerDuty, or incident
+      management.
+
+
+      The team had prior designs and/or plans to implement BetterStack for monitoring and observability
+      (metrics, logs, alerts). I''m looking for those specifically, plus any related research notes, PR
+      write-ups, or decisions.
+
+
+      Return grouped paths with dates and a one-line description of each. Prioritize anything that mentions
+      BetterStack, observability, logging, alerting, or uptime monitoring. Do not analyze contents deeply
+      — just locate and categorize.'
+  - id: mined-thoughts-locator-route-pos-2
+    kind: routing
+    expect_invoke: true
     prompt: Locate the sub-agent evaluation pipeline design document and any related research notes or
       iteration transcripts in the thoughts/ directory. Return the file paths grouped by type (design
       / research / transcript).
@@ -49,114 +89,65 @@ routing:
   - id: mined-thoughts-locator-route-neg-1
     kind: routing
     expect_invoke: false
-    actual_route: codebase-locator
-    confusability: 0.097
-    prompt: Locate the Drizzle migration SQL file(s) related to the "outbox" table or the outbox-sweep
-      mechanism in this repo, and the directory they live in. Return only verified file paths (no content
-      descriptions).
+    actual_route: docs-locator
+    confusability: 0.268
+    prompt: 'Find any ADRs or feature docs in the docs/ tree that govern or relate to: observability,
+      monitoring, logging, alerting, error tracking, metrics, uptime monitoring, PostHog, analytics, or
+      incident response.
+
+
+      Return grouped paths. For each ADR, include its number and recorded Status (Proposed/Accepted/Superseded).
+      Give a one-line description of each. Don''t deep-analyze — just locate and categorize.'
   - id: mined-thoughts-locator-route-neg-2
     kind: routing
     expect_invoke: false
     actual_route: codebase-locator
-    confusability: 0.051
-    prompt: 'Locate where **lead scoring** lives in this codebase. Return file locations only — do not
-      explain behavior — grouped by purpose:
+    confusability: 0.111
+    prompt: 'I need to understand the current observability/monitoring setup in this Next.js codebase.
+      Locate (paths only, grouped by purpose):
 
 
-      1. The scoring module''s source files
+      1. Where PostHog is configured and initialized (client and server side) — config files, provider
+      components, env vars referencing POSTHOG.
 
-      2. Every place lead scoring is invoked / called from
+      2. Any OpenTelemetry / OTLP / instrumentation setup — especially `instrumentation.ts`, `instrumentation-client.ts`,
+      or `register()` hooks in the Next.js app.
 
-      3. The scoring tests
+      3. Any existing logging utilities, logger modules, or structured logging.
+
+      4. Any Inngest scheduled functions / cron jobs (look in src/inngest) — I''m interested in whether
+      there''s an existing pattern for scheduled "heartbeat"-style events. The CLAUDE.md mentions an "outbox-sweep"
+      cron and an outbox pattern.
+
+      5. Any existing error tracking or monitoring instrumentation (Sentry, etc.).
+
+      6. The Next.js version and whether the app uses the app router (check package.json and folder structure).
 
 
-      Give full paths from the repo root.'
+      Return file paths grouped by the categories above, with a one-line note on each. Paths only — don''t
+      explain mechanics in depth.'
   - id: mined-thoughts-locator-route-neg-3
     kind: routing
     expect_invoke: false
-    actual_route: web-research
-    confusability: 0.028
-    prompt: 'I need a thorough, current (as of 2026) research report on integrating OpenTelemetry (OTEL)
-      with Claude Code (Anthropic''s CLI coding agent) for LOCAL observability. The goal is to surface
-      real-world sub-agent activity — specifically sub-agent prompts, sub-agent results/outputs, and metrics
-      like latency, token usage, and cost — to build a baseline dataset for evaluating and improving sub-agent
-      prompts.
+    actual_route: web-lookup
+    confusability: 0.102
+    prompt: 'I''m on the **Vercel Pro plan** with a Next.js app. I need precise, current facts on two
+      things:
 
 
-      Please research and answer these specific questions, citing authoritative sources (prefer official
-      Anthropic/Claude Code docs at docs.claude.com or docs.anthropic.com, the Claude Code GitHub repo,
-      and OpenTelemetry official docs):
+      1. **Vercel Observability** (https://vercel.com/products/observability and related docs): What does
+      it include on the **Pro plan**? Specifically: logs (runtime logs, log retention period on Pro),
+      metrics/monitoring dashboards, "Observability Plus" add-on (what it adds and cost), OpenTelemetry
+      support (can Vercel export traces/logs via OTEL collector to third parties?). Is there a log drain
+      feature on Pro for shipping logs to an external service?
 
 
-      ## 1. Claude Code''s built-in OTEL / telemetry support
-
-      - Does Claude Code have native OpenTelemetry support? What environment variables enable it (e.g.
-      CLAUDE_CODE_ENABLE_TELEMETRY)?
-
-      - What is the FULL list of metrics Claude Code exports via OTEL? (e.g. token usage, cost, session
-      count, lines of code, API request duration/latency, etc.) Give exact metric names if documented.
-
-      - What logs/events does Claude Code export? Is there an events/logs exporter separate from metrics?
-
-      - CRITICAL: Does Claude Code''s OTEL telemetry capture the actual CONTENT of prompts and AI responses/outputs?
-      Is there a setting like OTEL_LOG_USER_PROMPTS or similar that controls whether prompt text is included?
-      What about the assistant''s output text?
-
-      - CRITICAL FOR OUR USE CASE: Does Claude Code''s telemetry distinguish or specifically capture SUB-AGENT
-      (Task tool / subagent) activity? When a main agent spawns a sub-agent, are the sub-agent''s prompt,
-      output, token usage, and latency captured as distinct telemetry events/spans/attributes? Is there
-      any agent-type or agent-id attribute on the events? Be precise about what is and isn''t captured
-      at the sub-agent granularity — this is the single most important question.
-
-      - Does Claude Code emit OTEL traces/spans (not just metrics and logs)? If so, what spans, and do
-      tool calls / sub-agent invocations appear as spans?
+      2. **Uptime / availability monitoring**: Does Vercel offer any built-in **uptime monitoring** or
+      synthetic/health-check monitoring that pings an endpoint and alerts on downtime? (I suspect not
+      natively.) If not, what''s the closest thing? Also: confirm Vercel **Cron Jobs** availability and
+      limits on the Pro plan (number of cron jobs, minimum frequency) — I''m considering using a scheduled
+      cron / heartbeat as a DIY uptime check.
 
 
-      ## 2. Local OTEL collector + storage + visualization stack
-
-      - What is the recommended way to run a local OpenTelemetry Collector (otelcol / otelcol-contrib)
-      to receive Claude Code''s telemetry?
-
-      - What configuration (OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_PROTOCOL grpc vs http/protobuf,
-      OTEL_METRICS_EXPORTER, OTEL_LOGS_EXPORTER) does Claude Code need to point at a local collector?
-
-      - What are the recommended local storage backends for each signal type: metrics (Prometheus?), logs/events
-      (Loki? ClickHouse?), traces (Jaeger? Tempo?)?
-
-      - What is the recommended local visualization layer (Grafana?)? Are there prebuilt Claude Code dashboards
-      published by Anthropic or the community?
-
-      - Is there a known docker-compose / one-command setup (official or community, e.g. a "claude-code-otel"
-      project on GitHub) that stands up collector + storage + Grafana locally? Name specific repos if
-      they exist.
-
-
-      ## 3. Capturing prompt/output CONTENT for evaluation (not just metrics)
-
-      - Since the core goal is capturing actual sub-agent prompt text and output text to build an eval
-      dataset, clarify: does the OTEL events/logs path actually carry the full text, or is it truncated/redacted?
-      Are there length limits?
-
-      - If Claude Code''s OTEL does NOT capture full sub-agent prompt+output content, what are the ALTERNATIVE
-      local interception approaches? Specifically research: (a) the Claude Code OTEL logs exporter content,
-      (b) hooks (PreToolUse/PostToolUse/SubagentStop hooks) and what data they receive, (c) reading the
-      local session transcript / .jsonl files Claude Code writes, (d) an LLM-proxy / man-in-the-middle
-      approach (e.g. LiteLLM proxy, or a custom Anthropic API proxy) to capture full request/response
-      bodies. Compare these on completeness of captured content.
-
-      - Specifically: is there a SubagentStop hook, and does it provide access to the sub-agent''s full
-      transcript/output?
-
-
-      ## 4. Practical recommendation
-
-      - Summarize the simplest local setup that would capture sub-agent prompts, outputs, latency, and
-      cost.
-
-      - Flag any gaps where OTEL alone is insufficient and a complementary approach (hooks, transcript
-      parsing, proxy) is needed.
-
-
-      Please be concrete and cite versions/dates where possible. Distinguish clearly between what is officially
-      documented vs community/experimental. Note that as of 2026 Claude Code is actively developed, so
-      prefer the most recent sources.'
+      Report concisely with facts and cite Vercel''s docs/pricing pages with dates. Flag clearly anything
+      that is an extra paid add-on vs included in Pro.'

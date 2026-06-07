@@ -23,8 +23,11 @@ description: <what>. Use when <when>. Not for <when-not, with reciprocal redirec
 tools: Bash, Read          # locator (search-first); analyzer is `Read, Bash`
 color: <distinct from siblings>
 model: sonnet              # ALWAYS start here — never assume opus; let the head-to-head decide
+# effort: high            # OPTIONAL — omit to take the model's tier default; set only when the head-to-head shows a level wins
 ---
 ```
+
+Like `model`, `effort` is a frontmatter setting the head-to-head tunes on data — but it's **frontmatter-only** (there is no per-spawn override, so the harness tests it via Path 2, not the model sweep; see [REFERENCE.md](REFERENCE.md) § Model & effort decision). Omit it unless a level proves out; `web-research.md` ships `effort: max` as the one precedent.
 
 **The description is the routing signal** — the only thing the planner sees when choosing tools. <60 words, third person, what / when / when-not, with **reciprocal redirects** that keep the family coherent. The load-bearing boundary across the suite: docs-* = decided architecture & shipped features (authoritative) · thoughts-* = transient ideas/designs/plans (speculative) · codebase-* = code · web-* = the web. When you add an agent, tighten the siblings' when-not clauses to point at it.
 

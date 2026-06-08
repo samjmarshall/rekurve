@@ -1,5 +1,5 @@
 ---
-description: Review and prioritize GitHub Project issues for PMF alignment
+description: Review, groom, and schedule GitHub Project issues for PMF alignment
 skills: roadmap-review
 model: opus
 effort: max
@@ -11,42 +11,39 @@ Use and follow the roadmap-review skill exactly as written.
 
 ## Pre-fetch GitHub Project Data
 
-Before starting the collaborative review, fetch the current project state:
+Before starting, fetch the live board, the completed-work corpus (for staleness detection), and the current timeline values (so the apply step knows what to clear):
 
-1. **List project items with all fields:**
 ```bash
-gh project item-list 2 --owner samjmarshall --format json --limit 100
-```
-
-2. **Get project field definitions:**
-```bash
+# Live board: open issues + project fields
+gh project item-list 2 --owner samjmarshall --format json --limit 200
 gh project field-list 2 --owner samjmarshall --format json
+gh issue list --repo samjmarshall/rekurve --state all --json number,title,state,createdAt,updatedAt,milestone,labels --limit 200
+
+# Completed-work corpus (~6 months) — comparison set for "superseded by shipped work"
+gh issue list --repo samjmarshall/rekurve --state closed --json number,title,closedAt,labels --limit 200
+gh pr list   --repo samjmarshall/rekurve --state merged --json number,title,mergedAt,files   --limit 200
+git log --since="6 months ago" --oneline
 ```
 
-3. **List all issues with milestones:**
-```bash
-gh issue list --repo samjmarshall/rekurve --state all --json number,title,state,milestone,labels --limit 100
-```
+The `item-list` JSON already carries each item's current Start date / End date / Iteration — note which issues have them set, so the scheduling apply step can clear stale values.
 
 ## Context to Read
 
-- `thoughts/docs/` - Non-technical project docs (strategy, messaging, pilot feedback)
-- Recent designs in `thoughts/designs/` - Past decisions
+- `thoughts/docs/` — strategy, messaging, pilot feedback
+- `thoughts/designs/` + `docs/adr/` — recent decisions and pivots (which areas changed)
 
-## Then Begin Collaborative Review
+## Then Begin the Review
 
-Follow the roadmap-review skill's question flow to understand:
-- Current reality and progress
-- Blockers and constraints
-- Available capacity
-- Time off or scheduling constraints
-- Warm leads or active prospects
+Follow the skill's flow:
 
-Then categorize issues and propose specific changes.
+1. **Health pass** — groom open issues into Remove / Needs-investigation / Ready (evidence-based; `uncertain` → Needs-investigation; clean-pass = assumed Ready).
+2. **Discovery** — capacity, blockers, leads, time off, and the WIP limit (Ready survivors only).
+3. **Prioritize + schedule** — sequence Active Now, then compute Start/End dates from Size + weekly hours + WIP.
+4. Propose changes section by section.
 
 ## Output
 
 Write the final approved roadmap prioritization to:
 `thoughts/roadmap/YYYY-MM-DD-roadmap-prioritization.md`
 
-STOP after writing - do not implement changes automatically.
+**STOP after writing — make no GitHub changes.** The founder reviews, then directs the `github-project` agent to apply (close Removes, set/clear Start/End dates, move milestones, drop iterations) and uses `/write_tickets` for Needs-investigation items.

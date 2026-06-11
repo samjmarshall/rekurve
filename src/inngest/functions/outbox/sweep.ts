@@ -47,7 +47,14 @@ export async function runSweep(step: Step): Promise<void> {
   }
 }
 
+// Hourly, not per-minute: the post-commit `inngest.send` is the fast path that
+// delivers ~every event in real time; this sweep is only the backstop for the
+// rare event whose post-commit send failed (ADR-014 — cadence is "a tunable
+// knob, not a contract"). A per-minute query kept Neon's compute from ever
+// autosuspending (scale-to-zero), pinning it ~24/7 and driving DB usage to
+// quota. Hourly lets the compute idle between sweeps; worst-case recovery for a
+// failed publish is bounded by this interval.
 export const outboxSweep = inngest.createFunction(
-  { id: "outbox-sweep", triggers: { cron: "* * * * *" } },
+  { id: "outbox-sweep", triggers: { cron: "0 * * * *" } },
   ({ step }) => runSweep(step),
 );

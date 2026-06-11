@@ -529,21 +529,19 @@ test.describe("SMS Share — E2E", () => {
 
     await queue.approveButton(msg.id).click();
 
-    // With placeholder Twilio creds, the dispatch fails and shows an error toast.
+    // Approve queues the async Twilio dispatch (outbox + Inngest worker).
     // Either way the share drawer must NOT appear.
     await expect(page.getByTestId("sms-share-drawer")).not.toBeVisible();
 
-    // The error toast surfaces (dispatch failed with placeholder credentials)
+    // Approve succeeds immediately — dispatch failures stay in the worker
     await expect(
-      page
-        .getByTestId("app-toast")
-        .filter({ hasText: /Approve failed|Failed to send/i }),
+      page.getByTestId("app-toast").filter({ hasText: "Draft approved" }),
     ).toBeVisible();
 
-    // Row remains pending — dispatch-before-status-flip ordering preserved
-    await expect(queue.row(msg.id)).toBeVisible();
+    // Row leaves the queue (optimistic removal)
+    await expect(queue.row(msg.id)).toBeHidden();
 
     const dbState = await getMessageStatus(msg.id);
-    expect(dbState?.status).toBe("pending");
+    expect(dbState?.status).toBe("approved");
   });
 });

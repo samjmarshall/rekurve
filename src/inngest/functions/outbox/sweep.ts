@@ -3,23 +3,32 @@ import { and, eq, isNull, lt, sql } from "drizzle-orm";
 import { inngest } from "~/inngest/client";
 import { db } from "~/server/db";
 import { outbox } from "~/server/db/schema/outbox";
+import { withDbTimeout } from "~/server/db/with-timeout";
 
 // biome-ignore lint/suspicious/noExplicitAny: Inngest serialises step results via JSON (Jsonify<T> ≠ T)
 type Step = { run: (id: string, fn: () => Promise<any>) => Promise<any> };
 
+// Bound each Neon HTTP call so a hung query fails fast as a retriable step error
+// instead of burning the function budget and 504-ing. Generous enough to absorb
+// a cold-resume (the hourly cadence means the compute is usually suspended when
+// the sweep fires), far below the route's 300s `maxDuration`.
+const DB_TIMEOUT_MS = 20_000;
+
 export async function runSweep(step: Step): Promise<void> {
   const rows = await step.run("select-unprocessed", () =>
-    db
-      .select()
-      .from(outbox)
-      .where(
-        and(
-          isNull(outbox.processedAt),
-          lt(outbox.createdAt, sql`now() - interval '30 seconds'`),
-        ),
-      )
-      .orderBy(outbox.createdAt)
-      .limit(100),
+    withDbTimeout("outbox-sweep:select", DB_TIMEOUT_MS, () =>
+      db
+        .select()
+        .from(outbox)
+        .where(
+          and(
+            isNull(outbox.processedAt),
+            lt(outbox.createdAt, sql`now() - interval '30 seconds'`),
+          ),
+        )
+        .orderBy(outbox.createdAt)
+        .limit(100),
+    ),
   );
 
   for (const row of rows) {
@@ -30,18 +39,22 @@ export async function runSweep(step: Step): Promise<void> {
           name: row.eventName,
           data: row.payload as Record<string, unknown>,
         });
-        await db
-          .update(outbox)
-          .set({ processedAt: sql`now()` })
-          .where(and(eq(outbox.id, row.id), isNull(outbox.processedAt)));
+        await withDbTimeout("outbox-sweep:mark-processed", DB_TIMEOUT_MS, () =>
+          db
+            .update(outbox)
+            .set({ processedAt: sql`now()` })
+            .where(and(eq(outbox.id, row.id), isNull(outbox.processedAt))),
+        );
       } catch (err) {
-        await db
-          .update(outbox)
-          .set({
-            attempts: sql`${outbox.attempts} + 1`,
-            lastError: String(err),
-          })
-          .where(eq(outbox.id, row.id));
+        await withDbTimeout("outbox-sweep:record-error", DB_TIMEOUT_MS, () =>
+          db
+            .update(outbox)
+            .set({
+              attempts: sql`${outbox.attempts} + 1`,
+              lastError: String(err),
+            })
+            .where(eq(outbox.id, row.id)),
+        );
       }
     });
   }

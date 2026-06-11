@@ -176,19 +176,21 @@ test.describe("SMS Dispatch — E2E", () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Failure path — works when Twilio credentials are absent/placeholder.
-  // The Twilio call fails, the TRPCError surfaces in the UI, and the row stays
-  // pending — this validates the dispatch-before-status-flip ordering.
+  // Async contract — works when Twilio credentials are absent/placeholder.
+  // Approve commits the status flip + outbox event atomically and returns
+  // immediately; the Twilio send happens later in the dispatch-sms Inngest
+  // worker. With placeholder credentials the worker can never succeed, so
+  // sent_at stays null and no conversations row is ever written.
   // ---------------------------------------------------------------------------
 
-  test("approve failure: Twilio error surfaces toast and leaves row pending", async ({
+  test("approve with flag ON: dispatch queued async; placeholder creds never stamp sentAt", async ({
     context,
     page,
     baseURL,
   }) => {
     test.skip(
       hasTwilioCredentials,
-      "Failure-path test only runs when TWILIO_AUTH_TOKEN is a placeholder (triggers the error)",
+      "Never-sent assertions only hold when TWILIO_AUTH_TOKEN is a placeholder (worker can't succeed)",
     );
 
     // Force sms-twilio-dispatch flag ON so the Twilio path runs (not the share sheet).
@@ -224,20 +226,22 @@ test.describe("SMS Dispatch — E2E", () => {
     await expect(queue.row(msg.id)).toBeVisible();
     await queue.approveButton(msg.id).click();
 
-    // Error toast surfaces
+    // Approve succeeds immediately — the send is the worker's problem
     await expect(
-      page.getByTestId("app-toast").filter({ hasText: /Failed to send SMS/i }),
+      page.getByTestId("app-toast").filter({ hasText: "Draft approved" }),
     ).toBeVisible();
 
-    // Row remains — dispatch failure left it pending
-    await expect(queue.row(msg.id)).toBeVisible();
+    // Row leaves the queue (optimistic removal)
+    await expect(queue.row(msg.id)).toBeHidden();
 
-    // DB: status still pending, approved_at null
+    // DB: status flipped, approved_at stamped, sent_at not — the dispatch-sms
+    // worker fails against placeholder credentials and never stamps it
     const dbState = await getMessageStatus(msg.id);
-    expect(dbState?.status).toBe("pending");
-    expect(dbState?.approved_at).toBeNull();
+    expect(dbState?.status).toBe("approved");
+    expect(dbState?.approved_at).not.toBeNull();
+    expect(dbState?.sent_at).toBeNull();
 
-    // No conversations row created
+    // No conversations row — the worker never gets past the Twilio send
     const convRows = await getConversationsForMessage(msg.id);
     expect(convRows).toHaveLength(0);
   });
@@ -248,8 +252,8 @@ test.describe("SMS Dispatch — E2E", () => {
   // Disabled until the Twilio account is fully configured. Re-enable by
   // changing `test.skip` back to `test` once TWILIO_FROM_NUMBER and
   // TWILIO_CONSULTANT_NUMBER are set (in addition to TWILIO_AUTH_TOKEN);
-  // without those, `sendSmsToConsultant` throws "Twilio phone numbers are not
-  // configured." and the test fails on the "Draft approved" toast.
+  // without those, the dispatch-sms worker fails with "Twilio phone numbers
+  // are not configured." and the sentAt poll below times out.
   // ---------------------------------------------------------------------------
 
   test.skip("happy path: approve relays SMS, creates conversations row, callback updates status", async ({
@@ -309,6 +313,21 @@ test.describe("SMS Dispatch — E2E", () => {
     const dbState = await getMessageStatus(msg.id);
     expect(dbState?.status).toBe("approved");
     expect(dbState?.approved_at).not.toBeNull();
+
+    // Poll until the dispatch-sms worker completes: it writes the conversation
+    // row then stamps sentAt. The outbox sweep runs on a 30s cron so allow 60s.
+    await expect
+      .poll(
+        async () => {
+          const status = await getMessageStatus(msg.id);
+          return status?.sent_at;
+        },
+        {
+          timeout: 60_000,
+          message: "dispatch-sms worker did not stamp sentAt within 60s",
+        },
+      )
+      .not.toBeNull();
 
     // conversations row created with SID
     const convRows = await getConversationsForMessage(msg.id);

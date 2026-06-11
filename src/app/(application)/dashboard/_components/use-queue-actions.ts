@@ -110,7 +110,7 @@ export function useApproveAction({ onRequestSmsShare }: SmsShareOptions) {
           // send is async — 10s keeps the confirmation on screen until it's underway.
           toast.add({ title: "Email on its way", timeout: 10_000 });
         } else {
-          // SMS dispatch is synchronous (or native-share); "approved" is accurate.
+          // SMS dispatch is async via outbox/Inngest (#310) or native-share.
           // TODO: align copy when sms-twilio-dispatch flag ships broadly (#262).
           toast.add({ title: "Draft approved" });
         }

@@ -53,6 +53,9 @@ const TASKS = [
   { id: 'ANALYZE-1', kind: 'analyze', agent: '«family»-analyzer', prompt: '«…»', oracle: '«verified; the discriminating detail»' },
 ]
 
+// `model` is a per-spawn override, so it sweeps in one run. `effort` is NOT — there is no
+// per-spawn effort opt today, so don't add effort cells here expecting them to take; test effort
+// via Path 2 (one run per `effort:` frontmatter value). See REFERENCE.md § Model & effort decision.
 const CANDS = [
   { id: 'explore-haiku', kind: 'baseline', model: 'haiku' },  // production baseline — always registered
   { id: 'specialist-sonnet', kind: 'specialist', model: 'sonnet' },

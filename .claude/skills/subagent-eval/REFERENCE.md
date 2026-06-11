@@ -59,7 +59,7 @@ Prove the harness's *logic* with **zero agents** before spending a real run — 
 
 This is how the routing + execution harnesses were de-risked before every launch (2026-06-03). Re-run it after every harness edit — it's free.
 
-## Model decision rule
+## Model & effort decision rule
 
 Default **sonnet** for every agent. Adopt **opus** only if, on the deciding (variance-controlled) axis, `mean(opus) ≥ mean(sonnet) + 0.05` AND opus isn't dragged by over-templating. Bar haiku for anything needing anti-hallucination discipline (§14.1: haiku could not follow the CRITICAL rules in 2026-05-04 testing).
 
@@ -67,6 +67,21 @@ Default **sonnet** for every agent. Adopt **opus** only if, on the deciding (var
 - `codebase-analyzer` = **opus** — deep CODE tracing rewards it.
 - `thoughts-analyzer`, `docs-analyzer` = **sonnet** — on PROSE distillation, opus over-templates/pads (appends unrequested sections), losing scope/length points faster than its grounding edge earns. Don't reason "analyzer = deep = opus".
 - Nuance: opus's padding is **open-ended-distillation-shaped** — on a pointed "what is X and its Status?" it was clean; on "summarize this as shipped" it padded. Sonnet still wins (opus = no upside + higher cost).
+
+### Effort — the second axis
+
+Effort (`output_config.effort`) is a co-equal execution axis: per Opus 4.8 guidance it's "a dimension to test, not a fixed setting." It is **not symmetric with model**:
+
+- **Switching is symmetric** — set `effort:` in the agent's frontmatter, exactly like `model:` (`.claude/agents/web-research.md` ships `model: opus` + `effort: max` as precedent; it's the only agent that sets effort — the rest take their model's tier default).
+- **Testing is not** — there is **no per-spawn `effort` override** on the Agent tool or Workflow `agent()` (both expose per-spawn `model`, neither exposes `effort`; confirmed 2026-06-07). So you cannot put effort cells in `CANDS` and sweep them in one Workflow run the way you sweep model. Two routes:
+  - **Path 2 (works today):** run the head-to-head once per `effort:` value — edit the frontmatter, restart to re-register, re-run — and compare the recorded per-run JSON across runs. Heavier, and the agent file changes between runs, so it carries the mid-run file-mutation/provenance caveat (§ Safety review): verify provenance before blaming a sub-agent.
+  - **Path 1 (filed prerequisite):** a per-spawn `effort` opt mirroring `model` would let effort join `CANDS` and sweep in a single run. It's a harness change, not a skill change.
+
+**Decision rule (2-D generalisation of the model rule):** across all `(model, effort)` cells, take the best mean; adopt the **cheapest cell within 0.05 of it**, quality first. Cost ranks by **model tier, then effort level**. A higher effort earns its keep only at `mean ≥ incumbent + 0.05` — the same bar as a model bump.
+
+**Authoritative support set (use it; don't probe).** Per the `claude-api` skill (`platform.claude.com/docs/…/effort`): effort works on Opus 4.5/4.6/4.7/4.8 and Sonnet 4.6; **Sonnet 4.6 supports only `low`/`medium`/`high`**, `max` is Opus-tier (4.6+), `xhigh` is Opus 4.7+, Haiku 4.5 errors entirely, and `high` == omitting effort. It's a known static table — set frontmatter from it, and rely on it rather than Claude Code's `/effort` menu, which may surface levels a model doesn't support. An invalid `(model, effort)` cell just fails the spawn; that's the only check needed.
+
+**Blind spot.** You can't observe the effort a sub-agent actually used (same limitation as `tool_uses`, §6.3). Two same-model effort cells landing within ~0.02 mean at indistinguishable token spend may be effectively equivalent — treat that as a soft "no measurable difference" flag, not a detector.
 
 ## Judge-prompt pattern
 

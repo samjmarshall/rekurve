@@ -1,0 +1,130 @@
+agent: docs-locator
+_generated_by: shape_tasks.py from .claude/eval/mined/corpus.jsonl
+_needs_review: true
+_note: Auto-mined §5 candidates. Curate to 5, then merge into tasks/per-agent/docs-locator.yaml alongside
+  golden + adversarial buckets.
+_mined_available: 2
+_mined_emitted: 2
+execution:
+- id: mined-docs-locator-exec-1
+  kind: execution
+  prompt: 'Find any ADRs or feature docs in the docs/ tree that govern or relate to: observability, monitoring,
+    logging, alerting, error tracking, metrics, uptime monitoring, PostHog, analytics, or incident response.
+
+
+    Return grouped paths. For each ADR, include its number and recorded Status (Proposed/Accepted/Superseded).
+    Give a one-line description of each. Don''t deep-analyze — just locate and categorize.'
+  provenance:
+    agent_id: aeb3dc842c2b348ce
+    session_id: 2eabff0a-a1b3-49c8-bfe4-a0e1cc8b85c9
+    model: claude-sonnet-4-6
+    latency_s: 58.96
+    tokens_total: 355788
+    n_tool_uses: 23
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/2eabff0a-a1b3-49c8-bfe4-a0e1cc8b85c9/subagents/agent-aeb3dc842c2b348ce.jsonl
+  sample_output_excerpt: 'The feature README is an index, not a topic doc. Now I have everything needed.
+
+
+    ---
+
+
+    ## Docs on observability, monitoring, logging, alerting, error tracking, metrics, uptime monitoring,
+    PostHog, analytics, and incident response
+
+
+    ### Feature docs
+
+
+    - `/Users/sam/workspace/rekurve/rekurve/docs/feature/posthog-analytics.md` — PostHog analytics (the
+    primary doc governing analytics instrumentation and e …'
+- id: mined-docs-locator-exec-2
+  kind: execution
+  prompt: Find the ADR about GraphQL.
+  provenance:
+    agent_id: ab441899e61ad6ab2
+    session_id: c485121e-d0ed-417b-a3e4-4538a2ab1a75
+    model: claude-sonnet-4-6
+    latency_s: 11.49
+    tokens_total: 35750
+    n_tool_uses: 3
+    source_file: /Users/sam/.claude/projects/-Users-sam-workspace-rekurve-rekurve/c485121e-d0ed-417b-a3e4-4538a2ab1a75/subagents/agent-ab441899e61ad6ab2.jsonl
+  sample_output_excerpt: 'No matches found in docs/ for: GraphQL.
+
+
+    The `grep` found no files mentioning GraphQL anywhere in `docs/`, and a full listing of all 17 ADRs
+    shows none with a GraphQL-related filename. The ADR catalogue covers topics such as iMessage, auth
+    gates, HubSpot, webhooks, lead scoring, Outlook, nurture scheduling, Inngest, tRPC, Upstash, and the
+    outbox pattern — but not GraphQL.
+
+
+    Total: 0 documents.'
+routing:
+  positives:
+  - id: mined-docs-locator-route-pos-1
+    kind: routing
+    expect_invoke: true
+    prompt: 'Find any ADRs or feature docs in the docs/ tree that govern or relate to: observability,
+      monitoring, logging, alerting, error tracking, metrics, uptime monitoring, PostHog, analytics, or
+      incident response.
+
+
+      Return grouped paths. For each ADR, include its number and recorded Status (Proposed/Accepted/Superseded).
+      Give a one-line description of each. Don''t deep-analyze — just locate and categorize.'
+  - id: mined-docs-locator-route-pos-2
+    kind: routing
+    expect_invoke: true
+    prompt: Find the ADR about GraphQL.
+  negatives:
+  - id: mined-docs-locator-route-neg-1
+    kind: routing
+    expect_invoke: false
+    actual_route: thoughts-locator
+    confusability: 0.268
+    prompt: 'Find all documents in the thoughts/ directory related to monitoring, observability, logging,
+      alerting, metrics, error tracking, uptime monitoring, BetterStack, PostHog, PagerDuty, or incident
+      management.
+
+
+      The team had prior designs and/or plans to implement BetterStack for monitoring and observability
+      (metrics, logs, alerts). I''m looking for those specifically, plus any related research notes, PR
+      write-ups, or decisions.
+
+
+      Return grouped paths with dates and a one-line description of each. Prioritize anything that mentions
+      BetterStack, observability, logging, alerting, or uptime monitoring. Do not analyze contents deeply
+      — just locate and categorize.'
+  - id: mined-docs-locator-route-neg-2
+    kind: routing
+    expect_invoke: false
+    actual_route: codebase-locator
+    confusability: 0.124
+    prompt: 'I need to understand the current observability/monitoring setup in this Next.js codebase.
+      Locate (paths only, grouped by purpose):
+
+
+      1. Where PostHog is configured and initialized (client and server side) — config files, provider
+      components, env vars referencing POSTHOG.
+
+      2. Any OpenTelemetry / OTLP / instrumentation setup — especially `instrumentation.ts`, `instrumentation-client.ts`,
+      or `register()` hooks in the Next.js app.
+
+      3. Any existing logging utilities, logger modules, or structured logging.
+
+      4. Any Inngest scheduled functions / cron jobs (look in src/inngest) — I''m interested in whether
+      there''s an existing pattern for scheduled "heartbeat"-style events. The CLAUDE.md mentions an "outbox-sweep"
+      cron and an outbox pattern.
+
+      5. Any existing error tracking or monitoring instrumentation (Sentry, etc.).
+
+      6. The Next.js version and whether the app uses the app router (check package.json and folder structure).
+
+
+      Return file paths grouped by the categories above, with a one-line note on each. Paths only — don''t
+      explain mechanics in depth.'
+  - id: mined-docs-locator-route-neg-3
+    kind: routing
+    expect_invoke: false
+    actual_route: docs-analyzer
+    confusability: 0.104
+    prompt: Distil docs/adr/adr003-hubspot-source-of-truth-for-contacts.md — what was decided, and what
+      is its recorded Status?

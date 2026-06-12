@@ -1,4 +1,4 @@
-name: Neon
+name: Preview teardown
 
 on:
   pull_request:
@@ -9,8 +9,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.event.ref }}
 
 jobs:
-  delete_neon_branch:
-    name: Delete Neon Branch
+  teardown_preview:
+    name: Tear down preview resources
     if: github.event_name == 'pull_request' || github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
     steps:
@@ -59,3 +59,50 @@ jobs:
           else
             echo "Branch $BRANCH_NAME does not exist — skipping delete"
           fi
+
+      # Delete this branch's Vercel preview deployments. The preview/<branch>
+      # Neon database is deleted above, so any preview deployment left running
+      # keeps getting its Inngest crons (e.g. outbox-sweep) invoked against a
+      # database that no longer exists — failing every minute with
+      # "password authentication failed". Removing the deployment stops that
+      # immediately. (Inngest itself has no archival API; its branch
+      # environments auto-archive 3 days after the last deploy, which is the
+      # backstop — see the note at the end of this job.)
+      - name: Delete Vercel preview deployments
+        if: steps.skip.outputs.skip != 'true'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
+          PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+        run: |
+          set -euo pipefail
+          if [ -z "${VERCEL_TOKEN:-}" ]; then
+            echo "::warning::VERCEL_TOKEN not set — skipping Vercel deployment cleanup"
+            exit 0
+          fi
+          api="https://api.vercel.com"
+          auth="Authorization: Bearer $VERCEL_TOKEN"
+          # Match by meta.githubCommitRef (the documented `branch` query filter
+          # is unreliable; preview deployments also report target=null, so we
+          # filter client-side and explicitly exclude production for safety).
+          ids=$(curl -fsS -H "$auth" \
+            "$api/v6/deployments?projectId=$PROJECT_ID&teamId=$TEAM_ID&limit=100" \
+            | jq -r --arg b "$BRANCH" \
+              '.deployments[] | select(.meta.githubCommitRef == $b and .target != "production") | .uid')
+          if [ -z "$ids" ]; then
+            echo "No preview deployments found for branch $BRANCH"
+            exit 0
+          fi
+          for id in $ids; do
+            echo "Deleting Vercel deployment $id"
+            curl -fsS -X DELETE -H "$auth" \
+              "$api/v13/deployments/$id?teamId=$TEAM_ID" | jq -c '{uid, state}'
+          done
+
+      # No Inngest cleanup step: app/environment archival is a dashboard-only
+      # action with no public REST endpoint. Inngest branch environments
+      # auto-archive 3 days after their last deploy (archiving only stops the
+      # environment's functions from triggering), and deleting the Vercel
+      # deployment above removes the endpoint Inngest invokes, so the orphaned
+      # crons stop right away rather than waiting out the timer.

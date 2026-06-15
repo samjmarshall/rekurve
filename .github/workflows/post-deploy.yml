@@ -7,7 +7,7 @@ on:
 
 jobs:
   setup:
-    name: DB Migration & E2E Setup (${{ github.event.client_payload.environment }})
+    name: DB Migration & E2E Setup
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -151,7 +151,7 @@ jobs:
         run: yarn playwright install-deps
 
   integration:
-    name: Rstest Integration (${{ github.event.client_payload.environment }})
+    name: Rstest Integration
     needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -200,7 +200,7 @@ jobs:
           DATABASE_URL_UNPOOLED: ${{ steps.dburl.outputs.db_url_unpooled }}
 
   shard:
-    name: E2E Test ${{ matrix.shard }}/4 (${{ github.event.client_payload.environment }})
+    name: E2E Test ${{ matrix.shard }}/4
     needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -217,7 +217,7 @@ jobs:
       - name: Report job & status
         uses: vercel/repository-dispatch/actions/status@v1
         with:
-          name: "E2E Test ${{ matrix.shard }}"
+          name: E2E Test ${{ matrix.shard }}/4
 
       - name: Checkout
         uses: vercel/repository-dispatch/actions/checkout@v1

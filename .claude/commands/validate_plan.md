@@ -89,7 +89,7 @@ For each phase in the plan:
 3. **Assess manual criteria**:
    - Walk every item under the phase's `### Success` → `**Manual**` checklist
    - Tick items you've personally verified; leave the rest unchecked with a note on what's still needed
-   - If an item invokes `/design_review` (required for UI phases), run it on the branch and include its verdict in the validation report — a phase with UI changes is not validated until `/design_review` is clean
+   - If any phase invokes `/design_review` (required for UI phases), run it **once for the whole plan** as `/design_review <plan-path>` rather than per-phase — passing the plan path lets it decompose the branch into isolated per-surface reviews aligned with the plan's UI phases and Manual criteria, run them in parallel, and return one consolidated report. Fold each per-surface verdict into the validation report. A phase with UI changes is not validated until its surfaces are clean in that report
 
 4. **Think deeply about edge cases**:
    - Were error conditions handled?
@@ -125,7 +125,8 @@ Create comprehensive validation summary:
 ✓ Lint + typecheck: `make check`
 ✓ Unit tests: `make test`
 ✗ E2E: `make test_e2e` (1 failing spec — see below)
-✓ Design review: `/design_review` clean (UI phases only)
+✓ Design review: `/design_review <plan-path>` — per-surface status (UI phases only)
+  ✓ /claims/[id] workspace · ✓ clause slide-over · ⚠️ audit slide-over (see findings)
 
 ### ADR & Terminology
 ✓ adr013 Accepted — code at `src/...:NN` matches the decision

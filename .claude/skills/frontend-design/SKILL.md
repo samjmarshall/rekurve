@@ -41,6 +41,6 @@ Interpret creatively and make unexpected choices that feel genuinely designed fo
 
 Remember: Claude is capable of extraordinary creative work. Don't hold back, show what can truly be created when thinking outside the box and committing fully to a distinctive vision.
 
-## Technical Implementation Checklist
+## Technical Post-Implementation Checklist
 
 After implementing UI components, follow this comprehensive design checklist: [design-checklist](./design-checklist.md)

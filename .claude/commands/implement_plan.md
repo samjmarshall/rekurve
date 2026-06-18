@@ -97,7 +97,7 @@ Use canonical terms from `CONTEXT.md` in all code, identifiers, and comments.
 When a phase modifies UI components, pages, or styles in `src/`:
 - Use the `frontend-design` skill to guide implementation
 - Follow `.claude/skills/frontend-design/design-checklist.md`
-- Run `/design_review` after completing the phase
+- Run `/design_review <plan-path> <phase-number>` after completing the phase — passing the plan path and the just-completed phase number as the focus hint scopes the parallel review to that phase's surfaces/overlays/states instead of re-reviewing the whole branch each phase
 
 ## Documentation
 

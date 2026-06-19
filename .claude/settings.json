@@ -22,6 +22,10 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/block-env-file-read.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/block-drizzle-push.sh"
           }
         ]
       },

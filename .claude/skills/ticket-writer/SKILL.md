@@ -2,7 +2,7 @@
 name: ticket-writer
 description: Single entry point for turning a design, plan, PRD, or in-chat spec into either a single GitHub Issue or a parent epic with child issues. Use when the user wants to create, review, or improve any ticket destined for a coding agent or another developer to pick up. Covers atomic issues, bug reports, technical tasks, spikes, and epic breakdowns using tracer-bullet vertical slices. Output is AFK-ready by default — written so a coding agent days later can produce the right work without the original chat context.
 model: opus
-effort: max
+effort: high
 ---
 
 Two shapes of work:

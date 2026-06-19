@@ -47,6 +47,10 @@ Use `--sensitive` when adding `BETTER_AUTH_SECRET`, `HUBSPOT_*`, `ANTHROPIC_API_
 
 ## Workflows
 
+### Reviewing code
+
+- **Pre-merge gate (optional).** Before merging a substantial PR, you may run `/code-review ultra` (alias `/ultrareview`) for a deep pass — a fleet of reviewer agents in a remote sandbox that independently reproduces and verifies each finding. **This is a premium feature billed against usage credits, not your plan's included usage:** Pro/Max get 3 one-time free runs, then ~$5–$20 per review in usage credits (which must be enabled on the account). Use fast `/code-review` (subscription usage) for everyday review.
+
 ### Verification
 
 **NEVER run `make build`, `make check`, `make test`, or `make test_e2e` directly via Bash.** Always use **@agent-codebase-verification**! This applies to both proactive post-code-change verification *and* explicit user requests ("run make test", "run the e2e suite"). The agent isolates verbose build/test output from the main context and returns a compact pass/fail result.

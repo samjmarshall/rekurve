@@ -520,6 +520,18 @@ sequenceDiagram
   - Preview: resets Neon branch to parent
   - Production: point-in-time restore to pre-migration timestamp
 
+#### Claude Code Review (`claude-code-review.yml`)
+
+- **Trigger**: PR `opened`, `synchronize`, `ready_for_review`, `reopened` (skips `renovate/` branches)
+- **Job**: Runs the built-in `/code-review` via `anthropics/claude-code-action@v1` and posts findings on the PR. Fires for every PR regardless of how it was created (including PRs Claude opens via `gh`).
+- **Auth**: `CLAUDE_CODE_OAUTH_TOKEN` secret (subscription auth — generate with `claude setup-token`)
+
+#### Claude Security Review (`claude-security-review.yml`)
+
+- **Trigger**: PR `opened`/`synchronize` touching security-sensitive paths (`src/lib/**`, `src/env.js`, `next.config.ts`, `**/*.env*`, `**/auth/**`)
+- **Job**: OWASP-Top-10-focused review via `anthropics/claude-code-action@v1`; comments findings on the PR
+- **Auth**: `CLAUDE_CODE_OAUTH_TOKEN` secret
+
 #### Planned Claude CI Workflows
 
 These workflows are defined in `.github/todo/` and will be activated as the project matures.
@@ -527,11 +539,9 @@ These workflows are defined in `.github/todo/` and will be activated as the proj
 | Workflow | File | Purpose |
 |----------|------|---------|
 | `@claude` Agent | `claude.yml` | Responds to `@claude` mentions in issues/PRs |
-| Code Review | `claude-code-review.yml` | Automated PR code review |
 | PR Description | `claude-pr-description.yml` | Auto-generate PR descriptions |
 | Issue Triage | `claude-issue-triage.yml` | Auto-label and categorize new issues |
 | Renovate Fix | `claude-renovate-fix.yml` | Auto-fix Renovate dependency update breakage |
-| Security Review | `claude-security-review.yml` | Security-focused PR review |
 
 ### Vercel Environment Management
 

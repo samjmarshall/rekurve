@@ -2,20 +2,6 @@
 
 ---
 
-## Scoped Rules
-
-This file holds only globally-relevant guidance. Subsystem-specific rules live in
-`.claude/rules/*.md` and load **automatically by path** when Claude touches matching files:
-
-- `.claude/rules/database-migrations.md` — `drizzle/`, `src/server/db/`, `scripts/seed-dev.ts`
-- `.claude/rules/e2e-testing.md` — `e2e/`
-- `.claude/rules/frontend.md` — `src/components/`, `src/app/`, `src/providers/`, `src/hooks/`
-- `.claude/rules/github-actions.md` — `.github/workflows/`
-
-Add new subsystem guidance as a path-scoped rule rather than growing this file.
-
----
-
 ## Current Project State
 
 **Status**: Pre-PMF validation phase.

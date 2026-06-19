@@ -74,6 +74,8 @@ When planning from a `/brainstorm` design doc, reconcile its appendix **before**
 - Tests ship in the phase that changes behaviour, not a trailing appendix.
 - Automated criteria use `make` targets (`make check`, `make test`, `make build`, `make test_e2e`).
 - UI phases add `/design_review` as a manual step.
+- Phases touching security-sensitive paths (`src/lib/**`, `src/env.js`, `next.config.ts`, `**/auth/**`, `**/*.env*`) add `/security-review` as a manual step.
+- `/code-review` over the whole branch is a standing `/validate_plan` step — do not add it as a per-phase manual item.
 - Refactors include characterization tests before the behaviour change.
 - Every reference to existing code includes `file:line`.
 - Non-trivial test work follows the TDD vertical-slice loop — one test → one impl → repeat. See the `tdd` skill.

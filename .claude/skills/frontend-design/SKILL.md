@@ -2,6 +2,8 @@
 name: frontend-design
 description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics.
 allowed-tools: mcp__shadcn__list_items_in_registries mcp__shadcn__get_item_examples_from_registries mcp__shadcn__view_items_in_registries mcp__shadcn__get_add_command_for_items
+model: opus
+effort: xhigh
 ---
 
 This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.

@@ -55,9 +55,16 @@ Once the user approves:
    ```
 
    Gotchas: must be `-F` (integer), not `-f` (string). Use the REST `.id`, not the GraphQL `node_id`.
-6. Add each child to the GitHub Project (`gh project item-add`) and set fields (Priority, Estimate, Iteration) per the GitHub Projects table in `SKILL.md`.
+6. Add each child to the GitHub Project (`gh project item-add`) and set **Status, Start date, Target date, and Milestone** per the GitHub Projects table in `references/github-publishing.md`. Start date / Target date are required — derive them from the dependency order so blockers start first and the last child's Target date lands on or before the milestone due date.
+7. Run the post-publish validator across the whole family and gate on exit 0:
 
-Steps 2–6 are **one turn, no mid-flow prompts**. Linking and field assignment are part of "create".
+   ```bash
+   yarn tsx .claude/skills/ticket-writer/scripts/validate-ticket.ts --epic <P>
+   ```
+
+   `--epic` validates the parent **and** every sub-issue's body sections and project fields in one pass. If it exits non-zero, fix the flagged issue(s) (commonly a missing `Start date` / `Target date`) and re-run until exit 0.
+
+Steps 2–7 are **one turn, no mid-flow prompts**. Linking, field assignment, and validation are part of "create".
 
 ### 5. Confirm and report
 

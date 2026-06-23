@@ -84,3 +84,17 @@ Before creating the issue, confirm:
 ## Publishing to GitHub Issues
 
 GitHub-specific publishing — `gh` commands, project field tables, sub-issue wiring, and "Related tickets" conventions — lives in **[references/github-publishing.md](references/github-publishing.md)**. Read it before creating any issue.
+
+---
+
+## Post-publish validation gate
+
+Once the issue(s) exist and project fields are set, run the bundled validator. **Hard gate** — it audits body sections and Project #4 fields (including the roadmap-driving Start date / Target date) against the per-type requirements in `scripts/rules.ts`.
+
+    # single issue — type auto-detected, or pass --type story|bug|task|spike|epic|child
+    yarn tsx .claude/skills/ticket-writer/scripts/validate-ticket.ts <issue-number>
+
+    # epic + every sub-issue in one pass
+    yarn tsx .claude/skills/ticket-writer/scripts/validate-ticket.ts --epic <P>
+
+Fix and re-run until it exits 0 before reporting the work done. Exit 1 = a ticket is non-compliant (most often a missing Start/Target date); exit 2 = the board could not be read (gh auth / API change / a renamed field).

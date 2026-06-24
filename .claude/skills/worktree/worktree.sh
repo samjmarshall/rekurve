@@ -141,7 +141,11 @@ cmd_create() {
   fi
 
   cp "$REPO_ROOT/.env" "$wt/.env"
-  log "Copied .env into worktree"
+  # thoughts/ is gitignored, so the checkout does not bring it across — copy it
+  # in explicitly. (.claude/, .mcp.json, CLAUDE.md are tracked and arrive via
+  # checkout.)
+  [[ -d "$REPO_ROOT/thoughts" ]] && cp -r "$REPO_ROOT/thoughts/." "$wt/thoughts/"
+  log "Copied .env + thoughts/ into worktree"
 
   # Populate the tree. This fires post-checkout ($3=1) with .env present, so
   # scripts/neon-branch.sh create provisions local/<branch>, migrates, seeds.
@@ -197,7 +201,7 @@ unsafe_reason() {
   else
     unpushed="$(git -C "$wt" log --oneline "${BASE_BRANCH}..HEAD" 2>/dev/null || true)"
   fi
-  [[ -n "$unpushed" ]] && echo "unpushed commits"
+  [[ -n "$unpushed" ]] && echo "unpushed commits" || true
 }
 
 # Remove one worktree + its local branch. Honors force/dry_run; applies the

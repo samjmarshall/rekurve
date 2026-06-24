@@ -83,18 +83,14 @@ Before creating the issue, confirm:
 
 ## Publishing to GitHub Issues
 
-GitHub-specific publishing — `gh` commands, project field tables, sub-issue wiring, and "Related tickets" conventions — lives in **[references/github-publishing.md](references/github-publishing.md)**. Read it before creating any issue.
+You author; you do **not** run `gh` yourself. Once the body is final, write it to a file and **delegate publishing to the `github-issue` agent** (`subagent_type: github-issue`) — it creates the issue, adds it to the repo's linked Project board, sets the fields, and runs the validation gate, returning distilled refs + the verdict so the verbose tracker output stays out of your context. For an atomic issue, hand it the title, body file, labels, milestone, and the field plan (Status/Start/Target). For an epic + children, follow **[references/epic-breakdown.md](references/epic-breakdown.md)** § Publish — same one-call handoff with the ordered child list and number-token bodies.
+
+The GitHub-specific spec the agent implements — project field table, sub-issue mechanics, "Related tickets" conventions — lives in **[references/github-publishing.md](references/github-publishing.md)**. Read it so your field plan and body files match what the agent expects.
 
 ---
 
 ## Post-publish validation gate
 
-Once the issue(s) exist and project fields are set, run the bundled validator. **Hard gate** — it audits body sections and Project #4 fields (including the roadmap-driving Start date / Target date) against the per-type requirements in `scripts/rules.ts`.
+The bundled validator is a **hard gate** — it audits body sections and the board's fields (including the roadmap-driving Start date / Target date) against the per-type requirements in `scripts/rules.ts`. The `github-issue` agent runs it as the final step of publishing (`validate-ticket.ts <issue-number>` for one ticket, `--epic <P>` for an epic + every sub-issue in one pass) and loops until exit 0, returning the verdict.
 
-    # single issue — type auto-detected, or pass --type story|bug|task|spike|epic|child
-    yarn tsx .claude/skills/ticket-writer/scripts/validate-ticket.ts <issue-number>
-
-    # epic + every sub-issue in one pass
-    yarn tsx .claude/skills/ticket-writer/scripts/validate-ticket.ts --epic <P>
-
-Fix and re-run until it exits 0 before reporting the work done. Exit 1 = a ticket is non-compliant (most often a missing Start/Target date); exit 2 = the board could not be read (gh auth / API change / a renamed field).
+Gate on the agent's reported result before declaring the work done. A **content** failure (missing section, weak AC — exit 1, often a missing Start/Target date) comes back to you: fix the body file or field plan and re-delegate, passing the existing issue numbers so the agent edits in place rather than re-creating. Exit 2 means the board could not be read (gh auth / API change / a renamed field) — an environment problem to surface, not a body fix.

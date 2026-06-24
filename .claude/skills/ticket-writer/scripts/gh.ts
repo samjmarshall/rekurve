@@ -11,10 +11,6 @@ import {
 	type RawProjectItem,
 } from "./rules";
 
-const REPO = "samjmarshall/ai-insurance-claims";
-const OWNER = "samjmarshall";
-const PROJECT = "4";
-
 // Expected project field display names (lowercased). A board rename silently
 // drops the JSON key → `assertExpectedFields` turns that into a hard failure
 // instead of a validator that quietly passes everything.
@@ -39,20 +35,104 @@ function parseJson(raw: string, cmd: string): unknown {
 	}
 }
 
+// --- Repo / project discovery -------------------------------------------------
+// No repo or project number is hard-coded. REPO comes from the local git context
+// (gh resolves the default remote); the project NUMBER + OWNER come from the
+// repo's single linked Projects v2 board. This keeps the validator identical
+// across repos — drop it into any repo with one linked board and it just works.
+// Escape hatch: `TICKET_PROJECT` overrides discovery (CI / a repo with >1 board).
+
+interface RepoContext {
+	repo: string; // "owner/name"
+	owner: string; // project owner login (== repo owner in the common case)
+	project: string; // Projects v2 board number, as a string
+}
+
+const RepoViewSchema = z.object({ nameWithOwner: z.string() });
+
+const LinkedProjectsSchema = z.object({
+	data: z.object({
+		repository: z.object({
+			projectsV2: z.object({
+				nodes: z.array(
+					z.object({
+						number: z.number(),
+						title: z.string(),
+						closed: z.boolean(),
+						owner: z.object({ login: z.string() }),
+					}),
+				),
+			}),
+		}),
+	}),
+});
+
+const LINKED_PROJECTS_QUERY = `query($owner:String!,$name:String!){repository(owner:$owner,name:$name){projectsV2(first:20){nodes{number title closed owner{... on User{login} ... on Organization{login}}}}}}`;
+
+let _ctx: RepoContext | null = null;
+
+/** Resolve repo/owner/project once per process; memoized. Throws GhError on a
+ *  missing remote, an unreadable board, or a zero/ambiguous linked-board count. */
+export function resolveContext(): RepoContext {
+	if (_ctx) return _ctx;
+
+	const repoCmd = "gh repo view --json nameWithOwner";
+	const repo = RepoViewSchema.parse(
+		parseJson(sh(repoCmd), repoCmd),
+	).nameWithOwner;
+	const [repoOwner, name] = repo.split("/");
+	if (!repoOwner || !name)
+		throw new GhError(`could not parse owner/name from "${repo}"`);
+
+	const override = process.env.TICKET_PROJECT?.trim();
+	if (override) {
+		if (!/^\d+$/.test(override))
+			throw new GhError(
+				`TICKET_PROJECT must be a project number, got "${override}"`,
+			);
+		_ctx = { repo, owner: repoOwner, project: override };
+		return _ctx;
+	}
+
+	const gqlCmd = `gh api graphql -f owner=${repoOwner} -f name=${name} -f query='${LINKED_PROJECTS_QUERY}'`;
+	const nodes = LinkedProjectsSchema.parse(parseJson(sh(gqlCmd), gqlCmd)).data
+		.repository.projectsV2.nodes;
+	const open = nodes.filter((n) => !n.closed);
+	if (open.length === 0)
+		throw new GhError(
+			`no open linked Projects v2 board for ${repo} — link one to the repo, or set TICKET_PROJECT`,
+		);
+	if (open.length > 1)
+		throw new GhError(
+			`${repo} has ${open.length} linked boards (${open
+				.map((n) => `#${n.number} ${n.title}`)
+				.join(", ")}) — set TICKET_PROJECT to disambiguate`,
+		);
+
+	_ctx = { repo, owner: open[0].owner.login, project: String(open[0].number) };
+	return _ctx;
+}
+
 /** Fetch one issue. Guards against PR/issue number collisions via the URL. */
 export function fetchIssue(n: number): RawIssue {
-	const cmd = `gh issue view ${n} --repo ${REPO} --json number,title,body,labels,milestone,url`;
+	const { repo } = resolveContext();
+	const cmd = `gh issue view ${n} --repo ${repo} --json number,title,body,labels,milestone,url`;
 	const parsed = RawIssueSchema.safeParse(parseJson(sh(cmd), cmd));
 	if (!parsed.success)
-		throw new GhError(`issue #${n}: unexpected gh shape — ${parsed.error.message}`);
+		throw new GhError(
+			`issue #${n}: unexpected gh shape — ${parsed.error.message}`,
+		);
 	if (!/\/issues\/\d+$/.test(parsed.data.url))
-		throw new GhError(`#${n} is not an issue (got ${parsed.data.url}) — PR number?`);
+		throw new GhError(
+			`#${n} is not an issue (got ${parsed.data.url}) — PR number?`,
+		);
 	return parsed.data;
 }
 
 /** Fetch the whole board once into a number→item map. Guards against pagination truncation. */
 export function fetchBoard(): Map<number, RawProjectItem> {
-	const cmd = `gh project item-list ${PROJECT} --owner ${OWNER} --format json --limit 200`;
+	const { owner, project } = resolveContext();
+	const cmd = `gh project item-list ${project} --owner ${owner} --format json --limit 200`;
 	const parsed = RawBoardSchema.safeParse(parseJson(sh(cmd), cmd));
 	if (!parsed.success)
 		throw new GhError(`board: unexpected gh shape — ${parsed.error.message}`);
@@ -67,7 +147,8 @@ export function fetchBoard(): Map<number, RawProjectItem> {
 
 /** Child issue numbers of an epic, in board order. */
 export function fetchSubIssues(n: number): number[] {
-	const cmd = `gh api /repos/${REPO}/issues/${n}/sub_issues --jq 'map(.number)'`;
+	const { repo } = resolveContext();
+	const cmd = `gh api /repos/${repo}/issues/${n}/sub_issues --jq 'map(.number)'`;
 	return z.array(z.number()).parse(parseJson(sh(cmd), cmd));
 }
 
@@ -77,10 +158,13 @@ const FieldListSchema = z.object({
 
 /** Rename guard: fail hard if an expected project field name is gone. */
 export function assertExpectedFields(): void {
-	const cmd = `gh project field-list ${PROJECT} --owner ${OWNER} --format json`;
+	const { owner, project } = resolveContext();
+	const cmd = `gh project field-list ${project} --owner ${owner} --format json`;
 	const parsed = FieldListSchema.safeParse(parseJson(sh(cmd), cmd));
 	if (!parsed.success)
-		throw new GhError(`field-list: unexpected gh shape — ${parsed.error.message}`);
+		throw new GhError(
+			`field-list: unexpected gh shape — ${parsed.error.message}`,
+		);
 	const names = new Set(parsed.data.fields.map((f) => f.name.toLowerCase()));
 	for (const required of REQUIRED_FIELD_NAMES)
 		if (!names.has(required))

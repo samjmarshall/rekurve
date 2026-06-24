@@ -40,31 +40,16 @@ Iterate until the user approves. **Do not publish anything before approval** —
 
 ### 4. Publish in dependency order
 
+You **author**; the `github-issue` agent **executes**. Keep the slicing, prose, and date judgment here — hand the agent a prepared set and let it run the noisy `gh` flow, so create loops, sub-issue links, and field mutations never land in your context.
+
 Once the user approves:
 
-1. Draft the **parent epic** body using the epic template in `references/epic-template.md`.
-2. Create the parent issue first (`gh issue create --label epic`). Capture its number — call it `P`.
-3. Draft all child bodies. The remaining children will be `P+1 … P+k` barring concurrent creates. Bake `Blocked by #N` and `Part of #P` references into the bodies up front.
-4. Create the children **sequentially in dependency order** (blockers first), so each body's `#N` references resolve to a real issue. `gh issue create` per child.
-5. Wire each child as a sub-issue of the parent (REST API, integer `sub_issue_id`):
+1. **Write the body files.** Draft the parent epic body (template in `references/epic-template.md`) and every child body to files (e.g. `epic.md`, `c1.md … ck.md` in scratch). In the bodies, write cross-references with **number tokens, not real numbers** — `Part of #{{EPIC}}`, `Blocked by #{{S3}}`, "see #{{S5}}". The agent substitutes `{{EPIC}}` → `P` and `{{S1}}…{{Sk}}` → `P+1 … P+k` once the parent number is known, so you never need to predict numbers.
+2. **Build the field plan.** For each issue, decide Status (`Todo`), Start date, and Target date — derive dates from the dependency order so blockers start first and the last child's Target date lands on or before the milestone due date (the field spec is in `references/github-publishing.md`).
+3. **Delegate the publish in one call** to the `github-issue` agent (`subagent_type: github-issue`). Hand it: the ordered `{title, body-file}` list (parent first, then children in dependency order); the epic's `epic` + any `refactor`/area labels; the milestone; and the per-issue field plan. (The agent discovers the repo and the linked Project board itself — you don't pass them.) The agent creates from the body files (substituting tokens), wires each child as a sub-issue of the parent, adds every issue to the Project and sets its fields, then runs the post-publish validator (`--epic <P>`) and loops until exit 0.
+4. **Relay the agent's result.** It returns distilled refs — epic `#P` + URL, children `#n` + URLs in dependency order, link/field ok-fail counts, and the validator verdict. Do not re-run `gh` yourself to "check"; the agent already grounded and reported it. If the validator failed on a **content** defect (missing section, weak AC), fix the body file and re-delegate, **handing the agent the existing issue numbers** so it edits in place (`gh issue edit`) rather than creating duplicates — that judgment is yours, the execution is the agent's.
 
-   ```bash
-   CHILD_ID=$(gh api /repos/OWNER/REPO/issues/<CHILD_NUM> --jq .id)
-   gh api -X POST /repos/OWNER/REPO/issues/<PARENT_NUM>/sub_issues \
-     -F "sub_issue_id=$CHILD_ID"
-   ```
-
-   Gotchas: must be `-F` (integer), not `-f` (string). Use the REST `.id`, not the GraphQL `node_id`.
-6. Add each child to the GitHub Project (`gh project item-add`) and set **Status, Start date, Target date, and Milestone** per the GitHub Projects table in `references/github-publishing.md`. Start date / Target date are required — derive them from the dependency order so blockers start first and the last child's Target date lands on or before the milestone due date.
-7. Run the post-publish validator across the whole family and gate on exit 0:
-
-   ```bash
-   yarn tsx .claude/skills/ticket-writer/scripts/validate-ticket.ts --epic <P>
-   ```
-
-   `--epic` validates the parent **and** every sub-issue's body sections and project fields in one pass. If it exits non-zero, fix the flagged issue(s) (commonly a missing `Start date` / `Target date`) and re-run until exit 0.
-
-Steps 2–7 are **one turn, no mid-flow prompts**. Linking, field assignment, and validation are part of "create".
+This is **one delegation, no mid-flow prompts** — creation, linking, field assignment, and validation are all the agent's single pass.
 
 ### 5. Confirm and report
 

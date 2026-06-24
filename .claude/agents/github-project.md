@@ -1,6 +1,6 @@
 ---
 name: github-project
-description: Operates the GitHub Issues + Projects v2 board via gh — queries state, computes milestone/field deltas, and applies the exact mutations asked, returning only distilled facts (counts, deltas, IDs), never raw issue bodies or list dumps. Use to read or restructure the issue tracker / project board. Not for repo code (codebase-locator), docs/ADRs (docs-locator), thoughts/ (thoughts-locator), or local git/PR work.
+description: Operates the GitHub Issues + Projects v2 board via gh — queries state, computes milestone/field deltas, and applies the exact mutations asked, returning only distilled facts (counts, deltas, IDs), never raw issue bodies or list dumps. Use to read or restructure the EXISTING issue tracker / project board. Not for publishing a prepared ticket set — creating issues from bodies, wiring sub-issues, running the ticket validator (github-issue) — nor repo code (codebase-locator), docs/ADRs (docs-locator), thoughts/ (thoughts-locator), or local git/PR work.
 tools: Bash, Read
 color: pink
 model: sonnet
@@ -32,7 +32,7 @@ Operate the issue tracker / project board and return distilled facts only — co
 1. Read with projection: `gh issue list --json number,title,state,milestone --jq '…'`, `gh issue view <n> --json …`, `gh api repos/:owner/:repo/milestones`, `gh project item-list/field-list --format json`. Pull only the fields you need; never dump bodies.
 2. For a restructure, compute the delta in `gh`/`jq` and confirm current membership before proposing or making any change.
 3. For mutations, verify-then-act, loop per item, and capture ok/fail counts (e.g. `gh issue edit "$n" --milestone "$t" && ok=$((ok+1)) || fail="$fail $n"`).
-4. Resolve the owner / number for Projects v2 ops from `gh project list`; never hard-code node IDs you did not read this run.
+4. **Discover the board — do not hard-code repo or project number.** Resolve the repo from the local git context (`gh repo view --json nameWithOwner`), then the project from the repo's single linked Projects v2 board: `gh api graphql -f owner=<owner> -f name=<name> -f query='query($owner:String!,$name:String!){repository(owner:$owner,name:$name){projectsV2(first:20){nodes{number title closed}}}}'` → the one node with `closed:false`. Zero or more than one open board → report and ask for an explicit number (or honour `TICKET_PROJECT`). Resolve field/option node IDs from `gh project field-list/item-list` this run; never hard-code an ID you did not read.
 5. Projects v2 reads (`gh project …`) consume the shared **GraphQL** quota; if it is rate-limited, fall back to REST (`gh api`, `gh issue list/view`) and report the best grounded answer with a one-line note on the limitation — never refuse a question you have already answered another way.
 
 ## Output

@@ -54,3 +54,12 @@ Use `--sensitive` when adding `BETTER_AUTH_SECRET`, `HUBSPOT_*`, `ANTHROPIC_API_
 ### Verification
 
 **NEVER run `make build`, `make check`, `make test`, or `make test_e2e` directly via Bash.** Always use **@agent-codebase-verification**! This applies to both proactive post-code-change verification *and* explicit user requests ("run make test", "run the e2e suite"). The agent isolates verbose build/test output from the main context and returns a compact pass/fail result.
+
+### GitHub Issues & Projects board
+
+**NEVER run `gh issue create`/`edit`, `gh api … /sub_issues`, or `gh project … ` field mutations directly via Bash in the main context.** Delegate to an agent so the verbose tracker output stays out of context:
+
+- **@agent-github-issue** — to *publish a prepared ticket set*: create issues from body files, wire sub-issues, set Project fields, and run the ticket validator. The `ticket-writer` skill routes its publish phase here.
+- **@agent-github-project** — to *read or restructure the existing board*: query state, compute milestone/field deltas, move/close/relabel issues.
+
+Pick by intent: authoring-then-publishing new issues → `github-issue`; operating on what's already there → `github-project`. Read-only one-off `gh` lookups in service of another task are fine inline.

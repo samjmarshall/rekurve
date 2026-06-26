@@ -1,7 +1,7 @@
 ---
 skills: tdd
 model: sonnet
-effort: xhigh
+effort: max
 ---
 # Implement Plan
 

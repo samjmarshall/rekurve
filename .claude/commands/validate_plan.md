@@ -1,5 +1,5 @@
 ---
-model: sonnet
+model: opus
 effort: xhigh
 ---
 # Validate Plan

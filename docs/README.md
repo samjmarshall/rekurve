@@ -143,6 +143,55 @@ Ralph auto-detects a sibling `.spec.json` when given a `.md` path. You can also 
 - Use **`/implement_plan`** when you want to stay in the loop, review changes as they happen, or the plan requires judgment calls
   - For tickets flagged as **HIITL** by `/write_tickets`.
 
+### Configuration (`settings.json`)
+
+`.claude/` holds two settings files. `settings.json` carries shared team defaults and is committed.
+`settings.local.json` carries per-developer overrides and is gitignored, so each developer keeps
+their own.
+
+| File | Scope | Committed | Holds |
+|------|-------|:---------:|-------|
+| `settings.json` | Whole team | Yes | Renderer, MCP servers, environment flags, hooks |
+| `settings.local.json` | Your machine | No | Your permission allowlist |
+
+**MCP servers.** `enableAllProjectMcpServers: false` keeps every server off by default.
+`enabledMcpjsonServers` turns on the ones we use — `shadcn` and four `playwright` instances.
+`disabledMcpjsonServers` blocks `chrome-devtools`.
+
+**Renderer** (the top-level `tui` key) selects how the CLI draws the terminal:
+
+| Value | Effect |
+|-------|--------|
+| `default` | Classic renderer. Keeps the conversation in the terminal's native scrollback, so the mouse wheel scrolls normally |
+| `fullscreen` | Flicker-free renderer with flat memory in long sessions, but draws in the alternate screen buffer, so the mouse wheel jumps by half-pages (PgUp/PgDn); which creates a terrible user experience if you have a touchy/sensitive mouse scroll, scrolling up/down command history rapidly and undesirably |
+
+We pin `default`. Switch at runtime with `/tui <default\|fullscreen>`.
+
+**Environment flags** (the `env` block):
+
+| Flag | Effect |
+|------|--------|
+| `CLAUDE_CODE_DISABLE_MOUSE=1` | Restores native terminal text selection and scroll |
+| `CLAUDE_CODE_DISABLE_1M_CONTEXT=1` | Caps context at 200K. Without it, an Opus session that switches to a `model: sonnet` skill (e.g. `/commit`, `/pull_request`) errors with "usage credits required for 1M context" |
+
+**Hooks** run guardrail and automation scripts from `.claude/scripts/` and `.claude/eval/`:
+
+| When | Action |
+|------|--------|
+| Before Bash and Read | Block dangerous git commands, Drizzle pushes, and `.env` reads |
+| After Edit and Write | Format with Biome, typecheck with `tsc` |
+| On skill use | Log the invocation to `.claude/skills.log` |
+| On subagent finish | Record cost and latency metrics |
+| On permission or idle prompt | Send a notification |
+
+**Permissions.** `settings.local.json` holds an `allow` list that pre-approves routine commands —
+yarn, git, gh — so Claude Code stops prompting. Edit it for your own preferences; it never reaches
+the repo.
+
+**Which file to edit.** Put team-wide changes — a new MCP server, a hook, an environment flag — in
+`settings.json` and commit them. Keep personal permissions in `settings.local.json` and leave it
+uncommitted.
+
 ### Prerequisites by Task Type
 
 | Task | Node + Yarn | `.env` vars | Neon CLI | Playwright | Claude Code |

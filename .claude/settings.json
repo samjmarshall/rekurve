@@ -1,7 +1,17 @@
 {
+  "tui": "default",
   "enableAllProjectMcpServers": false,
+  "enabledMcpjsonServers": [
+    "shadcn",
+    "playwright",
+    "playwright-2",
+    "playwright-3",
+    "playwright-4"
+  ],
+  "disabledMcpjsonServers": ["chrome-devtools"],
   "env": {
-    "CLAUDE_CODE_DISABLE_MOUSE": "1"
+    "CLAUDE_CODE_DISABLE_MOUSE": "1",
+    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1"
   },
   "hooks": {
     "PreToolUse": [

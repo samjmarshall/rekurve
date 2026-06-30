@@ -21,6 +21,19 @@
           {
             "type": "command",
             "command": "jq -c '{event:\"invoke\",ts:(now|todate),session_id:.session_id,skill:.tool_input.skill,args:(.tool_input.args // null)}' >> \"$CLAUDE_PROJECT_DIR/.claude/skills.log\""
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/route-bulky-docs.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__context7__resolve-library-id|mcp__context7__query-docs",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/route-bulky-docs.sh"
           }
         ]
       },

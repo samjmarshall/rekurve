@@ -77,9 +77,7 @@ export function resolveContext(): RepoContext {
 	if (_ctx) return _ctx;
 
 	const repoCmd = "gh repo view --json nameWithOwner";
-	const repo = RepoViewSchema.parse(
-		parseJson(sh(repoCmd), repoCmd),
-	).nameWithOwner;
+	const repo = RepoViewSchema.parse(parseJson(sh(repoCmd), repoCmd)).nameWithOwner;
 	const [repoOwner, name] = repo.split("/");
 	if (!repoOwner || !name)
 		throw new GhError(`could not parse owner/name from "${repo}"`);
@@ -87,9 +85,7 @@ export function resolveContext(): RepoContext {
 	const override = process.env.TICKET_PROJECT?.trim();
 	if (override) {
 		if (!/^\d+$/.test(override))
-			throw new GhError(
-				`TICKET_PROJECT must be a project number, got "${override}"`,
-			);
+			throw new GhError(`TICKET_PROJECT must be a project number, got "${override}"`);
 		_ctx = { repo, owner: repoOwner, project: override };
 		return _ctx;
 	}
@@ -119,13 +115,9 @@ export function fetchIssue(n: number): RawIssue {
 	const cmd = `gh issue view ${n} --repo ${repo} --json number,title,body,labels,milestone,url`;
 	const parsed = RawIssueSchema.safeParse(parseJson(sh(cmd), cmd));
 	if (!parsed.success)
-		throw new GhError(
-			`issue #${n}: unexpected gh shape — ${parsed.error.message}`,
-		);
+		throw new GhError(`issue #${n}: unexpected gh shape — ${parsed.error.message}`);
 	if (!/\/issues\/\d+$/.test(parsed.data.url))
-		throw new GhError(
-			`#${n} is not an issue (got ${parsed.data.url}) — PR number?`,
-		);
+		throw new GhError(`#${n} is not an issue (got ${parsed.data.url}) — PR number?`);
 	return parsed.data;
 }
 
@@ -162,9 +154,7 @@ export function assertExpectedFields(): void {
 	const cmd = `gh project field-list ${project} --owner ${owner} --format json`;
 	const parsed = FieldListSchema.safeParse(parseJson(sh(cmd), cmd));
 	if (!parsed.success)
-		throw new GhError(
-			`field-list: unexpected gh shape — ${parsed.error.message}`,
-		);
+		throw new GhError(`field-list: unexpected gh shape — ${parsed.error.message}`);
 	const names = new Set(parsed.data.fields.map((f) => f.name.toLowerCase()));
 	for (const required of REQUIRED_FIELD_NAMES)
 		if (!names.has(required))

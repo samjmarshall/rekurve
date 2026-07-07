@@ -1,4 +1,4 @@
-# CLAUDE.md
+- When reporting information to me, be extremely concise and sacrifice grammar for the sake of concision.
 
 ---
 
@@ -20,6 +20,8 @@ Prefer Makefile targets with `yarn` as a fallback — never use `npm` or `npx` d
 - `make test_e2e` — run Playwright E2E tests (`yarn test:e2e`)
 - `make start` — local dev server (`yarn dev`)
 - `make install` — install dependencies (`yarn`)
+- `make diagrams` — render ADR D2 diagrams (`docs/adr/diagrams/*.d2` -> `.svg`, ELK layout)
+- `make diagrams-check` — CI freshness gate: fails if any committed diagram SVG is stale
 
 The dev server runs via Vercel Portless - no port.
 - Main worktree (no prefix): https://rekurve.localhost

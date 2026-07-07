@@ -44,6 +44,8 @@ Chosen option: "[1. option 1]", because [justification. e.g., only option, which
 
 ### 1. [option 1]
 
+<!-- Optional diagram (see ADR-FORMAT.md, Diagrams): D2 -> SVG for topological options — ![Option N](diagrams/adrNNN-optionN-slug.svg); inline ```mermaid``` fenced block for flow-shaped; omit for degenerate options. -->
+
 [example | description | pointer to more information | ...] <!-- optional -->
 
 | Pros  | Cons  |
@@ -53,6 +55,8 @@ Chosen option: "[1. option 1]", because [justification. e.g., only option, which
 
 ### 2. [option 2]
 
+<!-- Optional diagram (see ADR-FORMAT.md, Diagrams): D2 -> SVG for topological options — ![Option N](diagrams/adrNNN-optionN-slug.svg); inline ```mermaid``` fenced block for flow-shaped; omit for degenerate options. -->
+
 [example | description | pointer to more information | ...] <!-- optional -->
 
 - Good, because [argument a]
@@ -61,6 +65,8 @@ Chosen option: "[1. option 1]", because [justification. e.g., only option, which
 - ... <!-- numbers of pros and cons can vary -->
 
 ### 3. [option 3]
+
+<!-- Optional diagram (see ADR-FORMAT.md, Diagrams): D2 -> SVG for topological options — ![Option N](diagrams/adrNNN-optionN-slug.svg); inline ```mermaid``` fenced block for flow-shaped; omit for degenerate options. -->
 
 [example | description | pointer to more information | ...] <!-- optional -->
 

@@ -20,21 +20,23 @@ operating manual for the D2 half.
 | Artifact | Role | Committed? |
 | --- | --- | --- |
 | `adrNNN-optionN-<slug>.d2` / `architecture-<slug>.d2` | Source of truth — text, line-diffs cleanly, reviewed in PRs | Yes |
-| `adrNNN-optionN-<slug>.svg` / `architecture-<slug>.svg` | Rendered output — what GitHub actually displays, reviewed as an image | Yes |
+| `adrNNN-optionN-<slug>.svg` (+ `-dark.svg`) / `architecture-<slug>.svg` (+ `-dark.svg`) | Rendered output — the light + dark pair GitHub displays via `<picture>`, reviewed as images | Yes |
 | `icons/` | Vendored local icon set (`vercel.svg`, `neon.svg`, `inngest.svg`, `hubspot.svg`, `outlook.svg`, …) — the shared visual vocabulary | Yes |
 
-Every `.d2` has a sibling `.svg` of the same basename. **Commit both**, always in the
-same change — a `.d2` without its freshly-rendered `.svg` fails CI (see
-`make diagrams-check`).
+Every `.d2` renders to **two** siblings of the same basename — `<basename>.svg` (light) and
+`<basename>-dark.svg` (dark). **Commit all three**, always in the same change — a `.d2`
+without both freshly-rendered SVGs fails CI (see `make diagrams-check`).
 
 ### Naming
 
 ```
-adrNNN-optionN-<slug>.d2      # per-ADR source
-adrNNN-optionN-<slug>.svg     # render (same basename)
+adrNNN-optionN-<slug>.d2        # per-ADR source
+adrNNN-optionN-<slug>.svg       # light render (same basename)
+adrNNN-optionN-<slug>-dark.svg  # dark render (--theme 200)
 
-architecture-<slug>.d2        # aggregate source (not tied to one ADR)
-architecture-<slug>.svg       # render (same basename)
+architecture-<slug>.d2          # aggregate source (not tied to one ADR)
+architecture-<slug>.svg         # light render (same basename)
+architecture-<slug>-dark.svg    # dark render (--theme 200)
 ```
 
 - `NNN` — zero-padded ADR number (`014`, `017`).
@@ -43,12 +45,21 @@ architecture-<slug>.svg       # render (same basename)
 - `<slug>` — a short kebab-case handle for the option (`outbox`, `http-batch`,
   `always-200`) or, for aggregates, for the view (`solution`).
 
-Reference a diagram from the ADR by relative path (the only form GitHub renders for a
-committed SVG), placed under that option's `### N.` heading, above its pros/cons table:
+Reference a diagram from the ADR with a `<picture>` block (relative paths — the only form
+GitHub renders for a committed SVG), placed under that option's `### N.` heading, above its
+pros/cons table. The `<source>` serves the dark render in dark mode; the `<img>` is the
+light default and the universal fallback:
 
-```markdown
-![Option 1 — transactional outbox + Inngest fan-out](diagrams/adr014-option1-outbox.svg)
+```html
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/adr014-option1-outbox-dark.svg">
+  <img alt="Option 1 — transactional outbox + Inngest fan-out" src="diagrams/adr014-option1-outbox.svg">
+</picture>
 ```
+
+A single `--dark-theme` adaptive SVG **won't** work here: GitHub sandboxes embedded SVGs and
+strips the internal `prefers-color-scheme` media query, so it always renders light. Two files
+selected by an outer `<picture>` is the pattern that actually adapts on GitHub.
 
 Not every option earns a canvas. Skip degenerate options ("status quo", "direct send")
 where a one-line prose delta says everything — forcing a canvas there is diagram-theatre.
@@ -75,16 +86,16 @@ brew install d2@0.7.1        # or pin via your version manager if a newer d2 is 
 
 Two Makefile targets:
 
-- **`make diagrams`** — renders every `.d2` under this folder to a sibling `.svg` with
-  the ELK layout engine. Run it after editing **any** `.d2`, then commit **both** the
-  `.d2` and its regenerated `.svg`. This is a codegen target (no network fetch), so it's
-  fine to run inline.
+- **`make diagrams`** — renders every `.d2` under this folder to its light `.svg`
+  (`--theme 0`) and dark `-dark.svg` (`--theme 200`) siblings with the ELK layout engine.
+  Run it after editing **any** `.d2`, then commit the `.d2` and **both** regenerated SVGs.
+  This is a codegen target (no network fetch), so it's fine to run inline.
 - **`make diagrams-check`** — the CI freshness gate. Re-renders to a temp location and
   diffs against the committed SVGs; a **stale or missing** SVG fails the build. This is
   the verification surface — it runs in CI so "the diagram on GitHub matches its source"
   is enforced, not trusted to memory.
 
-Typical loop: edit `.d2` → `make diagrams` → eyeball the `.svg` → commit both.
+Typical loop: edit `.d2` → `make diagrams` → eyeball **both** SVGs (light + dark) → commit all three.
 
 ## The local-icon rule
 
@@ -108,6 +119,21 @@ an upstream icon changes), and every ADR draws the same Vercel/Neon/Inngest glyp
 To add a vendor to the vocabulary, drop its SVG into `icons/` and reference it by
 relative path — don't reach for a URL.
 
+**Mode-specific icons.** Because icons are baked in as base64, they **don't** recolour with
+the D2 theme, so a mark tuned for the light canvas can vanish (or invert) on the dark one.
+`currentColor`/`currentFill` tricks don't help — a base64-embedded icon has no host `color`
+to inherit, so it just falls back to black. Two ways to make one legible in both modes:
+
+- **One brand-colour file** — if a single saturated fill reads on both canvases, use it and
+  ship one file. `drizzle` does this with its brand lime `#c5f74f`.
+- **A `-dark` variant + swap** — commit `icons/<name>-dark.svg` and let the `diagrams` recipe
+  `sed`-swap the path in the **dark** render only; the light render keeps the original.
+  `inngest` and `vercel` do this with a white (`#FFFFFF`) `-dark` glyph. Add a `-dark` file +
+  a swap clause in the `Makefile` when a new mode-specific icon lands.
+
+Colourful icons (HubSpot, Anthropic, PostHog, Twilio, Neon, tRPC) and self-contained marks
+(Next.js's badge) read in both modes and need neither treatment.
+
 ## Vendored icon vocabulary
 
 The shared `icons/` set. Prefer one of these glyphs over a bare labelled box for any
@@ -115,13 +141,13 @@ recognised service, so the same component looks the same across every ADR.
 
 | Icon | Represents |
 | --- | --- |
-| `vercel.svg` | Vercel — hosting / deployment target |
+| `vercel.svg` (+ `-dark`) | Vercel — hosting / deployment target |
 | `neon.svg` | Neon — serverless Postgres |
 | `postgres.svg` | Postgres — the local/canonical relational store |
 | `nextjs.svg` | Next.js — the app framework |
 | `trpc.svg` | tRPC — typed API layer |
-| `drizzle.svg` | Drizzle — ORM / schema + migrations |
-| `inngest.svg` | Inngest — durable workflow / event delivery |
+| `drizzle.svg` | Drizzle — ORM / schema + migrations (brand lime, one file) |
+| `inngest.svg` (+ `-dark`) | Inngest — durable workflow / event delivery |
 | `hubspot.svg` | HubSpot — CRM source of truth for contacts |
 | `outlook.svg` | Outlook / Microsoft 365 — outbound mail |
 | `anthropic.svg` | Anthropic / Claude — LLM provider |
@@ -133,8 +159,14 @@ recognised service, so the same component looks the same across every ADR.
 
 Keep it light and consistent — this is polished vendor topology, not a napkin sketch.
 
-- **Theme:** a single neutral **light** theme, `--theme 0`. Not dark, not
-  per-color-scheme — the self-contained SVG must stay legible against GitHub's dark mode.
+- **Theme:** a light + dark pair — `--theme 0` (Neutral Default) → `<basename>.svg` and
+  `--theme 200` (Dark Mauve) → `<basename>-dark.svg` — selected per reader via the ADR's
+  `<picture>` block. `make diagrams` renders both from one `.d2`; never hand-edit either
+  SVG. Vendored brand icons are baked in as base64 and **don't** recolour with the theme, so
+  a mode-specific glyph needs either one brand-colour file that reads on both canvases or a
+  white `-dark` variant swapped in for the dark render (see
+  [the local-icon rule](#the-local-icon-rule)); eyeball a new icon on the dark canvas and
+  add a variant if it disappears.
 - **No sketch mode.** Clean geometry, not hand-drawn.
 - **Direction:** `direction: right` (left-to-right) is the architecture default,
   overridable per diagram when a top-down flow reads better.
@@ -152,7 +184,7 @@ Keep it light and consistent — this is polished vendor topology, not a napkin 
   don't paint a static edge green. Reserve it for the primary ingress/egress data path; keep
   control-plane and backstop edges static (and uncoloured) so the flow reads as signal, not
   decoration. Valid on **connections only**, never shapes. It compiles to CSS `@keyframes`,
-  which animates on GitHub through the `![](…svg)` image embed and stays byte-deterministic — so
+  which animates on GitHub through the `<picture>`/`<img>` embed and stays byte-deterministic — so
   `make diagrams-check` still passes.
 - **Cylinders = data stores.** Give any persistent store (`shape: cylinder`) — Postgres,
   Neon, an outbox table, a queue's durable log.
@@ -172,7 +204,7 @@ Keep it light and consistent — this is polished vendor topology, not a napkin 
 The canonical exemplar — copy its structure when authoring a new diagram:
 
 - **`adr014-option1-outbox`** — [`.d2`](adr014-option1-outbox.d2) /
-  [`.svg`](adr014-option1-outbox.svg) — the transactional-outbox + Inngest fan-out
+  [`.svg`](adr014-option1-outbox.svg) / [`-dark.svg`](adr014-option1-outbox-dark.svg) — the transactional-outbox + Inngest fan-out
   topology for durable delivery ([ADR-014](../adr014-outbox-pattern-for-inngest-delivery.md)):
   cylinders for the canonical store + outbox table, an Inngest container fanning out to
   the downstream vendors (HubSpot, Outlook, Twilio).

@@ -59,7 +59,10 @@ The writing tRPC mutation (or webhook handler, or background job) inserts one or
 
 ### 1. Transactional outbox + post-commit `inngest.send` + 30 s cron sweep
 
-![Option 1 — transactional outbox + Inngest fan-out](diagrams/adr014-option1-outbox.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/adr014-option1-outbox-dark.svg">
+  <img alt="Option 1 — transactional outbox + Inngest fan-out" src="diagrams/adr014-option1-outbox.svg">
+</picture>
 
 The outbox row is written inside the canonical transaction; the post-commit `inngest.send` is best-effort fast-path; the cron sweep is the durable backstop. Row id doubles as the Inngest idempotency key.
 

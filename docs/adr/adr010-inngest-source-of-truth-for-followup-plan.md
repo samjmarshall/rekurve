@@ -51,7 +51,10 @@ Architecture at a glance: [Option 1 — Inngest control state, local DB output s
 
 ### 1. Inngest owns control state, local DB owns output state
 
-![Option 1 — Inngest control state, local DB output state](diagrams/adr010-option1-control-state.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/adr010-option1-control-state-dark.svg">
+  <img alt="Option 1 — Inngest control state, local DB output state" src="diagrams/adr010-option1-control-state.svg">
+</picture>
 
 One Inngest function instance per active Lead represents the active Follow-up plan. The function consumes `lead.captured` / `lead.stage-changed` events, sleeps to the next cadence boundary, and emits `nurture.followup-message-drafted` when it inserts into `message_queue`. The local DB holds the *outputs* of the plan (`message_queue`, `conversations`) and the canonical Lead row, but no row mirrors the live function-instance state.
 

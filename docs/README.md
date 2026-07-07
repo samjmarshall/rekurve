@@ -24,7 +24,6 @@ Remember, when the main context window goes over ~120k tokens, deep reasoning an
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./context-window-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="./context-window.png">
   <img alt="Context Window" src="./context-window.png">
 </picture>
 
@@ -52,7 +51,6 @@ This project takes the Anthropic workflow above and expands on it.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./workflow-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="./workflow.png">
   <img alt="Claude Code Workflow" src="./workflow.png">
 </picture>
 
@@ -68,7 +66,6 @@ Not every task uses every step. Small fixes can skip straight to Implement → C
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./adr-workflow-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="./adr-workflow.png">
   <img alt="Claude Code ADR Workflow" src="./adr-workflow.png">
 </picture>
 
@@ -212,7 +209,10 @@ make start       # dev server at https://rekurve.localhost
 
 ## Architecture
 
-![Solution Architecture — current runtime topology, rendered from `adr/diagrams/architecture-solution.d2`](adr/diagrams/architecture-solution.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="adr/diagrams/architecture-solution-dark.svg">
+  <img alt="Solution Architecture — current runtime topology, rendered from `adr/diagrams/architecture-solution.d2`" src="adr/diagrams/architecture-solution.svg">
+</picture>
 
 ### Feature reference
 

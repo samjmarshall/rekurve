@@ -60,7 +60,10 @@ Lead writes commit to the local DB synchronously inside the tRPC mutation alongs
 
 ### 1. Local Postgres `leads` table is canonical; HubSpot Contacts are downstream via the outbox
 
-![Option 1 — local `leads` canonical, HubSpot downstream mirror](diagrams/adr013-option1-local-canonical.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/adr013-option1-local-canonical-dark.svg">
+  <img alt="Option 1 — local `leads` canonical, HubSpot downstream mirror" src="diagrams/adr013-option1-local-canonical.svg">
+</picture>
 
 Lead writes commit to the local DB synchronously inside the tRPC mutation, alongside `qualifyAndScore()` and an outbox row insert — all in one Postgres transaction. The mutation returns the scored row to the consultant before any external system is touched. Inngest workers consume the outbox row and push to HubSpot, start the Follow-up plan, and run any other side-effect-shaped fan-out.
 

@@ -63,7 +63,10 @@ Concretely: PostHog receives application logs over **OTLP** through a logger sea
 
 ### 1. Existing tools + free tiers (chosen)
 
-![Option 1 — PostHog + PagerDuty free + DIY dead-man's-switch](diagrams/adr018-option1-posthog-pagerduty.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/adr018-option1-posthog-pagerduty-dark.svg">
+  <img alt="Option 1 — PostHog + PagerDuty free + DIY dead-man's-switch" src="diagrams/adr018-option1-posthog-pagerduty.svg">
+</picture>
 
 PostHog for logs/errors/analytics/alerts, PagerDuty free as the dedup funnel + pager, a DIY Inngest→PostHog dead-man's-switch for uptime.
 

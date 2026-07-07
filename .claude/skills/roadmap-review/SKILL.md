@@ -1,6 +1,6 @@
 ---
 name: roadmap-review
-description: Collaborative review, grooming, and scheduling of GitHub Project issues for pre-PMF startups. Use to reassess priorities, restructure milestones, close stale or superseded issues, judge whether an issue is ready to plan, or (re)build the roadmap timeline — Start/End dates, implementation order, and developer capacity — on the board. Especially useful when capacity changes, strategy shifts, or after completing major work.
+description: Collaborative review, grooming, and scheduling of GitHub Project issues for pre-PMF startups. Use to reassess priorities, restructure milestones, close stale or superseded issues, judge whether an issue is ready to plan, or (re)build the roadmap timeline — Start/Target dates, implementation order, and developer capacity — on the board. Especially useful when capacity changes, strategy shifts, or after completing major work.
 model: opus
 effort: max
 ---
@@ -13,7 +13,7 @@ Help founders review and restructure their GitHub Project to focus on what matte
 
 1. **Groom** — work the open backlog issue-by-issue: is it stale (superseded by completed work → close), not ready (needs a split / acceptance criteria / a spike), or ready to plan?
 2. **Prioritize** — sequence the ready survivors against the single PMF goal and real capacity.
-3. **Schedule** — write the resulting timeline back to the board: Start/End dates, implementation order, and the developer's concurrent-capacity ceiling.
+3. **Schedule** — write the resulting timeline back to the board: Start/Target dates, implementation order, and the developer's concurrent-capacity ceiling.
 
 This skill **recommends** — it writes a prioritization doc and STOPs. It makes **no GitHub changes itself**; the `github-project` agent applies them on the founder's explicit OK (see [Applying the changes](#applying-the-changes)).
 
@@ -204,9 +204,9 @@ Include: context/constraints discovered · strategic rationale · the 5-bucket r
 |---|---|
 | **Remove** | Close as `not_planned`; record the `superseded-by #X` / `delivered-by PR #X` evidence in a closing comment. |
 | **Needs-investigation** | Leave open in Backlog; **no date**; recommend `/write_tickets` to the founder. |
-| **Active Now** | Set Priority; set Status → Ready/In progress; set **Start + End dates** per the Schedule table. |
+| **Active Now** | Set Priority; set Status → Ready/In progress; set **Start + Target dates** per the Schedule table. |
 | **Blocked** | Status → Blocked; note the dependency; no date until unblocked. |
-| **Deprioritize / Post-PMF / Post-Pilot** | Set milestone; **clear** Priority, Start date, End date, Iteration. |
+| **Deprioritize / Post-PMF / Post-Pilot** | Set milestone; **clear** Priority, Start date, Target date, Iteration. |
 | **Iteration field** | **Dropped** — clear it everywhere. Iterations can't be created via API (UI-only); the board runs one timeline via dates, not two. |
 
 **This project's Projects v2 IDs** (Project #2, `PVT_kwHOAHz9qs4AjXIr`; re-introspect with `gh project field-list` if they drift):
@@ -214,7 +214,7 @@ Include: context/constraints discovered · strategic rationale · the 5-bucket r
 | Field | ID | Notes |
 |---|---|---|
 | Start date (DATE) | `PVTF_lAHOAHz9qs4AjXIrzgbvEgA` | `gh project item-edit --field-id … --date YYYY-MM-DD`; `--clear` to empty |
-| End date (DATE) | `PVTF_lAHOAHz9qs4AjXIrzgbvEgE` | same |
+| Target date (DATE) | `PVTF_lAHOAHz9qs4AjXIrzgbvEgE` | same |
 | Iteration | `PVTIF_lAHOAHz9qs4AjXIrzgbvEf8` | clear everywhere |
 | Size | `PVTSSF_lAHOAHz9qs4AjXIrzgbvEf0` | XS `eff732af` · S `9592a5a3` · M `9728cbdc` · L `c53df028` · XL `7b141a16` |
 | Priority | `PVTSSF_lAHOAHz9qs4AjXIrzgbvEfw` | P0 `79628723` · P1 `0a877460` · P2 `da944a9c` |

@@ -25,7 +25,7 @@ gh pr list   --repo samjmarshall/rekurve --state merged --json number,title,merg
 git log --since="6 months ago" --oneline
 ```
 
-The `item-list` JSON already carries each item's current Start date / End date / Iteration — note which issues have them set, so the scheduling apply step can clear stale values.
+The `item-list` JSON already carries each item's current Start date / Target date / Iteration — note which issues have them set, so the scheduling apply step can clear stale values.
 
 ## Context to Read
 
@@ -38,7 +38,7 @@ Follow the skill's flow:
 
 1. **Health pass** — groom open issues into Remove / Needs-investigation / Ready (evidence-based; `uncertain` → Needs-investigation; clean-pass = assumed Ready).
 2. **Discovery** — capacity, blockers, leads, time off, and the WIP limit (Ready survivors only).
-3. **Prioritize + schedule** — sequence Active Now, then compute Start/End dates from Size + weekly hours + WIP.
+3. **Prioritize + schedule** — sequence Active Now, then compute Start/Target dates from Size + weekly hours + WIP.
 4. Propose changes section by section.
 
 ## Output
@@ -46,4 +46,4 @@ Follow the skill's flow:
 Write the final approved roadmap prioritization to:
 `thoughts/roadmap/YYYY-MM-DD-roadmap-prioritization.md`
 
-**STOP after writing — make no GitHub changes.** The founder reviews, then directs the `github-project` agent to apply (close Removes, set/clear Start/End dates, move milestones, drop iterations) and uses `/write_tickets` for Needs-investigation items.
+**STOP after writing — make no GitHub changes.** The founder reviews, then directs the `github-project` agent to apply (close Removes, set/clear Start/Target dates, move milestones, drop iterations) and uses `/write_tickets` for Needs-investigation items.

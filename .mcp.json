@@ -8,6 +8,18 @@
       "command": "npx",
       "args": ["@playwright/mcp@latest"]
     },
+    "playwright-2": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--isolated", "--headless"]
+    },
+    "playwright-3": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--isolated", "--headless"]
+    },
+    "playwright-4": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--isolated", "--headless"]
+    },
     "chrome-devtools": {
       "command": "npx",
       "args": ["-y", "chrome-devtools-mcp@latest"]

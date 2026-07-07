@@ -1,26 +1,45 @@
 # Publishing tickets to GitHub Issues
 
-System-specific guidance for the GitHub Issues + GitHub Projects backend.
+System-specific guidance for the GitHub Issues + GitHub Projects backend. **You do not run these `gh` commands yourself** — publishing is delegated to the `github-issue` agent (`subagent_type: github-issue`), which keeps the verbose create/link/field output out of your context and returns distilled refs + the validator verdict. This file is the **spec that agent implements**: the field shapes, the sub-issue mechanics, and the validation gate. Author the bodies + field plan (per `SKILL.md` and `epic-breakdown.md`), then hand them off.
 
 ## Linking and field assignment are part of "create"
 
-After plan approval, create tickets, wire sub-issue relationships, add to the project, and set fields in one turn. Don't pause mid-flow to ask about linking. Set labels/assignees/milestone via `gh issue create` flags (`--label`, `--assignee`, `--milestone`); set project fields via `gh project item-add` plus a GraphQL mutation per item. Sub-issue wiring is only relevant during epic publishing — see **[epic-breakdown.md](epic-breakdown.md)**.
+Creation, sub-issue wiring, project membership, and field-setting are one handoff to the `github-issue` agent — not separate turns, and never a mid-flow prompt. Hand it labels/assignees/milestone (it passes them as `gh issue create` flags) and the per-issue field plan (it runs `gh project item-add` plus one GraphQL mutation per field). Sub-issue wiring applies only to epic publishing — see **[epic-breakdown.md](epic-breakdown.md)**. The mechanics below are the agent's contract, documented here so the spec has one home.
 
-## GitHub Projects integration
+## GitHub Projects integration (the repo's linked Projects v2 board)
 
-When issues are added to a GitHub Project, set these fields:
+The agent discovers the board — it does not hard-code a project number. It resolves the repo from the local git context and the project from the repo's single linked Projects v2 board (the one open linked board; `TICKET_PROJECT` overrides). When an issue is added, set the fields the caller's field plan names. The validator enforces only these three:
 
-| Field | Description | Values |
-|-------|-------------|--------|
-| **Priority** | Urgency/importance | P0 (Critical), P1 (High), P2 (Medium), P3 (Low) |
-| **Estimate** | Days of effort | Number (e.g., 0.5, 1, 2) — aim for ≤2 |
-| **Iteration** | Sprint/cycle | Current iteration name or "Backlog" |
-| **Start date** | When work begins | YYYY-MM-DD format |
-| **End date** | Target completion | YYYY-MM-DD format |
+| Field | Required? | Values |
+|-------|-----------|--------|
+| **Status** | yes | the board's status single-select (e.g. Todo \| In progress \| Done) |
+| **Start date** | **required** | YYYY-MM-DD |
+| **Target date** | **required** | YYYY-MM-DD |
+| **Milestone** | when one applies | e.g. "M1.5 — Production assessor build" |
 
-**Setting fields via CLI:** `gh project item-add` to attach the issue, then `gh project item-list --format json` to capture the item ID, then a `gh api graphql` mutation against `updateProjectV2ItemFieldValue` per field. Run `gh project field-list <NUM> --owner <OWNER>` first to get field and option IDs.
+Set any other board fields named in the caller's field plan (a Priority, Size, Team, Iteration, etc. — whatever this board carries); leave fields the plan does not mention unset. Read each field's id/options fresh (`gh project field-list`) — board schemas differ per repo, so never assume which optional fields exist.
 
-Set Priority, Estimate, start/end date, Iteration, Milestone (optional), at creation; Estimate in days.
+**Start date and Target date are mandatory and drive the date-driven roadmap** — an item missing either does not render on the timeline. Derive them from the dependency graph and the milestone due date, in working days:
+
+- Order each issue after its `Blocked by` predecessors (topological order).
+- Walk forward from the earliest start, allotting each issue its estimated working days (skip weekends).
+- The last issue's Target date must land on or before the milestone's due date. If it can't, the slice plan is too big for the milestone — re-scope; don't fudge the dates.
+
+**How the agent sets fields:** `gh project item-add` to attach the issue, then `gh project item-list <PROJECT> --owner <OWNER> --format json` to capture the item id, then one `gh api graphql updateProjectV2ItemFieldValue` mutation per field — where `<PROJECT>`/`<OWNER>` are the discovered board number and owner. It reads field/option ids fresh (`gh project field-list <PROJECT> --owner <OWNER>`) — never hard-codes them. Date fields take a `date` value; single-selects (Status, Team) take a `singleSelectOptionId`:
+
+```bash
+# date field (Start date / Target date)
+gh api graphql -f query='mutation($p:ID!,$i:ID!,$f:ID!,$d:Date!){
+  updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{date:$d}}){projectV2Item{id}}}' \
+  -f p=<PROJECT_ID> -f i=<ITEM_ID> -f f=<DATE_FIELD_ID> -f d=2026-06-30
+
+# single-select field (Status / Team)
+# … value:{ singleSelectOptionId:"<OPTION_ID>" } instead of value:{ date:… }
+```
+
+Set Status, Start date, Target date, and Milestone (when one applies) at creation. Start date and Target date are required.
+
+The **post-publish validation gate** (see `SKILL.md`) is the agent's final step — it runs `yarn tsx .claude/skills/ticket-writer/scripts/validate-ticket.ts --epic <P>` (or `<issue>` for a single ticket), loops until exit 0, and returns the PASS/FAIL verdict. Running this validator is the agent's one sanctioned exception to its `gh`-only writes; you gate on the verdict it reports. A content failure (missing section, weak AC) comes back to you to fix in the body file and re-delegate.
 
 ## Related tickets
 

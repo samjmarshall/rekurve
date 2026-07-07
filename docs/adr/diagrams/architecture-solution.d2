@@ -1,0 +1,187 @@
+# Aggregate solution-architecture topology for the repo README — the current runtime shape
+# that results from the whole ADR set, not tied to a single ADR.
+# House style: render with `d2 --layout elk --theme 0` (neutral light, no sketch).
+# Solid = live today; faded (opacity) = built-but-not-live / proposed.
+direction: down
+
+title: |md
+  **Solution Architecture** — current runtime topology (aggregate of all ADRs)
+
+  _Solid = live today · faded = built-but-not-live / proposed_
+|
+title.near: top-center
+
+browser: Browser {
+  client: tRPC client · HTTP batch stream {
+    icon: ./icons/trpc.svg
+  }
+}
+
+vercel: Vercel — edge, serverless, previews, cron {
+  icon: ./icons/vercel.svg
+
+  next: Next.js 16 · App Router {
+    icon: ./icons/nextjs.svg
+    website: (website) · marketing
+    application: (application) · authenticated app
+    login: (login) · email-OTP auth
+    api: /api · webhooks, auth, inngest
+  }
+
+  trpc: tRPC server · protectedProcedure / aiProcedure {
+    icon: ./icons/trpc.svg
+  }
+  auth: better-auth · email OTP
+  drizzle: Drizzle ORM · neon-http db.batch() {
+    icon: ./icons/drizzle.svg
+  }
+}
+
+neon: Neon Postgres · neon-http {
+  icon: ./icons/neon.svg
+  leads: leads · canonical lead state {
+    shape: cylinder
+  }
+  outbox: outbox · event_name · processed_at · attempts {
+    shape: cylinder
+  }
+  output: conversations · message_queue {
+    shape: cylinder
+  }
+}
+
+inngest: Inngest — durable fan-out seam + Follow-up-plan state {
+  icon: ./icons/inngest.svg
+  workers: durable workers · idempotency = outbox row id
+  followup: Follow-up plan · 1 instance / lead
+}
+
+vendors: External services {
+  style.stroke-dash: 3
+  hubspot: HubSpot — CRM mirror · webhook · BCC reconcile {
+    icon: ./icons/hubspot.svg
+  }
+  outlook: Microsoft Graph — /me/sendMail (Outlook) {
+    icon: ./icons/outlook.svg
+  }
+  anthropic: Anthropic — Claude · drafting / nurture {
+    icon: ./icons/anthropic.svg
+  }
+  posthog: PostHog — product analytics + errors {
+    icon: ./icons/posthog.svg
+  }
+  resend: Resend — transactional email (OTP)
+  upstash: Upstash Redis — rate-limit store
+
+  twilio: Twilio — SMS relay to consultant · planned (env-gated) {
+    icon: ./icons/twilio.svg
+    style.opacity: 0.45
+  }
+  imessage: iMessage — device bridge (Texting Blue) · planned {
+    style.opacity: 0.45
+  }
+}
+
+observability: Observability · proposed (ADR-018) {
+  style.stroke-dash: 3
+  style.opacity: 0.45
+  posthogLogs: PostHog Logs · OTLP {
+    style.opacity: 0.45
+  }
+  pagerduty: PagerDuty · on-call paging {
+    icon: ./icons/pagerduty.svg
+    style.opacity: 0.45
+  }
+  heartbeat: dead-man's-switch cron · ~2 min SELECT 1 {
+    style.opacity: 0.45
+  }
+}
+
+dev: Development {
+  style.stroke-dash: 3
+  github: GitHub — source · CI/CD · project mgmt
+  renovate: Renovate — dependency updates
+}
+
+# ── Live data path — the single green spine (request → atomic write → fan-out) ──
+browser.client -> vercel.next: HTTP batch stream {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+vercel.next -> vercel.trpc: tRPC call {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+vercel.trpc -> vercel.drizzle: {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+vercel.drizzle -> neon: "db.batch([leadWrite, outboxInsert]) · one COMMIT" {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+inngest.workers -> vendors.hubspot: contact push {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+inngest.workers -> vendors.outlook: {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+inngest.workers -> vendors.anthropic: {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+
+# ── Outbox delivery: post-commit fast-path + hourly cron backstop (control, dashed) ──
+vercel.drizzle -> inngest: post-commit inngest.send · best-effort {
+  style.stroke-dash: 3
+}
+neon.outbox -> inngest: cron sweep (hourly backstop) · processed_at IS NULL {
+  style.stroke-dash: 3
+}
+
+# ── Auth + rate limiting (static) ──
+vercel.next.login -> vercel.auth
+vercel.auth -> vendors.upstash: rate-limit (OTP send)
+vercel.auth -> vendors.resend: send OTP
+vercel.trpc -> vendors.upstash: aiProcedure rate-limit
+
+# ── Analytics (static) ──
+vercel.next -> vendors.posthog: analytics + errors
+
+# ── Inbound webhook + CI/CD (control plane, dashed) ──
+vendors.hubspot -> vercel.next.api: webhook · signed · always-200 {
+  style.stroke-dash: 3
+}
+dev.github -> vercel: CI/CD {
+  style.stroke-dash: 3
+}
+
+# ── Planned fan-out + proposed observability (dashed + faded) ──
+inngest.workers -> vendors.twilio: SMS {
+  style.stroke-dash: 3
+  style.opacity: 0.45
+}
+inngest.workers -> vendors.imessage: {
+  style.stroke-dash: 3
+  style.opacity: 0.45
+}
+vercel.next -> observability: logs / alerts {
+  style.stroke-dash: 3
+  style.opacity: 0.45
+}

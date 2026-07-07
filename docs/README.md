@@ -212,75 +212,7 @@ make start       # dev server at https://rekurve.localhost
 
 ## Architecture
 
-### Application Stack
-
-```mermaid
-graph TD
-    Browser --> Vercel[Vercel Edge Network]
-    Vercel --> NextJS[Next.js 16 App Router]
-
-    NextJS --> Website["(website) — marketing pages"]
-    NextJS --> Application["(application) — authenticated app"]
-    NextJS --> Login["(login) — auth flows"]
-    NextJS --> API["/api — webhooks, auth, cron"]
-
-    Application --> tRPC_Server["tRPC Server (direct call)"]
-    Browser -->|HTTP batch stream| tRPC_Client["tRPC Client"]
-    tRPC_Client --> NextJS
-
-    tRPC_Server --> Drizzle[Drizzle ORM]
-    Drizzle --> Neon[(Neon Postgres)]
-
-    NextJS --> BetterAuth["better-auth (email OTP)"]
-    BetterAuth --> Resend[Resend — transactional email]
-    BetterAuth --> Drizzle
-
-    NextJS --> HubSpot[HubSpot API]
-    NextJS --> Anthropic["Anthropic API — Claude (drafting, nurture)"]
-    NextJS --> MSGraph["Microsoft Graph — /me/sendMail (Outlook)"]
-    NextJS --> Twilio["Twilio — SMS relay to consultant"]
-    NextJS --> PostHog[PostHog — analytics]
-
-    HubSpot -.->|webhook| API
-
-    GitHub[GitHub Actions] -->|CI/CD| Vercel
-```
-
-### Cloud Infrastructure
-
-```mermaid
-graph LR
-    subgraph Hosting
-        Vercel["Vercel — hosting, edge, previews, cron"]
-    end
-
-    subgraph Database
-        Neon["Neon Postgres — branch-per-PR, pooled + unpooled"]
-    end
-
-    subgraph Integrations
-        HubSpot["HubSpot — CRM, contact sync, webhooks, BCC reconciliation"]
-        Resend["Resend — transactional email (OTP)"]
-        Anthropic["Anthropic — Claude API (drafting + nurture)"]
-        MSGraph["Microsoft Graph — Outlook /me/sendMail"]
-        Twilio["Twilio — SMS relay to consultant (relay-to-consultant model)"]
-        PostHog["PostHog — analytics, session recording, errors"]
-    end
-
-    subgraph Development
-        GitHub["GitHub — source, CI/CD, project management"]
-        Renovate["Renovate — automated dependency updates"]
-    end
-
-    Vercel --> Neon
-    Vercel --> HubSpot
-    Vercel --> Resend
-    Vercel --> Anthropic
-    Vercel --> MSGraph
-    Vercel --> Twilio
-    Vercel --> PostHog
-    GitHub --> Vercel
-```
+![Solution Architecture — current runtime topology, rendered from `adr/diagrams/architecture-solution.d2`](adr/diagrams/architecture-solution.svg)
 
 ### Feature reference
 

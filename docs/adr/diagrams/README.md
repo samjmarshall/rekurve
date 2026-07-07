@@ -1,9 +1,15 @@
 # ADR architecture diagrams — how-to & house style
 
-Icon-rich **solution-architecture** diagrams for our in-depth ADRs. Authored as `.d2`
-text (the diffable source of truth), compiled to a committed `.svg` (what GitHub
-renders). Flow-shaped diagrams — sequence, state, ER, request paths — stay inline in
-the ADR as fenced ` ```mermaid ` blocks and do **not** live here.
+Icon-rich **solution-architecture** diagrams. Two classes live here:
+
+- **Per-ADR** (`adrNNN-optionN-<slug>`) — the topology for one option in one in-depth ADR.
+- **Aggregate** (`architecture-<slug>`) — a high-level roll-up of the whole ADR set, not
+  tied to any single ADR (e.g. the solution-architecture diagram embedded in the repo
+  [`README`](../../README.md)). Same house style, same tooling.
+
+Both are authored as `.d2` text (the diffable source of truth), compiled to a committed
+`.svg` (what GitHub renders). Flow-shaped diagrams — sequence, state, ER, request paths —
+stay inline as fenced ` ```mermaid ` blocks and do **not** live here.
 
 The split is deliberate: **D2 for architecture** (topology, vendor boundaries, stores),
 **Mermaid for flow** (ordering, state transitions, request lifecycles). This file is the
@@ -13,8 +19,8 @@ operating manual for the D2 half.
 
 | Artifact | Role | Committed? |
 | --- | --- | --- |
-| `adrNNN-optionN-<slug>.d2` | Source of truth — text, line-diffs cleanly, reviewed in PRs | Yes |
-| `adrNNN-optionN-<slug>.svg` | Rendered output — what GitHub actually displays, reviewed as an image | Yes |
+| `adrNNN-optionN-<slug>.d2` / `architecture-<slug>.d2` | Source of truth — text, line-diffs cleanly, reviewed in PRs | Yes |
+| `adrNNN-optionN-<slug>.svg` / `architecture-<slug>.svg` | Rendered output — what GitHub actually displays, reviewed as an image | Yes |
 | `icons/` | Vendored local icon set (`vercel.svg`, `neon.svg`, `inngest.svg`, `hubspot.svg`, `outlook.svg`, …) — the shared visual vocabulary | Yes |
 
 Every `.d2` has a sibling `.svg` of the same basename. **Commit both**, always in the
@@ -24,15 +30,18 @@ same change — a `.d2` without its freshly-rendered `.svg` fails CI (see
 ### Naming
 
 ```
-adrNNN-optionN-<slug>.d2      # source
+adrNNN-optionN-<slug>.d2      # per-ADR source
 adrNNN-optionN-<slug>.svg     # render (same basename)
+
+architecture-<slug>.d2        # aggregate source (not tied to one ADR)
+architecture-<slug>.svg       # render (same basename)
 ```
 
 - `NNN` — zero-padded ADR number (`014`, `017`).
 - `optionN` — the option number under "Pros and Cons of the Options"; the chosen
   option's diagram doubles as the Decision Outcome visual.
 - `<slug>` — a short kebab-case handle for the option (`outbox`, `http-batch`,
-  `always-200`).
+  `always-200`) or, for aggregates, for the view (`solution`).
 
 Reference a diagram from the ADR by relative path (the only form GitHub renders for a
 committed SVG), placed under that option's `### N.` heading, above its pros/cons table:
@@ -150,6 +159,10 @@ Keep it light and consistent — this is polished vendor topology, not a napkin 
 - **Containers = vendor / trust boundaries.** Nest services inside a container to show a
   deployment target or trust zone (e.g. everything running on Vercel, everything inside
   the Neon project).
+- **Faded (`style.opacity`) = planned / not-live.** A built-but-inactive or proposed
+  component (e.g. an env-gated worker, a not-yet-provisioned vendor) renders at reduced
+  opacity with a `· planned` / `· proposed` label suffix; live components stay
+  full-opacity. Lets one aggregate diagram show current state and roadmap without two files.
 - **Icons are the shared vocabulary.** Prefer a vendored `icons/` glyph over a bare
   labelled box for any recognised service, so the same component looks the same across
   every ADR.

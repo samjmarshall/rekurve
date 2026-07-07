@@ -1,0 +1,64 @@
+# ADR-013 (chosen) — the local Postgres `leads` table is CANONICAL; HubSpot is a DOWNSTREAM mirror.
+# This view is store ownership + data direction. The outbox/sweep delivery mechanism lives in adr014.
+# House style: render with `d2 --layout elk --theme 0` (neutral light, no sketch).
+direction: right
+
+title: |md
+  **ADR-013 (chosen)** — local `leads` is canonical; the mutation returns before any external system; HubSpot is stamped downstream
+|
+title.near: top-center
+
+consultant: Consultant · capture flow {
+  shape: person
+}
+
+vercel: Vercel serverless {
+  icon: ./icons/vercel.svg
+  mutation: tRPC leads.create / leads.update {
+    icon: ./icons/trpc.svg
+  }
+}
+
+neon: Neon Postgres — CANONICAL · one BEGIN…COMMIT {
+  icon: ./icons/neon.svg
+  leads: leads · canonical · identity · qualification · score · stage {
+    shape: cylinder
+  }
+  outbox: outbox {
+    shape: cylinder
+  }
+}
+
+inngest: Inngest · post-commit worker (delivery — see adr014) {
+  icon: ./icons/inngest.svg
+  style.stroke-dash: 3
+}
+
+hubspot: HubSpot Contacts · DOWNSTREAM mirror {
+  icon: ./icons/hubspot.svg
+}
+
+consultant -> vercel.mutation: 1 · save
+vercel.mutation -> neon: "2 · one txn — leads write + qualifyAndScore() + outbox insert" {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+vercel.mutation -> consultant: 3 · returns scored row · before any external system {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+neon.outbox -> inngest: 4 · post-commit fan-out (adr014) {
+  style.stroke-dash: 3
+}
+inngest -> hubspot: 5 · dedup-or-create
+inngest -> neon.leads: "6 · stamp hubspotContactId (nullable → set)"
+hubspot -> neon.leads: "inbound one-way — contact.creation → local row · hubspotSync=false (no echo)" {
+  style: {
+    stroke-dash: 3
+    stroke: "#B45309"
+  }
+}

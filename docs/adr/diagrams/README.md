@@ -118,6 +118,7 @@ recognised service, so the same component looks the same across every ADR.
 | `anthropic.svg` | Anthropic / Claude — LLM provider |
 | `twilio.svg` | Twilio — SMS |
 | `posthog.svg` | PostHog — product analytics |
+| `pagerduty.svg` | PagerDuty — on-call paging / incident dedup |
 
 ## House style
 

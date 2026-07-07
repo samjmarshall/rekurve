@@ -35,6 +35,8 @@ Which store is canonical for Lead identity, qualification, score, and stage — 
 
 Chosen option: "1. Local Postgres `leads` table is canonical; HubSpot Contacts are downstream via the outbox", because it is the only option that removes HubSpot from the consultant's hot write path while preserving idempotency and bounded orphan-recovery — and the architectural prerequisite (durable retry via Inngest + outbox) that justified adr003's opposite posture no longer holds.
 
+Architecture at a glance: [Option 1 — local `leads` canonical, HubSpot downstream mirror](diagrams/adr013-option1-local-canonical.svg) (rendered in full under Option 1 below).
+
 Lead writes commit to the local DB synchronously inside the tRPC mutation alongside `qualifyAndScore()` and the outbox insert, all in one Postgres transaction. The mutation returns the scored row to the consultant before any external system is touched. Post-commit fan-out (HubSpot push, Follow-up plan start, MS Graph drafts, Twilio sends, analytics) is delivered through outbox rows and Inngest functions.
 
 ### Positive Consequences
@@ -57,6 +59,8 @@ Lead writes commit to the local DB synchronously inside the tRPC mutation alongs
 ## Pros and Cons of the Options
 
 ### 1. Local Postgres `leads` table is canonical; HubSpot Contacts are downstream via the outbox
+
+![Option 1 — local `leads` canonical, HubSpot downstream mirror](diagrams/adr013-option1-local-canonical.svg)
 
 Lead writes commit to the local DB synchronously inside the tRPC mutation, alongside `qualifyAndScore()` and an outbox row insert — all in one Postgres transaction. The mutation returns the scored row to the consultant before any external system is touched. Inngest workers consume the outbox row and push to HubSpot, start the Follow-up plan, and run any other side-effect-shaped fan-out.
 

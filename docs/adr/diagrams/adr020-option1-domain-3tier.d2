@@ -1,0 +1,99 @@
+# ADR-020 (chosen) — by-domain 3-tier server architecture, factory-closure DI,
+# atomic commit(writes, outboxEvents) repository primitive.
+# Kernel is isomorphic-by-need: scoring + correlation + client-imported schemas only;
+# decide() fns stay server-side inside their domain module (leads.decide.ts).
+# House style: render via `make diagrams` (ELK layout, --theme 0 light + --theme 200 dark).
+# Cylinders = data stores. Containers = boundaries. Icons via ./icons/ only (embedded at render).
+direction: right
+
+title: |md
+  **ADR-020 (chosen)** — by-domain 3-tier · factory-closure DI · atomic `commit(writes, outboxEvents)`
+|
+title.near: top-center
+
+# ---- Entry points: the two thin controller adapters speak to these ----
+client: Next.js client {
+  icon: ./icons/nextjs.svg
+}
+events: Inngest event {
+  icon: ./icons/inngest.svg
+}
+
+# ---- Isomorphic kernel: safe to import from client OR server (dashed = no server-only bar) ----
+kernel: "src/domain — isomorphic kernel · pure model + types" {
+  style.stroke-dash: 4
+  pure: "qualifyAndScore() + score factors · messaging correlation · client-imported zod schemas"
+}
+
+# ---- Hard server-only trust boundary ----
+server: "src/server — server-only hard boundary" {
+
+  leads: "leads/ — reference domain module" {
+
+    adapters: "controllers / adapters — tier 1 · two thin adapters over one service" {
+      router: "leads.router.ts" {
+        icon: ./icons/trpc.svg
+      }
+      worker: "leads.worker.ts" {
+        icon: ./icons/inngest.svg
+      }
+    }
+
+    decide: "leads.decide.ts · pure decide() — server-only"
+
+    service: "leads.service.ts · service — tier 2"
+
+    repo: "leads.repository.ts · repository — tier 3" {
+      icon: ./icons/drizzle.svg
+    }
+
+    module: "leads.module.ts · composition root" {
+      style.stroke-dash: 3
+    }
+
+    # intra-domain request flow
+    adapters.router -> service: "delegate"
+    adapters.worker -> service: "N sequential calls"
+    service -> decide: "decide(input, state) → writes + events"
+    service -> repo: "commit(writes, outboxEvents)"
+
+    # composition root wires the make* factories (import-time singletons)
+    module -> adapters: "make*() DI" {
+      style.stroke-dash: 3
+    }
+    module -> service {
+      style.stroke-dash: 3
+    }
+    module -> repo {
+      style.stroke-dash: 3
+    }
+  }
+
+  peers: "messaging/ · nurture/ · hubspot/ · lots/ — modules · router · worker · service · repository · module" {
+    style.stroke-dash: 4
+  }
+
+  thin: "ms-graph/ · twilio/ · ai/ — thin adapter modules (collapse rule · ms-graph owns ms_graph_tokens)" {
+    style.stroke-dash: 4
+  }
+
+  peers -> thin: "injected into owning domains"
+}
+
+# ---- Data store ----
+db: Neon Postgres {
+  shape: cylinder
+  icon: ./icons/neon.svg
+}
+
+# ---- Cross-boundary edges ----
+client -> server.leads.adapters.router: "tRPC query / mutation"
+events -> server.leads.adapters.worker: "event · step.run"
+client -> kernel.pure: "safe import"
+server.leads.service -> kernel.pure: "qualifyAndScore() — pure scoring"
+server.leads.repo -> db: "one atomic db.batch() — canonical + outbox rows (adr019/adr017)" {
+  style: {
+    animated: true
+    stroke: green
+  }
+}

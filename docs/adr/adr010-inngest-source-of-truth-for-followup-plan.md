@@ -96,3 +96,4 @@ Inngest holds the live truth, but every state transition appends a row for repla
 - Superseded by this ADR: [adr008](adr008-nurture-auto-start-is-best-effort.md) — auto-start best-effort swallow replaced by the outbox contract below
 - Refined by [adr011](adr011-followup-drafts-retry-then-pause.md) — failure-handling rule that lives on top of this ADR
 - Enabled by [adr014](adr014-outbox-pattern-for-inngest-delivery.md) — outbox pattern for at-least-once Inngest delivery, atomic with the canonical-store write per [adr013](adr013-local-db-canonical-for-lead-data.md)
+- Generalized by: [adr019](adr019-system-wide-transactional-outbox-posture.md) — the control-state/output-state split this ADR fixed for nurture is extended system-wide

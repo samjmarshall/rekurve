@@ -74,3 +74,4 @@ This decision **resolves** the `intake.ts:16` `// TODO(#258)` (driver swap rejec
 - Refinement of: [adr014](adr014-outbox-pattern-for-inngest-delivery.md) — specifies the atomicity mechanism that ADR-014 requires
 - Enabled by: [adr005](adr005-deterministic-lead-scoring.md) — scoring purity makes the batch limitation irrelevant
 - Context: [adr013](adr013-local-db-canonical-for-lead-data.md) — the DB-first canonical-store decision this atomicity mechanism enables
+- Generalized by: [adr019](adr019-system-wide-transactional-outbox-posture.md) — the db.batch atomicity mechanism is restated as the system-wide rule

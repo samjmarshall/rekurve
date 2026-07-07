@@ -50,7 +50,10 @@ sinks: Side effects — a new subscriber is a new Inngest fn {
 }
 
 vercel.writer -> db: "1 · db.batch([leadWrite, outboxInsert]) — atomic, one COMMIT" {
-  style.animated: true
+  style: {
+    animated: true
+    stroke: green
+  }
 }
 vercel.writer -> inngest: 2 · post-commit inngest.send (best-effort) · set processed_at on ok {
   style.stroke-dash: 3
@@ -60,17 +63,32 @@ vercel.cron -> inngest: 4 · re-deliver · row id = idempotency key {
   style.stroke-dash: 3
 }
 inngest.workers -> sinks.hubspot: 5 · fan-out (at-least-once) {
-  style.animated: true
+  style: {
+    animated: true
+    stroke: green
+  }
 }
 inngest.workers -> sinks.outlook: {
-  style.animated: true
+  style: {
+    animated: true
+    stroke: green
+  }
 }
 inngest.workers -> sinks.anthropic: {
-  style.animated: true
+  style: {
+    animated: true
+    stroke: green
+  }
 }
 inngest.workers -> sinks.twilio: {
-  style.animated: true
+  style: {
+    animated: true
+    stroke: green
+  }
 }
 inngest.workers -> sinks.posthog: {
-  style.animated: true
+  style: {
+    animated: true
+    stroke: green
+  }
 }

@@ -128,13 +128,22 @@ Keep it light and consistent — this is polished vendor topology, not a napkin 
 - **No sketch mode.** Clean geometry, not hand-drawn.
 - **Direction:** `direction: right` (left-to-right) is the architecture default,
   overridable per diagram when a top-down flow reads better.
-- **Animated edges = live data flow.** Add `style.animated: true` (dot-notation, same shape
-  as `style.stroke-dash`) to a connection to make it flow, e.g.
-  `inngest.workers -> sinks.hubspot: 5 · fan-out { style.animated: true }`. Reserve it for the
-  primary ingress/egress data path; keep control-plane and backstop edges static so the motion
-  reads as signal, not decoration. Valid on **connections only**, never shapes. It compiles to
-  CSS `@keyframes`, which animates on GitHub through the `![](…svg)` image embed and stays
-  byte-deterministic — so `make diagrams-check` still passes.
+- **Animated green edges = live data flow.** A live-data-flow connection gets **both**
+  `animated: true` and `stroke: green`, authored as a `style { }` block, e.g.
+  ```d2
+  inngest.workers -> sinks.hubspot: 5 · fan-out {
+    style: {
+      animated: true
+      stroke: green
+    }
+  }
+  ```
+  Green + motion is the single treatment for a live path — don't animate without the green, and
+  don't paint a static edge green. Reserve it for the primary ingress/egress data path; keep
+  control-plane and backstop edges static (and uncoloured) so the flow reads as signal, not
+  decoration. Valid on **connections only**, never shapes. It compiles to CSS `@keyframes`,
+  which animates on GitHub through the `![](…svg)` image embed and stays byte-deterministic — so
+  `make diagrams-check` still passes.
 - **Cylinders = data stores.** Give any persistent store (`shape: cylinder`) — Postgres,
   Neon, an outbox table, a queue's durable log.
 - **Containers = vendor / trust boundaries.** Nest services inside a container to show a

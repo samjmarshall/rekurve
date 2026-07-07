@@ -6,7 +6,13 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!.yarn", "!**/*.spec.json", "!.claude/skills"]
+    "includes": [
+      "**",
+      "!.yarn",
+      "!**/*.spec.json",
+      "!.claude/skills",
+      "!docs/adr/diagrams"
+    ]
   },
   "formatter": {
     "enabled": true,

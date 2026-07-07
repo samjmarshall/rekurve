@@ -33,6 +33,8 @@ Where does the live Follow-up-plan run state live: local DB, Inngest, or both?
 
 Chosen option: "1. Inngest owns control state, local DB owns output state", because it is the only option with a single canonical store for the live workflow state, places the "one active plan per Lead" constraint at the workflow layer where it belongs, and uses Inngest's durable state machine for the durability it was selected to provide.
 
+Architecture at a glance: [Option 1 — Inngest control state, local DB output state](diagrams/adr010-option1-control-state.svg) (rendered in full under Option 1 below).
+
 ### Positive Consequences
 
 - **The `nurture_sequences` table and `nurture_active_one_per_lead_uidx` index are dropped in the migration.** No data migration is required: pilot scale is ~20–50 active Leads, and a Lead's correct rhythm is fully derivable from its current `leadStage`. The cutover sends one `lead.stage-changed` event per active Lead and Inngest spins up the right runner.
@@ -48,6 +50,8 @@ Chosen option: "1. Inngest owns control state, local DB owns output state", beca
 ## Pros and Cons of the Options
 
 ### 1. Inngest owns control state, local DB owns output state
+
+![Option 1 — Inngest control state, local DB output state](diagrams/adr010-option1-control-state.svg)
 
 One Inngest function instance per active Lead represents the active Follow-up plan. The function consumes `lead.captured` / `lead.stage-changed` events, sleeps to the next cadence boundary, and emits `nurture.followup-message-drafted` when it inserts into `message_queue`. The local DB holds the *outputs* of the plan (`message_queue`, `conversations`) and the canonical Lead row, but no row mirrors the live function-instance state.
 

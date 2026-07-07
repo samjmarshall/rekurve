@@ -1,0 +1,94 @@
+# ADR-014 (chosen) — transactional outbox + post-commit inngest.send + 30s cron sweep.
+# Inngest is the single fan-out seam; outbox row id = Inngest idempotency key.
+# House style: render with `d2 --layout elk --theme 0` (neutral light, no sketch).
+direction: right
+
+title: |md
+  **ADR-014 (chosen)** — atomic `db.batch()` write + post-commit `inngest.send`, with a 30s cron sweep as the durable backstop
+|
+title.near: top-center
+
+vercel: Vercel serverless {
+  icon: ./icons/vercel.svg
+  writer: tRPC mutation / webhook / job
+  cron: cron sweep ~30s
+}
+
+db: Neon Postgres — atomic db.batch() · one BEGIN…COMMIT (adr017) {
+  icon: ./icons/neon.svg
+  style.stroke-dash: 3
+  leads: leads · canonical Lead state {
+    shape: cylinder
+  }
+  outbox: outbox · processed_at · attempts {
+    shape: cylinder
+  }
+}
+
+inngest: Inngest · single fan-out seam {
+  icon: ./icons/inngest.svg
+  workers: durable workers · idempotency key = outbox row id
+}
+
+sinks: Side effects — a new subscriber is a new Inngest fn {
+  style.stroke-dash: 3
+  hubspot: HubSpot · contact / deal push {
+    icon: ./icons/hubspot.svg
+  }
+  outlook: Outlook (MS Graph) · draft emails {
+    icon: ./icons/outlook.svg
+  }
+  anthropic: Anthropic · message drafting {
+    icon: ./icons/anthropic.svg
+  }
+  twilio: Twilio · SMS relay {
+    icon: ./icons/twilio.svg
+  }
+  posthog: PostHog · analytics {
+    icon: ./icons/posthog.svg
+  }
+}
+
+vercel.writer -> db: "1 · db.batch([leadWrite, outboxInsert]) — atomic, one COMMIT" {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+vercel.writer -> inngest: 2 · post-commit inngest.send (best-effort) · set processed_at on ok {
+  style.stroke-dash: 3
+}
+vercel.cron -> db.outbox: 3 · sweep ~30s · processed_at IS NULL
+vercel.cron -> inngest: 4 · re-deliver · row id = idempotency key {
+  style.stroke-dash: 3
+}
+inngest.workers -> sinks.hubspot: 5 · fan-out (at-least-once) {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+inngest.workers -> sinks.outlook: {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+inngest.workers -> sinks.anthropic: {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+inngest.workers -> sinks.twilio: {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+inngest.workers -> sinks.posthog: {
+  style: {
+    animated: true
+    stroke: green
+  }
+}

@@ -35,6 +35,8 @@ Do we buy the Better Stack bundle as designed, or assemble monitoring, logging, 
 
 Chosen option: "1. Existing tools + free tiers", because it is the only option that adds **zero new vendors and ~$0/mo** while consolidating the deferred agent's context into one store and keeping every seam reversible (OTLP is a standard exporter swap; PagerDuty ingests the generic Events API v2) — at the price of a deliberately-scoped uptime blind spot that a no-code external monitor can close later.
 
+Architecture at a glance: [Option 1 — PostHog + PagerDuty free + DIY dead-man's-switch](diagrams/adr018-option1-posthog-pagerduty.svg) (rendered in full under Option 1 below).
+
 Concretely: PostHog receives application logs over **OTLP** through a logger seam extending `src/instrumentation.ts`, flushed with `forceFlush()` via Next.js `after()` so Vercel does not freeze the function before logs ship. PostHog error-tracking, insight, and log alerts all fire generic webhooks templated to **PagerDuty's Events API v2**, which is the single dedup funnel and pages the on-call through its mobile app. Uptime is a **dead-man's-switch**: an Inngest cron (~2 min, modeled on the outbox sweep) runs a cheap Neon `SELECT 1` and emits a heartbeat **log** only on success; a PostHog **Logs** alert (`count < 1` over a 5-minute window, fixed 5-minute evaluation) pages when the heartbeat stops. CI migration/verify failures `curl` the same Events API v2. Business metrics stay in PostHog insights; infra metrics stay in Vercel's Observability dashboard. The deferred AI triage agent (2026-04-30 design §6/§8) slots in later as a **parallel** consumer that enriches incidents but never gates human paging.
 
 ### Positive Consequences
@@ -60,6 +62,8 @@ Concretely: PostHog receives application logs over **OTLP** through a logger sea
 ## Pros and Cons of the Options
 
 ### 1. Existing tools + free tiers (chosen)
+
+![Option 1 — PostHog + PagerDuty free + DIY dead-man's-switch](diagrams/adr018-option1-posthog-pagerduty.svg)
 
 PostHog for logs/errors/analytics/alerts, PagerDuty free as the dedup funnel + pager, a DIY Inngest→PostHog dead-man's-switch for uptime.
 

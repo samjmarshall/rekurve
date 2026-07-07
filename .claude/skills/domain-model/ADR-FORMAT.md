@@ -68,10 +68,19 @@ Date: 'YYYY-MM-DD'
 - **Open Questions (in-depth, optional)** — only when Status is `Proposed` or `In Progress`. Each item is something a concrete check or spike could resolve.
 - **Links (optional)** — prefix with the relationship: `Design:`, `Epic:`, `Refined by`, `Superseded by`, `Vendor docs:`. Bare URLs are noise.
 
+## Diagrams
+
+- **Format follows content, per option.** A genuinely topological option (vendor/service topology) gets **D2 compiled to a committed SVG**; a flow-shaped option (sequence/state/ER/request-path) or a trivial 2–3-box architecture gets an **inline Mermaid** fenced ```` ```mermaid ```` block; a degenerate option (status-quo / one-line prose delta) gets **no diagram**.
+- **Placement.** A per-option diagram sits under that option's `### N.` heading in Pros and Cons of the Options, above its table. The chosen option's diagram doubles as the Decision Outcome visual — Decision Outcome cross-references it ("see the diagram under option N") rather than duplicating it.
+- **D2 source and reference.** Sources live at `docs/adr/diagrams/adrNNN-optionN-<slug>.d2` with a committed sibling `.svg`; reference the SVG from the ADR with a relative-path image: `![...](diagrams/adrNNN-optionN-<slug>.svg)`.
+- **Local icons only.** Vendor icons live under `docs/adr/diagrams/icons/` and are referenced as `icon: ./icons/<name>.svg` — never hot-link `icons.terrastruct.com`. D2 embeds local icons as base64 so the SVG renders on GitHub.
+- **Animate live data flow (D2 only).** Mark the primary runtime data-flow edges — ingress writes and egress fan-out — with `style: { animated: true; stroke: green }` so the diagram shows data moving; leave structural, control-plane, and durable-backstop edges static and uncoloured. Animate the primary path only — a diagram where every edge wiggles is noise, not signal. `animated` is connections-only, never shapes. See `docs/adr/diagrams/README.md`, House style.
+- **Pipeline.** Run `make diagrams` after editing any `.d2` (commit both files); `make diagrams-check` is the CI freshness gate. See `docs/adr/diagrams/README.md`.
+
 ## Anti-patterns
 
 - **Dense single-paragraph decision body.** If the Decision section is one 8-sentence paragraph, you're hiding the structure the template is designed to expose. Break it into Context / Decision / Consequences (simple) or the seven-section in-depth flow.
 - **`**Status:**` as a bold inline label.** Status belongs in the YAML frontmatter, not in the body.
-- **Empty option tables.** If there were no real alternatives, use the simple template. A Pros/Cons table with one option in it is theatre.
+- **Empty option tables.** If there were no real alternatives, use the simple template. A Pros/Cons table with one option in it is theatre. Forcing a diagram onto a degenerate option is the same theatre — a one-line prose delta is better.
 - **"For more context, see X"** in place of the Context section. The ADR should stand alone; link out for supporting detail, not for the decision itself.
 - **Mutating an accepted ADR.** When the decision changes, write a new ADR, set the old one's Status to `Superseded by [ADRNNN](...)`, and link the new one back via the Links section.

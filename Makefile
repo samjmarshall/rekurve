@@ -84,3 +84,11 @@ clean:
 		node_modules .yarn/cache .yarn/install-state.gz \
 		test-results playwright-report .playwright-mcp
 	yarn run portless clean
+
+# Render every docs/adr/diagrams/*.d2 to a sibling .svg via `d2 --layout elk --theme 0` (codegen, safe to run inline; commit both files). Recipe cd's into the diagrams dir so relative ./icons/*.svg in the .d2 files resolve. The `data-d2-version` attribute is normalised (leading `v` stripped) so a Homebrew d2 ("0.7.1") and the release binary CI installs ("v0.7.1") emit byte-identical SVGs.
+diagrams:
+	@cd docs/adr/diagrams && for f in *.d2; do [ -e "$$f" ] || continue; echo "d2 -> $${f%.d2}.svg"; d2 --layout elk --theme 0 "$$f" - | sed 's/\(data-d2-version="\)v/\1/' > "$${f%.d2}.svg"; done
+
+# CI freshness gate: regenerates each diagram to a temp dir (same version normalisation as `diagrams`) and fails on a stale/missing SVG. Recipe cd's into the diagrams dir so relative ./icons/*.svg in the .d2 files resolve.
+diagrams-check:
+	@tmp=$$(mktemp -d); status=0; cd docs/adr/diagrams && for f in *.d2; do [ -e "$$f" ] || continue; d2 --layout elk --theme 0 "$$f" - | sed 's/\(data-d2-version="\)v/\1/' > "$$tmp/$$(basename "$${f%.d2}").svg"; if ! diff -q "$$tmp/$$(basename "$${f%.d2}").svg" "$${f%.d2}.svg" >/dev/null 2>&1; then echo "STALE or MISSING: docs/adr/diagrams/$${f%.d2}.svg - run make diagrams"; status=1; fi; done; rm -rf "$$tmp"; exit $$status

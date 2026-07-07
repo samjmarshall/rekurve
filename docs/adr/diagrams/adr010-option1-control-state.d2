@@ -1,0 +1,53 @@
+# ADR-010 (chosen) — Inngest owns Follow-up-plan CONTROL state; the local DB owns OUTPUT state only.
+# One canonical store for live workflow state; `nurture_sequences` is dropped.
+# House style: render with `d2 --layout elk --theme 0` (neutral light, no sketch).
+direction: right
+
+title: |md
+  **ADR-010 (chosen)** — Inngest is canonical for run state (one fn per Lead); local DB holds only outputs; `nurture_sequences` dropped
+|
+title.near: top-center
+
+events: Domain events · via outbox (adr014) {
+  style.stroke-dash: 3
+  ev: lead.captured · lead.stage-changed
+}
+
+inngest: Inngest — CANONICAL control state {
+  icon: ./icons/inngest.svg
+  runner: "one fn instance per Lead · concurrency {key: leadId, limit: 1} · sleeps to cadence boundary"
+  dash: Inngest dashboard · answers operator questions (no admin UI)
+}
+
+neon: Neon Postgres — OUTPUT state only {
+  icon: ./icons/neon.svg
+  leads: leads · canonical Lead row (adr013) {
+    shape: cylinder
+  }
+  mq: message_queue {
+    shape: cylinder
+  }
+  conv: conversations {
+    shape: cylinder
+  }
+  dropped: nurture_sequences · DROPPED + one-per-lead index removed {
+    style.stroke-dash: 3
+  }
+}
+
+dashboard: Consultant dashboard {
+  icon: ./icons/nextjs.svg
+}
+
+events.ev -> inngest.runner: 1 · consume · spin up / advance runner {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+inngest.runner -> neon.mq: 2 · insert message_queue · emit nurture.followup-message-drafted
+dashboard -> neon.mq: 3 · reads approval queue · joined to leads
+dashboard -> neon.conv: reads sent history
+inngest.runner -> inngest.dash: operator view — no Rekurve admin UI {
+  style.stroke-dash: 3
+}

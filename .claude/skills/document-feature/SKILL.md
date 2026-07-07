@@ -72,7 +72,6 @@ Methodology: one question at a time, propose a recommended answer when the codeb
 ## Behavioural rules
 
 - **Do not create ADRs.** If a hard-to-reverse decision surfaces without one, flag inline with `> [!NOTE] Missing ADR: <decision>. Recommend /domain-model.` Defer creation to the `domain-model` skill.
-- **Do not invoke `/caveman`.** It is a global chat toggle. Apply its principles to *the doc*, not *the conversation*.
 - Frontmatter required fields: `status: living`, `last-updated: YYYY-MM-DD`, `related-adrs:`, `related-design:`, `related-epic:`, `related-issues:` (GitHub issue/PR numbers — `gh issue list` and `git log` for the slug surface candidates).
 - Bootstrap `docs/feature/` if it does not exist; the first feature doc creates the directory.
 

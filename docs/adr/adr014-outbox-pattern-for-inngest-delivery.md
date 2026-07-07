@@ -37,6 +37,8 @@ How is at-least-once delivery to Inngest guaranteed atomically with the canonica
 
 Chosen option: "1. Transactional outbox + post-commit `inngest.send` + 30 s cron sweep, with the outbox row id as the Inngest idempotency key", because it is the only option that ties the publish record to the same transaction as the canonical write (closing the COMMIT-then-fail gap), keeps Inngest's availability off the consultant's request path, fits Vercel's serverless runtime without a long-running listener, and preserves Inngest as the single fan-out seam.
 
+Architecture at a glance: [Option 1 — transactional outbox + Inngest fan-out](diagrams/adr014-option1-outbox.svg) (rendered in full under Option 1 below).
+
 The writing tRPC mutation (or webhook handler, or background job) inserts one or more rows into a single `outbox` table inside the same Postgres transaction as the canonical state change. After the transaction commits, the writer attempts `inngest.send()` for each new row. On success, the writer sets `processed_at`. On `inngest.send` failure, the writer logs to the logging backend and returns the canonical mutation result to the user as if the send succeeded — the failure does not bubble up. A scheduled cron (every 30 s) sweeps rows where `processed_at IS NULL AND created_at < now() - interval '30 seconds'`, retries `inngest.send`, and increments `attempts`. The outbox row's `id` is the Inngest idempotency key, so a retry that races with the original send is a guaranteed no-op.
 
 ### Positive Consequences
@@ -56,6 +58,8 @@ The writing tRPC mutation (or webhook handler, or background job) inserts one or
 ## Pros and Cons of the Options
 
 ### 1. Transactional outbox + post-commit `inngest.send` + 30 s cron sweep
+
+![Option 1 — transactional outbox + Inngest fan-out](diagrams/adr014-option1-outbox.svg)
 
 The outbox row is written inside the canonical transaction; the post-commit `inngest.send` is best-effort fast-path; the cron sweep is the durable backstop. Row id doubles as the Inngest idempotency key.
 

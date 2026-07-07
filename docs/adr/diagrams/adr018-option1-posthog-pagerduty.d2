@@ -1,0 +1,77 @@
+# ADR-018 (chosen) — observability on existing tools: PostHog + PagerDuty free + a DIY dead-man's-switch.
+# PostHog is the single queryable store; PagerDuty is the single dedup + paging funnel.
+# House style: render with `d2 --layout elk --theme 0` (neutral light, no sketch).
+direction: right
+
+title: |md
+  **ADR-018 (chosen)** — app logs → OTLP → PostHog, alerts → PagerDuty, uptime via an Inngest→PostHog dead-man's-switch
+|
+title.near: top-center
+
+vercel: Vercel serverless {
+  icon: ./icons/vercel.svg
+  style.stroke-dash: 3
+  app: Next.js app · instrumentation.ts log seam {
+    icon: ./icons/nextjs.svg
+  }
+  heartbeat: heartbeat cron ~2m · SELECT 1
+}
+
+inngest: Inngest · cron scheduler {
+  icon: ./icons/inngest.svg
+}
+
+neon: Neon Postgres {
+  icon: ./icons/neon.svg
+  db: leads · canonical store {
+    shape: cylinder
+  }
+}
+
+posthog: PostHog · single queryable store {
+  icon: ./icons/posthog.svg
+  store: logs · errors · analytics {
+    shape: cylinder
+  }
+  alerts: "alerts — error · insight · Logs (count < 1 over 5m)"
+}
+
+pagerduty: PagerDuty free · single dedup funnel {
+  icon: ./icons/pagerduty.svg
+}
+
+oncall: On-call · mobile page {
+  shape: person
+}
+
+ci: GitHub Actions CI · migrate + verify
+
+vobs: Vercel Observability · infra metrics {
+  icon: ./icons/vercel.svg
+  style.stroke-dash: 3
+}
+
+vercel.app -> posthog.store: "1 · app logs → OTLP · forceFlush() via after()" {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+inngest -> vercel.heartbeat: 2 · cron ~2m · calls back into /api/inngest {
+  style.stroke-dash: 3
+}
+vercel.heartbeat -> neon.db: 3 · SELECT 1
+vercel.heartbeat -> posthog.store: 4 · heartbeat log on success only {
+  style.stroke-dash: 3
+}
+posthog.alerts -> pagerduty: "5 · alert webhook → Events API v2 (heartbeat stops ⇒ page)" {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+ci -> pagerduty: 6 · CI failure · curl Events API v2
+pagerduty -> oncall: 7 · page (independent of app uptime)
+vercel.app -> vobs: infra metrics kept on Vercel {
+  style.stroke-dash: 3
+}

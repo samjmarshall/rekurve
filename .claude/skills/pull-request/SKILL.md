@@ -103,4 +103,5 @@ effort: high
 ## Notes
 
 - **Portable:** templates live in `templates/` next to this file. Drop the skill into any repo and it works — no `.github/` or `docs/` setup required.
-- Use the **writing-clearly-and-concisely** skill when filling prose sections.
+- Use the skill writing-clearly-and-concisely when filling prose sections.
+- Be extremely concise and sacrifice grammar for the sake of concision.

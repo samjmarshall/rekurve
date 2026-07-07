@@ -61,4 +61,5 @@ The type describes the **category** of change, not what the change does. The sco
 
 - Group related changes together
 - Keep commits focused and atomic when possible
-- Use skill writing-clearly-and-concisely is available to help draft messages
+- Use the skill writing-clearly-and-concisely when filling prose sections.
+- Be extremely concise and sacrifice grammar for the sake of concision.

@@ -1,8 +1,8 @@
 # Plain-language rules for feature docs
 
-Two reading zones, Strunk on top, caveman-extracted compression on the bottom, and a replaceable-pattern checklist you can self-verify against.
+Two reading zones, Strunk on top, compression on the bottom, and a replaceable-pattern checklist you can self-verify against.
 
-The rules below are **output rules for the doc** — do not invoke `/caveman` (that toggles a chat mode) or rely on `/writing-clearly-and-concisely` to do all the work. Apply them as you draft, then call the writing skill at the end for a final pass.
+The rules below are **output rules for the doc** — Apply them as you draft, then call the writing-clearly-and-concisely skill at the end for a final pass.
 
 ---
 
@@ -55,7 +55,7 @@ Cited from `writing-clearly-and-concisely/SKILL.md`. The four below are the load
 
 ---
 
-## 3. Compression rules (extracted from caveman; do not invoke /caveman)
+## 3. Compression rules
 
 These apply to *the doc*, not the conversation. Use them after the Strunk pass for a second sweep.
 

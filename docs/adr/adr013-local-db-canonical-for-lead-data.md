@@ -130,3 +130,4 @@ Therefore HubSpot-origin ingest (#259) emits `lead.captured` with `hubspotSync: 
 - Refined by this ADR: [adr008](adr008-nurture-auto-start-is-best-effort.md) — already superseded by [adr010](adr010-inngest-source-of-truth-for-followup-plan.md); the swallow rule no longer has a referent on this surface
 - Parallel decision: [adr010](adr010-inngest-source-of-truth-for-followup-plan.md) — Inngest is canonical for Follow-up plan run state, different domain, same posture
 - Enabled by [adr014](adr014-outbox-pattern-for-inngest-delivery.md) — outbox pattern for at-least-once delivery to Inngest, the reliability layer this ADR sits on
+- Generalized by: [adr019](adr019-system-wide-transactional-outbox-posture.md) — the local-canonical posture this ADR fixed for Leads is extended to all domain state

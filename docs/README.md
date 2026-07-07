@@ -241,6 +241,10 @@ Point-in-time architecture decisions — why we chose X over Y — live in [`doc
 | [015](adr/adr015-upstash-rate-limit-for-otp-send.md) | Upstash rate-limit for OTP-send, email-keyed, via better-auth before-hook |
 | [016](adr/adr016-trpc-ai-procedure-rate-limit.md) | tRPC AI procedure rate limit via `aiProcedure` building block, per-user, fail-open |
 | [017](adr/adr017-atomic-outbox-writes-via-neon-http-batch.md) | Atomic outbox writes via `neon-http` `db.batch()`, rejecting `neon-serverless` interactive-transaction swap |
+| [018](adr/adr018-observability-foundation-posthog-pagerduty.md) | Observability and on-call on existing tools — PostHog + PagerDuty free + a DIY dead-man's-switch |
+| [019](adr/adr019-system-wide-transactional-outbox-posture.md) | Transactional-outbox posture is system-wide: write → deliver → backstop → read; UI never reads the event tape |
+| [020](adr/adr020-domain-oriented-3-tier-server-architecture.md) | Domain-oriented 3-tier server architecture with atomic `commit(writes, outboxEvents)` repository primitive |
+| [021](adr/adr021-per-domain-schema-files.md) | Per-domain Drizzle schema files with a shared bucket and merge barrel |
 
 ## Prerequisites
 

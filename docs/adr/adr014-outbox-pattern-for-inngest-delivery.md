@@ -116,6 +116,12 @@ Treat the outbox as transient: insert, attempt `inngest.send`, delete the row on
 - Bad, because Inngest's DLQ only covers events Inngest has accepted. The publish-side failure mode this ADR exists to close is exactly the case Inngest's DLQ cannot see.
 - Bad, because keeping the row through `processed_at` is what makes the at-least-once contract enforceable; deleting it on success collapses two distinct states ("never published" and "published-and-cleaned-up") into one.
 
+## Consequence update (2026-07-07, #324)
+
+The Option 1 analysis above declares the sweep window "a tunable knob, not a contract." That knob has been turned: the sweep cron now runs **hourly** (`cron: "0 * * * *"` in `src/inngest/functions/outbox/sweep.ts`), not every 30 seconds. The 30-second value survives only as the row-age floor in the sweep's filter (`created_at < now() - interval '30 seconds'`) — exactly the anti-race role this ADR assigned it, protecting the post-commit fast path from a duplicate-delivery race.
+
+The change exercises the license this ADR granted: under real load every event is delivered by the post-commit `inngest.send` and never reaches the sweep, so the hourly cadence trades worst-case backstop latency (~30 s → ~1 h) for fewer scheduled cold-resumes on suspended compute. The at-least-once contract, the row-id idempotency key, and the delivery topology are unchanged. The authoritative statement of the current cadence — and of the system-wide posture this pattern now serves — is [adr019](adr019-system-wide-transactional-outbox-posture.md).
+
 ## Links
 
 - Enables: [adr013](adr013-local-db-canonical-for-lead-data.md) — the canonical-store decision this pattern makes safe
@@ -123,3 +129,4 @@ Treat the outbox as transient: insert, attempt `inngest.send`, delete the row on
 - Atomicity mechanism refined by: [adr017](adr017-atomic-outbox-writes-via-neon-http-batch.md) — `db.batch()` over `neon-http` as the implementation of the "same transaction" requirement
 - Logging/alert destination governed by: [adr018](adr018-observability-foundation-posthog-pagerduty.md)
 - Runbook (TBD): log-based alert rules on the logging backend for stuck outbox rows (`processed_at IS NULL AND attempts > N`) and persistent `inngest.send` failures
+- Generalized by: [adr019](adr019-system-wide-transactional-outbox-posture.md) — system-wide statement of the outbox posture; records the current (hourly) sweep cadence

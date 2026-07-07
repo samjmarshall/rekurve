@@ -1,0 +1,54 @@
+# ADR-019 (chosen) — the outbox posture, system-wide: write → deliver → backstop → read.
+# Canonical state lives in rows; the UI never reads the event tape.
+# House style: `make diagrams` renders the light (--theme 0) + dark (--theme 200) pair, ELK layout.
+direction: right
+
+title: |md
+  **ADR-019 (chosen)** — write → deliver → backstop → read, system-wide
+|
+title.near: top-center
+
+vercel: Vercel serverless {
+  icon: ./icons/vercel.svg
+  writer: tRPC mutation / webhook / worker
+  sweep: cron sweep · hourly backstop
+  ui: dashboard (read model)
+}
+
+txn: "atomic db.batch() → Neon · single BEGIN…COMMIT array-transaction (adr017)" {
+  style.stroke-dash: 3
+  canonical: Neon Postgres · canonical domain rows (leads · message_queue · conversations · lot_matches) {
+    icon: ./icons/neon.svg
+    shape: cylinder
+  }
+  outbox: outbox · processed_at IS NULL = unacked {
+    icon: ./icons/postgres.svg
+    shape: cylinder
+  }
+}
+
+inngest: Inngest {
+  icon: ./icons/inngest.svg
+  workers: durable workers · own live control state · idempotency key = outbox row id
+}
+
+vercel.writer -> txn: "1 · db.batch([canonicalWrites, outboxInserts]) — atomic, one COMMIT" {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+vercel.writer -> inngest.workers: 2 · post-commit inngest.send (best-effort) · stamp processed_at {
+  style.stroke-dash: 3
+}
+vercel.sweep -> txn.outbox: "3 · hourly sweep · processed_at IS NULL AND age > 30s"
+vercel.sweep -> inngest.workers: 4 · re-deliver · row id = idempotency key {
+  style.stroke-dash: 3
+}
+inngest.workers -> txn.canonical: 5 · write output rows (control state stays in Inngest) {
+  style: {
+    animated: true
+    stroke: green
+  }
+}
+vercel.ui -> txn.canonical: 6 · read canonical rows · never the event tape

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { buttonVariants } from "~/components/ui/button-variants";
-import type { LeadCreate } from "~/server/api/schemas/leads";
+import type { LeadCreate } from "~/domain/leads/schemas";
 import { useTRPC } from "~/trpc/react";
 import { leadFormResolver } from "../_lib/schema";
 import { FormNavigation } from "./form-navigation";

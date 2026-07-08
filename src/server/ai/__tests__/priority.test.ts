@@ -1,7 +1,6 @@
 import { describe, expect, test } from "@rstest/core";
-
+import { makeLead } from "~/server/leads/__tests__/fixtures";
 import { computePriority, isOverdue } from "../priority";
-import { makeLead } from "./fixtures";
 
 const NOW = new Date("2026-04-13T00:00:00Z");
 

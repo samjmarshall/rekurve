@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ScoreMetadata } from "~/server/scoring";
+import type { ScoreMetadata } from "~/domain/scoring";
 
 // Enum schemas — mirror values from src/server/leads/leads.schema.ts
 export const propertyTypeSchema = z.enum([

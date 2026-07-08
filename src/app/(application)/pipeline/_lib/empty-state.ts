@@ -1,4 +1,4 @@
-import type { PipelineFilters } from "~/server/api/schemas/leads";
+import type { PipelineFilters } from "~/domain/leads/schemas";
 import { type LeadStage, STAGE_ORDER } from "./stage-meta";
 
 interface EmptyStateInput {

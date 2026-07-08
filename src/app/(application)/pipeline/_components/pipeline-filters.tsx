@@ -13,7 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "~/components/ui/select";
-import type { constructionTimelineSchema } from "~/server/api/schemas/leads";
+import type { constructionTimelineSchema } from "~/domain/leads/schemas";
 import {
   buildPipelineSearchParams,
   parseFiltersFromSearchParams,

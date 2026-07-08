@@ -41,9 +41,9 @@ related-prs: [125]
 - `src/app/(application)/leads/[id]/_components/conversation-history.tsx` — Epic-3 placeholder
 - `src/app/(application)/leads/[id]/_lib/display.ts` — pure helpers: `stageLabel`, `stageTone`, `stageRingClasses`, `factorLabel`, `impactTone`, enum formatters, `formatDate`, `formatLastContacted`
 - `src/app/(application)/leads/[id]/_lib/__tests__/display.test.ts` — unit tests for the helpers
-- `src/server/api/routers/leads.ts:30-62` — `scoreLead()` helper (synchronous re-score + HubSpot push)
-- `src/server/api/routers/leads.ts:154-164` — `getById` procedure
-- `src/server/api/routers/leads.ts:221-289` — `update` procedure (re-scores when `SCORING_FIELDS` change)
+- `src/server/leads/leads.decide.ts:160-201` — `decideUpdateLead()` (synchronous re-score; HubSpot push moved to the `lead-hubspot-sync` Inngest fanout)
+- `src/server/leads/leads.router.ts:25-33` — `getById` procedure
+- `src/server/leads/leads.router.ts:39-44` — `update` procedure (re-scores when `SCORING_FIELDS` change)
 - `e2e/pages/sections/lead-profile.section.ts` — Playwright section object
 - `e2e/features/lead-profile.spec.ts` — five end-to-end tests covering read, score breakdown, next-question targeting, and edit-in-place
 
@@ -71,7 +71,7 @@ related-prs: [125]
 
 ### Operations
 
-**Health signals**: *No PostHog events or structured logs from this feature today — open gap.* The one logged path is `[scoring] HubSpot sync failed for lead {id}` from `scoreLead()` (`src/server/api/routers/leads.ts:57`), which fires on HubSpot score/stage push failures; the mutation response still ships. E2E tests are the de-facto health check.
+**Health signals**: *No PostHog events or structured logs from this feature today — open gap.* HubSpot score/stage push failures now surface as failed `lead-hubspot-sync` Inngest runs (`src/inngest/functions/leads/lead-fanout.ts`), not a console line; the mutation response still ships. E2E tests are the de-facto health check.
 
 **Alerts**: none. A regression surfaces as a broken `/leads/[id]` page, not a page.
 

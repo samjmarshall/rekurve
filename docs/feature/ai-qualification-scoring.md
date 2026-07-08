@@ -31,13 +31,13 @@ related-prs: [122]
 ## Design
 
 **Lives in**:
-- `src/server/scoring/score-factors.ts` — six pure-TS scoring functions (`scoreLand`, `scoreFinance`, `scoreTimeline`, `scoreBudget`, `scorePropertyType`, `scoreEngagement`), `parseBudgetAmount`, `detectGaps`, `pickNextQuestion`
-- `src/server/scoring/qualify-and-score.ts` — `qualifyAndScore()` orchestrator + `deriveStage()` (0-25 unqualified · 26-50 nurture · 51-75 warm · 76-100 hot)
-- `src/server/scoring/score-schemas.ts` — Zod `scoreResultSchema`, `ScoreResult`, `ScoreMetadata` (= `ScoreResult & { scoredAt: string }`)
-- `src/server/scoring/index.ts` — barrel export
-- `src/server/scoring/__tests__/{score-factors,qualify-and-score,schema}.test.ts` — direct input/output tests, no mocking
-- `src/server/api/routers/leads.ts:30-62` — `scoreLead()` orchestrator: persists `leadScore`/`leadStage`/`scoreMetadata`, fire-and-log HubSpot push
-- `src/server/api/routers/leads.ts:65-78` — `SCORING_FIELDS` set (12 keys) gates re-scoring on update
+- `src/domain/scoring/score-factors.ts` — six pure-TS scoring functions (`scoreLand`, `scoreFinance`, `scoreTimeline`, `scoreBudget`, `scorePropertyType`, `scoreEngagement`), `parseBudgetAmount`, `detectGaps`, `pickNextQuestion`
+- `src/domain/scoring/qualify-and-score.ts` — `qualifyAndScore()` orchestrator + `deriveStage()` (0-25 unqualified · 26-50 nurture · 51-75 warm · 76-100 hot)
+- `src/domain/scoring/score-schemas.ts` — Zod `scoreResultSchema`, `ScoreResult`, `ScoreMetadata` (= `ScoreResult & { scoredAt: string }`)
+- `src/domain/scoring/index.ts` — barrel export
+- `src/domain/scoring/__tests__/{score-factors,qualify-and-score,schema}.test.ts` — direct input/output tests, no mocking
+- `src/server/leads/leads.decide.ts:70-109,160-201` — `decideCaptureLead()`/`decideUpdateLead()`: compute `leadScore`/`leadStage`/`scoreMetadata` via `qualifyAndScore()` (HubSpot push moved to the `lead-hubspot-sync` Inngest fanout)
+- `src/server/leads/leads.decide.ts:42-55` — `SCORING_FIELDS` set (12 keys) gates re-scoring on update
 - `src/server/leads/leads.schema.ts:84-86` — `lead_score int default 0`, `lead_stage enum default 'unqualified'`, `score_metadata jsonb`
 - `drizzle/0001_boring_giant_man.sql` — adds the `score_metadata` column
 - `src/server/hubspot/properties.ts:23-24,77` — maps `leadScore` (integer) and `leadStage` to HubSpot contact properties

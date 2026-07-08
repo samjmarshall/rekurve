@@ -1,42 +1,29 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 import { TRPCError } from "@trpc/server";
-import type { createCaller } from "../root";
 
-type Caller = ReturnType<typeof createCaller>;
+import { makeLead } from "./fixtures";
 
-const mockLead = {
+// Router tests: createCaller over makeLeadsRouter({ service }) — the real
+// router + service + repository run over an injected fake db object literal
+// (no rs.doMock of the leads seams); create/update swap in service fakes to
+// assert delegation. rs.doMock survives only for the tRPC context deps
+// (~/env, ~/lib/session, ~/server/db) that trpc.ts imports at module scope.
+// Envelope/bucketing math lives in leads.service.test.ts — here we assert the
+// transport seam: input validation, auth, delegation, domain-error mapping.
+
+const mockLead = makeLead({
   id: "550e8400-e29b-41d4-a716-446655440000",
-  hubspotContactId: null,
   firstName: "John",
   lastName: "Smith",
   email: "john@example.com",
   phone: "0412345678",
-  preferredContactTime: null,
   hasLand: true,
-  landRegistered: null,
-  landAddress: null,
-  landSizeSqm: null,
-  landWidth: null,
-  landDepth: null,
-  propertyType: "first_home_buyer" as const,
-  budget: null,
-  seenBroker: null,
-  constructionTimeline: null,
-  leadScore: 0,
-  leadStage: "unqualified" as const,
-  preferredEstates: null,
-  preferredSuburbs: null,
-  leadSource: null,
-  referrerName: null,
-  notes: null,
-  resolveFinanceOptedIn: false,
-  scoreMetadata: null,
-  createdAt: new Date("2026-01-01"),
-  updatedAt: new Date("2026-01-01"),
-  lastContactedAt: null,
-};
+  propertyType: "first_home_buyer",
+});
 
 let mockDb: Record<string, unknown>;
+let mockCaptureLead: ReturnType<typeof rs.fn>;
+let mockUpdateLead: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
@@ -71,28 +58,48 @@ beforeEach(() => {
 
   rs.doMock("~/server/db", () => ({ db: mockDb }));
 
-  // The router now delegates create/update to the intake module
-  rs.doMock("~/server/leads/intake", () => ({
-    captureLead: rs.fn().mockResolvedValue(mockLead),
-    updateLead: rs.fn().mockResolvedValue(mockLead),
-  }));
+  mockCaptureLead = rs.fn().mockResolvedValue(mockLead);
+  mockUpdateLead = rs.fn().mockResolvedValue(mockLead);
 });
 
-async function getCaller(): Promise<Caller> {
-  const { createCaller } = await import("../root");
-  const { createTRPCContext } = await import("../trpc");
+async function getCaller() {
+  const { makeLeadsRepository } = await import(
+    "~/server/leads/leads.repository"
+  );
+  const { makeLeadsService } = await import("~/server/leads/leads.service");
+  const { makeLeadsRouter } = await import("~/server/leads/leads.router");
+  const { createCallerFactory, createTRPCContext } = await import(
+    "~/server/api/trpc"
+  );
+
+  const repo = makeLeadsRepository({
+    db: mockDb as never,
+    // Fake batch: resolve the (already-thenable, mock-built) statements in
+    // place so `.returning()` rows flow back positionally like db.batch.
+    commitWithOutbox: rs.fn((stmts: readonly unknown[]) =>
+      Promise.all(stmts as Promise<unknown>[]),
+    ) as never,
+  });
+  // Real service over the fake db for reads; create/update swap in fakes so
+  // delegation (and only delegation) is asserted at the router seam.
+  const service = {
+    ...makeLeadsService({ repo }),
+    captureLead: mockCaptureLead,
+    updateLead: mockUpdateLead,
+  };
+  const router = makeLeadsRouter({ service: service as never });
   const ctx = await createTRPCContext({ headers: new Headers() });
-  return createCaller(ctx);
+  return createCallerFactory(router)(ctx);
 }
 
-// --- leads.create ---
+// --- create ---
 
 describe("leads.create", () => {
   test("rejects invalid input", async () => {
     const caller = await getCaller();
     try {
       // @ts-expect-error — intentionally invalid input
-      await caller.leads.create({ firstName: "" });
+      await caller.create({ firstName: "" });
       expect.unreachable("Should have thrown");
     } catch (e) {
       expect(e).toBeInstanceOf(TRPCError);
@@ -106,7 +113,7 @@ describe("leads.create", () => {
     }));
     const caller = await getCaller();
     try {
-      await caller.leads.create({ firstName: "John", lastName: "Smith" });
+      await caller.create({ firstName: "John", lastName: "Smith" });
       expect.unreachable("Should have thrown");
     } catch (e) {
       expect(e).toBeInstanceOf(TRPCError);
@@ -114,11 +121,10 @@ describe("leads.create", () => {
     }
   });
 
-  test("delegates to captureLead and returns its result", async () => {
-    const { captureLead } = await import("~/server/leads/intake");
+  test("delegates to service.captureLead and returns its result", async () => {
     const caller = await getCaller();
 
-    const result = await caller.leads.create({
+    const result = await caller.create({
       firstName: "John",
       lastName: "Smith",
       email: "john@example.com",
@@ -127,9 +133,8 @@ describe("leads.create", () => {
       propertyType: "first_home_buyer",
     });
 
-    expect(captureLead).toHaveBeenCalledOnce();
-    expect(captureLead).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockCaptureLead).toHaveBeenCalledOnce();
+    expect(mockCaptureLead).toHaveBeenCalledWith(
       expect.objectContaining({ firstName: "John", lastName: "Smith" }),
       expect.objectContaining({ userId: "test-user-id" }),
     );
@@ -137,13 +142,13 @@ describe("leads.create", () => {
   });
 });
 
-// --- leads.update ---
+// --- update ---
 
 describe("leads.update", () => {
   test("rejects invalid uuid", async () => {
     const caller = await getCaller();
     try {
-      await caller.leads.update({ id: "not-a-uuid", firstName: "Test" });
+      await caller.update({ id: "not-a-uuid", firstName: "Test" });
       expect.unreachable("Should have thrown");
     } catch (e) {
       expect(e).toBeInstanceOf(TRPCError);
@@ -151,27 +156,43 @@ describe("leads.update", () => {
     }
   });
 
-  test("delegates to updateLead and returns its result", async () => {
-    const { updateLead } = await import("~/server/leads/intake");
+  test("delegates to service.updateLead and returns its result", async () => {
     const caller = await getCaller();
 
-    const result = await caller.leads.update({
+    const result = await caller.update({
       id: mockLead.id,
       budget: "$700K",
     });
 
-    expect(updateLead).toHaveBeenCalledOnce();
-    expect(updateLead).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockUpdateLead).toHaveBeenCalledOnce();
+    expect(mockUpdateLead).toHaveBeenCalledWith(
       mockLead.id,
       expect.objectContaining({ budget: "$700K" }),
       expect.objectContaining({ userId: "test-user-id" }),
     );
     expect(result).toEqual(mockLead);
   });
+
+  test("maps LeadNotFoundError to TRPCError NOT_FOUND / 'Lead not found'", async () => {
+    const caller = await getCaller();
+    // Same-registry import (post-resetModules) so the router's instanceof
+    // check sees the same class the fake throws.
+    const { LeadNotFoundError } = await import("~/server/leads/leads.errors");
+    mockUpdateLead.mockRejectedValue(new LeadNotFoundError(mockLead.id));
+
+    try {
+      await caller.update({ id: mockLead.id, notes: "ghost" });
+      expect.unreachable("Should have thrown");
+    } catch (e) {
+      expect(e).toBeInstanceOf(TRPCError);
+      // Byte-stable transport contract: code + message pinned exactly.
+      expect((e as TRPCError).code).toBe("NOT_FOUND");
+      expect((e as TRPCError).message).toBe("Lead not found");
+    }
+  });
 });
 
-// --- leads.getById ---
+// --- getById ---
 
 describe("leads.getById", () => {
   test("returns a lead when found", async () => {
@@ -180,7 +201,7 @@ describe("leads.getById", () => {
     ).leads.findFirst.mockResolvedValue(mockLead);
 
     const caller = await getCaller();
-    const result = await caller.leads.getById({ id: mockLead.id });
+    const result = await caller.getById({ id: mockLead.id });
 
     expect(result.id).toBe(mockLead.id);
     expect(result.firstName).toBe("John");
@@ -194,21 +215,22 @@ describe("leads.getById", () => {
     const caller = await getCaller();
 
     try {
-      await caller.leads.getById({
+      await caller.getById({
         id: "00000000-0000-0000-0000-000000000000",
       });
       expect.unreachable("Should have thrown");
     } catch (e) {
       expect(e).toBeInstanceOf(TRPCError);
       expect((e as TRPCError).code).toBe("NOT_FOUND");
+      expect((e as TRPCError).message).toBe("Lead not found");
     }
   });
 });
 
-// --- leads.list ---
+// --- list ---
 
 describe("leads.list", () => {
-  test("returns paginated results with defaults", async () => {
+  test("returns the pagination envelope with schema defaults applied", async () => {
     (
       mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
     ).leads.findMany.mockResolvedValue([mockLead]);
@@ -221,33 +243,15 @@ describe("leads.list", () => {
     });
 
     const caller = await getCaller();
-    const result = await caller.leads.list({});
+    const result = await caller.list({});
 
     expect(result.items).toHaveLength(1);
-    expect(result.pagination.page).toBe(1);
-    expect(result.pagination.limit).toBe(20);
-    expect(result.pagination.total).toBe(1);
-    expect(result.pagination.totalPages).toBe(1);
-  });
-
-  test("returns empty results", async () => {
-    (
-      mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
-    ).leads.findMany.mockResolvedValue([]);
-
-    const mockFrom = rs.fn().mockReturnValue({
-      where: rs.fn().mockResolvedValue([{ count: 0 }]),
+    expect(result.pagination).toEqual({
+      page: 1,
+      limit: 20,
+      total: 1,
+      totalPages: 1,
     });
-    (mockDb.select as ReturnType<typeof rs.fn>).mockReturnValue({
-      from: mockFrom,
-    });
-
-    const caller = await getCaller();
-    const result = await caller.leads.list({});
-
-    expect(result.items).toHaveLength(0);
-    expect(result.pagination.total).toBe(0);
-    expect(result.pagination.totalPages).toBe(0);
   });
 
   test("accepts filter parameters", async () => {
@@ -263,7 +267,7 @@ describe("leads.list", () => {
     });
 
     const caller = await getCaller();
-    const result = await caller.leads.list({
+    const result = await caller.list({
       stage: "hot",
       page: 2,
       limit: 10,
@@ -276,16 +280,16 @@ describe("leads.list", () => {
   });
 });
 
-// --- leads.delete ---
+// --- delete ---
 
 describe("leads.delete", () => {
-  test("deletes a lead successfully", async () => {
+  test("deletes a lead successfully (through the commit write door)", async () => {
     const returning = rs.fn().mockResolvedValue([{ id: mockLead.id }]);
     const where = rs.fn().mockReturnValue({ returning });
     (mockDb.delete as ReturnType<typeof rs.fn>).mockReturnValue({ where });
 
     const caller = await getCaller();
-    const result = await caller.leads.delete({ id: mockLead.id });
+    const result = await caller.delete({ id: mockLead.id });
 
     expect(result.id).toBe(mockLead.id);
   });
@@ -298,54 +302,38 @@ describe("leads.delete", () => {
     const caller = await getCaller();
 
     try {
-      await caller.leads.delete({
+      await caller.delete({
         id: "00000000-0000-0000-0000-000000000000",
       });
       expect.unreachable("Should have thrown");
     } catch (e) {
       expect(e).toBeInstanceOf(TRPCError);
       expect((e as TRPCError).code).toBe("NOT_FOUND");
+      expect((e as TRPCError).message).toBe("Lead not found");
     }
   });
 });
 
-// --- leads.getByStage ---
+// --- getByStage ---
 
 describe("leads.getByStage", () => {
-  test("groups leads into stage buckets", async () => {
-    const leadsData = [
-      { ...mockLead, id: "1", leadStage: "unqualified" as const },
-      { ...mockLead, id: "2", leadStage: "warm" as const },
-      { ...mockLead, id: "3", leadStage: "hot" as const },
-      { ...mockLead, id: "4", leadStage: "nurture" as const },
-      { ...mockLead, id: "5", leadStage: "hot" as const },
-    ];
-
+  test("returns the four stage lanes (bucketing math pinned in service tests)", async () => {
     (
       mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
-    ).leads.findMany.mockResolvedValue(leadsData);
+    ).leads.findMany.mockResolvedValue([
+      { ...mockLead, id: "1", leadStage: "hot" as const },
+    ]);
 
     const caller = await getCaller();
-    const result = await caller.leads.getByStage();
+    const result = await caller.getByStage();
 
-    expect(result.unqualified).toHaveLength(1);
-    expect(result.nurture).toHaveLength(1);
-    expect(result.warm).toHaveLength(1);
-    expect(result.hot).toHaveLength(2);
-  });
-
-  test("returns empty buckets when no leads exist", async () => {
-    (
-      mockDb.query as { leads: { findMany: ReturnType<typeof rs.fn> } }
-    ).leads.findMany.mockResolvedValue([]);
-
-    const caller = await getCaller();
-    const result = await caller.leads.getByStage();
-
-    expect(result.unqualified).toHaveLength(0);
-    expect(result.nurture).toHaveLength(0);
-    expect(result.warm).toHaveLength(0);
-    expect(result.hot).toHaveLength(0);
+    expect(Object.keys(result).sort()).toEqual([
+      "hot",
+      "nurture",
+      "unqualified",
+      "warm",
+    ]);
+    expect(result.hot).toHaveLength(1);
   });
 
   test("runs an unfiltered query when input is undefined", async () => {
@@ -355,7 +343,7 @@ describe("leads.getByStage", () => {
     findMany.mockResolvedValue([]);
 
     const caller = await getCaller();
-    await caller.leads.getByStage();
+    await caller.getByStage();
 
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: undefined }),
@@ -369,7 +357,7 @@ describe("leads.getByStage", () => {
     findMany.mockResolvedValue([]);
 
     const caller = await getCaller();
-    await caller.leads.getByStage({ fhogEligible: true });
+    await caller.getByStage({ fhogEligible: true });
 
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.anything() }),
@@ -383,7 +371,7 @@ describe("leads.getByStage", () => {
     findMany.mockResolvedValue([]);
 
     const caller = await getCaller();
-    await caller.leads.getByStage({ constructionTimeline: "ready_now" });
+    await caller.getByStage({ constructionTimeline: "ready_now" });
 
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.anything() }),
@@ -397,7 +385,7 @@ describe("leads.getByStage", () => {
     findMany.mockResolvedValue([]);
 
     const caller = await getCaller();
-    await caller.leads.getByStage({ preferredEstate: "Springfield Rise" });
+    await caller.getByStage({ preferredEstate: "Springfield Rise" });
 
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.anything() }),

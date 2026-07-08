@@ -49,11 +49,14 @@ let registry: Record<
 let functions: IntrospectedFn[];
 
 beforeAll(async () => {
-  // ~/env and ~/server/db are the load-bearing mocks: the workers value-import
-  // ~/server/db, whose module-scope neon() needs a real DATABASE_URL, and
-  // ~/env validates at import outside SKIP_ENV_VALIDATION. Everything else is
-  // import-safe — "server-only" markers resolve to the rstest alias stub and
-  // the schema barrel's drizzle pgTable defs are side-effect-free.
+  // ~/env and ~/server/db are the load-bearing mocks: the workers
+  // value-import ~/server/db, whose module-scope neon() needs a real
+  // DATABASE_URL; and ~/env validates at import outside SKIP_ENV_VALIDATION.
+  // Everything else is import-safe — leads.module no longer constructs the
+  // tRPC router (root.ts wires the adapter), so the workers' graph never
+  // reaches ~/server/api/trpc / ~/lib/auth; "server-only" markers resolve to
+  // the rstest alias stub and the schema barrel's drizzle pgTable defs are
+  // side-effect-free.
   rs.doMock("~/env", () => ({ env: {} }));
   rs.doMock("~/server/db", () => ({ db: {} }));
 
@@ -206,12 +209,13 @@ describe("Inngest registry — golden contract", () => {
 // required. If a case fails, fix the drift at the emit site or schema — never
 // by loosening the payload below.
 const EMIT_SITE_PAYLOADS: Record<EventName, Record<string, unknown>> = {
-  // intake.ts captureLeadFromHubspot — hubspotSync: false suppresses the echo
-  // sync on HubSpot-origin ingest (captureLead omits the flag entirely).
+  // leads.decide.ts decideCaptureFromHubspot — hubspotSync: false suppresses
+  // the echo sync on HubSpot-origin ingest (decideCaptureLead omits the flag
+  // entirely).
   "lead.captured": { leadId: "lead-1", userId: "user-1", hubspotSync: false },
-  // intake.ts updateLead
+  // leads.decide.ts decideUpdateLead
   "lead.updated": { leadId: "lead-1", userId: "user-1" },
-  // intake.ts buildStageChangedEvent — fromStage null on first capture
+  // leads.decide.ts stageChangedEvent — fromStage null on first capture
   "lead.stage-changed": {
     leadId: "lead-1",
     userId: "user-1",

@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { inngest } from "~/inngest/client";
 import { db } from "~/server/db";
-import { conversations, leads, messageQueue } from "~/server/db/schema";
-import { resolveLeadOwnerUserId } from "~/server/leads/owner";
+import { conversations, messageQueue } from "~/server/db/schema";
+import { leadsModule } from "~/server/leads/leads.module";
 import { sendEmail } from "~/server/ms-graph";
 import { HUBSPOT_EMAIL_EVENTS, MESSAGE_EVENTS } from "~/server/outbox";
 
@@ -63,11 +63,8 @@ export async function runDispatchEmail(
   // double-send window (death after Graph 202, before the step returns) is
   // bounded by the sentAt/dispatchingAt guards.
   await step.run("send-via-graph", async () => {
-    const userId = await resolveLeadOwnerUserId(db);
-    const lead = await db.query.leads.findFirst({
-      where: eq(leads.id, leadId),
-      columns: { email: true },
-    });
+    const userId = await leadsModule.service.resolveOwnerUserId();
+    const lead = await leadsModule.service.getLeadContact(leadId);
     if (!lead?.email) {
       throw new Error(`dispatch-email: lead ${leadId} has no email`);
     }

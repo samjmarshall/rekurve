@@ -39,7 +39,7 @@ related-prs: [121]
 - `src/app/(application)/layout.tsx` — mounts `<ToastProvider>` once for every route in the route group
 - `src/app/(application)/dashboard/page.tsx` — renders `<QuickCaptureButton />` alongside the action queue
 - `src/lib/phone.ts` — shared `AU_MOBILE_REGEX` + `isValidAuMobile` (extracted from the full enquiry form)
-- `src/server/api/routers/leads.ts` — `leads.create` mutation; this form reuses it as-is
+- `src/server/leads/leads.router.ts` — `leads.create` mutation; this form reuses it as-is
 - `e2e/pages/sections/quick-capture.section.ts` — Playwright page-object section
 - `e2e/features/leads-crud.spec.ts:126-179` — happy-path + phone-validation specs
 

@@ -39,7 +39,7 @@ related-prs: [147]
 - `src/app/api/cron/nurture-scheduler/route.ts` — `GET` handler. Bearer auth against `env.CRON_SECRET`, calls `runSchedulerTick(db, resolveDraftFn(request))`, returns `{ drafted, failed }`
 - `src/app/api/dev/nurture/advance/route.ts` — `POST { sequenceId }`. Backdates `nextStepAt` by 60s. Returns 404 in production
 - `src/server/ai/stub.ts` — `resolveDraftFn(req)`. When `x-ai-stub: 1` is set, returns a deterministic draft fn that re-uses real `selectChannel` and `computePriority` and prefixes `body`/`aiReasoning` with `[ai-stub]`
-- `src/server/api/routers/leads.ts:142` (create) and `:270` (update on qualification change) — auto-start hook points; both wrap `startOrUpdateSequence` in `.catch(console.error)`
+- `src/server/leads/leads.decide.ts:70-109` (create) and `:160-201` (update on qualification change) — auto-start hook points; both wrap `startOrUpdateSequence` in `.catch(console.error)`
 - `vercel.json` — root config: `{ crons: [{ path: "/api/cron/nurture-scheduler", schedule: "0 0 * * *" }] }`
 - `e2e/features/nurture-scheduler.spec.ts` — three serial-mode tests: auto-start (migration gate), cron drafts a pending message, action queue renders the draft
 - `e2e/utils/nurture-helper.ts` — Neon client: `seedActiveSequence`, `getActiveSequenceByLead`, `getPendingMessagesByLead`, `waitForPendingMessage`, `cleanupSequences`, `cronRequestContext`

@@ -15,7 +15,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import type { ScoreMetadata } from "~/server/scoring";
+import type { ScoreMetadata } from "~/domain/scoring";
 
 export const preferredContactTimeEnum = pgEnum("preferred_contact_time", [
   "weekdays",
@@ -113,3 +113,9 @@ export const leads = pgTable(
     index("leads_lead_stage_idx").on(table.leadStage),
   ],
 );
+
+// Canonical row/insert types for the leads table — every tier (decide,
+// repository, service, ai draft schemas) imports these; never re-derive
+// `$inferSelect` elsewhere.
+export type LeadRow = typeof leads.$inferSelect;
+export type LeadInsert = typeof leads.$inferInsert;

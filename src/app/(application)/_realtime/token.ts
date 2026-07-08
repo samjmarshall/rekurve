@@ -16,9 +16,11 @@
 // fully serialisable, and complete enough for useRealtime to subscribe.
 import { getSubscriptionToken } from "inngest/realtime";
 
-import { userChannel } from "~/inngest/channels";
 import { inngest } from "~/inngest/client";
 import { getSession } from "~/lib/session";
+// Channel definition only — not the composition root, which would drag the
+// db/outbox wiring into this server action.
+import { userChannel } from "~/server/leads/leads.channels";
 
 export async function fetchLeadSubscriptionToken() {
   const session = await getSession();

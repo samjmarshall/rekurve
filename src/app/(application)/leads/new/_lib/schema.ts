@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Resolver } from "react-hook-form";
+import { type LeadCreate, leadCreateSchema } from "~/domain/leads/schemas";
 import { isValidAuMobile } from "~/lib/phone";
-import { type LeadCreate, leadCreateSchema } from "~/server/api/schemas/leads";
 
 export { isValidAuMobile };
 

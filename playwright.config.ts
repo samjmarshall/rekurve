@@ -32,12 +32,14 @@ export default defineConfig({
     permissions: [],
     geolocation: undefined,
 
-    // Bypass Vercel Deployment Protection for automated tests
+    // Bypass Vercel Deployment Protection for automated tests. Do NOT add
+    // x-vercel-set-bypass-cookie: its 307 + _vercel_jwt cookie makes
+    // APIRequestContext POSTs carry a cookie without an Origin header, which
+    // better-auth's CSRF check rejects with 403 MISSING_OR_NULL_ORIGIN.
     extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
       ? {
           "x-vercel-protection-bypass":
             process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
-          "x-vercel-set-bypass-cookie": "true",
         }
       : {},
   },

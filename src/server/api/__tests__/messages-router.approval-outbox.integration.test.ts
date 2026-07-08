@@ -32,7 +32,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
         .where(inArray(schema.messageQueue.id, [messageId]));
       await db.delete(schema.leads).where(inArray(schema.leads.id, [leadId]));
       // ms_graph_tokens cascades on user delete
-      const { user } = await import("~/server/db/schema/auth");
+      const { user } = await import("~/server/db/schema");
       await db.delete(user).where(inArray(user.id, [userId]));
     });
 
@@ -55,7 +55,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
       const { db } = await import("~/server/db");
       const schema = await import("~/server/db/schema");
-      const { user } = await import("~/server/db/schema/auth");
+      const { user } = await import("~/server/db/schema");
       const { createCaller } = await import("../root");
       const { createTRPCContext } = await import("../trpc");
 

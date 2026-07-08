@@ -37,7 +37,7 @@ related-prs: [104, 106, 107, 120]
 - `src/app/(login)/login/page.tsx` — two-step UI: email form → 6-digit `InputOTP`
 - `src/app/(login)/layout.tsx` — redirects authed users to `/dashboard`, sets `noindex`
 - `src/app/(application)/layout.tsx` — redirects unauthed users to `/login`
-- `src/server/db/schema/auth.ts` — 4 tables: `user`, `session`, `account`, `verification`
+- `src/server/db/shared.schema.ts` — 4 tables: `user`, `session`, `account`, `verification`
 - `src/lib/posthog.ts` — `authTracking.identify` and `authTracking.loginSuccess`
 
 **Choice made**: better-auth + `emailOTP` plugin, Drizzle adapter on Neon Postgres, Resend for OTP delivery, layout-level session checks in each route group.

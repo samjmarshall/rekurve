@@ -3,13 +3,16 @@ import { inngest } from "~/inngest/client";
 import { resolveWorkerDraftFn } from "~/server/ai/stub";
 import { db } from "~/server/db";
 import { leads, messageQueue } from "~/server/db/schema";
+import type { EventName } from "~/server/inngest/events";
 import { rhythmForStage } from "~/server/nurture/rhythm";
 import { OUTBOX_EVENTS } from "~/server/outbox";
 
+// `satisfies` pins each name to an EVENT_REGISTRY key (adr019 clause 7) —
+// type-only, so no runtime dep on the registry module.
 export const NURTURE_EVENTS = {
   FOLLOWUP_DRAFTED: "nurture.followup-message-drafted",
   PLAN_PAUSED: "nurture.plan-paused",
-} as const;
+} as const satisfies Record<string, EventName>;
 
 type Step = {
   // biome-ignore lint/suspicious/noExplicitAny: Inngest serialises step results via JSON (Jsonify<T> ≠ T)

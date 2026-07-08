@@ -12,7 +12,7 @@ import {
   normalizeEmail,
 } from "~/lib/rate-limit";
 import { db } from "~/server/db";
-import * as authSchema from "~/server/db/schema/auth";
+import * as authSchema from "~/server/db/shared.schema";
 
 const resend = new Resend(env.RESEND_API_KEY);
 

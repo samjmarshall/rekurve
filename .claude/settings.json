@@ -3,13 +3,15 @@
   "tui": "default",
   "enableAllProjectMcpServers": false,
   "enabledMcpjsonServers": [
-    "shadcn",
+    "chrome-devtools",
     "playwright",
     "playwright-2",
     "playwright-3",
-    "playwright-4"
+    "playwright-4",
+    "posthog",
+    "shadcn",
+    "vercel"
   ],
-  "disabledMcpjsonServers": ["chrome-devtools"],
   "env": {
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
     "CLAUDE_CODE_DISABLE_MOUSE": "1",
@@ -72,7 +74,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/biome-format.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/biome-check.sh"
           },
           {
             "type": "command",

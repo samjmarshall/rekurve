@@ -1,7 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const baseURL = process.env.VERCEL_URL ?? "http://localhost:3000";
 const isCI = process.env.CI === "true";
+// Honor VERCEL_URL only in CI (post-deploy sets the preview URL there). Locally
+// a stray VERCEL_URL in .env would send the browsers to production while the
+// webServer health-check stays green on localhost.
+const baseURL =
+  isCI && process.env.VERCEL_URL
+    ? process.env.VERCEL_URL
+    : "http://localhost:3000";
 
 export default defineConfig({
   testDir: "./e2e",

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@rstest/core";
-import { scoreResultSchema } from "../schema";
+import { scoreResultSchema } from "../score-schemas";
 
 const validResult = {
   score: 62,

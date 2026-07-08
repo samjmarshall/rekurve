@@ -1,3 +1,5 @@
+import "server-only";
+
 import { isNull } from "drizzle-orm";
 import {
   index,

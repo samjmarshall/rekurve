@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Enum schemas — mirror values from src/server/db/schema/enums.ts
+// Enum schemas — mirror values from src/server/messaging/messaging.schema.ts
 export const channelSchema = z.enum(["sms", "email"]);
 
 export const messageStatusSchema = z.enum([

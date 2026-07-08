@@ -21,7 +21,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)("outboxSweep integration", () => {
     }));
 
     const { db } = await import("~/server/db");
-    const { outbox } = await import("~/server/db/schema/outbox");
+    const { outbox } = await import("~/server/outbox/outbox.schema");
     const { runSweep } = await import("../sweep");
 
     // Insert 3 rows aged > 30 s by backdating created_at
@@ -57,7 +57,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)("outboxSweep integration", () => {
 
   afterAll(async () => {
     const { db } = await import("~/server/db");
-    const { outbox } = await import("~/server/db/schema/outbox");
+    const { outbox } = await import("~/server/outbox/outbox.schema");
     await db.delete(outbox).where(eq(outbox.eventName, TEST_EVENT));
   });
 });

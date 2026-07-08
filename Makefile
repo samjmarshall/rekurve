@@ -1,12 +1,8 @@
+SHELL := /bin/bash -euo pipefail
+
 # `server-only` throws at import unless the `react-server` export condition is set.
-# `next build` sets it itself; `tsx`/`drizzle-kit` get it baked into their
-# package.json scripts (db:*, seed:dev, smoke:draft). Exception: db:migrate —
-# `drizzle-kit migrate` reads only the SQL files + journal in `drizzle/` and
-# never loads `*.schema.ts`, so it deliberately has no NODE_OPTIONS prefix.
-# Do NOT export it here
-# globally: rstest would then resolve react's react-server build (no
-# createContext) and break component tests — tests stub `server-only` via a
-# resolve.alias in rstest.config.ts instead.
+# `next build` sets it; `tsx`/`drizzle-kit` don't.
+export NODE_OPTIONS=--conditions=react-server
 
 install:
 	yarn
@@ -27,8 +23,7 @@ check:
 	yarn check
 
 fix:
-	yarn lint:fix
-	yarn format:write
+	yarn check:fix
 
 test:
 	yarn test

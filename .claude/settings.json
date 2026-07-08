@@ -72,7 +72,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/biome-format.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/biome-check.sh"
           },
           {
             "type": "command",

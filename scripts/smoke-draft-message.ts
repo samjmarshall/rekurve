@@ -2,7 +2,10 @@
  * Smoke test for `draftMessage` — dev-only script, not imported by the app.
  *
  * Usage:
- *   yarn tsx scripts/smoke-draft-message.ts <leadId>
+ *   yarn smoke:draft <leadId>
+ *
+ * (Not `yarn tsx` directly — the script imports `server-only`-marked modules,
+ * so it needs the baked `NODE_OPTIONS=--conditions=react-server`.)
  *
  * Loads a lead by id from the dev DB, invokes `draftMessage`, and prints
  * the output so operators can eyeball message quality, priority math, and
@@ -16,7 +19,7 @@ import { leads } from "~/server/db/schema";
 
 const leadId = process.argv[2];
 if (!leadId) {
-  console.error("usage: yarn tsx scripts/smoke-draft-message.ts <leadId>");
+  console.error("usage: yarn smoke:draft <leadId>");
   process.exit(1);
 }
 

@@ -1,6 +1,8 @@
+import "server-only";
+
 import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-import { user } from "./auth";
+import { user } from "~/server/db/shared.schema";
 
 export const msGraphTokens = pgTable("ms_graph_tokens", {
   userId: text("user_id")

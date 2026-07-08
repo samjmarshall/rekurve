@@ -1,3 +1,5 @@
+import "server-only";
+
 import { isNotNull } from "drizzle-orm";
 import {
   boolean,
@@ -5,6 +7,7 @@ import {
   integer,
   jsonb,
   numeric,
+  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -13,13 +16,42 @@ import {
 } from "drizzle-orm/pg-core";
 
 import type { ScoreMetadata } from "~/server/scoring";
-import {
-  constructionTimelineEnum,
-  leadSourceEnum,
-  leadStageEnum,
-  preferredContactTimeEnum,
-  propertyTypeEnum,
-} from "./enums";
+
+export const preferredContactTimeEnum = pgEnum("preferred_contact_time", [
+  "weekdays",
+  "weekends",
+  "anytime",
+]);
+
+export const propertyTypeEnum = pgEnum("property_type", [
+  "single_storey",
+  "double_storey",
+  "investment",
+  "upsize",
+  "downsize",
+  "first_home_buyer",
+]);
+
+export const constructionTimelineEnum = pgEnum("construction_timeline", [
+  "ready_now",
+  "3_6_months",
+  "12_months_plus",
+]);
+
+export const leadStageEnum = pgEnum("lead_stage", [
+  "unqualified",
+  "nurture",
+  "warm",
+  "hot",
+]);
+
+export const leadSourceEnum = pgEnum("lead_source", [
+  "walk_in",
+  "referral",
+  "social",
+  "web",
+  "other",
+]);
 
 export const leads = pgTable(
   "leads",

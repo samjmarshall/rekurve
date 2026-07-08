@@ -2,7 +2,7 @@ import { and, isNotNull, lt, sql } from "drizzle-orm";
 
 import { inngest } from "~/inngest/client";
 import { db } from "~/server/db";
-import { outbox } from "~/server/db/schema/outbox";
+import { outbox } from "~/server/outbox/outbox.schema";
 
 // biome-ignore lint/suspicious/noExplicitAny: Inngest serialises step results via JSON (Jsonify<T> ≠ T)
 type Step = { run: (id: string, fn: () => Promise<any>) => Promise<any> };

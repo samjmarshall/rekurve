@@ -42,7 +42,7 @@ related-prs: [158]
 - `src/server/ms-graph/client.ts` — `MsGraphNotConnectedError`, `getMsalClient()` (single-tenant `ConfidentialClientApplication`), `graphClientForUser(userId)` with auto-refresh on 60s skew
 - `src/server/ms-graph/emails.ts` — `sendEmail()`: posts `/me/sendMail`, always BCCs `env.HUBSPOT_BCC_ADDRESS`
 - `src/server/ms-graph/index.ts` — barrel export
-- `src/server/db/schema/ms-graph-tokens.ts` — `ms_graph_tokens` (`userId` PK → `user.id` cascade, `accessToken`, `refreshToken`, `expiresAt`, `microsoftUserId`, `email`)
+- `src/server/ms-graph/ms-graph.schema.ts` — `ms_graph_tokens` (`userId` PK → `user.id` cascade, `accessToken`, `refreshToken`, `expiresAt`, `microsoftUserId`, `email`)
 - `src/server/hubspot/emails.ts` — `getEmailEngagement()` reads `hs_email_subject`/`hs_email_direction`/`hs_timestamp`/`hs_email_to_email`; `findContactIdForEmail()` walks the `emails → contacts` association
 - `src/app/api/auth/ms-graph/start/route.ts` — builds the MSAL auth URL, redirects to Microsoft consent
 - `src/app/api/auth/ms-graph/callback/route.ts` — exchanges the code for tokens via direct POST to `/oauth2/v2.0/token` (MSAL's `acquireTokenByCode` does not surface `refresh_token` in its result type), upserts `ms_graph_tokens`, enriches with `/me`, redirects `/dashboard?ms_connected=1`

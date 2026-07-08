@@ -37,7 +37,7 @@ related-prs: []
 - `src/server/ai/channel-selection.ts` — `selectChannel(lead)`
 - `src/server/ai/priority.ts` — `computePriority(lead)`, `isOverdue(lead)`
 - `src/server/ai/prompts.ts` — `DRAFT_SYSTEM_PROMPT` (Creation Homes QLD persona) + `buildUserPrompt()`
-- `src/server/ai/schema.ts` — `claudeDraftSchema`, `draftMessageOutputSchema`, `DraftMessageInput`/`DraftMessageOutput` types
+- `src/server/ai/draft-schemas.ts` — `claudeDraftSchema`, `draftMessageOutputSchema`, `DraftMessageInput`/`DraftMessageOutput` types
 - `src/server/ai/index.ts` — barrel: `draftMessage` + types only
 - `src/server/ai/stub.ts` — `resolveDraftFn(req)` — returns a deterministic stub when an inbound request carries `x-ai-stub: 1`
 - `src/server/ai/__tests__/` — `channel-selection.test.ts`, `priority.test.ts`, `prompts.test.ts`, `draft-message.test.ts`, `stub.test.ts`, `fixtures.ts`

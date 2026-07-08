@@ -1,4 +1,4 @@
-import type { leads } from "~/server/db/schema/leads";
+import type { leads } from "~/server/leads/leads.schema";
 
 const PROPERTY_MAP = {
   firstName: "firstname",

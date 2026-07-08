@@ -45,7 +45,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     afterAll(async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { outbox } = await import("~/server/db/schema/outbox");
+      const { outbox } = await import("~/server/outbox/outbox.schema");
       if (createdLeadIds.length > 0) {
         await db.delete(leads).where(inArray(leads.id, createdLeadIds));
       }
@@ -89,7 +89,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("writes lead row and outbox row atomically (both present after call)", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { outbox } = await import("~/server/db/schema/outbox");
+      const { outbox } = await import("~/server/outbox/outbox.schema");
       const { captureLead } = await import("~/server/leads/intake");
 
       const userId = `user-atomic-${RUN_ID}`;
@@ -174,7 +174,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("qualifying edit re-scores and writes lead.updated outbox row", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { outbox } = await import("~/server/db/schema/outbox");
+      const { outbox } = await import("~/server/outbox/outbox.schema");
       const { updateLead } = await import("~/server/leads/intake");
 
       const [lead] = await db
@@ -219,7 +219,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("non-qualifying edit still writes lead.updated outbox row", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { outbox } = await import("~/server/db/schema/outbox");
+      const { outbox } = await import("~/server/outbox/outbox.schema");
       const { updateLead } = await import("~/server/leads/intake");
 
       const [lead] = await db
@@ -249,7 +249,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("captureLeadFromHubspot writes scored lead row with hubspotContactId and outbox row with hubspotSync:false", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { outbox } = await import("~/server/db/schema/outbox");
+      const { outbox } = await import("~/server/outbox/outbox.schema");
       const { captureLeadFromHubspot } = await import("~/server/leads/intake");
 
       const hubspotContactId = `hs-${RUN_ID}`;
@@ -326,7 +326,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     test("captureLead — new lead writes lead.stage-changed outbox row with fromStage:null", async () => {
       const { db } = await import("~/server/db");
-      const { outbox } = await import("~/server/db/schema/outbox");
+      const { outbox } = await import("~/server/outbox/outbox.schema");
       const { captureLead } = await import("~/server/leads/intake");
 
       const userId = `user-stage-new-${RUN_ID}`;
@@ -355,7 +355,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("updateLead — qualifying edit that changes stage writes lead.stage-changed row", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { outbox } = await import("~/server/db/schema/outbox");
+      const { outbox } = await import("~/server/outbox/outbox.schema");
       const { updateLead } = await import("~/server/leads/intake");
 
       const [lead] = await db
@@ -399,7 +399,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("updateLead — non-qualifying edit does NOT write lead.stage-changed row", async () => {
       const { db } = await import("~/server/db");
       const { leads } = await import("~/server/db/schema");
-      const { outbox } = await import("~/server/db/schema/outbox");
+      const { outbox } = await import("~/server/outbox/outbox.schema");
       const { updateLead } = await import("~/server/leads/intake");
 
       const [lead] = await db

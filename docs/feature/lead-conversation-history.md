@@ -38,7 +38,7 @@ related-prs: [159]
 - `src/server/api/routers/conversations.ts` — `conversationsRouter.list({ leadId })`: single protected `select … leftJoin(message_queue) … orderBy(desc(createdAt))`
 - `src/server/api/schemas/conversations.ts` — `conversationsListSchema` (Zod, uuid-validated `leadId`)
 - `src/server/api/root.ts:9` — wires `conversations: conversationsRouter` into `appRouter`
-- `src/server/db/schema/conversations.ts` — table definition (id, leadId, messageQueueId, channel, direction, deliveryMethod, subject, body, hubspotActivityId, createdAt) with `conversations_lead_id_idx`
+- `src/server/messaging/messaging.schema.ts` — table definition (id, leadId, messageQueueId, channel, direction, deliveryMethod, subject, body, hubspotActivityId, createdAt) with `conversations_lead_id_idx`
 - `src/app/(application)/leads/[id]/_components/conversation-history.tsx` — Card shell, `useTRPC().conversations.list` query, loading/error/empty branches, `<ul>` with `max-h-[28rem] overflow-y-auto`
 - `src/app/(application)/leads/[id]/_components/conversation-item.tsx` — single-row bubble, channel icon, direction label, `formatLastContact` timestamp, "Edited" pill + inline disclosure
 - `src/app/(application)/leads/[id]/_lib/conversation-display.ts` — `directionLabel`, `channelIcon` (returns a string key — `"MessageSquare" | "Mail"` — so the helper stays DOM-free for tests), `wasEdited`

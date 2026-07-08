@@ -32,7 +32,7 @@ beforeEach(() => {
 describe("runPrune", () => {
   test("calls db.delete on the outbox table", async () => {
     const { runPrune } = await import("../prune");
-    const { outbox } = await import("~/server/db/schema/outbox");
+    const { outbox } = await import("~/server/outbox/outbox.schema");
 
     await runPrune(mockStep as never);
 

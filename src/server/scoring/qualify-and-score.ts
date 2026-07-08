@@ -1,4 +1,3 @@
-import type { ScoreResult } from "./schema";
 import {
   detectGaps,
   pickNextQuestion,
@@ -9,6 +8,7 @@ import {
   scorePropertyType,
   scoreTimeline,
 } from "./score-factors";
+import type { ScoreResult } from "./score-schemas";
 
 type LeadStage = "unqualified" | "nurture" | "warm" | "hot";
 

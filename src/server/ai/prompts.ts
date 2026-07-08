@@ -1,5 +1,5 @@
 import type { Channel } from "./channel-selection";
-import type { LeadRow } from "./schema";
+import type { LeadRow } from "./draft-schemas";
 
 // Hardcoded for MVP pilot (Creation Homes QLD). Tone-of-voice tuning is a
 // later ticket — see #127 "What we're NOT doing" section.

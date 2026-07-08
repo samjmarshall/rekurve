@@ -1,3 +1,13 @@
+# `server-only` throws at import unless the `react-server` export condition is set.
+# `next build` sets it itself; `tsx`/`drizzle-kit` get it baked into their
+# package.json scripts (db:*, seed:dev, smoke:draft). Exception: db:migrate —
+# `drizzle-kit migrate` reads only the SQL files + journal in `drizzle/` and
+# never loads `*.schema.ts`, so it deliberately has no NODE_OPTIONS prefix.
+# Do NOT export it here
+# globally: rstest would then resolve react's react-server build (no
+# createContext) and break component tests — tests stub `server-only` via a
+# resolve.alias in rstest.config.ts instead.
+
 install:
 	yarn
 
@@ -80,10 +90,12 @@ release:
 	yarn release
 
 clean:
+	# portless must run while node_modules still exists; the guard skips it only
+	# on a fresh clone (no node_modules) — real portless failures stay loud
+	test ! -d node_modules || yarn run portless clean
 	rm -rf .next/ next-env.d.ts tsconfig.tsbuildinfo \
 		node_modules .yarn/cache .yarn/install-state.gz \
 		test-results playwright-report .playwright-mcp
-	yarn run portless clean
 
 # Render every docs/adr/diagrams/*.d2 to a light `.svg` (`--theme 0`) and a dark `-dark.svg` (`--theme 200` Dark Mauve) sibling; ADR docs pick between them with a `<picture>` + prefers-color-scheme block (a single `--dark-theme` adaptive SVG can't be used — GitHub sandboxes embedded SVGs and strips the internal media query). Codegen, safe to run inline; commit all files. Recipe cd's into the diagrams dir so relative ./icons/*.svg in the .d2 files resolve. Icons are baked in as base64 and don't recolour with the theme, so mode-specific glyphs need a `-dark` variant swapped in for the dark render only: `inngest`/`vercel` get a white `-dark` icon (the light render keeps the dark original), while `drizzle` uses one brand-colour file that reads on both canvases (see docs/adr/diagrams/README.md). The `data-d2-version` attribute is normalised (leading `v` stripped) so a Homebrew d2 ("0.7.1") and the release binary CI installs ("v0.7.1") emit byte-identical SVGs.
 diagrams:

@@ -44,7 +44,7 @@ related-prs: [145, 146, 158]
 - `src/app/(application)/dashboard/_lib/snooze.ts` — `MIN_BUFFER_MS = 15 * 60 * 1000`, `validateSnoozeTime`, `nextMonday9am`, `toLocalInputValue`
 - `src/server/api/routers/messages.ts` — `listPending` query + `approve` / `editAndApprove` / `snooze` / `dismiss` mutations + `loadActionable` / `loadActionableWithLead` / `checkEmailPreconditions` helpers
 - `src/server/api/schemas/messages.ts` — Zod schemas; `MIN_SNOOZE_BUFFER_MS = 15 * 60 * 1000` mirrors the client constant
-- `src/server/db/schema/message-queue.ts` — `message_queue` table, single composite index `(status, priority)`
+- `src/server/messaging/messaging.schema.ts` — `message_queue` table, single composite index `(status, priority)`
 - `e2e/features/action-queue.spec.ts` — five end-to-end specs (approve, edit, snooze, dismiss, priority order)
 - `e2e/pages/sections/action-queue.section.ts` — Playwright section object exposing every `data-testid` the spec needs
 

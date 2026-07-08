@@ -7,13 +7,13 @@ import {
   getAnthropicClient,
 } from "./anthropic-client";
 import { selectChannel } from "./channel-selection";
-import { computePriority } from "./priority";
-import { buildUserPrompt, DRAFT_SYSTEM_PROMPT } from "./prompts";
 import {
   claudeDraftSchema,
   type DraftMessageInput,
   type DraftMessageOutput,
-} from "./schema";
+} from "./draft-schemas";
+import { computePriority } from "./priority";
+import { buildUserPrompt, DRAFT_SYSTEM_PROMPT } from "./prompts";
 
 const MS_PER_DAY = 86_400_000;
 

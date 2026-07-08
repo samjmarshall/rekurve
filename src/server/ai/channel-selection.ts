@@ -1,4 +1,4 @@
-import type { LeadRow } from "./schema";
+import type { LeadRow } from "./draft-schemas";
 
 export type Channel = "sms" | "email";
 

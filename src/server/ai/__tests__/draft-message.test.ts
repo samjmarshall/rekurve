@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 
-import { draftMessageOutputSchema } from "../schema";
+import { draftMessageOutputSchema } from "../draft-schemas";
 import { makeLead } from "./fixtures";
 
 type ParseFn = ReturnType<typeof rs.fn>;

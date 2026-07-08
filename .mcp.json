@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "shadcn": {
+    "chrome-devtools": {
       "command": "npx",
-      "args": ["shadcn@latest", "mcp"]
+      "args": ["-y", "chrome-devtools-mcp@latest"]
     },
     "playwright": {
       "command": "npx",
@@ -20,9 +20,17 @@
       "command": "npx",
       "args": ["@playwright/mcp@latest", "--isolated", "--headless"]
     },
-    "chrome-devtools": {
+    "posthog": {
+      "type": "http",
+      "url": "https://mcp.posthog.com/mcp"
+    },
+    "shadcn": {
       "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest"]
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com"
     }
   }
 }

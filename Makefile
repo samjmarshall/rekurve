@@ -1,3 +1,15 @@
+SHELL := /bin/bash -euo pipefail
+
+# `server-only` throws at import unless the `react-server` export condition is set.
+# `next build` sets it; `tsx`/`drizzle-kit` don't.
+export NODE_OPTIONS=--conditions=react-server
+
+# Exception: under the react-server condition Node resolves `react` to its
+# react-server build (no createContext/useLayoutEffect), breaking component
+# tests. Rstest stubs `server-only` via resolve.alias instead, so its targets
+# must not inherit the condition.
+test test_coverage test_integration: NODE_OPTIONS=
+
 install:
 	yarn
 
@@ -17,8 +29,7 @@ check:
 	yarn check
 
 fix:
-	yarn lint:fix
-	yarn format:write
+	yarn check:fix
 
 test:
 	yarn test
@@ -80,10 +91,12 @@ release:
 	yarn release
 
 clean:
+	# portless must run while node_modules still exists; the guard skips it only
+	# on a fresh clone (no node_modules) — real portless failures stay loud
+	test ! -d node_modules || yarn run portless clean
 	rm -rf .next/ next-env.d.ts tsconfig.tsbuildinfo \
 		node_modules .yarn/cache .yarn/install-state.gz \
 		test-results playwright-report .playwright-mcp
-	yarn run portless clean
 
 # Render every docs/adr/diagrams/*.d2 to a light `.svg` (`--theme 0`) and a dark `-dark.svg` (`--theme 200` Dark Mauve) sibling; ADR docs pick between them with a `<picture>` + prefers-color-scheme block (a single `--dark-theme` adaptive SVG can't be used — GitHub sandboxes embedded SVGs and strips the internal media query). Codegen, safe to run inline; commit all files. Recipe cd's into the diagrams dir so relative ./icons/*.svg in the .d2 files resolve. Icons are baked in as base64 and don't recolour with the theme, so mode-specific glyphs need a `-dark` variant swapped in for the dark render only: `inngest`/`vercel` get a white `-dark` icon (the light render keeps the dark original), while `drizzle` uses one brand-colour file that reads on both canvases (see docs/adr/diagrams/README.md). The `data-d2-version` attribute is normalised (leading `v` stripped) so a Homebrew d2 ("0.7.1") and the release binary CI installs ("v0.7.1") emit byte-identical SVGs.
 diagrams:

@@ -63,7 +63,7 @@ jobs:
             ```
 
           claude_args: |
-            --max-turns 5
+            --max-turns 40
             --allowedTools "Bash(gh pr:*),Read,Glob,Grep"
         env:
           GH_TOKEN: ${{ github.token }}

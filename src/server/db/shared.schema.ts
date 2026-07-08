@@ -1,3 +1,5 @@
+import "server-only";
+
 import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {

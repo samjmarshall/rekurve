@@ -1,22 +1,19 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 import { and, eq, isNull } from "drizzle-orm";
 
+import { makeOutboxDbMocks } from "./fixtures";
+
 // --- buildOutboxEvent ---
 
 describe("buildOutboxEvent", () => {
-  let mockQueryObject: Record<string, unknown>;
-  let mockValues: ReturnType<typeof rs.fn>;
-  let mockInsert: ReturnType<typeof rs.fn>;
+  let mocks: ReturnType<typeof makeOutboxDbMocks>;
 
   beforeEach(() => {
     rs.resetModules();
-
-    mockQueryObject = { __isQuery: true };
-    mockValues = rs.fn().mockReturnValue(mockQueryObject);
-    mockInsert = rs.fn().mockReturnValue({ values: mockValues });
+    mocks = makeOutboxDbMocks();
 
     rs.doMock("~/server/db", () => ({
-      db: { insert: mockInsert },
+      db: { insert: mocks.insert },
     }));
 
     rs.doMock("~/inngest/client", () => ({
@@ -27,7 +24,10 @@ describe("buildOutboxEvent", () => {
   test("returns a UUID string id", async () => {
     const { buildOutboxEvent } = await import("../index");
 
-    const result = buildOutboxEvent("lead.captured", { leadId: "abc" });
+    const result = buildOutboxEvent("lead.captured", {
+      leadId: "abc",
+      userId: "user-1",
+    });
 
     expect(typeof result.id).toBe("string");
     expect(result.id).toMatch(
@@ -37,13 +37,16 @@ describe("buildOutboxEvent", () => {
 
   test("calls db.insert with outbox table and does not execute", async () => {
     const { buildOutboxEvent } = await import("../index");
-    const { outbox } = await import("~/server/db/schema/outbox");
+    const { outbox } = await import("~/server/outbox/outbox.schema");
 
-    const result = buildOutboxEvent("lead.captured", { leadId: "abc" });
+    const result = buildOutboxEvent("lead.captured", {
+      leadId: "abc",
+      userId: "user-1",
+    });
 
-    expect(mockInsert).toHaveBeenCalledWith(outbox);
-    expect(mockValues).toHaveBeenCalledOnce();
-    expect(result.query).toBe(mockQueryObject);
+    expect(mocks.insert).toHaveBeenCalledWith(outbox);
+    expect(mocks.values).toHaveBeenCalledOnce();
+    expect(result.query).toBe(mocks.queries[0]);
   });
 
   test("passes id, eventName, and payload to values()", async () => {
@@ -52,9 +55,7 @@ describe("buildOutboxEvent", () => {
     const payload = { leadId: "abc", userId: "user-1" };
     const result = buildOutboxEvent("lead.captured", payload);
 
-    const [valuesArg] = mockValues.mock.calls[0] as [
-      { id: string; eventName: string; payload: unknown },
-    ];
+    const valuesArg = mocks.queries[0]!.values;
     expect(valuesArg.id).toBe(result.id);
     expect(valuesArg.eventName).toBe("lead.captured");
     expect(valuesArg.payload).toEqual(payload);
@@ -73,35 +74,71 @@ describe("buildOutboxEvent", () => {
   test("each call generates a distinct id", async () => {
     const { buildOutboxEvent } = await import("../index");
 
-    const r1 = buildOutboxEvent("lead.captured", { a: 1 });
-    const r2 = buildOutboxEvent("lead.updated", { a: 2 });
+    const r1 = buildOutboxEvent("lead.captured", {
+      leadId: "a",
+      userId: "user-1",
+    });
+    const r2 = buildOutboxEvent("lead.updated", {
+      leadId: "b",
+      userId: "user-1",
+    });
 
     expect(r1.id).not.toBe(r2.id);
+  });
+
+  // Write-time registry validation (adr019 clause 7). The sweep read path
+  // never re-parses — covered by sweep tests staying schema-free.
+  test("rejects a payload that fails the registry schema", async () => {
+    const { buildOutboxEvent } = await import("../index");
+
+    expect(() =>
+      buildOutboxEvent("lead.captured", { leadId: "abc" } as never),
+    ).toThrow();
+    expect(mocks.insert).not.toHaveBeenCalled();
+  });
+
+  test("passes optional fields through to the row payload", async () => {
+    const { buildOutboxEvent } = await import("../index");
+
+    const payload = { leadId: "abc", userId: "user-1", hubspotSync: false };
+    const result = buildOutboxEvent("lead.captured", payload);
+
+    expect(result.payload).toEqual(payload);
+    expect(mocks.queries[0]!.values.payload).toEqual(payload);
+  });
+
+  test("accepts a null fromStage on lead.stage-changed", async () => {
+    const { buildOutboxEvent } = await import("../index");
+
+    const payload = {
+      leadId: "abc",
+      userId: "user-1",
+      fromStage: null,
+      toStage: "warm",
+    } as const;
+    const result = buildOutboxEvent("lead.stage-changed", payload);
+
+    expect(result.payload).toEqual(payload);
   });
 });
 
 // --- sendPostCommit ---
 
 describe("sendPostCommit", () => {
+  let mocks: ReturnType<typeof makeOutboxDbMocks>;
   let mockSend: ReturnType<typeof rs.fn>;
-  let mockWhere: ReturnType<typeof rs.fn>;
-  let mockSet: ReturnType<typeof rs.fn>;
-  let mockUpdate: ReturnType<typeof rs.fn>;
 
   beforeEach(() => {
     rs.resetModules();
+    mocks = makeOutboxDbMocks();
 
     mockSend = rs.fn().mockResolvedValue(undefined);
     rs.doMock("~/inngest/client", () => ({
       inngest: { send: mockSend },
     }));
 
-    mockWhere = rs.fn().mockResolvedValue(undefined);
-    mockSet = rs.fn().mockReturnValue({ where: mockWhere });
-    mockUpdate = rs.fn().mockReturnValue({ set: mockSet });
-
     rs.doMock("~/server/db", () => ({
-      db: { update: mockUpdate },
+      db: { update: mocks.update },
     }));
   });
 
@@ -121,15 +158,15 @@ describe("sendPostCommit", () => {
 
   test("marks processedAt after successful send", async () => {
     const { sendPostCommit } = await import("../index");
-    const { outbox } = await import("~/server/db/schema/outbox");
+    const { outbox } = await import("~/server/outbox/outbox.schema");
 
     await sendPostCommit([{ id: "evt-1", name: "lead.captured", data: {} }]);
 
-    expect(mockUpdate).toHaveBeenCalledWith(outbox);
-    expect(mockSet).toHaveBeenCalledWith(
+    expect(mocks.update).toHaveBeenCalledWith(outbox);
+    expect(mocks.set).toHaveBeenCalledWith(
       expect.objectContaining({ processedAt: expect.anything() }),
     );
-    expect(mockWhere).toHaveBeenCalledWith(
+    expect(mocks.where).toHaveBeenCalledWith(
       and(eq(outbox.id, "evt-1"), isNull(outbox.processedAt)),
     );
   });
@@ -155,7 +192,7 @@ describe("sendPostCommit", () => {
     const consoleSpy = rs.spyOn(console, "error").mockImplementation(() => {});
 
     await sendPostCommit([{ id: "evt-1", name: "lead.captured", data: {} }]);
-    expect(mockUpdate).not.toHaveBeenCalled();
+    expect(mocks.update).not.toHaveBeenCalled();
 
     consoleSpy.mockRestore();
   });

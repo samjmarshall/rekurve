@@ -1,7 +1,7 @@
 import type { Faker } from "@faker-js/faker";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type * as schema from "~/server/db/schema";
-import { leads } from "~/server/db/schema/leads";
+import { leads } from "~/server/leads/leads.schema";
 
 type DB = NeonHttpDatabase<typeof schema>;
 

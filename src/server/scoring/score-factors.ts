@@ -1,4 +1,4 @@
-import type { ScoreResult } from "./schema";
+import type { ScoreResult } from "./score-schemas";
 
 type FactorBreakdown = ScoreResult["breakdown"][keyof ScoreResult["breakdown"]];
 type Gap = ScoreResult["gaps"][number];

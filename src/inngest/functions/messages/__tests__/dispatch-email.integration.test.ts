@@ -21,7 +21,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     afterAll(async () => {
       const { db } = await import("~/server/db");
       const schema = await import("~/server/db/schema");
-      const { user } = await import("~/server/db/schema/auth");
+      const { user } = await import("~/server/db/shared.schema");
       await db
         .delete(schema.conversations)
         .where(eq(schema.conversations.messageQueueId, messageId));
@@ -47,7 +47,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
       const { db } = await import("~/server/db");
       const schema = await import("~/server/db/schema");
-      const { user } = await import("~/server/db/schema/auth");
+      const { user } = await import("~/server/db/shared.schema");
       const { runDispatchEmail } = await import("../dispatch-email");
 
       // Seed: user (so resolveLeadOwnerUserId resolves) → lead → approved email.

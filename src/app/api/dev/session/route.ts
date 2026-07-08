@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { session, user } from "~/server/db/schema/auth";
+import { session, user } from "~/server/db/shared.schema";
 
 const DEV_EMAIL = "design-review@dev.local";
 const DEV_NAME = "Design Reviewer";

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { leads } from "~/server/db/schema";
+import type { leads } from "~/server/leads/leads.schema";
 
 export type LeadRow = typeof leads.$inferSelect;
 

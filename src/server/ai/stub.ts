@@ -1,6 +1,9 @@
 import { selectChannel } from "~/server/ai/channel-selection";
+import type {
+  DraftMessageInput,
+  DraftMessageOutput,
+} from "~/server/ai/draft-schemas";
 import { computePriority } from "~/server/ai/priority";
-import type { DraftMessageInput, DraftMessageOutput } from "~/server/ai/schema";
 
 export type DraftFn = (input: DraftMessageInput) => Promise<DraftMessageOutput>;
 

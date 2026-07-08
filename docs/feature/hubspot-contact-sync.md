@@ -39,7 +39,7 @@ related-prs: [113, 123]
 - `src/server/api/routers/leads.ts:81-152` — `create` procedure; HubSpot-first, then `INSERT … ON CONFLICT (hubspot_contact_id) DO UPDATE`
 - `src/server/api/routers/leads.ts:221-282` — `update` procedure; HubSpot-first PATCH of mapped+changed fields, then DB update
 - `src/app/api/hubspot/webhook/route.ts` — v3 signature gate, 5-minute timestamp window, per-event try/catch, always-200 response
-- `src/server/db/schema/leads.ts:26` — `hubspotContactId text("hubspot_contact_id").unique()` (the only sync state)
+- `src/server/leads/leads.schema.ts:60` — `hubspotContactId text("hubspot_contact_id").unique()` (the only sync state)
 - `src/server/hubspot/__tests__/{client,contacts,properties}.test.ts` — unit coverage
 - `src/app/api/hubspot/webhook/__tests__/route.test.ts` — signature + per-event-type processing
 - `e2e/features/hubspot-sync.spec.ts` — outbound (always) + inbound (production-only, gated on `HUBSPOT_WEBHOOK_ACTIVE`)

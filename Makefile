@@ -4,6 +4,12 @@ SHELL := /bin/bash -euo pipefail
 # `next build` sets it; `tsx`/`drizzle-kit` don't.
 export NODE_OPTIONS=--conditions=react-server
 
+# Exception: under the react-server condition Node resolves `react` to its
+# react-server build (no createContext/useLayoutEffect), breaking component
+# tests. Rstest stubs `server-only` via resolve.alias instead, so its targets
+# must not inherit the condition.
+test test_coverage test_integration: NODE_OPTIONS=
+
 install:
 	yarn
 

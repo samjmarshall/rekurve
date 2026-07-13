@@ -35,9 +35,9 @@ related-prs: [113, 123]
 - `src/server/hubspot/contacts.ts` — `createContact`, `getContact`, `updateContact`, `searchContacts`, `findExistingContact` (email-first, phone-fallback dedup)
 - `src/server/hubspot/properties.ts` — 20-entry `PROPERTY_MAP` plus `toHubSpotProperties` / `fromHubSpotProperties` / `toAppField` / `coerceFromHubSpot` (inbound type coercion for booleans + `leadScore`)
 - `src/server/hubspot/index.ts` — barrel export
-- `src/server/api/routers/leads.ts:30-62` — `scoreLead()` helper; pushes `lead_score` + `lead_stage` to HubSpot, swallows errors
-- `src/server/api/routers/leads.ts:81-152` — `create` procedure; HubSpot-first, then `INSERT … ON CONFLICT (hubspot_contact_id) DO UPDATE`
-- `src/server/api/routers/leads.ts:221-282` — `update` procedure; HubSpot-first PATCH of mapped+changed fields, then DB update
+- `src/server/leads/leads.decide.ts:70-109,160-201` — `decideCaptureLead()`/`decideUpdateLead()`; compute `lead_score` + `lead_stage` (post-commit HubSpot push lives in `src/inngest/functions/leads/lead-fanout.ts`)
+- `src/server/leads/leads.router.ts:19-23` — `create` procedure; the `INSERT … ON CONFLICT (hubspot_contact_id) DO UPDATE` upsert now lives in `src/server/leads/leads.repository.ts:151-163` (`upsertOnHubspotContactId` write)
+- `src/server/leads/leads.router.ts:39-44` — `update` procedure; the HubSpot PATCH of mapped fields now runs post-commit in `src/inngest/functions/leads/lead-fanout.ts`
 - `src/app/api/hubspot/webhook/route.ts` — v3 signature gate, 5-minute timestamp window, per-event try/catch, always-200 response
 - `src/server/leads/leads.schema.ts:60` — `hubspotContactId text("hubspot_contact_id").unique()` (the only sync state)
 - `src/server/hubspot/__tests__/{client,contacts,properties}.test.ts` — unit coverage
@@ -79,8 +79,8 @@ related-prs: [113, 123]
 
 | Source | Format string | Fires when |
 |---|---|---|
-| `src/server/api/routers/leads.ts:57` | `[scoring] HubSpot sync failed for lead {id}:` | `scoreLead()` could not push score+stage to HubSpot |
-| `src/server/api/routers/leads.ts:126-130` | `[leads.create] local insert failed for HubSpot contact {id}:` | HubSpot create succeeded, local insert threw — orphan in HubSpot |
+| `src/inngest/functions/leads/lead-fanout.ts` | *(console line removed — surfaces as a failed `lead-hubspot-sync` Inngest run)* | HubSpot score/stage push failed post-commit |
+| `src/inngest/functions/leads/lead-fanout.ts` (`stamp` step) | *(console line removed — surfaces as a failed `lead-hubspot-sync` Inngest run)* | HubSpot create succeeded, contact-id stamp failed — orphan in HubSpot |
 | `src/app/api/hubspot/webhook/route.ts:69` | `[HubSpot Webhook] Failed to process {subscriptionType} for objectId {objectId}:` | Per-event handler threw; event dropped, next event proceeds |
 | `src/app/api/hubspot/webhook/route.ts:102` | `[HubSpot Webhook] Ignoring unhandled event: {subscriptionType}` | Subscription type the handler does not implement |
 

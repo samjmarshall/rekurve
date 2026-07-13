@@ -63,12 +63,13 @@ beforeEach(() => {
     }),
   }));
 
-  rs.doMock("~/server/leads/intake", () => ({
-    captureLeadFromHubspot: mockCaptureFromHubspot,
-  }));
-
-  rs.doMock("~/server/leads/owner", () => ({
-    resolveLeadOwnerUserId: rs.fn().mockResolvedValue("owner-1"),
+  rs.doMock("~/server/leads/leads.module", () => ({
+    leadsModule: {
+      service: {
+        captureLeadFromHubspot: mockCaptureFromHubspot,
+        resolveOwnerUserId: rs.fn().mockResolvedValue("owner-1"),
+      },
+    },
   }));
 
   rs.doMock("~/server/outbox", () => ({
@@ -209,7 +210,6 @@ describe("Webhook event processing", () => {
     expect(response.status).toBe(200);
     expect(mockGetContact).toHaveBeenCalledWith("456");
     expect(mockCaptureFromHubspot).toHaveBeenCalledWith(
-      expect.anything(),
       "456",
       expect.any(Object),
       expect.objectContaining({ userId: "owner-1" }),

@@ -1,7 +1,7 @@
 import {
   type PipelineFilters,
   pipelineFiltersSchema,
-} from "~/server/api/schemas/leads";
+} from "~/domain/leads/schemas";
 import { type LeadStage, STAGE_ORDER } from "./stage-meta";
 
 type RawParams =

@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Resolver } from "react-hook-form";
 import { z } from "zod";
+import { leadSourceSchema } from "~/domain/leads/schemas";
 import { isValidAuMobile } from "~/lib/phone";
-import { leadSourceSchema } from "~/server/api/schemas/leads";
 
 export const quickCaptureFormSchema = z.object({
   firstName: z

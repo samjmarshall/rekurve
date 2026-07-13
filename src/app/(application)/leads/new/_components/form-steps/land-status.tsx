@@ -12,7 +12,7 @@ import {
   FieldSet,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import type { LeadCreate } from "~/server/api/schemas/leads";
+import type { LeadCreate } from "~/domain/leads/schemas";
 import { SegmentedControl } from "../segmented-control";
 
 const YES_NO_OPTIONS = [

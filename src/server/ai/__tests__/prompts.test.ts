@@ -1,8 +1,8 @@
 import { describe, expect, test } from "@rstest/core";
 
-import type { ScoreMetadata } from "~/server/scoring";
+import type { ScoreMetadata } from "~/domain/scoring";
+import { makeLead } from "~/server/leads/__tests__/fixtures";
 import { buildUserPrompt } from "../prompts";
-import { makeLead } from "./fixtures";
 
 const fullMetadata: ScoreMetadata = {
   score: 62,

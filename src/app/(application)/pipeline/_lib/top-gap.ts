@@ -1,4 +1,4 @@
-import type { ScoreMetadata } from "~/server/scoring";
+import type { ScoreMetadata } from "~/domain/scoring";
 
 /**
  * The single most-impactful missing qualification field. ScoreMetadata.gaps

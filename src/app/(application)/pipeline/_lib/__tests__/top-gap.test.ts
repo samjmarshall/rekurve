@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@rstest/core";
-import type { ScoreMetadata } from "~/server/scoring";
+import type { ScoreMetadata } from "~/domain/scoring";
 import { extractTopGap } from "../top-gap";
 
 const baseMetadata: ScoreMetadata = {

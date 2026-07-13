@@ -18,7 +18,7 @@ import {
   SelectTrigger,
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
-import type { LeadCreate } from "~/server/api/schemas/leads";
+import type { LeadCreate } from "~/domain/leads/schemas";
 
 const LEAD_SOURCE_OPTIONS = [
   { value: "walk_in", label: "Display Home Walk-in" },

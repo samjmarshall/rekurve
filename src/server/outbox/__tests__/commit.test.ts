@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 
 import type { OutboxEventDescriptor } from "~/server/inngest/events";
-import { makeOutboxDbMocks } from "./fixtures";
+import { makeCommitWithOutbox } from "../commit";
+import { createOutboxHelpers } from "../core";
+import { makeFakeInngest, makeOutboxDbMocks } from "./fixtures";
 
 const CAPTURED: OutboxEventDescriptor = {
   name: "lead.captured",
@@ -13,50 +15,38 @@ const STAGE_CHANGED: OutboxEventDescriptor = {
   data: { leadId: "lead-1", userId: "user-1", fromStage: null, toStage: "hot" },
 };
 
-describe("makeCommitWithOutbox", () => {
+describe("commitWithOutbox", () => {
   let calls: string[];
   let mocks: ReturnType<typeof makeOutboxDbMocks>;
-  let mockSend: ReturnType<typeof rs.fn>;
-  let mockBatch: ReturnType<typeof rs.fn>;
+  let fakeInngest: ReturnType<typeof makeFakeInngest>;
+  let commitWithOutbox: ReturnType<
+    typeof createOutboxHelpers
+  >["commitWithOutbox"];
 
   beforeEach(() => {
-    rs.resetModules();
     calls = [];
     mocks = makeOutboxDbMocks();
-
-    // buildOutboxEvent + sendPostCommit both use the module-level db.
-    rs.doMock("~/server/db", () => ({
-      db: { insert: mocks.insert, update: mocks.update },
-    }));
-
-    mockSend = rs.fn().mockImplementation(async () => {
-      calls.push("send");
-    });
-    rs.doMock("~/inngest/client", () => ({
-      inngest: { send: mockSend },
-    }));
-
-    mockBatch = rs.fn().mockImplementation(async () => {
+    mocks.batch.mockImplementation(async () => {
       calls.push("batch");
       return [];
     });
+    fakeInngest = makeFakeInngest();
+    fakeInngest.send.mockImplementation(async () => {
+      calls.push("send");
+    });
+    ({ commitWithOutbox } = createOutboxHelpers({
+      db: mocks.db,
+      inngest: fakeInngest.inngest,
+    }));
   });
 
-  async function makeCommit() {
-    const { makeCommitWithOutbox } = await import("../commit");
-    return makeCommitWithOutbox({
-      batch: mockBatch,
-    } as unknown as Parameters<typeof makeCommitWithOutbox>[0]);
-  }
-
   test("batches caller statements then outbox inserts, in event order, in ONE db.batch", async () => {
-    const commitWithOutbox = await makeCommit();
     const stmt = { __isStmt: true };
 
     await commitWithOutbox([stmt] as never, [CAPTURED, STAGE_CHANGED]);
 
-    expect(mockBatch).toHaveBeenCalledTimes(1);
-    const [items] = mockBatch.mock.calls[0] as [unknown[]];
+    expect(mocks.batch).toHaveBeenCalledTimes(1);
+    const [items] = mocks.batch.mock.calls[0] as [unknown[]];
     // Caller statements first, then one DISTINCT insert per event: identity
     // (toBe) pins the order, and each insert's values carry its own event.
     expect(items).toHaveLength(3);
@@ -68,9 +58,8 @@ describe("makeCommitWithOutbox", () => {
   });
 
   test("returns the batch results so .returning() rows flow back", async () => {
-    const commitWithOutbox = await makeCommit();
     const row = { id: "lead-1" };
-    mockBatch.mockResolvedValue([[row], {}]);
+    mocks.batch.mockResolvedValue([[row], {}]);
 
     const results = await commitWithOutbox([{ __isStmt: true }] as never, [
       CAPTURED,
@@ -80,12 +69,10 @@ describe("makeCommitWithOutbox", () => {
   });
 
   test("sends each event post-commit keyed by its outbox row id", async () => {
-    const commitWithOutbox = await makeCommit();
-
     await commitWithOutbox([], [CAPTURED]);
 
-    expect(mockSend).toHaveBeenCalledTimes(1);
-    const [sent] = mockSend.mock.calls[0] as [
+    expect(fakeInngest.send).toHaveBeenCalledTimes(1);
+    const [sent] = fakeInngest.send.mock.calls[0] as [
       { id: string; name: string; data: unknown },
     ];
     expect(sent.name).toBe("lead.captured");
@@ -95,12 +82,10 @@ describe("makeCommitWithOutbox", () => {
   });
 
   test("pairs each of two post-commit sends with its OWN outbox row id", async () => {
-    const commitWithOutbox = await makeCommit();
-
     await commitWithOutbox([], [CAPTURED, STAGE_CHANGED]);
 
-    expect(mockSend).toHaveBeenCalledTimes(2);
-    const sends = mockSend.mock.calls.map(
+    expect(fakeInngest.send).toHaveBeenCalledTimes(2);
+    const sends = fakeInngest.send.mock.calls.map(
       ([evt]) => evt as { id: string; name: string; data: unknown },
     );
     expect(sends.map((s) => s.name)).toEqual([
@@ -116,51 +101,43 @@ describe("makeCommitWithOutbox", () => {
   });
 
   test("commits the batch before the post-commit send", async () => {
-    const commitWithOutbox = await makeCommit();
-
     await commitWithOutbox([], [CAPTURED]);
 
     expect(calls).toEqual(["batch", "send"]);
   });
 
   test("empty events: batches statements alone and sends nothing", async () => {
-    const commitWithOutbox = await makeCommit();
     const stmt = { __isStmt: true };
 
     await commitWithOutbox([stmt] as never, []);
 
-    const [items] = mockBatch.mock.calls[0] as [unknown[]];
+    const [items] = mocks.batch.mock.calls[0] as [unknown[]];
     expect(items).toEqual([stmt]);
-    expect(mockSend).not.toHaveBeenCalled();
+    expect(fakeInngest.send).not.toHaveBeenCalled();
   });
 
   test("no statements and no events: skips db.batch entirely", async () => {
-    const commitWithOutbox = await makeCommit();
-
     const results = await commitWithOutbox([], []);
 
-    expect(mockBatch).not.toHaveBeenCalled();
-    expect(mockSend).not.toHaveBeenCalled();
+    expect(mocks.batch).not.toHaveBeenCalled();
+    expect(fakeInngest.send).not.toHaveBeenCalled();
     expect(results).toEqual([]);
   });
 
   test("rejects an invalid payload at write time, before anything commits", async () => {
-    const commitWithOutbox = await makeCommit();
-
     await expect(
       commitWithOutbox(
         [],
         [{ name: "lead.captured", data: { leadId: "lead-1" } } as never],
       ),
     ).rejects.toThrow();
-    expect(mockBatch).not.toHaveBeenCalled();
-    expect(mockSend).not.toHaveBeenCalled();
+    expect(mocks.batch).not.toHaveBeenCalled();
+    expect(fakeInngest.send).not.toHaveBeenCalled();
   });
 
   test("a failed post-commit send is swallowed and results still return", async () => {
-    const commitWithOutbox = await makeCommit();
-    mockSend.mockRejectedValue(new Error("send failed"));
-    mockBatch.mockResolvedValue([{}]);
+    fakeInngest.send.mockRejectedValue(new Error("send failed"));
+    mocks.batch.mockResolvedValue([{}]);
     const consoleSpy = rs.spyOn(console, "error").mockImplementation(() => {});
 
     const results = await commitWithOutbox([], [CAPTURED]);
@@ -168,5 +145,22 @@ describe("makeCommitWithOutbox", () => {
     expect(results).toEqual([{}]);
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
+  });
+});
+
+describe("makeCommitWithOutbox", () => {
+  // Binder-only test (no events, so the real Inngest singleton it closes over
+  // is never exercised): the injected db is the one the batch runs on.
+  test("executes the batch on the injected db", async () => {
+    const mocks = makeOutboxDbMocks();
+    const commitWithOutbox = makeCommitWithOutbox(mocks.db);
+    const stmt = { __isStmt: true };
+
+    const results = await commitWithOutbox([stmt] as never, []);
+
+    expect(mocks.batch).toHaveBeenCalledTimes(1);
+    const [items] = mocks.batch.mock.calls[0] as [unknown[]];
+    expect(items).toEqual([stmt]);
+    expect(results).toEqual([]);
   });
 });

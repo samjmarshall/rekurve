@@ -40,8 +40,8 @@ related-prs: [124]
 - `src/app/(application)/pipeline/_lib/format-last-contact.ts` — `Intl.RelativeTimeFormat` helper
 - `src/app/(application)/pipeline/_lib/top-gap.ts` — picks `gaps[0].description` from `score_metadata`
 - `src/app/(application)/pipeline/_lib/__tests__/{filters,format-last-contact,top-gap}.test.ts` — pure-function tests
-- `src/server/api/routers/leads.ts:298-325` — `leads.getByStage` procedure
-- `src/server/api/schemas/leads.ts:121-129` — `pipelineFiltersSchema`
+- `src/server/leads/leads.router.ts:56-58` — `leads.getByStage` procedure
+- `src/domain/leads/schemas.ts:123-129` — `pipelineFiltersSchema`
 - `e2e/pages/sections/pipeline-board.section.ts` — Playwright section object
 - `e2e/features/leads-crud.spec.ts:193-449` — five board E2E tests
 

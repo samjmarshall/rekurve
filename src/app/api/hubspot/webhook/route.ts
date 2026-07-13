@@ -1,15 +1,13 @@
 import { Signature } from "@hubspot/api-client";
 import { NextResponse } from "next/server";
 import { env } from "~/env";
-import { db } from "~/server/db";
 import { extractCorrelationId } from "~/server/dispatch/correlation";
 import {
   fromContactProperties,
   getContact,
   getEmailEngagement,
 } from "~/server/hubspot";
-import { captureLeadFromHubspot } from "~/server/leads/intake";
-import { resolveLeadOwnerUserId } from "~/server/leads/owner";
+import { leadsModule } from "~/server/leads/leads.module";
 import {
   buildOutboxEvent,
   HUBSPOT_EMAIL_EVENTS,
@@ -110,8 +108,10 @@ async function processEvent(event: WebhookEvent): Promise<void> {
 async function handleContactCreation(hubspotId: string): Promise<void> {
   const contact = await getContact(hubspotId);
   const properties = fromContactProperties(contact.properties);
-  const userId = await resolveLeadOwnerUserId(db);
-  await captureLeadFromHubspot(db, hubspotId, properties, { db, userId });
+  const userId = await leadsModule.service.resolveOwnerUserId();
+  await leadsModule.service.captureLeadFromHubspot(hubspotId, properties, {
+    userId,
+  });
 }
 
 async function handleEmailCreation(emailObjectId: string): Promise<void> {

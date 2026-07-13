@@ -57,7 +57,9 @@ describe("tRPC — Authenticated", () => {
     }));
   });
 
-  // leads and messages routers have dedicated tests in *-router.test.ts
+  // Routers with dedicated tests aren't re-covered here: per-domain routers
+  // test next to their domain (src/server/leads/__tests__/leads.router.test.ts);
+  // not-yet-migrated ones in *-router.test.ts alongside this file.
   const stubs = [
     { name: "lots.getAll", call: (c: Caller) => c.lots.getAll(), expected: [] },
     {

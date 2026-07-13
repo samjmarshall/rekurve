@@ -46,8 +46,8 @@ related-prs: [117]
 - `src/app/(application)/leads/new/_lib/__tests__/schema.test.ts` — phone-validation unit tests
 - `src/lib/phone.ts` — shared `isValidAuMobile` (also used by quick capture)
 - `src/app/(application)/pipeline/_components/pipeline-board.tsx:44-50, 69-79` — header **Add Lead** button + empty-state **Add your first lead** link (the only entry points)
-- `src/server/api/routers/leads.ts` — `leads.create` mutation; this form reuses it as-is
-- `src/server/api/schemas/leads.ts` — `leadCreateSchema` (only `firstName`/`lastName` required, rest `.nullish()`) + `LeadCreate` type
+- `src/server/leads/leads.router.ts` — `leads.create` mutation; this form reuses it as-is
+- `src/domain/leads/schemas.ts` — `leadCreateSchema` (only `firstName`/`lastName` required, rest `.nullish()`) + `LeadCreate` type
 - `e2e/pages/sections/lead-form.section.ts` — Playwright page-object section with per-step fillers
 - `e2e/features/leads-crud.spec.ts` — happy-path, step-validation, and back-navigation specs
 

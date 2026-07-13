@@ -18,7 +18,7 @@ describe("runDispatchEmail — unit", () => {
   let mockInngestSend: ReturnType<typeof rs.fn>;
   let mockResolveOwner: ReturnType<typeof rs.fn>;
   let mockMsgFindFirst: ReturnType<typeof rs.fn>;
-  let mockLeadFindFirst: ReturnType<typeof rs.fn>;
+  let mockGetLeadContact: ReturnType<typeof rs.fn>;
   let mockUpdateSet: ReturnType<typeof rs.fn>;
   let mockInsertValues: ReturnType<typeof rs.fn>;
   let mockSelectLimit: ReturnType<typeof rs.fn>;
@@ -32,9 +32,9 @@ describe("runDispatchEmail — unit", () => {
     mockInngestSend = rs.fn().mockResolvedValue(undefined);
     mockResolveOwner = rs.fn().mockResolvedValue("owner-user-id");
     mockMsgFindFirst = rs.fn().mockResolvedValue(approvedEmail);
-    mockLeadFindFirst = rs
+    mockGetLeadContact = rs
       .fn()
-      .mockResolvedValue({ email: "jane@example.com" });
+      .mockResolvedValue({ email: "jane@example.com", phone: null });
 
     const mockUpdateWhere = rs.fn().mockResolvedValue(undefined);
     mockUpdateSet = rs.fn().mockReturnValue({ where: mockUpdateWhere });
@@ -53,7 +53,6 @@ describe("runDispatchEmail — unit", () => {
       db: {
         query: {
           messageQueue: { findFirst: mockMsgFindFirst },
-          leads: { findFirst: mockLeadFindFirst },
         },
         update: mockUpdate,
         insert: mockInsert,
@@ -62,11 +61,15 @@ describe("runDispatchEmail — unit", () => {
     }));
     rs.doMock("~/server/db/schema", () => ({
       conversations: {},
-      leads: {},
       messageQueue: {},
     }));
-    rs.doMock("~/server/leads/owner", () => ({
-      resolveLeadOwnerUserId: mockResolveOwner,
+    rs.doMock("~/server/leads/leads.module", () => ({
+      leadsModule: {
+        service: {
+          resolveOwnerUserId: mockResolveOwner,
+          getLeadContact: mockGetLeadContact,
+        },
+      },
     }));
     rs.doMock("~/server/ms-graph", () => ({ sendEmail: mockSendEmail }));
     rs.doMock("~/server/outbox", () => ({

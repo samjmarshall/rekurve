@@ -1,28 +1,20 @@
-import { and, eq, isNull } from "drizzle-orm";
-import type { Realtime } from "inngest/realtime";
-
-import { userChannel } from "~/inngest/channels";
 import { inngest } from "~/inngest/client";
-import { db } from "~/server/db";
-import { leads } from "~/server/db/schema";
 import {
   createContact,
   findExistingContact,
   toContactProperties,
   updateContact,
 } from "~/server/hubspot";
+import {
+  publishLeadUpdated,
+  type RealtimePublishStep,
+} from "~/server/leads/leads.channels";
+import { leadsModule } from "~/server/leads/leads.module";
 import { OUTBOX_EVENTS } from "~/server/outbox";
 
-type Step = {
+type Step = RealtimePublishStep & {
   // biome-ignore lint/suspicious/noExplicitAny: Inngest serialises step results via JSON (Jsonify<T> ≠ T)
   run: (id: string, fn: () => Promise<any>) => Promise<any>;
-  realtime: {
-    publish: <TData>(
-      id: string,
-      topicRef: Realtime.TopicRef<TData>,
-      data: TData,
-    ) => Promise<TData>;
-  };
 };
 
 // Post-commit fan-out for a captured/updated lead: starts the nurture sequence,
@@ -38,7 +30,7 @@ export async function runLeadCapturedFanout(
   const { leadId, userId, hubspotSync = true } = event.data;
 
   const lead = await step.run("load-lead", () =>
-    db.query.leads.findFirst({ where: eq(leads.id, leadId) }),
+    leadsModule.service.getById(leadId),
   );
   if (!lead) return;
 
@@ -58,10 +50,7 @@ export async function runLeadCapturedFanout(
           );
       hubspotContactId = contact.id;
       await step.run("stamp", () =>
-        db
-          .update(leads)
-          .set({ hubspotContactId })
-          .where(and(eq(leads.id, leadId), isNull(leads.hubspotContactId))),
+        leadsModule.service.stampHubspotContactId(leadId, contact.id),
       );
     } else {
       await step.run("hs-patch", () =>
@@ -70,11 +59,10 @@ export async function runLeadCapturedFanout(
     }
   }
 
-  await step.realtime.publish(
-    "publish-lead-updated",
-    userChannel(userId)["lead.updated"],
-    { leadId, hubspotContactId },
-  );
+  await publishLeadUpdated(step, userId, {
+    leadId,
+    hubspotContactId,
+  });
 }
 
 export const leadCapturedFanout = inngest.createFunction(

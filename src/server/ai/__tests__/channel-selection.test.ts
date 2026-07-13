@@ -1,7 +1,6 @@
 import { describe, expect, test } from "@rstest/core";
-
+import { makeLead } from "~/server/leads/__tests__/fixtures";
 import { selectChannel } from "../channel-selection";
-import { makeLead } from "./fixtures";
 
 describe("selectChannel", () => {
   test("hot + email + phone → email", () => {

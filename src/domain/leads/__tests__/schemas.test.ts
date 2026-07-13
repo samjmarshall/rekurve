@@ -4,7 +4,7 @@ import {
   leadFilterSchema,
   leadQuickCaptureSchema,
   leadUpdateSchema,
-} from "../leads";
+} from "../schemas";
 
 describe("leadCreateSchema", () => {
   test("accepts valid full form input", () => {

@@ -2,13 +2,17 @@
 import "dotenv/config";
 
 import { afterAll, beforeEach, describe, expect, rs, test } from "@rstest/core";
-import { TRPCError } from "@trpc/server";
 import { eq, inArray } from "drizzle-orm";
 
 const RUN_ID = `${Date.now()}.${Math.random().toString(36).slice(2)}`;
 
+// Real Neon through the real module graph (leads.module composition root →
+// repository commit → commitWithOutbox → one db.batch). Only the Inngest
+// client is mocked so the post-commit send is a no-op; the row + outbox-row
+// atomicity assertions are the executable spec of adr017/adr019.
+
 describe.skipIf(!process.env.INTEGRATION_DB)(
-  "captureLead / updateLead integration",
+  "leadsModule capture / update integration",
   () => {
     const createdLeadIds: string[] = [];
     const createdOutboxIds: string[] = [];
@@ -36,7 +40,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
         toContactProperties: rs.fn().mockReturnValue({}),
       }));
 
-      // Mock inngest.send so sendPostCommit doesn't actually send
+      // Mock inngest.send so the post-commit send doesn't actually send
       rs.doMock("~/inngest/client", () => ({
         inngest: { send: rs.fn().mockResolvedValue(undefined) },
       }));
@@ -44,7 +48,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     afterAll(async () => {
       const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
+      const { leads } = await import("~/server/leads/leads.schema");
       const { outbox } = await import("~/server/outbox/outbox.schema");
       if (createdLeadIds.length > 0) {
         await db.delete(leads).where(inArray(leads.id, createdLeadIds));
@@ -57,8 +61,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     // ---- captureLead ----
 
     test("returns row with null hubspotContactId and scoring fields set", async () => {
-      const { db } = await import("~/server/db");
-      const { captureLead } = await import("~/server/leads/intake");
+      const { leadsModule } = await import("~/server/leads/leads.module");
 
       const email = `intake.${RUN_ID}.t1@test.example`;
       const input = {
@@ -74,8 +77,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
         propertyType: "first_home_buyer" as const,
       };
 
-      const lead = await captureLead(db, input, {
-        db,
+      const lead = await leadsModule.service.captureLead(input, {
         userId: `user-${RUN_ID}`,
       });
       createdLeadIds.push(lead.id);
@@ -88,17 +90,16 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     test("writes lead row and outbox row atomically (both present after call)", async () => {
       const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
+      const { leads } = await import("~/server/leads/leads.schema");
       const { outbox } = await import("~/server/outbox/outbox.schema");
-      const { captureLead } = await import("~/server/leads/intake");
+      const { leadsModule } = await import("~/server/leads/leads.module");
 
       const userId = `user-atomic-${RUN_ID}`;
       const email = `intake.${RUN_ID}.t2@test.example`;
 
-      const lead = await captureLead(
-        db,
+      const lead = await leadsModule.service.captureLead(
         { firstName: "Atomic", lastName: "Test", email },
-        { db, userId },
+        { userId },
       );
       createdLeadIds.push(lead.id);
 
@@ -124,23 +125,21 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     test("same-email re-capture updates in place (upsert preserved)", async () => {
       const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
-      const { captureLead } = await import("~/server/leads/intake");
+      const { leads } = await import("~/server/leads/leads.schema");
+      const { leadsModule } = await import("~/server/leads/leads.module");
 
       const email = `intake.${RUN_ID}.t3@test.example`;
       const userId = `user-upsert-${RUN_ID}`;
 
-      const first = await captureLead(
-        db,
+      const first = await leadsModule.service.captureLead(
         { firstName: "First", lastName: "Capture", email },
-        { db, userId },
+        { userId },
       );
       createdLeadIds.push(first.id);
 
-      const second = await captureLead(
-        db,
+      const second = await leadsModule.service.captureLead(
         { firstName: "Second", lastName: "Capture", email },
-        { db, userId },
+        { userId },
       );
 
       // Same row updated, not a new row
@@ -155,14 +154,12 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     });
 
     test("makes no synchronous HubSpot calls (mocks would throw if called)", async () => {
-      const { db } = await import("~/server/db");
-      const { captureLead } = await import("~/server/leads/intake");
+      const { leadsModule } = await import("~/server/leads/leads.module");
 
       // If HubSpot is called the mock throws — this just needs to resolve
-      const lead = await captureLead(
-        db,
+      const lead = await leadsModule.service.captureLead(
         { firstName: "NoHubspot", lastName: "Test" },
-        { db, userId: `user-${RUN_ID}` },
+        { userId: `user-${RUN_ID}` },
       );
       createdLeadIds.push(lead.id);
 
@@ -173,9 +170,9 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     test("qualifying edit re-scores and writes lead.updated outbox row", async () => {
       const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
+      const { leads } = await import("~/server/leads/leads.schema");
       const { outbox } = await import("~/server/outbox/outbox.schema");
-      const { updateLead } = await import("~/server/leads/intake");
+      const { leadsModule } = await import("~/server/leads/leads.module");
 
       const [lead] = await db
         .insert(leads)
@@ -190,11 +187,10 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
       const userId = `user-rescore-${RUN_ID}`;
       const before = new Date();
-      const updated = await updateLead(
-        db,
+      const updated = await leadsModule.service.updateLead(
         lead!.id,
         { landSizeSqm: "800", landRegistered: true, hasLand: true },
-        { db, userId },
+        { userId },
       );
 
       expect(updated.leadScore).toBeGreaterThan(0);
@@ -218,9 +214,9 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     test("non-qualifying edit still writes lead.updated outbox row", async () => {
       const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
+      const { leads } = await import("~/server/leads/leads.schema");
       const { outbox } = await import("~/server/outbox/outbox.schema");
-      const { updateLead } = await import("~/server/leads/intake");
+      const { leadsModule } = await import("~/server/leads/leads.module");
 
       const [lead] = await db
         .insert(leads)
@@ -229,7 +225,11 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       createdLeadIds.push(lead!.id);
 
       const userId = `user-notes-${RUN_ID}`;
-      await updateLead(db, lead!.id, { notes: "just a note" }, { db, userId });
+      await leadsModule.service.updateLead(
+        lead!.id,
+        { notes: "just a note" },
+        { userId },
+      );
 
       const outboxRows = await db
         .select()
@@ -248,9 +248,9 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     test("captureLeadFromHubspot writes scored lead row with hubspotContactId and outbox row with hubspotSync:false", async () => {
       const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
+      const { leads } = await import("~/server/leads/leads.schema");
       const { outbox } = await import("~/server/outbox/outbox.schema");
-      const { captureLeadFromHubspot } = await import("~/server/leads/intake");
+      const { leadsModule } = await import("~/server/leads/leads.module");
 
       const hubspotContactId = `hs-${RUN_ID}`;
       const userId = `user-hs-${RUN_ID}`;
@@ -266,14 +266,10 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
         propertyType: "first_home_buyer" as const,
       };
 
-      const lead = await captureLeadFromHubspot(
-        db,
+      const lead = await leadsModule.service.captureLeadFromHubspot(
         hubspotContactId,
         properties,
-        {
-          db,
-          userId,
-        },
+        { userId },
       );
       createdLeadIds.push(lead.id);
 
@@ -304,22 +300,83 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       createdOutboxIds.push(ourRow!.id);
     });
 
-    test("updateLead — not found throws NOT_FOUND", async () => {
-      const { db } = await import("~/server/db");
-      const { updateLead } = await import("~/server/leads/intake");
+    test("updateLead — not found throws LeadNotFoundError (domain error, not transport)", async () => {
+      const { leadsModule } = await import("~/server/leads/leads.module");
+      // Same-registry import (post-resetModules) so instanceof matches the
+      // class the freshly-imported service throws.
+      const { LeadNotFoundError } = await import("~/server/leads/leads.errors");
 
+      const ghostId = crypto.randomUUID();
       try {
-        await updateLead(
-          db,
-          crypto.randomUUID(),
+        await leadsModule.service.updateLead(
+          ghostId,
           { notes: "ghost" },
-          { db, userId: "user-ghost" },
+          { userId: "user-ghost" },
         );
         expect.unreachable("Should have thrown");
       } catch (e) {
-        expect(e).toBeInstanceOf(TRPCError);
-        expect((e as InstanceType<typeof TRPCError>).code).toBe("NOT_FOUND");
+        expect(e).toBeInstanceOf(LeadNotFoundError);
+        expect((e as InstanceType<typeof LeadNotFoundError>).leadId).toBe(
+          ghostId,
+        );
       }
+    });
+
+    // ---- deleteLead / stampHubspotContactId (commit variants) ----
+
+    test("deleteLead round-trips through commit — row gone, {id} returned", async () => {
+      const { db } = await import("~/server/db");
+      const { leads } = await import("~/server/leads/leads.schema");
+      const { leadsModule } = await import("~/server/leads/leads.module");
+
+      const lead = await leadsModule.service.captureLead(
+        { firstName: "Delete", lastName: "Me" },
+        { userId: `user-delete-${RUN_ID}` },
+      );
+      createdLeadIds.push(lead.id); // harmless if already deleted
+
+      const deleted = await leadsModule.service.deleteLead(lead.id);
+      expect(deleted).toEqual({ id: lead.id });
+
+      const row = await db.query.leads.findFirst({
+        where: eq(leads.id, lead.id),
+      });
+      expect(row).toBeUndefined();
+
+      // Deleting a missing row returns undefined (router maps to NOT_FOUND).
+      const again = await leadsModule.service.deleteLead(lead.id);
+      expect(again).toBeUndefined();
+    });
+
+    test("stampHubspotContactId — guarded stamp sets only while NULL", async () => {
+      const { db } = await import("~/server/db");
+      const { leads } = await import("~/server/leads/leads.schema");
+      const { leadsModule } = await import("~/server/leads/leads.module");
+
+      const lead = await leadsModule.service.captureLead(
+        { firstName: "Stamp", lastName: "Test" },
+        { userId: `user-stamp-${RUN_ID}` },
+      );
+      createdLeadIds.push(lead.id);
+      expect(lead.hubspotContactId).toBeNull();
+
+      const firstStamp = `hs-stamp-${RUN_ID}`;
+      await leadsModule.service.stampHubspotContactId(lead.id, firstStamp);
+
+      const stamped = await db.query.leads.findFirst({
+        where: eq(leads.id, lead.id),
+      });
+      expect(stamped!.hubspotContactId).toBe(firstStamp);
+
+      // Idempotency fence: a second stamp must not overwrite.
+      await leadsModule.service.stampHubspotContactId(
+        lead.id,
+        `hs-stamp-late-${RUN_ID}`,
+      );
+      const after = await db.query.leads.findFirst({
+        where: eq(leads.id, lead.id),
+      });
+      expect(after!.hubspotContactId).toBe(firstStamp);
     });
 
     // ---- lead.stage-changed outbox rows ----
@@ -327,13 +384,12 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     test("captureLead — new lead writes lead.stage-changed outbox row with fromStage:null", async () => {
       const { db } = await import("~/server/db");
       const { outbox } = await import("~/server/outbox/outbox.schema");
-      const { captureLead } = await import("~/server/leads/intake");
+      const { leadsModule } = await import("~/server/leads/leads.module");
 
       const userId = `user-stage-new-${RUN_ID}`;
-      const lead = await captureLead(
-        db,
+      const lead = await leadsModule.service.captureLead(
         { firstName: "StageNew", lastName: "Test" },
-        { db, userId },
+        { userId },
       );
       createdLeadIds.push(lead.id);
 
@@ -354,9 +410,9 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     test("updateLead — qualifying edit that changes stage writes lead.stage-changed row", async () => {
       const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
+      const { leads } = await import("~/server/leads/leads.schema");
       const { outbox } = await import("~/server/outbox/outbox.schema");
-      const { updateLead } = await import("~/server/leads/intake");
+      const { leadsModule } = await import("~/server/leads/leads.module");
 
       const [lead] = await db
         .insert(leads)
@@ -370,11 +426,10 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       createdLeadIds.push(lead!.id);
 
       const userId = `user-stage-change-${RUN_ID}`;
-      const updated = await updateLead(
-        db,
+      const updated = await leadsModule.service.updateLead(
         lead!.id,
         { landSizeSqm: "800", landRegistered: true, hasLand: true },
-        { db, userId },
+        { userId },
       );
 
       // Only check for stage-changed if the stage actually changed
@@ -398,9 +453,9 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     test("updateLead — non-qualifying edit does NOT write lead.stage-changed row", async () => {
       const { db } = await import("~/server/db");
-      const { leads } = await import("~/server/db/schema");
+      const { leads } = await import("~/server/leads/leads.schema");
       const { outbox } = await import("~/server/outbox/outbox.schema");
-      const { updateLead } = await import("~/server/leads/intake");
+      const { leadsModule } = await import("~/server/leads/leads.module");
 
       const [lead] = await db
         .insert(leads)
@@ -409,7 +464,11 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       createdLeadIds.push(lead!.id);
 
       const userId = `user-no-stage-${RUN_ID}`;
-      await updateLead(db, lead!.id, { notes: "just a note" }, { db, userId });
+      await leadsModule.service.updateLead(
+        lead!.id,
+        { notes: "just a note" },
+        { userId },
+      );
 
       const outboxRows = await db
         .select()

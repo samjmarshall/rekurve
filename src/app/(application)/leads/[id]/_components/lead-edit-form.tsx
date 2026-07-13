@@ -10,7 +10,7 @@ import { LandStatus } from "~/app/(application)/leads/new/_components/form-steps
 import { leadFormResolver } from "~/app/(application)/leads/new/_lib/schema";
 import { Button } from "~/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
-import type { LeadCreate } from "~/server/api/schemas/leads";
+import type { LeadCreate } from "~/domain/leads/schemas";
 import { useTRPC } from "~/trpc/react";
 import type { Lead } from "./lead-profile-view";
 

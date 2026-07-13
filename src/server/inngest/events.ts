@@ -2,7 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 
-import { leadStageSchema } from "~/server/api/schemas/leads";
+import { leadStageSchema } from "~/domain/leads/schemas";
 
 /**
  * Single naming + payload authority for every Inngest event (adr019 clause 7).

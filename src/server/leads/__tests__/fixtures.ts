@@ -1,8 +1,10 @@
-import type { LeadRow } from "../draft-schemas";
+import type { LeadRow } from "~/server/leads/leads.schema";
 
 /**
- * Shared base lead fixture. Override any fields per test — leave defaults
- * otherwise. `leadStage` defaults to "unqualified" to match the DB default.
+ * Shared base lead fixture, owned by the leads domain (the reference domain —
+ * downstream domains' tests import it from here). Override any fields per
+ * test — leave defaults otherwise. `leadStage` defaults to "unqualified" to
+ * match the DB default.
  */
 export function makeLead(overrides: Partial<LeadRow> = {}): LeadRow {
   return {

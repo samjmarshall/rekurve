@@ -1,8 +1,10 @@
 import { z } from "zod";
 
-import type { leads } from "~/server/leads/leads.schema";
+// Canonical row type lives with the leads table; re-exported for the ai
+// modules that type their inputs off it.
+export type { LeadRow } from "~/server/leads/leads.schema";
 
-export type LeadRow = typeof leads.$inferSelect;
+import type { LeadRow } from "~/server/leads/leads.schema";
 
 export const draftMessageOutputSchema = z.object({
   channel: z.enum(["sms", "email"]),

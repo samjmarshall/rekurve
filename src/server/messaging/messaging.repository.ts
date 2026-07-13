@@ -18,15 +18,19 @@ import { conversations, messageQueue } from "./messaging.schema";
 type Db = typeof defaultDb;
 type BatchItem = Parameters<CommitWithOutbox>[0][number];
 
-/** Per-variant result of the write door: only updateMessage returns the fresh
- * row from `.returning()` (adr006 — mutations return the row); the worker/
- * webhook stamps are fire-and-forget and return void, matching the pre-split
- * inline statements, which carried no RETURNING clause. */
+/** Per-variant result of the write door: updateMessage returns the fresh row
+ * from `.returning()` (adr006 — mutations return the row); insertMessage
+ * returns only `{ id }` (the nurture enqueue port's former inline
+ * `.returning({ id })` shape); the worker/webhook stamps are fire-and-forget
+ * and return void, matching the pre-split inline statements, which carried no
+ * RETURNING clause. */
 type MessagingCommitResult<W extends MessagingWrite> = W extends {
   kind: "updateMessage";
 }
   ? MessageRow | undefined
-  : undefined;
+  : W extends { kind: "insertMessage" }
+    ? { id: string } | undefined
+    : undefined;
 
 /** Positional result tuple of the plural write door: one entry per write, in
  * write order (batch results align with statements; outbox inserts trail). */
@@ -175,6 +179,13 @@ export function makeMessagingRepository({
           .set(write.set)
           .where(eq(messageQueue.id, write.id))
           .returning();
+      case "insertMessage":
+        // id-only returning — byte-equal to the nurture plan-runner's former
+        // inline insert (the id is the Inngest-memoised step value).
+        return db
+          .insert(messageQueue)
+          .values(write.values)
+          .returning({ id: messageQueue.id });
       case "markDispatching":
         return db
           .update(messageQueue)
@@ -213,11 +224,16 @@ export function makeMessagingRepository({
     events: readonly OutboxEventDescriptor[],
   ): Promise<MessagingCommitResults<Ws>> {
     const results = await commitWithOutbox(writes.map(toStatement), events);
-    return writes.map((write, i) =>
-      write.kind === "updateMessage"
-        ? (results[i] as MessageRow[])[0]
-        : undefined,
-    ) as MessagingCommitResults<Ws>;
+    return writes.map((write, i) => {
+      switch (write.kind) {
+        case "updateMessage":
+          return (results[i] as MessageRow[])[0];
+        case "insertMessage":
+          return (results[i] as { id: string }[])[0];
+        default:
+          return undefined;
+      }
+    }) as MessagingCommitResults<Ws>;
   }
 
   return {

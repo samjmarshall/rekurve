@@ -196,6 +196,60 @@ describe("messagingService.loadReconciliationTarget — reconciliation probe", (
   });
 });
 
+describe("messagingService.enqueueDraft — nurture draft port", () => {
+  // Write-shape pin: the exact insert column set of the nurture plan-runner's
+  // former inline message_queue insert — {leadId, channel, subject, body,
+  // aiReasoning, priority, status:"pending"}, defaults covering the rest.
+  // toEqual (not objectContaining) so a stray extra key or a dropped column
+  // fails the test. NO outbox event: nurture.followup-message-drafted is the
+  // worker's own emit step (direct inngest send), never a commit rider.
+  const draft = {
+    leadId: LEAD_ID,
+    channel: "sms" as const,
+    subject: null,
+    body: "Hi Jane, checking in on your build plans.",
+    aiReasoning: "[stub] warm lead, sms preferred",
+    priority: 50,
+  };
+
+  test("commits exactly ONE insertMessage with the pinned column set, no events", async () => {
+    const { service, repo } = makeService({
+      commit: rs.fn().mockResolvedValue([{ id: MSG_ID }]),
+    });
+
+    await service.enqueueDraft(draft);
+
+    expect(repo.commit).toHaveBeenCalledTimes(1);
+    expect(repo.commit).toHaveBeenCalledWith(
+      [
+        {
+          kind: "insertMessage",
+          values: {
+            leadId: LEAD_ID,
+            channel: "sms",
+            subject: null,
+            body: "Hi Jane, checking in on your build plans.",
+            aiReasoning: "[stub] warm lead, sms preferred",
+            priority: 50,
+            status: "pending",
+          },
+        },
+      ],
+      [],
+    );
+  });
+
+  test("returns the inserted id (the worker's Inngest-memoised step value)", async () => {
+    const { service } = makeService({
+      commit: rs.fn().mockResolvedValue([{ id: MSG_ID }]),
+    });
+
+    const inserted = await service.enqueueDraft(draft);
+
+    expect(inserted).toEqual({ id: MSG_ID });
+  });
+});
+
 describe("messagingService.stampSent — idempotent stamp-only port", () => {
   // Idempotence itself lives in the repository's `sentAt IS NULL` guard on the
   // stampSent statement; the service's contract is the wire shape: exactly one

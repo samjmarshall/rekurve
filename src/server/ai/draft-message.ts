@@ -1,3 +1,5 @@
+import "server-only";
+
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 
 import {

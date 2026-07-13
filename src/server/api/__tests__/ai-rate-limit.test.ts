@@ -1,25 +1,14 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 import { TRPCError } from "@trpc/server";
 
+import { mockTrpcContextDeps } from "./caller-harness";
+
 beforeEach(() => {
   rs.resetModules();
 
-  rs.doMock("~/env", () => ({
-    env: {
-      DATABASE_URL: "postgres://mock",
-      HUBSPOT_ACCESS_TOKEN: "mock",
-      HUBSPOT_CLIENT_SECRET: "mock",
-    },
-  }));
+  mockTrpcContextDeps();
 
   rs.doMock("~/server/db", () => ({ db: {} }));
-
-  rs.doMock("~/lib/session", () => ({
-    getSession: rs.fn().mockResolvedValue({
-      user: { id: "test-user-id", email: "test@example.com", name: "Test" },
-      session: { id: "test-session-id" },
-    }),
-  }));
 });
 
 function makeLimitResult(

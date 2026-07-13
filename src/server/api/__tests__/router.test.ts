@@ -1,20 +1,16 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 import { TRPCError } from "@trpc/server";
-import type { createCaller } from "../root";
-
-type Caller = ReturnType<typeof createCaller>;
+import {
+  type RootCaller as Caller,
+  getRootCaller,
+  mockTrpcContextDeps,
+} from "./caller-harness";
 
 beforeEach(() => {
   rs.resetModules();
 
-  // Mock env to avoid missing env vars
-  rs.doMock("~/env", () => ({
-    env: {
-      DATABASE_URL: "postgres://mock",
-      HUBSPOT_ACCESS_TOKEN: "mock",
-      HUBSPOT_CLIENT_SECRET: "mock",
-    },
-  }));
+  // Default: unauthenticated (null session)
+  mockTrpcContextDeps({ session: null });
 
   // Mock db — minimal shape for any stub queries
   rs.doMock("~/server/db", () => ({
@@ -22,20 +18,11 @@ beforeEach(() => {
       query: {},
     },
   }));
-
-  // Default: unauthenticated (null session)
-  rs.doMock("~/lib/session", () => ({
-    getSession: rs.fn().mockResolvedValue(null),
-  }));
 });
 
 describe("tRPC — Unauthenticated", () => {
   test("protected procedure throws UNAUTHORIZED without session", async () => {
-    const { createCaller } = await import("../root");
-    const { createTRPCContext } = await import("../trpc");
-
-    const ctx = await createTRPCContext({ headers: new Headers() });
-    const caller = createCaller(ctx);
+    const caller = await getRootCaller();
 
     try {
       await caller.leads.getByStage();
@@ -49,12 +36,7 @@ describe("tRPC — Unauthenticated", () => {
 
 describe("tRPC — Authenticated", () => {
   beforeEach(() => {
-    rs.doMock("~/lib/session", () => ({
-      getSession: rs.fn().mockResolvedValue({
-        user: { id: "test-user-id", email: "test@example.com", name: "Test" },
-        session: { id: "test-session-id" },
-      }),
-    }));
+    mockTrpcContextDeps();
   });
 
   // Routers with dedicated tests aren't re-covered here: per-domain routers
@@ -71,11 +53,7 @@ describe("tRPC — Authenticated", () => {
 
   for (const { name, call, expected } of stubs) {
     test(`${name} returns expected stub data`, async () => {
-      const { createCaller } = await import("../root");
-      const { createTRPCContext } = await import("../trpc");
-
-      const ctx = await createTRPCContext({ headers: new Headers() });
-      const caller = createCaller(ctx);
+      const caller = await getRootCaller();
 
       const result = await call(caller);
       expect(result).toEqual(expected);

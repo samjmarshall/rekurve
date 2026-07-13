@@ -1,9 +1,7 @@
-import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { validateRequest } from "twilio";
 import { env } from "~/env";
-import { db } from "~/server/db";
-import { conversations } from "~/server/db/schema";
+import { messagingModule } from "~/server/messaging/messaging.module";
 
 export async function POST(request: Request) {
   const signature = request.headers.get("x-twilio-signature");
@@ -45,10 +43,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ received: true });
     }
 
-    await db
-      .update(conversations)
-      .set({ deliveryStatus: messageStatus })
-      .where(eq(conversations.twilioMessageSid, messageSid));
+    await messagingModule.service.recordDeliveryStatus({
+      sid: messageSid,
+      status: messageStatus,
+    });
   } catch (error) {
     console.error("[Twilio Status] Error updating delivery status:", error);
   }

@@ -1,5 +1,5 @@
+import { formatCorrelationHeader } from "~/domain/messaging/correlation";
 import { env } from "~/env";
-import { formatCorrelationHeader } from "~/server/dispatch/correlation";
 import { graphClientForUser } from "./client";
 
 export interface SendEmailArgs {

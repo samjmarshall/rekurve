@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 import { TRPCError } from "@trpc/server";
 
+import { mockTrpcContextDeps } from "~/server/api/__tests__/caller-harness";
 import { makeLead } from "./fixtures";
 
 // Router tests: createCaller over makeLeadsRouter({ service }) — the real
@@ -28,20 +29,7 @@ let mockUpdateLead: ReturnType<typeof rs.fn>;
 beforeEach(() => {
   rs.resetModules();
 
-  rs.doMock("~/env", () => ({
-    env: {
-      DATABASE_URL: "postgres://mock",
-      HUBSPOT_ACCESS_TOKEN: "mock-token",
-      HUBSPOT_CLIENT_SECRET: "mock-secret",
-    },
-  }));
-
-  rs.doMock("~/lib/session", () => ({
-    getSession: rs.fn().mockResolvedValue({
-      user: { id: "test-user-id", email: "test@example.com", name: "Test" },
-      session: { id: "test-session-id" },
-    }),
-  }));
+  mockTrpcContextDeps();
 
   mockDb = {
     insert: rs.fn(),
@@ -108,9 +96,7 @@ describe("leads.create", () => {
   });
 
   test("rejects unauthenticated request", async () => {
-    rs.doMock("~/lib/session", () => ({
-      getSession: rs.fn().mockResolvedValue(null),
-    }));
+    mockTrpcContextDeps({ session: null });
     const caller = await getCaller();
     try {
       await caller.create({ firstName: "John", lastName: "Smith" });

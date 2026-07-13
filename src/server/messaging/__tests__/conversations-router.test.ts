@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 
 import { TRPCError } from "@trpc/server";
-import type { createCaller } from "../root";
-
-type Caller = ReturnType<typeof createCaller>;
+import {
+  getRootCaller,
+  mockTrpcContextDeps,
+} from "~/server/api/__tests__/caller-harness";
 
 const LEAD_ID = "660e8400-e29b-41d4-a716-446655440001";
 const CONV_ID_1 = "770e8400-e29b-41d4-a716-446655440002";
@@ -26,25 +27,7 @@ let mockDb: Record<string, unknown>;
 beforeEach(() => {
   rs.resetModules();
 
-  rs.doMock("~/env", () => ({
-    env: {
-      DATABASE_URL: "postgres://mock",
-      HUBSPOT_ACCESS_TOKEN: "mock",
-      HUBSPOT_CLIENT_SECRET: "mock",
-      HUBSPOT_BCC_ADDRESS: "bcc@bcc.hubspot.com",
-      MS_GRAPH_CLIENT_ID: "test-id",
-      MS_GRAPH_CLIENT_SECRET: "test-secret",
-      MS_GRAPH_REDIRECT_URI:
-        "https://rekurve.localhost/api/auth/ms-graph/callback",
-    },
-  }));
-
-  rs.doMock("~/lib/session", () => ({
-    getSession: rs.fn().mockResolvedValue({
-      user: { id: "test-user-id", email: "test@example.com", name: "Test" },
-      session: { id: "test-session-id" },
-    }),
-  }));
+  mockTrpcContextDeps();
 
   mockDb = {
     select: rs.fn(),
@@ -52,13 +35,6 @@ beforeEach(() => {
 
   rs.doMock("~/server/db", () => ({ db: mockDb }));
 });
-
-async function getCaller(): Promise<Caller> {
-  const { createCaller } = await import("../root");
-  const { createTRPCContext } = await import("../trpc");
-  const ctx = await createTRPCContext({ headers: new Headers() });
-  return createCaller(ctx);
-}
 
 // Wire up the chainable select().from().leftJoin().where().orderBy() pipeline
 function mockSelectListConversations(rows: unknown[]) {
@@ -87,7 +63,7 @@ describe("conversations.list", () => {
     };
     mockSelectListConversations([newer, older]);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.conversations.list({ leadId: LEAD_ID });
 
     expect(result).toHaveLength(2);
@@ -98,7 +74,7 @@ describe("conversations.list", () => {
   test("returns empty array when lead has no conversations", async () => {
     mockSelectListConversations([]);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.conversations.list({ leadId: LEAD_ID });
 
     expect(result).toEqual([]);
@@ -112,7 +88,7 @@ describe("conversations.list", () => {
     };
     mockSelectListConversations([editedRow]);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.conversations.list({ leadId: LEAD_ID });
 
     expect(result[0]?.originalBody).toBe("Original AI draft");
@@ -123,14 +99,14 @@ describe("conversations.list", () => {
     const unlinkedRow = { ...baseConversation, originalBody: null };
     mockSelectListConversations([unlinkedRow]);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.conversations.list({ leadId: LEAD_ID });
 
     expect(result[0]?.originalBody).toBeNull();
   });
 
   test("rejects non-uuid leadId with BAD_REQUEST", async () => {
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.conversations.list({ leadId: "not-a-uuid" });
       expect.unreachable("Should have thrown");
@@ -143,7 +119,7 @@ describe("conversations.list", () => {
   test("scopes where clause to the requested leadId", async () => {
     const { leftJoin, where, orderBy } = mockSelectListConversations([]);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     await caller.conversations.list({ leadId: LEAD_ID });
 
     expect(leftJoin).toHaveBeenCalled();

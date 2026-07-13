@@ -1,4 +1,14 @@
-export type LeadStage = "unqualified" | "nurture" | "warm" | "hot";
+import "server-only";
+
+import type { z } from "zod";
+
+import type { leadStageSchema } from "~/domain/leads/schemas";
+
+// Stage authority is the kernel enum (adr019 clause 7 types the
+// lead.stage-changed payload off it) — deriving here makes the RHYTHM_DAYS
+// Record exhaustiveness check force the cadence decision in this file when a
+// stage is added.
+export type LeadStage = z.infer<typeof leadStageSchema>;
 
 export const RHYTHM_DAYS: Record<LeadStage, number | null> = {
   unqualified: 3,

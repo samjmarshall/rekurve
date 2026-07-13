@@ -1,3 +1,5 @@
+import "server-only";
+
 import { z } from "zod";
 
 // Canonical row type lives with the leads table; re-exported for the ai

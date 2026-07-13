@@ -66,3 +66,14 @@ export type EventPayload<K extends EventName> = z.infer<
 export type OutboxEventDescriptor = {
   [K in EventName]: { name: K; data: EventPayload<K> };
 }[EventName];
+/**
+ * Correlated direct-send port (workers' `sendEvent` dep): the generic pins
+ * name↔payload as a pair, so a crossed pairing (right name, wrong payload)
+ * fails at compile time — these direct `inngest.send` paths bypass
+ * `buildOutboxEvent`'s write-time Zod parse, making the compiler the only
+ * validation they get.
+ */
+export type SendEvent = <N extends EventName>(event: {
+  name: N;
+  data: EventPayload<N>;
+}) => Promise<unknown>;

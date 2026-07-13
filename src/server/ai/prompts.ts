@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { Channel } from "./channel-selection";
 import type { LeadRow } from "./draft-schemas";
 

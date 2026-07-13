@@ -1,7 +1,7 @@
 import "server-only";
 
 import { inngest } from "~/inngest/client";
-import type { EventPayload } from "~/server/inngest/events";
+import type { EventPayload, SendEvent } from "~/server/inngest/events";
 import { HUBSPOT_EMAIL_EVENTS, MESSAGE_EVENTS } from "~/server/outbox";
 
 type Step = {
@@ -61,10 +61,9 @@ export type DispatchEmailWorkerDeps = {
     body: string;
     correlationId: string;
   }) => Promise<unknown>;
-  sendEvent: (event: {
-    name: string;
-    data: EventPayload<"hubspot.engagement-missed">;
-  }) => Promise<unknown>;
+  /** Correlated send port (SendEvent): name↔payload pinned as a pair — this
+   * direct inngest.send path bypasses buildOutboxEvent's write-time parse. */
+  sendEvent: SendEvent;
 };
 
 /**

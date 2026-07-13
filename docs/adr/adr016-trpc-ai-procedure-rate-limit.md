@@ -13,7 +13,7 @@ Technical Story: S3 (LOW) of the deferred security remediation —
 
 ## Context and Problem Statement
 
-`aiRouter` (`src/server/api/routers/ai.ts`) is the only tRPC surface where each
+`makeAiRouter` (`src/server/ai/ai.router.ts`) is the only tRPC surface where each
 authenticated call has a direct Anthropic inference cost. `protectedProcedure`
 bounds authentication but places no per-user ceiling on call volume — a single
 authenticated user could loop an LLM procedure and drive unbounded Anthropic

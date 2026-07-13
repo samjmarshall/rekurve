@@ -130,6 +130,44 @@ export function makeMessagingService({ repo }: { repo: MessagingRepository }) {
     return repo.listConversations(input.leadId);
   }
 
+  // ── Worker-facing ports (#328 nurture pipeline) ───────────────────────────
+
+  /** Nurture plan-runner port: insert one pending draft into the queue. The
+   * value set is byte-equal to the runner's former inline insert — exactly
+   * {leadId, channel, subject, body, aiReasoning, priority, status:"pending"}
+   * (defaults cover the rest) — and only the id comes back (the worker's
+   * Inngest-memoised step value). Deliberately NO outbox event: the
+   * `nurture.followup-message-drafted` emit is the worker's own follow-up
+   * step (direct inngest.send, its pre-split delivery path), not a commit
+   * rider. */
+  async function enqueueDraft(draft: {
+    leadId: string;
+    channel: "sms" | "email";
+    subject: string | null;
+    body: string;
+    aiReasoning: string | null;
+    priority: number;
+  }): Promise<{ id: string }> {
+    const [inserted] = await repo.commit(
+      [
+        {
+          kind: "insertMessage",
+          values: {
+            leadId: draft.leadId,
+            channel: draft.channel,
+            subject: draft.subject,
+            body: draft.body,
+            aiReasoning: draft.aiReasoning,
+            priority: draft.priority,
+            status: "pending",
+          },
+        },
+      ],
+      [],
+    );
+    return inserted!;
+  }
+
   // ── Worker-facing ports (#261 dispatch pipeline) ──────────────────────────
   // Consumed by the dispatch-email / dispatch-sms / dispatch-imessage /
   // reconcile-missed-engagement worker adapters. Semantics are byte-equal to
@@ -333,6 +371,7 @@ export function makeMessagingService({ repo }: { repo: MessagingRepository }) {
     dismiss,
     listPending,
     listConversations,
+    enqueueDraft,
     loadDispatchable,
     markDispatching,
     stampSent,

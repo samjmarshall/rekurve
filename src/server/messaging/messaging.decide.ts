@@ -38,6 +38,9 @@ type MessagingDecideCtx = { hasMsGraphToken: boolean };
  * per commit):
  * - updateMessage: update-by-id with `.returning()` (approve/editAndApprove/
  *   snooze/dismiss — mutations return the fresh row, adr006)
+ * - insertMessage: new draft row into the queue, returning only the id (the
+ *   nurture plan-runner's enqueue port — the worker memoises the id via
+ *   Inngest, so the row itself never crosses the step boundary)
  * - markDispatching: dispatchingAt fence stamp, no returning (dispatch workers,
  *   immediately before the external send — the dismiss-during-dispatch guard)
  * - stampSent: sentAt stamp guarded on `sentAt IS NULL`, no returning
@@ -50,6 +53,7 @@ type MessagingDecideCtx = { hasMsGraphToken: boolean };
  */
 export type MessagingWrite =
   | { kind: "updateMessage"; id: string; set: Partial<MessageInsert> }
+  | { kind: "insertMessage"; values: MessageInsert }
   | { kind: "markDispatching"; id: string; dispatchingAt: Date }
   | { kind: "stampSent"; id: string; sentAt: Date }
   | { kind: "insertConversation"; values: ConversationInsert }

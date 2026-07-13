@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { LeadRow } from "./draft-schemas";
 
 export type Channel = "sms" | "email";

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { selectChannel } from "~/server/ai/channel-selection";
 import type {
   DraftMessageInput,

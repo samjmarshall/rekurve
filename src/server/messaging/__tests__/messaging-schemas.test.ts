@@ -4,7 +4,7 @@ import {
   messageDismissSchema,
   messageEditAndApproveSchema,
   messageSnoozeSchema,
-} from "../messages";
+} from "../messaging-schemas";
 
 const VALID_UUID = "550e8400-e29b-41d4-a716-446655440000";
 

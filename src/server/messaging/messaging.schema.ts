@@ -84,3 +84,7 @@ export const conversations = pgTable(
     index("conversations_twilio_sid_idx").on(table.twilioMessageSid),
   ],
 );
+
+export type MessageRow = typeof messageQueue.$inferSelect;
+export type MessageInsert = typeof messageQueue.$inferInsert;
+export type ConversationInsert = typeof conversations.$inferInsert;

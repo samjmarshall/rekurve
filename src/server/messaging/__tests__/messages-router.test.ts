@@ -1,28 +1,33 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 
 import { TRPCError } from "@trpc/server";
-import type { createCaller } from "../root";
+import {
+  getRootCaller,
+  mockTrpcContextDeps,
+} from "~/server/api/__tests__/caller-harness";
+import { makeMessage } from "./fixtures";
 
-type Caller = ReturnType<typeof createCaller>;
+// Router tests over the real appRouter wiring: root → messaging.module →
+// makeMessagingRepository over the mocked ~/server/db, with the outbox commit
+// seam (~/server/outbox/commit) replaced by a fake that mirrors the real
+// commitWithOutbox over the test spies (mockBuildOutboxEvent / mockDb.batch /
+// mockSendPostCommit) — so every pre-split assertion on event payloads, batch
+// atomicity, and post-commit sends is preserved. Moved from
+// src/server/api/__tests__/ in the PR-3 domain split; the only adapted
+// assertions are the two skipDispatch cells, where the single write door now
+// routes the UPDATE through db.batch (with no outbox row) instead of a direct
+// update — noted inline.
 
 const MSG_ID = "550e8400-e29b-41d4-a716-446655440000";
 const LEAD_ID = "660e8400-e29b-41d4-a716-446655440001";
 
-const baseMessage = {
+const baseMessage = makeMessage({
   id: MSG_ID,
   leadId: LEAD_ID,
-  channel: "sms" as const,
-  subject: null,
   body: "Original draft body",
-  aiReasoning: null,
   priority: 5,
-  status: "pending" as const,
-  snoozedUntil: null,
-  originalBody: null,
-  approvedAt: null,
-  sentAt: null,
   createdAt: new Date("2026-04-10T00:00:00Z"),
-};
+});
 
 const baseLead = {
   id: LEAD_ID,
@@ -38,6 +43,7 @@ const baseLead = {
 let mockDb: Record<string, unknown>;
 let mockBuildOutboxEvent: ReturnType<typeof rs.fn>;
 let mockSendPostCommit: ReturnType<typeof rs.fn>;
+let mockCommitWithOutbox: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
@@ -50,49 +56,13 @@ beforeEach(() => {
   }));
   mockSendPostCommit = rs.fn().mockResolvedValue(undefined);
 
-  rs.doMock("~/env", () => ({
-    env: {
-      DATABASE_URL: "postgres://mock",
-      HUBSPOT_ACCESS_TOKEN: "mock",
-      HUBSPOT_CLIENT_SECRET: "mock",
-      HUBSPOT_BCC_ADDRESS: "bcc@bcc.hubspot.com",
-      MS_GRAPH_CLIENT_ID: "test-id",
-      MS_GRAPH_CLIENT_SECRET: "test-secret",
-      MS_GRAPH_REDIRECT_URI:
-        "https://rekurve.localhost/api/auth/ms-graph/callback",
-      BETTER_AUTH_URL: "https://rekurve.localhost",
-      TWILIO_ACCOUNT_SID: "ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      TWILIO_AUTH_TOKEN: "test-auth-token",
-      TWILIO_FROM_NUMBER: "+14155551234",
-      TWILIO_CONSULTANT_NUMBER: "+61400000000",
-    },
-  }));
-
-  rs.doMock("~/lib/session", () => ({
-    getSession: rs.fn().mockResolvedValue({
-      user: { id: "test-user-id", email: "test@example.com", name: "Test" },
-      session: { id: "test-session-id" },
-    }),
-  }));
-
-  rs.doMock("~/server/outbox", () => ({
-    OUTBOX_EVENTS: {
-      LEAD_CAPTURED: "lead.captured",
-      LEAD_UPDATED: "lead.updated",
-      LEAD_STAGE_CHANGED: "lead.stage-changed",
-    },
-    MESSAGE_EVENTS: { APPROVAL_REQUESTED: "message.approval-requested" },
-    HUBSPOT_EMAIL_EVENTS: {
-      ENGAGEMENT_CREATED: "hubspot.email.engagement-created",
-      ENGAGEMENT_MISSED: "hubspot.engagement-missed",
-    },
-    buildOutboxEvent: mockBuildOutboxEvent,
-    sendPostCommit: mockSendPostCommit,
-  }));
+  mockTrpcContextDeps();
 
   mockDb = {
     update: rs.fn(),
-    batch: rs.fn(),
+    // Default: resolve the (already-thenable, mock-built) statements in place
+    // so `.returning()` rows flow back positionally like db.batch.
+    batch: rs.fn((items: Promise<unknown>[]) => Promise.all(items)),
     select: rs.fn(),
     query: {
       messageQueue: { findFirst: rs.fn() },
@@ -104,14 +74,44 @@ beforeEach(() => {
   };
 
   rs.doMock("~/server/db", () => ({ db: mockDb }));
-});
 
-async function getCaller(): Promise<Caller> {
-  const { createCaller } = await import("../root");
-  const { createTRPCContext } = await import("../trpc");
-  const ctx = await createTRPCContext({ headers: new Headers() });
-  return createCaller(ctx);
-}
+  // The outbox commit seam: a faithful mirror of the real commitWithOutbox
+  // (~/server/outbox/core) over the test spies — build outbox rows, co-batch
+  // them with the canonical statements, then post-commit send.
+  mockCommitWithOutbox = rs.fn(
+    async (
+      stmts: readonly unknown[],
+      events: readonly { name: string; data: unknown }[],
+    ) => {
+      const built = events.map(
+        (evt) =>
+          mockBuildOutboxEvent(evt.name, evt.data) as {
+            id: string;
+            eventName: string;
+            payload: unknown;
+            query: unknown;
+          },
+      );
+      const items = [...stmts, ...built.map((evt) => evt.query)];
+      const results =
+        items.length > 0
+          ? await (mockDb.batch as ReturnType<typeof rs.fn>)(items)
+          : [];
+      await mockSendPostCommit(
+        built.map((evt) => ({
+          id: evt.id,
+          name: evt.eventName,
+          data: evt.payload,
+        })),
+      );
+      return results;
+    },
+  );
+
+  rs.doMock("~/server/outbox/commit", () => ({
+    makeCommitWithOutbox: () => mockCommitWithOutbox,
+  }));
+});
 
 // Helper — wire up a chainable update mock that returns the given row
 function mockUpdateReturning(row: unknown) {
@@ -122,7 +122,7 @@ function mockUpdateReturning(row: unknown) {
   return { set, where, returning };
 }
 
-// Helper — the email branch enqueues via db.batch([updateStmt, evt.query]),
+// Helper — the enqueue path commits via db.batch([updateStmt, evt.query]),
 // which resolves to [[updatedRow], insertResult]. Wires both update().set()
 // (so callers can assert the status payload) and batch's resolved value.
 function mockEmailEnqueue(updatedRow: unknown) {
@@ -163,7 +163,7 @@ describe("messages.listPending", () => {
   test("returns rows with joined lead context", async () => {
     mockSelectListPending([joinedRow]);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.listPending();
 
     expect(result).toHaveLength(1);
@@ -180,7 +180,7 @@ describe("messages.listPending", () => {
   test("returns empty array when no pending rows", async () => {
     mockSelectListPending([]);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.listPending();
 
     expect(result).toEqual([]);
@@ -189,7 +189,7 @@ describe("messages.listPending", () => {
   test("inner-joins leads and filters by status + snoozedUntil", async () => {
     const { innerJoin, where, orderBy } = mockSelectListPending([]);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     await caller.messages.listPending();
 
     expect(innerJoin).toHaveBeenCalled();
@@ -205,7 +205,7 @@ describe("messages.listPending", () => {
     };
     mockSelectListPending([elapsed]);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.listPending();
 
     expect(result).toHaveLength(1);
@@ -228,7 +228,7 @@ describe("messages.approve", () => {
     };
     const { set } = mockEmailEnqueue(approved);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.approve({ id: MSG_ID });
 
     expect(result.status).toBe("approved");
@@ -253,7 +253,7 @@ describe("messages.approve", () => {
       approvedAt: new Date(),
     });
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.approve({ id: MSG_ID });
 
     expect(result.status).toBe("approved");
@@ -264,7 +264,7 @@ describe("messages.approve", () => {
       mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
     ).messageQueue.findFirst.mockResolvedValue(undefined);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.approve({ id: MSG_ID });
       expect.unreachable("Should have thrown");
@@ -282,7 +282,7 @@ describe("messages.approve", () => {
       status: "dismissed",
     });
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.approve({ id: MSG_ID });
       expect.unreachable("Should have thrown");
@@ -294,7 +294,7 @@ describe("messages.approve", () => {
   });
 
   test("rejects invalid uuid", async () => {
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.approve({ id: "not-a-uuid" });
       expect.unreachable("Should have thrown");
@@ -322,7 +322,7 @@ describe("messages.editAndApprove", () => {
     };
     const { set } = mockEmailEnqueue(edited);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.editAndApprove({
       id: MSG_ID,
       body: "Rewritten message",
@@ -352,7 +352,7 @@ describe("messages.editAndApprove", () => {
 
     const { set } = mockEmailEnqueue(previouslyEdited);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     await caller.messages.editAndApprove({ id: MSG_ID, body: "Second edit" });
 
     expect(set).toHaveBeenCalledWith(
@@ -361,7 +361,7 @@ describe("messages.editAndApprove", () => {
   });
 
   test("rejects empty body via Zod", async () => {
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.editAndApprove({ id: MSG_ID, body: "" });
       expect.unreachable("Should have thrown");
@@ -379,7 +379,7 @@ describe("messages.editAndApprove", () => {
       status: "approved",
     });
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.editAndApprove({ id: MSG_ID, body: "Too late" });
       expect.unreachable("Should have thrown");
@@ -405,7 +405,7 @@ describe("messages.snooze", () => {
     };
     const { set } = mockUpdateReturning(snoozed);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.snooze({
       id: MSG_ID,
       snoozedUntil: future,
@@ -419,7 +419,7 @@ describe("messages.snooze", () => {
 
   test("rejects past snoozedUntil via Zod", async () => {
     const past = new Date(Date.now() - 1000);
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.snooze({ id: MSG_ID, snoozedUntil: past });
       expect.unreachable("Should have thrown");
@@ -430,7 +430,7 @@ describe("messages.snooze", () => {
 
   test("rejects snoozedUntil inside the 15-minute buffer", async () => {
     const tooSoon = new Date(Date.now() + 14 * 60 * 1000);
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.snooze({ id: MSG_ID, snoozedUntil: tooSoon });
       expect.unreachable("Should have thrown");
@@ -451,7 +451,7 @@ describe("messages.snooze", () => {
       snoozedUntil: atBoundary,
     });
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.snooze({
       id: MSG_ID,
       snoozedUntil: atBoundary,
@@ -468,7 +468,7 @@ describe("messages.snooze", () => {
     });
 
     const future = new Date(Date.now() + 3600_000);
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.snooze({ id: MSG_ID, snoozedUntil: future });
       expect.unreachable("Should have thrown");
@@ -489,7 +489,7 @@ describe("messages.dismiss", () => {
     const dismissed = { ...baseMessage, status: "dismissed" as const };
     const { set } = mockUpdateReturning(dismissed);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.dismiss({ id: MSG_ID });
 
     expect(result.status).toBe("dismissed");
@@ -508,7 +508,7 @@ describe("messages.dismiss", () => {
 
     mockUpdateReturning({ ...baseMessage, status: "dismissed" });
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.dismiss({ id: MSG_ID });
 
     expect(result.status).toBe("dismissed");
@@ -519,7 +519,7 @@ describe("messages.dismiss", () => {
       mockDb.query as { messageQueue: { findFirst: ReturnType<typeof rs.fn> } }
     ).messageQueue.findFirst.mockResolvedValue(undefined);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.dismiss({ id: MSG_ID });
       expect.unreachable("Should have thrown");
@@ -536,7 +536,7 @@ describe("messages.dismiss", () => {
       status: "dismissed",
     });
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.dismiss({ id: MSG_ID });
       expect.unreachable("Should have thrown");
@@ -572,7 +572,7 @@ describe("messages.approve — email channel", () => {
     };
     const { set } = mockEmailEnqueue(approved);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.approve({ id: MSG_ID });
 
     expect(result.status).toBe("approved");
@@ -613,7 +613,7 @@ describe("messages.approve — email channel", () => {
       hubspotContactId: null,
     });
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.approve({ id: MSG_ID });
       expect.unreachable("Should have thrown");
@@ -634,7 +634,7 @@ describe("messages.approve — email channel", () => {
       email: null,
     });
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.approve({ id: MSG_ID });
       expect.unreachable("Should have thrown");
@@ -652,7 +652,7 @@ describe("messages.approve — email channel", () => {
       undefined,
     );
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.approve({ id: MSG_ID });
       expect.unreachable("Should have thrown");
@@ -676,7 +676,7 @@ describe("messages.approve — email channel", () => {
     };
     const { set } = mockEmailEnqueue(approved);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.approve({ id: MSG_ID });
 
     expect(result.status).toBe("approved");
@@ -723,7 +723,7 @@ describe("messages.approve — email channel", () => {
     };
     const { set } = mockUpdateReturning(approved);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.approve({
       id: MSG_ID,
       skipDispatch: true,
@@ -731,7 +731,11 @@ describe("messages.approve — email channel", () => {
 
     expect(result.status).toBe("approved");
     expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
-    expect(mockDb.batch).not.toHaveBeenCalled();
+    // ADAPTED (PR-3 write door): the UPDATE now commits via db.batch — with
+    // NO outbox row co-batched (pre-split: a direct update, batch untouched).
+    expect(
+      (mockDb.batch as ReturnType<typeof rs.fn>).mock.calls[0]![0],
+    ).toHaveLength(1);
     expect(set).toHaveBeenCalledWith(
       expect.objectContaining({
         status: "approved",
@@ -757,7 +761,7 @@ describe("messages.editAndApprove — sms channel", () => {
     };
     const { set } = mockUpdateReturning(edited);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.editAndApprove({
       id: MSG_ID,
       body: "Edited body",
@@ -766,7 +770,11 @@ describe("messages.editAndApprove — sms channel", () => {
 
     expect(result.status).toBe("edited_and_approved");
     expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
-    expect(mockDb.batch).not.toHaveBeenCalled();
+    // ADAPTED (PR-3 write door): the UPDATE now commits via db.batch — with
+    // NO outbox row co-batched (pre-split: a direct update, batch untouched).
+    expect(
+      (mockDb.batch as ReturnType<typeof rs.fn>).mock.calls[0]![0],
+    ).toHaveLength(1);
     expect(set).toHaveBeenCalledWith(
       expect.objectContaining({
         status: "edited_and_approved",
@@ -789,7 +797,7 @@ describe("messages.editAndApprove — sms channel", () => {
     };
     const { set } = mockEmailEnqueue(edited);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.editAndApprove({
       id: MSG_ID,
       body: "Edited body",
@@ -834,7 +842,7 @@ describe("messages.editAndApprove — email channel", () => {
     };
     const { set } = mockEmailEnqueue(edited);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     const result = await caller.messages.editAndApprove({
       id: MSG_ID,
       body: "Rewritten",
@@ -873,7 +881,7 @@ describe("messages.editAndApprove — email channel", () => {
       email: null,
     });
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     try {
       await caller.messages.editAndApprove({ id: MSG_ID, body: "Rewritten" });
       expect.unreachable("Should have thrown");
@@ -897,7 +905,7 @@ describe("messages.editAndApprove — email channel", () => {
     };
     mockEmailEnqueue(edited);
 
-    const caller = await getCaller();
+    const caller = await getRootCaller();
     await caller.messages.editAndApprove({ id: MSG_ID, body: "Rewritten" });
 
     expect(mockBuildOutboxEvent).toHaveBeenCalledWith(

@@ -1,7 +1,7 @@
 import { Signature } from "@hubspot/api-client";
 import { NextResponse } from "next/server";
+import { extractCorrelationId } from "~/domain/messaging/correlation";
 import { env } from "~/env";
-import { extractCorrelationId } from "~/server/dispatch/correlation";
 import {
   fromContactProperties,
   getContact,

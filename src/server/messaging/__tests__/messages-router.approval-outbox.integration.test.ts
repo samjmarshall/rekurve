@@ -1,9 +1,14 @@
 // dotenv MUST be imported first so process.env is populated before ~/env is evaluated
 import "dotenv/config";
 
-import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, rs, test } from "@rstest/core";
-import { and, sql as dsql, eq, inArray } from "drizzle-orm";
+import { and, sql as dsql, eq } from "drizzle-orm";
+
+import {
+  cleanupSeededRows,
+  makeSeedIds,
+  seedLeadAndMessage,
+} from "./integration-fixtures";
 
 // Integration: prove that messages.approve for the email channel writes the
 // status flip AND the message.approval-requested outbox row atomically against
@@ -14,27 +19,12 @@ import { and, sql as dsql, eq, inArray } from "drizzle-orm";
 describe.skipIf(!process.env.INTEGRATION_DB)(
   "messages.approve → outbox (integration)",
   () => {
-    const suffix = `${Date.now()}-${randomUUID().slice(0, 8)}`;
-    const userId = `int-user-${suffix}`;
-    const leadId = randomUUID();
-    const messageId = randomUUID();
-    const email = `int-${suffix}@test.rekurve.dev`;
+    const ids = makeSeedIds("int");
+    const { suffix, userId, leadId, messageId, email } = ids;
 
-    afterAll(async () => {
-      const { db } = await import("~/server/db");
-      const schema = await import("~/server/db/schema");
-      // outbox rows we created are keyed by payload.messageId
-      await db
-        .delete(schema.outbox)
-        .where(dsql`${schema.outbox.payload}->>'messageId' = ${messageId}`);
-      await db
-        .delete(schema.messageQueue)
-        .where(inArray(schema.messageQueue.id, [messageId]));
-      await db.delete(schema.leads).where(inArray(schema.leads.id, [leadId]));
-      // ms_graph_tokens cascades on user delete
-      const { user } = await import("~/server/db/schema");
-      await db.delete(user).where(inArray(user.id, [userId]));
-    });
+    // ms_graph_tokens cascades on user delete; outbox rows are keyed by
+    // payload.messageId (outbox: true).
+    afterAll(() => cleanupSeededRows(ids, { outbox: true }));
 
     test("email approve enqueues exactly one approval-requested row and flips status", async () => {
       rs.resetModules();
@@ -55,19 +45,20 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
       const { db } = await import("~/server/db");
       const schema = await import("~/server/db/schema");
-      const { user } = await import("~/server/db/schema");
-      const { createCaller } = await import("../root");
-      const { createTRPCContext } = await import("../trpc");
+      const { createCaller } = await import("~/server/api/root");
+      const { createTRPCContext } = await import("~/server/api/trpc");
 
-      // Seed: user → lead → MS Graph tokens → pending email message.
-      await db.insert(user).values({ id: userId, name: "Integration", email });
-      await db.insert(schema.leads).values({
-        id: leadId,
-        firstName: "Int",
-        lastName: "Test",
-        email,
-        hubspotContactId: `hs-int-${suffix}`,
-      });
+      // Seed: user → lead → pending email message → MS Graph tokens.
+      await seedLeadAndMessage(
+        ids,
+        {
+          channel: "email",
+          subject: "Integration subject",
+          body: "Integration body",
+          status: "pending",
+        },
+        { withUser: true },
+      );
       await db.insert(schema.msGraphTokens).values({
         userId,
         accessToken: "int-access-token",
@@ -75,15 +66,6 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
         expiresAt: new Date(Date.now() + 60 * 60 * 1000),
         microsoftUserId: "int-ms-user",
         email,
-      });
-      await db.insert(schema.messageQueue).values({
-        id: messageId,
-        leadId,
-        channel: "email",
-        subject: "Integration subject",
-        body: "Integration body",
-        status: "pending",
-        priority: 50,
       });
 
       const ctx = await createTRPCContext({ headers: new Headers() });

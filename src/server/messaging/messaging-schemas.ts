@@ -1,15 +1,9 @@
+import "server-only";
+
 import { z } from "zod";
 
-// Enum schemas — mirror values from src/server/messaging/messaging.schema.ts
-export const channelSchema = z.enum(["sms", "email"]);
-
-export const messageStatusSchema = z.enum([
-  "pending",
-  "approved",
-  "edited_and_approved",
-  "dismissed",
-  "snoozed",
-]);
+// tRPC input schemas for the messaging domain (adr020 isomorphic-by-need:
+// zero client importers, so these live server-side, not in src/domain).
 
 // approve / dismiss — id only
 export const messageApproveSchema = z.object({
@@ -44,7 +38,10 @@ export const messageSnoozeSchema = z.object({
     }),
 });
 
+// conversations.list — lead-scoped read
+export const conversationsListSchema = z.object({ leadId: z.string().uuid() });
+
 export type MessageApprove = z.infer<typeof messageApproveSchema>;
-export type MessageDismiss = z.infer<typeof messageDismissSchema>;
 export type MessageEditAndApprove = z.infer<typeof messageEditAndApproveSchema>;
 export type MessageSnooze = z.infer<typeof messageSnoozeSchema>;
+export type ConversationsList = z.infer<typeof conversationsListSchema>;

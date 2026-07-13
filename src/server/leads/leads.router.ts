@@ -10,17 +10,8 @@ import {
   pipelineFiltersSchema,
 } from "~/domain/leads/schemas";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { LeadNotFoundError } from "./leads.errors";
+import { toTRPCError } from "~/server/api/trpc-error-map";
 import type { LeadsService } from "./leads.service";
-
-// Domain-error mapping: the service throws transport-agnostic errors
-// (leads.errors.ts); this adapter owns their tRPC representation.
-function toTRPCError(err: unknown): never {
-  if (err instanceof LeadNotFoundError) {
-    throw new TRPCError({ code: "NOT_FOUND", message: "Lead not found" });
-  }
-  throw err;
-}
 
 // Thin tRPC adapter (adr020): zod, auth, domain-error mapping — no queries.
 // Procedure names and shapes are byte-stable (router-paths golden pins them).

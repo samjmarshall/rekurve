@@ -1,3 +1,5 @@
+import "server-only";
+
 import { env } from "~/env";
 import { hubspot } from "./client";
 
@@ -47,26 +49,6 @@ export async function getEmailEngagement(
   } catch (err) {
     if (isNotFoundError(err)) return null;
     throw err;
-  }
-}
-
-export async function findContactIdForEmail(
-  emailId: string,
-): Promise<string | null> {
-  if (env.HUBSPOT_MOCK === "true") {
-    console.log("[hubspot-mock] findContactIdForEmail");
-    return null;
-  }
-  try {
-    const response = await hubspot.crm.associations.v4.basicApi.getPage(
-      "emails",
-      emailId,
-      "contacts",
-    );
-    const results = response.results ?? [];
-    return results.length > 0 ? String(results[0]!.toObjectId) : null;
-  } catch {
-    return null;
   }
 }
 

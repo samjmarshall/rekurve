@@ -13,14 +13,15 @@ import { leadStageSchema } from "~/domain/leads/schemas";
  * error-loop the backstop. Schemas are strict: an unknown payload key (e.g. a
  * typo'd `hubSpotSync`) fails loudly at write time instead of being silently
  * stripped — a stripped-then-absent optional flag would flip a consumer's
- * default (lead-fanout reads absent `hubspotSync` as true).
+ * default (the lead-hubspot-sync worker — src/server/hubspot/hubspot.worker.ts
+ * — reads absent `hubspotSync` as true).
  */
 export const EVENT_REGISTRY = {
   "lead.captured": z.strictObject({
     leadId: z.string(),
     userId: z.string(),
-    // HubSpot-origin ingest sets false to suppress the echo sync (lead-fanout
-    // reads it as `hubspotSync = true` when absent).
+    // HubSpot-origin ingest sets false to suppress the echo sync (the
+    // lead-hubspot-sync worker reads it as `hubspotSync = true` when absent).
     hubspotSync: z.boolean().optional(),
   }),
   "lead.updated": z.strictObject({

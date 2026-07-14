@@ -97,20 +97,6 @@ describe("updateContact", () => {
   });
 });
 
-describe("searchContacts", () => {
-  test("calls searchApi.doSearch and maps results", async () => {
-    mockDoSearch.mockResolvedValue({
-      results: [MOCK_RESPONSE],
-    });
-
-    const { searchContacts } = await import("../contacts");
-    const results = await searchContacts("jane@example.com");
-
-    expect(results).toHaveLength(1);
-    expect(results[0]!.properties.email).toBe("jane@example.com");
-  });
-});
-
 describe("findExistingContact", () => {
   test("finds contact by email first", async () => {
     mockDoSearch.mockResolvedValue({ results: [MOCK_RESPONSE] });

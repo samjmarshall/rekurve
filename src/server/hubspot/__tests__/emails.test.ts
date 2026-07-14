@@ -1,13 +1,11 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 
 let mockGetById: ReturnType<typeof rs.fn>;
-let mockGetPage: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
   rs.resetModules();
 
   mockGetById = rs.fn();
-  mockGetPage = rs.fn();
 
   rs.doMock("~/env", () => ({
     env: {
@@ -22,13 +20,6 @@ beforeEach(() => {
           emails: {
             basicApi: {
               getById: mockGetById,
-            },
-          },
-        },
-        associations: {
-          v4: {
-            basicApi: {
-              getPage: mockGetPage,
             },
           },
         },
@@ -116,37 +107,5 @@ describe("getEmailEngagement", () => {
     expect(result!.timestamp).toBeNull();
     expect(result!.toEmail).toBeNull();
     expect(result!.headers).toBeNull();
-  });
-});
-
-describe("findContactIdForEmail", () => {
-  test("returns contact id from associations", async () => {
-    mockGetPage.mockResolvedValue({
-      results: [{ toObjectId: 42, associationTypes: [] }],
-    });
-
-    const { findContactIdForEmail } = await import("../emails");
-    const result = await findContactIdForEmail("eng-123");
-
-    expect(result).toBe("42");
-    expect(mockGetPage).toHaveBeenCalledWith("emails", "eng-123", "contacts");
-  });
-
-  test("returns null when no associations found", async () => {
-    mockGetPage.mockResolvedValue({ results: [] });
-
-    const { findContactIdForEmail } = await import("../emails");
-    const result = await findContactIdForEmail("eng-123");
-
-    expect(result).toBeNull();
-  });
-
-  test("returns null on API error", async () => {
-    mockGetPage.mockRejectedValue(new Error("API error"));
-
-    const { findContactIdForEmail } = await import("../emails");
-    const result = await findContactIdForEmail("eng-123");
-
-    expect(result).toBeNull();
   });
 });

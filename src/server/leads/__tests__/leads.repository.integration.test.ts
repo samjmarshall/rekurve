@@ -20,8 +20,11 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
     beforeEach(() => {
       rs.resetModules();
 
-      // HubSpot must not be called — mock it to throw if invoked
-      rs.doMock("~/server/hubspot", () => ({
+      // HubSpot must not be called — mock the contacts adapter (the barrel is
+      // gone under #329; the mock registry keys on the resolved module, so
+      // this intercepts the hubspot module's relative import too) to throw if
+      // invoked.
+      rs.doMock("~/server/hubspot/contacts", () => ({
         findExistingContact: rs
           .fn()
           .mockRejectedValue(
@@ -37,7 +40,6 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
           .mockRejectedValue(
             new Error("HubSpot must not be called in DB-first mode"),
           ),
-        toContactProperties: rs.fn().mockReturnValue({}),
       }));
 
       // Mock inngest.send so the post-commit send doesn't actually send

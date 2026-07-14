@@ -15,9 +15,8 @@ type Step = {
 type ReconcileEvent = { data: EventPayload<"hubspot.engagement-missed"> };
 
 // Worker port surface (adr020): the conversation/lead read and the engagement
-// stamp come from messagingModule.service; listEmailEngagementsForContact
-// stays a direct ~/server/hubspot import wired in the adapter (injected via
-// the factory so #329 only rewires the composition, not the core).
+// stamp come from messagingModule.service; listEmailEngagementsForContact is
+// wired from hubspotModule.service in the composition root (#329).
 export type ReconcileEngagementWorkerDeps = {
   /**
    * Loads the conversation for the message plus the lead's hubspotContactId.

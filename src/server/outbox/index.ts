@@ -14,8 +14,10 @@ export const OUTBOX_EVENTS = {
   LEAD_STAGE_CHANGED: "lead.stage-changed",
 } as const satisfies Record<string, EventName>;
 
-// Co-located so the router, webhook, and dispatch workers all import event
-// names from ~/server/outbox without depending on ~/inngest (#261).
+// Co-located so the router and dispatch workers import event names from
+// ~/server/outbox without depending on ~/inngest (#261). The hubspot webhook
+// no longer consumes these — it pins its wire string module-privately
+// (hubspot.webhook.ts) to stay off this barrel's db/inngest graph.
 export const MESSAGE_EVENTS = {
   APPROVAL_REQUESTED: "message.approval-requested",
 } as const satisfies Record<string, EventName>;
@@ -28,7 +30,11 @@ export const HUBSPOT_EMAIL_EVENTS = {
 // App-singleton binding of the outbox helpers (core.ts holds the logic and
 // its DI seam). Repositories constructed on a non-singleton db go through
 // makeCommitWithOutbox (./commit) or createOutboxHelpers directly.
-export const { buildOutboxEvent, sendPostCommit } = createOutboxHelpers({
-  db,
-  inngest,
-});
+// buildOutboxEvent/sendPostCommit have no runtime importers left (the webhook
+// moved onto `publish`); they stay exported as the adr019-documented compat
+// surface — #330 decides whether they are retired or kept.
+export const { buildOutboxEvent, sendPostCommit, publish } =
+  createOutboxHelpers({
+    db,
+    inngest,
+  });

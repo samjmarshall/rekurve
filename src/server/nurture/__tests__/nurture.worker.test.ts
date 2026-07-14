@@ -1,6 +1,7 @@
 import { InngestTestEngine } from "@inngest/test";
 import { afterAll, beforeAll, describe, expect, rs, test } from "@rstest/core";
 
+import { neutraliseWorkerImports } from "~/server/__tests__/import-neutraliser";
 import { makeDraftOutput } from "~/server/ai/__tests__/fixtures";
 import { makeWaitingStep } from "~/server/inngest/__tests__/step-fake";
 import { makeLead } from "~/server/leads/__tests__/fixtures";
@@ -17,10 +18,8 @@ const hotLead = makeLead({ id: LEAD_ID, leadStage: "hot" });
 const stubDraftOutput = makeDraftOutput();
 
 // Factory seam (adr020): behaviour is asserted through a fake deps object, not
-// module mocks. The two rs.doMock blocks below are import neutralisers only —
-// the worker file's event-name import (~/server/outbox) pulls in
-// ~/server/db (module-scope neon() needs DATABASE_URL) and ~/env (validates
-// at import).
+// module mocks; neutraliseWorkerImports() handles the import-time env/db
+// graph (rationale documented on the helper).
 let makeRunNurturePlan: typeof import("../nurture.worker")["makeRunNurturePlan"];
 let makeNurturePlanRunner: typeof import("../nurture.worker")["makeNurturePlanRunner"];
 
@@ -30,8 +29,7 @@ const savedTestRhythm = process.env.NURTURE_TEST_RHYTHM;
 
 beforeAll(async () => {
   delete process.env.NURTURE_TEST_RHYTHM;
-  rs.doMock("~/env", () => ({ env: {} }));
-  rs.doMock("~/server/db", () => ({ db: {} }));
+  neutraliseWorkerImports();
   const mod = await import("../nurture.worker");
   makeRunNurturePlan = mod.makeRunNurturePlan;
   makeNurturePlanRunner = mod.makeNurturePlanRunner;

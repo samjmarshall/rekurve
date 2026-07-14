@@ -71,7 +71,7 @@ related-prs: [125]
 
 ### Operations
 
-**Health signals**: *No PostHog events or structured logs from this feature today — open gap.* HubSpot score/stage push failures now surface as failed `lead-hubspot-sync` Inngest runs (`src/inngest/functions/leads/lead-fanout.ts`), not a console line; the mutation response still ships. E2E tests are the de-facto health check.
+**Health signals**: *No PostHog events or structured logs from this feature today — open gap.* HubSpot score/stage push failures now surface as failed `lead-hubspot-sync` Inngest runs (`src/server/hubspot/hubspot.worker.ts`), not a console line; the mutation response still ships. E2E tests are the de-facto health check.
 
 **Alerts**: none. A regression surfaces as a broken `/leads/[id]` page, not a page.
 

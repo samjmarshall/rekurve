@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, rs, test } from "@rstest/core";
 
+import { neutraliseWorkerImports } from "~/server/__tests__/import-neutraliser";
 import { makeWaitingStep } from "~/server/inngest/__tests__/step-fake";
 import type { EventPayload } from "~/server/inngest/events";
 import type { DispatchEmailWorkerDeps } from "../dispatch-email.worker";
@@ -12,18 +13,15 @@ const LEAD_ID = "lead-0000-0000-0000-000000000001";
 const approvedEmail = { subject: "Following up", body: "Hi Jane" };
 
 // Factory seam (adr020): behaviour is asserted through a fake deps object, not
-// module mocks. The two rs.doMock blocks below are import neutralisers only —
-// the worker file's event-name import (~/server/outbox) pulls in
-// ~/server/db (module-scope neon() needs DATABASE_URL) and ~/env (validates
-// at import).
+// module mocks; neutraliseWorkerImports() handles the import-time env/db
+// graph (rationale documented on the helper).
 let makeRunDispatchEmail: (
   deps: DispatchEmailWorkerDeps,
 ) => (event: unknown, step: unknown) => Promise<void>;
 let workerFn: { id: () => string; opts: Record<string, unknown> };
 
 beforeAll(async () => {
-  rs.doMock("~/env", () => ({ env: {} }));
-  rs.doMock("~/server/db", () => ({ db: {} }));
+  neutraliseWorkerImports();
   const mod = await import("../dispatch-email.worker");
   makeRunDispatchEmail = mod.makeRunDispatchEmail as never;
   workerFn = mod.makeDispatchEmailWorker(makeDeps() as never) as never;

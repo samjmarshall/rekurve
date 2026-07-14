@@ -1,15 +1,14 @@
 import { beforeEach, describe, expect, rs, test } from "@rstest/core";
 
+import { makeWebhookRequest as makeRequest } from "~/server/hubspot/__tests__/fixtures";
+
 let mockIsValid: ReturnType<typeof rs.fn>;
 let mockGetContact: ReturnType<typeof rs.fn>;
 let mockGetEmailEngagement: ReturnType<typeof rs.fn>;
-let mockFindContactIdForEmail: ReturnType<typeof rs.fn>;
 let mockCaptureFromHubspot: ReturnType<typeof rs.fn>;
 let mockUpdate: ReturnType<typeof rs.fn>;
 let mockDbDelete: ReturnType<typeof rs.fn>;
-let mockLeadsFindFirst: ReturnType<typeof rs.fn>;
-let mockConversationsFindFirst: ReturnType<typeof rs.fn>;
-let mockBuildOutboxEvent: ReturnType<typeof rs.fn>;
+let mockPublish: ReturnType<typeof rs.fn>;
 let mockSendPostCommit: ReturnType<typeof rs.fn>;
 
 beforeEach(() => {
@@ -17,18 +16,17 @@ beforeEach(() => {
 
   mockIsValid = rs.fn();
   mockGetEmailEngagement = rs.fn();
-  mockFindContactIdForEmail = rs.fn();
-  mockLeadsFindFirst = rs.fn();
-  mockConversationsFindFirst = rs.fn();
   mockCaptureFromHubspot = rs.fn().mockResolvedValue(undefined);
-  mockBuildOutboxEvent = rs.fn((eventName: string, payload: unknown) => ({
-    id: "outbox-evt-1",
-    eventName,
-    payload,
-    query: Promise.resolve(undefined),
-  }));
+  mockPublish = rs.fn().mockResolvedValue(undefined);
   mockSendPostCommit = rs.fn().mockResolvedValue(undefined);
 
+  // The route is a thin HTTP adapter over hubspotModule.service, so the REAL
+  // module graph (hubspot.module composition + webhook service) runs under
+  // the route. Mocks sit on the module's seams: the module-private adapter
+  // files (the mock registry keys on the RESOLVED module, so the alias
+  // specifiers below intercept the module's relative "./contacts"/"./emails"
+  // imports), the cross-domain module surfaces, and the HubSpot SDK.
+  // properties.ts is pure — the real fromContactProperties runs.
   rs.doMock("~/env", () => ({
     env: {
       HUBSPOT_CLIENT_SECRET: "test-secret",
@@ -37,30 +35,21 @@ beforeEach(() => {
 
   rs.doMock("@hubspot/api-client", () => ({
     Signature: { isValid: mockIsValid },
+    // client.ts constructs eagerly if the module graph pulls it in.
+    Client: class {},
   }));
 
   mockGetContact = rs.fn();
-  rs.doMock("~/server/hubspot", () => ({
+  rs.doMock("~/server/hubspot/contacts", () => ({
     getContact: mockGetContact,
+    findExistingContact: rs.fn(),
+    createContact: rs.fn(),
+    updateContact: rs.fn(),
+  }));
+
+  rs.doMock("~/server/hubspot/emails", () => ({
     getEmailEngagement: mockGetEmailEngagement,
-    findContactIdForEmail: mockFindContactIdForEmail,
-    fromContactProperties: rs.fn((props: Record<string, unknown>) => {
-      const map: Record<string, string> = {
-        firstname: "firstName",
-        lastname: "lastName",
-        email: "email",
-        phone: "phone",
-        lead_score: "leadScore",
-      };
-      const result: Record<string, unknown> = {};
-      for (const [k, v] of Object.entries(props)) {
-        const appKey = map[k];
-        if (appKey && v != null) {
-          result[appKey] = appKey === "leadScore" ? parseInt(String(v), 10) : v;
-        }
-      }
-      return result;
-    }),
+    listEmailEngagementsForContact: rs.fn(),
   }));
 
   rs.doMock("~/server/leads/leads.module", () => ({
@@ -77,11 +66,25 @@ beforeEach(() => {
       ENGAGEMENT_CREATED: "hubspot.email.engagement-created",
       ENGAGEMENT_MISSED: "hubspot.engagement-missed",
     },
-    buildOutboxEvent: mockBuildOutboxEvent,
+    // The engagement emission goes through the write-less publish (adr017
+    // batch shape, adr019 clause 7); the legacy pair stays mocked so an
+    // accidental fallback to the inline buildOutboxEvent + sendPostCommit
+    // form is caught rather than crashing.
+    publish: mockPublish,
+    buildOutboxEvent: rs.fn(),
     sendPostCommit: mockSendPostCommit,
   }));
 
-  // Mock db — only update/delete/query needed (insert no longer used for contact.creation)
+  // Defensive: nothing in the webhook graph may touch the real Inngest client.
+  rs.doMock("~/inngest/client", () => ({
+    inngest: { send: rs.fn().mockResolvedValue(undefined) },
+  }));
+
+  // db tripwire (ADR-013 — inbound HubSpot events must not write the db):
+  // nothing in the thinned webhook graph imports ~/server/db today, but the
+  // doMock registers before the dynamic route import, so a regression that
+  // reintroduces a direct write IS intercepted — the update/delete spies are
+  // pinned not-called by the inbound-event tests below.
   const updateWhere = rs.fn().mockResolvedValue(undefined);
   const updateSet = rs.fn().mockReturnValue({ where: updateWhere });
   mockUpdate = rs.fn().mockReturnValue({ set: updateSet });
@@ -93,59 +96,27 @@ beforeEach(() => {
     db: {
       update: mockUpdate,
       delete: mockDbDelete,
-      query: {
-        leads: { findFirst: mockLeadsFindFirst },
-        conversations: { findFirst: mockConversationsFindFirst },
-      },
-    },
-  }));
-
-  rs.doMock("~/server/db/schema", () => ({
-    leads: { hubspotContactId: "hubspot_contact_id" },
-    conversations: {
-      leadId: "lead_id",
-      deliveryMethod: "delivery_method",
-      direction: "direction",
-      hubspotActivityId: "hubspot_activity_id",
-      createdAt: "created_at",
-      subject: "subject",
     },
   }));
 });
-
-function makeRequest(opts: {
-  body?: string;
-  signature?: string | null;
-  timestamp?: string | null;
-}): Request {
-  const headers = new Headers();
-  if (opts.signature !== null) {
-    headers.set("x-hubspot-signature-v3", opts.signature ?? "sig");
-  }
-  if (opts.timestamp !== null) {
-    headers.set(
-      "x-hubspot-request-timestamp",
-      opts.timestamp ?? String(Date.now()),
-    );
-  }
-  return new Request("https://example.com/api/hubspot/webhook", {
-    method: "POST",
-    headers,
-    body: opts.body ?? '[{"subscriptionType":"contact.creation","objectId":1}]',
-  });
-}
 
 describe("POST /api/hubspot/webhook", () => {
   test("returns 401 when signature header is missing", async () => {
     const { POST } = await import("../route");
     const response = await POST(makeRequest({ signature: null }));
     expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({
+      error: "Missing signature headers",
+    });
   });
 
   test("returns 401 when timestamp header is missing", async () => {
     const { POST } = await import("../route");
     const response = await POST(makeRequest({ timestamp: null }));
     expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({
+      error: "Missing signature headers",
+    });
   });
 
   test("returns 401 when timestamp is older than 5 minutes", async () => {
@@ -153,6 +124,7 @@ describe("POST /api/hubspot/webhook", () => {
     const oldTimestamp = String(Date.now() - 6 * 60 * 1000);
     const response = await POST(makeRequest({ timestamp: oldTimestamp }));
     expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ error: "Timestamp expired" });
   });
 
   test("returns 401 when signature is invalid", async () => {
@@ -160,6 +132,7 @@ describe("POST /api/hubspot/webhook", () => {
     const { POST } = await import("../route");
     const response = await POST(makeRequest({}));
     expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ error: "Invalid signature" });
   });
 
   test("returns 200 when signature is valid", async () => {
@@ -374,14 +347,17 @@ describe("object.creation (EMAIL) webhook events", () => {
     expect(response.status).toBe(200);
     expect(mockGetEmailEngagement).toHaveBeenCalledWith("999");
     // Emits the correlation event keyed by the extracted id, carrying the
-    // engagement object id as the activity id.
-    expect(mockBuildOutboxEvent).toHaveBeenCalledWith(
-      "hubspot.email.engagement-created",
-      { correlationId: CORRELATION_ID, hubspotActivityId: "999" },
-    );
-    expect(mockSendPostCommit).toHaveBeenCalledWith([
-      expect.objectContaining({ name: "hubspot.email.engagement-created" }),
+    // engagement object id as the activity id — one write-less publish batch
+    // (name + exact payload key-set pinned by the strict registry).
+    expect(mockPublish).toHaveBeenCalledWith([
+      {
+        name: "hubspot.email.engagement-created",
+        data: { correlationId: CORRELATION_ID, hubspotActivityId: "999" },
+      },
     ]);
+    // publish owns the outbox write AND the post-commit send — no second
+    // send path through the legacy inline form.
+    expect(mockSendPostCommit).not.toHaveBeenCalled();
     // No direct conversation stamp anymore — the worker owns that.
     expect(mockUpdate).not.toHaveBeenCalled();
   });
@@ -401,7 +377,7 @@ describe("object.creation (EMAIL) webhook events", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
+    expect(mockPublish).not.toHaveBeenCalled();
     expect(mockSendPostCommit).not.toHaveBeenCalled();
   });
 
@@ -420,7 +396,7 @@ describe("object.creation (EMAIL) webhook events", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
+    expect(mockPublish).not.toHaveBeenCalled();
   });
 
   test("inbound email (INCOMING_EMAIL direction) → no emit", async () => {
@@ -438,7 +414,7 @@ describe("object.creation (EMAIL) webhook events", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
+    expect(mockPublish).not.toHaveBeenCalled();
     expect(mockSendPostCommit).not.toHaveBeenCalled();
   });
 
@@ -454,6 +430,6 @@ describe("object.creation (EMAIL) webhook events", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mockBuildOutboxEvent).not.toHaveBeenCalled();
+    expect(mockPublish).not.toHaveBeenCalled();
   });
 });

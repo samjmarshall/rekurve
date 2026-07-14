@@ -36,10 +36,10 @@ export function createOutboxHelpers({
   // so every existing call site (evt.eventName/evt.payload/evt.query) is
   // untouched in this zero-behavior-change PR; the adr019 clause 7 shape
   // {id, name, data, insert} lands with the domain PRs (PR 6 retires this
-  // compat surface). Clause 7's write-less `publish(events)` (webhook's
-  // engagement-created emission) is likewise deferred to PR 5, its only caller —
-  // the webhook keeps its inline `await evt.query; sendPostCommit(...)` form
-  // until then.
+  // compat surface). Clause 7's write-less `publish(events)` landed with PR 5
+  // (see below): the webhook's engagement-created emission is its first
+  // caller, and the inline `await evt.query; sendPostCommit(...)` idiom is
+  // retired — do not copy it into new handlers.
   function buildOutboxEvent<K extends EventName>(
     eventName: K,
     payload: EventPayload<K>,
@@ -106,5 +106,20 @@ export function createOutboxHelpers({
     return results;
   }
 
-  return { buildOutboxEvent, sendPostCommit, commitWithOutbox };
+  /**
+   * Write-less commit (adr019 clause 7; deferred from the enabling-infra PR to
+   * its first caller — the webhook's engagement-created emission): for
+   * emit-only surfaces with no canonical rows of their own. Builds the outbox
+   * inserts, commits them in ONE `db.batch` (adr017 — batch-shaped, never an
+   * interactive tx), then runs the same best-effort post-commit send +
+   * `processedAt` stamp (log-and-swallow on failure; hourly sweep backstop)
+   * as every other commit path.
+   */
+  async function publish(
+    events: readonly OutboxEventDescriptor[],
+  ): Promise<void> {
+    await commitWithOutbox([], events);
+  }
+
+  return { buildOutboxEvent, sendPostCommit, commitWithOutbox, publish };
 }

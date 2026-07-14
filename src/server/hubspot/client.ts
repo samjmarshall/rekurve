@@ -1,3 +1,5 @@
+import "server-only";
+
 import { Client } from "@hubspot/api-client";
 import { env } from "~/env";
 

@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { leads } from "~/server/leads/leads.schema";
 
 const PROPERTY_MAP = {

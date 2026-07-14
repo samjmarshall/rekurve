@@ -169,7 +169,8 @@ export function makeLeadsRepository({
       }
       case "stamp": {
         // Guarded stamp: only while still NULL, so a concurrently-stamped id
-        // is never overwritten (the lead-fanout idempotency fence).
+        // is never overwritten (the lead-hubspot-sync worker's idempotency
+        // fence — src/server/hubspot/hubspot.worker.ts).
         await run(
           db
             .update(leads)

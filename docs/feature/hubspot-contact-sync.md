@@ -34,10 +34,10 @@ related-prs: [113, 123]
 - `src/server/hubspot/client.ts` — singleton `@hubspot/api-client` with `numberOfApiCallRetries: 3` (10s on 429, exponential on 5xx)
 - `src/server/hubspot/contacts.ts` — `createContact`, `getContact`, `updateContact`, `searchContacts`, `findExistingContact` (email-first, phone-fallback dedup)
 - `src/server/hubspot/properties.ts` — 20-entry `PROPERTY_MAP` plus `toHubSpotProperties` / `fromHubSpotProperties` / `toAppField` / `coerceFromHubSpot` (inbound type coercion for booleans + `leadScore`)
-- `src/server/hubspot/index.ts` — barrel export
-- `src/server/leads/leads.decide.ts:70-109,160-201` — `decideCaptureLead()`/`decideUpdateLead()`; compute `lead_score` + `lead_stage` (post-commit HubSpot push lives in `src/inngest/functions/leads/lead-fanout.ts`)
+- `src/server/hubspot/hubspot.module.ts` — composition root (replaced the old `src/server/hubspot/index.ts` barrel)
+- `src/server/leads/leads.decide.ts:70-109,160-201` — `decideCaptureLead()`/`decideUpdateLead()`; compute `lead_score` + `lead_stage` (post-commit HubSpot push lives in `src/server/hubspot/hubspot.worker.ts`)
 - `src/server/leads/leads.router.ts:19-23` — `create` procedure; the `INSERT … ON CONFLICT (hubspot_contact_id) DO UPDATE` upsert now lives in `src/server/leads/leads.repository.ts:151-163` (`upsertOnHubspotContactId` write)
-- `src/server/leads/leads.router.ts:39-44` — `update` procedure; the HubSpot PATCH of mapped fields now runs post-commit in `src/inngest/functions/leads/lead-fanout.ts`
+- `src/server/leads/leads.router.ts:39-44` — `update` procedure; the HubSpot PATCH of mapped fields now runs post-commit in `src/server/hubspot/hubspot.worker.ts`
 - `src/app/api/hubspot/webhook/route.ts` — v3 signature gate, 5-minute timestamp window, per-event try/catch, always-200 response
 - `src/server/leads/leads.schema.ts:60` — `hubspotContactId text("hubspot_contact_id").unique()` (the only sync state)
 - `src/server/hubspot/__tests__/{client,contacts,properties}.test.ts` — unit coverage
@@ -79,10 +79,10 @@ related-prs: [113, 123]
 
 | Source | Format string | Fires when |
 |---|---|---|
-| `src/inngest/functions/leads/lead-fanout.ts` | *(console line removed — surfaces as a failed `lead-hubspot-sync` Inngest run)* | HubSpot score/stage push failed post-commit |
-| `src/inngest/functions/leads/lead-fanout.ts` (`stamp` step) | *(console line removed — surfaces as a failed `lead-hubspot-sync` Inngest run)* | HubSpot create succeeded, contact-id stamp failed — orphan in HubSpot |
-| `src/app/api/hubspot/webhook/route.ts:69` | `[HubSpot Webhook] Failed to process {subscriptionType} for objectId {objectId}:` | Per-event handler threw; event dropped, next event proceeds |
-| `src/app/api/hubspot/webhook/route.ts:102` | `[HubSpot Webhook] Ignoring unhandled event: {subscriptionType}` | Subscription type the handler does not implement |
+| `src/server/hubspot/hubspot.worker.ts` | *(console line removed — surfaces as a failed `lead-hubspot-sync` Inngest run)* | HubSpot score/stage push failed post-commit |
+| `src/server/hubspot/hubspot.service.ts` (`stamp` step) | *(console line removed — surfaces as a failed `lead-hubspot-sync` Inngest run)* | HubSpot create succeeded, contact-id stamp failed — orphan in HubSpot |
+| `src/server/hubspot/hubspot.webhook.ts:118` | `[HubSpot Webhook] Failed to process {subscriptionType} for objectId {objectId}:` | Per-event handler threw; event dropped, next event proceeds |
+| `src/server/hubspot/hubspot.webhook.ts:147` | `[HubSpot Webhook] Ignoring unhandled event: {subscriptionType}` | Subscription type the handler does not implement |
 
 **Alerts**: none.
 

@@ -33,7 +33,8 @@ type LeadDecideCtx = { userId: string; newId: () => string };
  * - upsert: insert … onConflictDoUpdate(hubspotContactId) (HubSpot-origin ingest)
  * - update: update-by-id (existing-email capture, lead edit)
  * - stamp: guarded hubspotContactId stamp (set only while still NULL — the
- *   lead-fanout idempotency fence)
+ *   idempotency fence for the lead-hubspot-sync worker,
+ *   src/server/hubspot/hubspot.worker.ts)
  * - delete: delete-by-id (imperative CRUD; no outbox event today)
  */
 export type LeadWrite =
@@ -148,8 +149,8 @@ export function decideCaptureFromHubspot(
   } as LeadInsert;
 
   const events: OutboxEventDescriptor[] = [
-    // hubspotSync: false suppresses the echo sync back to HubSpot
-    // (lead-fanout reads the flag as true when absent).
+    // hubspotSync: false suppresses the echo sync back to HubSpot (the
+    // lead-hubspot-sync worker reads the flag as true when absent).
     {
       name: "lead.captured",
       data: { leadId, userId: ctx.userId, hubspotSync: false },

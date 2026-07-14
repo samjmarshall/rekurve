@@ -185,6 +185,116 @@ describe("sendPostCommit", () => {
   });
 });
 
+// --- publish ---
+
+// Write-less commit (adr019 clause 7): the emit-only path — outbox inserts in
+// ONE db.batch, then the same post-commit send + processedAt stamp + swallow
+// as every commit path. First caller: the HubSpot webhook's
+// engagement-created emission (replacing its inline
+// `await evt.query; sendPostCommit(...)` idiom).
+describe("publish", () => {
+  let mocks: ReturnType<typeof makeOutboxDbMocks>;
+  let fakeInngest: ReturnType<typeof makeFakeInngest>;
+  let publish: ReturnType<typeof createOutboxHelpers>["publish"];
+
+  beforeEach(() => {
+    mocks = makeOutboxDbMocks();
+    fakeInngest = makeFakeInngest();
+    ({ publish } = createOutboxHelpers({
+      db: mocks.db,
+      inngest: fakeInngest.inngest,
+    }));
+  });
+
+  test("commits JUST the outbox inserts in ONE db.batch, in event order", async () => {
+    await publish([
+      {
+        name: "hubspot.email.engagement-created",
+        data: { correlationId: "corr-1", hubspotActivityId: "hs-act-1" },
+      },
+      { name: "lead.captured", data: { leadId: "lead-1", userId: "user-1" } },
+    ]);
+
+    expect(mocks.batch).toHaveBeenCalledTimes(1);
+    const [items] = mocks.batch.mock.calls[0] as [unknown[]];
+    expect(items).toHaveLength(2);
+    expect(items[0]).toBe(mocks.queries[0]);
+    expect(items[1]).toBe(mocks.queries[1]);
+    expect(mocks.queries[0]!.values.eventName).toBe(
+      "hubspot.email.engagement-created",
+    );
+    expect(mocks.queries[1]!.values.eventName).toBe("lead.captured");
+  });
+
+  test("batch commits BEFORE the post-commit send; send keyed by the row id, processedAt stamped", async () => {
+    const calls: string[] = [];
+    mocks.batch.mockImplementation(async () => {
+      calls.push("batch");
+      return [];
+    });
+    fakeInngest.send.mockImplementation(async () => {
+      calls.push("send");
+    });
+
+    await publish([
+      {
+        name: "hubspot.email.engagement-created",
+        data: { correlationId: "corr-1", hubspotActivityId: "hs-act-1" },
+      },
+    ]);
+
+    expect(calls).toEqual(["batch", "send"]);
+    expect(fakeInngest.send).toHaveBeenCalledWith({
+      id: mocks.queries[0]!.values.id,
+      name: "hubspot.email.engagement-created",
+      data: { correlationId: "corr-1", hubspotActivityId: "hs-act-1" },
+    });
+    expect(mocks.where).toHaveBeenCalledWith(
+      and(
+        eq(outbox.id, mocks.queries[0]!.values.id),
+        isNull(outbox.processedAt),
+      ),
+    );
+  });
+
+  test("rejects a payload that fails the registry schema before anything commits", async () => {
+    await expect(
+      publish([
+        {
+          name: "hubspot.email.engagement-created",
+          data: { correlationId: "corr-1" },
+        } as never,
+      ]),
+    ).rejects.toThrow();
+    expect(mocks.batch).not.toHaveBeenCalled();
+  });
+
+  test("swallows send failure (row stays unprocessed for the sweep)", async () => {
+    fakeInngest.send.mockRejectedValue(new Error("send failed"));
+    const consoleSpy = rs.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(
+      publish([
+        {
+          name: "hubspot.email.engagement-created",
+          data: { correlationId: "corr-1", hubspotActivityId: "hs-act-1" },
+        },
+      ]),
+    ).resolves.toBeUndefined();
+    expect(mocks.batch).toHaveBeenCalledTimes(1);
+    expect(mocks.update).not.toHaveBeenCalled();
+
+    consoleSpy.mockRestore();
+  });
+
+  test("no events → no batch, no send", async () => {
+    await publish([]);
+
+    expect(mocks.batch).not.toHaveBeenCalled();
+    expect(fakeInngest.send).not.toHaveBeenCalled();
+  });
+});
+
 // --- ~/server/outbox singleton binding ---
 
 describe("~/server/outbox (index)", () => {
@@ -196,7 +306,7 @@ describe("~/server/outbox (index)", () => {
     rs.doMock("~/server/db", () => ({ db: { insert: mocks.insert } }));
     rs.doMock("~/inngest/client", () => ({ inngest: { send: rs.fn() } }));
 
-    const { buildOutboxEvent } = await import("../index");
+    const { buildOutboxEvent, publish } = await import("../index");
     const { outbox: outboxTable } = await import("../outbox.schema");
 
     const result = buildOutboxEvent("lead.captured", {
@@ -206,5 +316,7 @@ describe("~/server/outbox (index)", () => {
 
     expect(mocks.insert).toHaveBeenCalledWith(outboxTable);
     expect(result.query).toBe(mocks.queries[0]);
+    // The write-less publish is bound on the same singletons.
+    expect(typeof publish).toBe("function");
   });
 });

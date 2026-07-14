@@ -1,3 +1,5 @@
+import "server-only";
+
 import { FilterOperatorEnum } from "@hubspot/api-client/lib/codegen/crm/contacts/models/Filter";
 import { env } from "~/env";
 import { hubspot } from "./client";
@@ -80,23 +82,6 @@ export async function updateContact(
     properties,
   });
   return mapContact(response);
-}
-
-/** Search contacts by email, name, or other query string. */
-export async function searchContacts(query: string): Promise<HubSpotContact[]> {
-  if (env.HUBSPOT_MOCK === "true") {
-    console.log("[hubspot-mock] searchContacts");
-    return [];
-  }
-  const response = await hubspot.crm.contacts.searchApi.doSearch({
-    query,
-    properties: ALL_PROPERTIES,
-    limit: 20,
-    after: "0",
-    sorts: ["-createdate"],
-    filterGroups: [],
-  });
-  return response.results.map(mapContact);
 }
 
 /** Search for an existing HubSpot contact by email or phone (for dedup on create). */

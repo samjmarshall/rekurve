@@ -2,7 +2,7 @@ import "server-only";
 
 import { env } from "~/env";
 import { inngest } from "~/inngest/client";
-import { listEmailEngagementsForContact } from "~/server/hubspot";
+import { hubspotModule } from "~/server/hubspot/hubspot.module";
 import { leadsModule } from "~/server/leads/leads.module";
 import { sendEmail } from "~/server/ms-graph";
 import { sendSmsToConsultant } from "~/server/twilio";
@@ -15,10 +15,12 @@ import { makeReconcileMissedEngagementWorker } from "./reconcile-engagement.work
 // Workers composition root (adr020): the *.worker.ts factories consume the
 // messaging service's worker-facing ports (loadDispatchable, markDispatching,
 // recordEmailSend, recordSmsSend, stampSent, loadReconciliationTarget,
-// stampEngagement) plus the lead ports and channel adapters wired here. Kept
-// separate from messaging.module.ts (same split as leads) so service-only
-// consumers — the Twilio status route — never load the inngest client or the
-// ms-graph/twilio/hubspot adapter graphs. The four Inngest adapters are built
+// stampEngagement) plus the lead + hubspot service ports and channel adapters
+// wired here. Kept separate from messaging.module.ts (same split as leads) so
+// service-only consumers — the Twilio status route — never load the inngest
+// client, the ms-graph/twilio adapter graphs, or the hubspot module graph
+// (messaging→hubspot flows through hubspotModule.service ports only; the
+// engagement flow back stays event-mediated). The four Inngest adapters are built
 // ONCE at module scope; the functions registry (~/inngest/functions) serves
 // them — worker files export only factories.
 const { service } = messagingModule;
@@ -48,7 +50,8 @@ export const messagingWorkers = {
   }),
   reconcileMissedEngagement: makeReconcileMissedEngagementWorker({
     loadReconciliationTarget: service.loadReconciliationTarget,
-    listEmailEngagementsForContact,
+    listEmailEngagementsForContact:
+      hubspotModule.service.listEmailEngagementsForContact,
     stampEngagement: service.stampEngagement,
   }),
 };

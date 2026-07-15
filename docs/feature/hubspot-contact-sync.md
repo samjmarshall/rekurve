@@ -48,29 +48,33 @@ related-prs: [113, 123]
 - `scripts/hubspot-provision-properties.ts` — referenced by `make hubspot_provision`; provisions custom properties and the `Rekurve` group
 
 **Choice made**:
-- **HubSpot-first writes on create and update.** A local row never references a non-existent contact. If HubSpot fails, the mutation fails — by design.
-- **Upsert on `hubspot_contact_id` for create.** `onConflictDoUpdate(hubspotContactId)` makes `leads.create` idempotent against the inbound `contact.creation` webhook. Whichever lands first wins; the form data overwrites the webhook's bare row. Bug-fixed in commit `db7981f` after a real race in pilot.
+- **DB-first writes; HubSpot is a downstream mirror via the outbox.** `leads.create` / `leads.update` commit the lead row and its outbox events (`lead.captured` / `lead.updated`) in one `db.batch` and return — HubSpot is never on the request path ([adr013](../adr/adr013-local-db-canonical-for-lead-data.md), [adr019](../adr/adr019-system-wide-transactional-outbox-posture.md)). The `lead-hubspot-sync` Inngest worker (`src/server/hubspot/hubspot.worker.ts`) does the HubSpot push post-commit, with Inngest retries; the hourly outbox sweep is the delivery backstop.
+- **Upsert on `hubspot_contact_id` for HubSpot-origin ingest.** The `contact.creation` webhook path (`captureLeadFromHubspot` → `decideCaptureFromHubspot`) upserts on `hubspot_contact_id`, so ingest is idempotent against a race with a local capture. The ingest emits `lead.captured` with `hubspotSync: false` so the contact is not echoed straight back to HubSpot.
+- **Inbound HubSpot edits are not honoured pre-PMF.** `contact.propertyChange` and `contact.deletion` are logged and dropped (`hubspot.webhook.ts`) — the local DB is canonical ([adr013](../adr/adr013-local-db-canonical-for-lead-data.md)); the next outbound sync overwrites HubSpot. `contact.creation` remains a one-way ingest path.
 - **Webhook always returns 200.** The handler catches per-event errors, logs `[HubSpot Webhook] Failed to process …`, and runs the next event. HubSpot never sees a 5xx, so no retry storm.
-- **`scoreLead()` swallows HubSpot errors.** A HubSpot outage during scoring must not fail the request — the local score persists, HubSpot catches up on the next qualifying edit.
-- **Email-first, phone-fallback dedup.** `findExistingContact()` runs an `EQ` search on `email`, then `phone` if no email match. Existing contact → `updateContact`; otherwise `createContact`.
-- **No service layer.** HubSpot calls live inline in the leads router, matching the existing pattern. Trade-off: harder to test the router without mocking HubSpot.
+- **Email-first, phone-fallback dedup.** For an unlinked lead the worker's `hs-dedup` step runs `findExistingContact()` — an `EQ` search on `email`, then `phone`. Existing contact → `hs-update`; otherwise `hs-create`; either way the contact id is stamped back onto the lead (`stamp`). An already-linked lead gets a single `hs-patch`.
+- **Score and stage ride the same push.** `lead_score` / `lead_stage` are mapped contact properties, so there is no separate score PATCH; a failed push surfaces as a failed `lead-hubspot-sync` run and is retried by Inngest.
+- **Service layer per adr020.** `hubspot.module.ts` exposes `{ service }` (`syncLeadContact`, the webhook handlers, the engagement read port); the raw API adapters (`client.ts` / `contacts.ts` / `emails.ts` / `properties.ts`) are module-private, and tests fake the I/O seam through factory deps.
 
 **Rejected alternatives**:
 - **Scheduled reconciliation cron** — deferred until divergence is observed.
 - **Webhook retry queue / dead-letter** — for pilot scale, log and move on.
-- **Bidirectional sync with `changeSource` loop guard** — handlers are idempotent (PATCHing the same value is a no-op), so unnecessary.
+- **Bidirectional sync with `changeSource` loop guard** — inbound edits are dropped entirely pre-PMF (adr013), so no loop guard is needed; the ingest path's `hubspotSync: false` flag suppresses the one echo that could loop.
 - **Programmatic creation of HubSpot custom properties** — would couple deploy time to a HubSpot admin operation; the setup guide documents the manual steps instead.
-- **DB-first writes with HubSpot fan-out after** — would orphan local rows on HubSpot failure and silently mask broken integrations.
+- **HubSpot-first synchronous writes** — the original design ([adr003](../adr/adr003-hubspot-source-of-truth-for-contacts.md)): every mutation blocked on 1–2 HubSpot round-trips and a HubSpot outage failed lead capture. Retired by adr013 once Inngest + the outbox provided the durable retry surface adr003 was missing.
 
 **Anchored in ADRs**:
-- [adr003 — HubSpot is the source of truth for contact data](../adr/adr003-hubspot-source-of-truth-for-contacts.md): governs HubSpot-first writes, the local row's role as a cache + extension, idempotent webhook handlers, and the deliberate omission of bidirectional loop guards or scheduled reconciliation.
+- [adr013 — Local DB is canonical for lead data](../adr/adr013-local-db-canonical-for-lead-data.md): governs DB-first writes, the post-commit HubSpot push, the log-and-drop of inbound `propertyChange`/`deletion`, and the nullable-then-stamped `hubspotContactId` window.
+- [adr019 — System-wide transactional outbox posture](../adr/adr019-system-wide-transactional-outbox-posture.md) (mechanism: [adr014](../adr/adr014-outbox-pattern-for-inngest-delivery.md)/[adr017](../adr/adr017-atomic-outbox-writes-via-neon-http-batch.md)): governs the write → deliver → backstop path that carries `lead.captured`/`lead.updated` to the sync worker.
 - [adr004 — Webhook handler swallows per-event errors and always returns 200](../adr/adr004-webhook-swallow-and-always-200.md): governs the per-event try/catch + log + always-200 contract on `POST /api/hubspot/webhook`, and the idempotency requirement on every event handler.
+- [adr003 — HubSpot is the source of truth for contact data](../adr/adr003-hubspot-source-of-truth-for-contacts.md): the superseded original posture — kept for the webhook-idempotency reasoning; its canonical-store clause is reversed by adr013.
 
 **Trade-offs**:
-- **Latency**: every `leads.create` adds 1–2 HubSpot round-trips (dedup search + create-or-update); every qualifying-field `leads.update` adds 1–2 (PATCH + score push). Expect ~200–500ms per mutation. Acceptable at pilot.
-- **Orphan-on-DB-fail**: HubSpot-success / DB-fail produces a contact in HubSpot with no local row. The TRPC error message includes the contact ID; `[leads.create] local insert failed for HubSpot contact {id}` logs it. Recovery is manual.
-- **Score divergence on HubSpot outage**: `scoreLead()` swallows HubSpot errors. The local score is correct; HubSpot lags until the next mutation triggers another push.
-- **Silent observability**: no PostHog, no metrics. The four `console.error` format strings below are the entire signal surface.
+- **Latency**: mutations are local-only (one `db.batch`) — HubSpot's 1–2 round-trips moved off the request path into the worker. The cost moved, not vanished: HubSpot lags the local row by the fan-out latency (typically seconds; up to ~1 h if the post-commit send fails and the sweep delivers).
+- **Nullable link window**: a freshly captured lead has `hubspotContactId = null` until the worker's `stamp` step lands; consumers must tolerate it. The dashboard catches the link via the worker's realtime `lead.updated` publish.
+- **Orphan direction flipped**: the old "contact in HubSpot, no local row" orphan is gone; the failure mode is now "lead local, HubSpot push pending", visible as a failed/retrying `lead-hubspot-sync` run in Inngest rather than a consultant-facing error.
+- **Divergence on HubSpot outage**: the local row is always correct (canonical); HubSpot catches up when Inngest retries succeed. An outage longer than the retry budget leaves a failed run to replay from the Inngest dashboard.
+- **Silent observability**: no PostHog, no metrics. Failed `lead-hubspot-sync` runs in Inngest plus the webhook console lines below are the entire signal surface.
 - **Property-map drift**: adding a column to `leads` without touching `PROPERTY_MAP` silently drops it from sync. There is no compile-time link.
 
 ### Operations

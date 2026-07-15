@@ -11,13 +11,13 @@ let procedurePaths: string[];
 
 beforeAll(async () => {
   // Import-safety only — no procedure is invoked. ~/server/db does a
-  // module-scope neon() that needs a real DATABASE_URL; ~/lib/session pulls in
+  // module-scope neon() that needs a real DATABASE_URL; ~/server/auth/session pulls in
   // better-auth's module-scope init; ~/env validates at import. The schema
   // modules need no mock — "server-only" resolves to the rstest alias stub and
   // their drizzle pgTable defs are side-effect-free.
   rs.doMock("~/env", () => ({ env: {} }));
   rs.doMock("~/server/db", () => ({ db: {} }));
-  rs.doMock("~/lib/session", () => ({ getSession: rs.fn() }));
+  rs.doMock("~/server/auth/session", () => ({ getSession: rs.fn() }));
 
   const { appRouter } = await import("../root");
   procedurePaths = Object.keys(appRouter._def.procedures).sort();

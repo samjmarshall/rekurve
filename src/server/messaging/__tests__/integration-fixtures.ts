@@ -39,7 +39,12 @@ export async function seedLeadAndMessage(
   opts: { withUser?: boolean } = {},
 ): Promise<void> {
   const { db } = await import("~/server/db");
-  const schema = await import("~/server/db/schema");
+  const schema = {
+    ...(await import("~/server/db/shared.schema")),
+    ...(await import("~/server/leads/leads.schema")),
+    ...(await import("~/server/messaging/messaging.schema")),
+    ...(await import("~/server/outbox/outbox.schema")),
+  };
   if (opts.withUser) {
     await db
       .insert(schema.user)
@@ -76,7 +81,12 @@ export async function cleanupSeededRows(
   opts: { outbox?: boolean } = {},
 ): Promise<void> {
   const { db } = await import("~/server/db");
-  const schema = await import("~/server/db/schema");
+  const schema = {
+    ...(await import("~/server/db/shared.schema")),
+    ...(await import("~/server/leads/leads.schema")),
+    ...(await import("~/server/messaging/messaging.schema")),
+    ...(await import("~/server/outbox/outbox.schema")),
+  };
   if (opts.outbox) {
     await db
       .delete(schema.outbox)

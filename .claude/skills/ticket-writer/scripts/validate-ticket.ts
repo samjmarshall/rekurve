@@ -1,7 +1,7 @@
 // Post-publish ticket validator — the skill's hard publish gate.
 //
-//   yarn tsx .claude/skills/ticket-writer/scripts/validate-ticket.ts <n> [--type <t>]
-//   yarn tsx .claude/skills/ticket-writer/scripts/validate-ticket.ts --epic <P>
+//   yarn tsx .claude/skills/write-tickets/scripts/validate-ticket.ts <n> [--type <t>]
+//   yarn tsx .claude/skills/write-tickets/scripts/validate-ticket.ts --epic <P>
 //
 // Exit codes: 0 = clean (warnings allowed) · 1 = a ticket is non-compliant ·
 // 2 = operational failure (gh unavailable / API shape drift / board rename /

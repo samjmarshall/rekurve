@@ -10,7 +10,7 @@ paths:
 
 ## Building & Reviewing UI
 
-Use the `frontend-design` skill when implementing UI components, pages, or layouts. After completing UI/UX work in `src/`, run `/design_review` before committing.
+Use the `frontend-design` skill when implementing UI components, pages, or layouts. After completing UI/UX work in `src/`, run `/design-review` before committing.
 
 ## Frontend Architecture
 

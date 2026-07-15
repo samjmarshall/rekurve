@@ -1,9 +1,11 @@
+import "server-only";
+
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import { Client } from "@microsoft/microsoft-graph-client";
 import { eq } from "drizzle-orm";
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { msGraphTokens } from "~/server/db/schema";
+import { msGraphTokens } from "~/server/ms-graph/ms-graph.schema";
 
 export class MsGraphNotConnectedError extends Error {
   constructor() {

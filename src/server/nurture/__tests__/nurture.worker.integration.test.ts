@@ -27,7 +27,10 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     afterAll(async () => {
       const { db } = await import("~/server/db");
-      const { leads, messageQueue } = await import("~/server/db/schema");
+      const { leads } = await import("~/server/leads/leads.schema");
+      const { messageQueue } = await import(
+        "~/server/messaging/messaging.schema"
+      );
       if (createdMessageIds.length > 0) {
         await db
           .delete(messageQueue)
@@ -40,7 +43,10 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     test("drafts on timeout — writes one pending message_queue row to Neon", async () => {
       const { db } = await import("~/server/db");
-      const { leads, messageQueue } = await import("~/server/db/schema");
+      const { leads } = await import("~/server/leads/leads.schema");
+      const { messageQueue } = await import(
+        "~/server/messaging/messaging.schema"
+      );
       const { leadsModule } = await import("~/server/leads/leads.module");
       const { messagingModule } = await import(
         "~/server/messaging/messaging.module"

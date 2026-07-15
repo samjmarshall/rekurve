@@ -15,7 +15,7 @@ import { eq } from "drizzle-orm";
 
 import { draftMessage } from "~/server/ai";
 import { db } from "~/server/db";
-import { leads } from "~/server/db/schema";
+import { leads } from "~/server/leads/leads.schema";
 
 const leadId = process.argv[2];
 if (!leadId) {

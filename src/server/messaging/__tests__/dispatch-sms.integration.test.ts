@@ -29,7 +29,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
 
     test("writes the conversation with twilioMessageSid and stamps sentAt", async () => {
       const { db } = await import("~/server/db");
-      const schema = await import("~/server/db/schema");
+      const schema = await import("~/server/messaging/messaging.schema");
       const { messagingModule } = await import(
         "~/server/messaging/messaging.module"
       );

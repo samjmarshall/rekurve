@@ -1,3 +1,5 @@
+import "server-only";
+
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
@@ -10,7 +12,7 @@ import {
   firstForwardedIp,
   ipLimiter,
   normalizeEmail,
-} from "~/lib/rate-limit";
+} from "~/server/auth/rate-limit";
 import { db } from "~/server/db";
 import * as authSchema from "~/server/db/shared.schema";
 

@@ -8,21 +8,14 @@ const TEST_EVENT = `outbox.integration.sweep.${Date.now()}.${Math.random().toStr
 
 describe.skipIf(!process.env.INTEGRATION_DB)("outboxSweep integration", () => {
   test("marks inserted rows as processed and is idempotent on re-run", async () => {
-    rs.resetModules();
-
-    // doMock must be called before importing sweep — sweep statically imports
-    // ~/inngest/client at load time, so the mock must be registered first.
+    // Real Neon db; only Inngest delivery is faked — the sweep core takes its
+    // send port as an injected dep (adr020), so no module mock is needed.
     const mockSend = rs.fn().mockResolvedValue([]);
-    rs.doMock("~/inngest/client", () => ({
-      inngest: {
-        createFunction: rs.fn().mockReturnValue({}),
-        send: mockSend,
-      },
-    }));
 
     const { db } = await import("~/server/db");
     const { outbox } = await import("~/server/outbox/outbox.schema");
-    const { runSweep } = await import("../sweep");
+    const { makeRunSweep } = await import("../outbox.worker");
+    const runSweep = makeRunSweep({ db, send: mockSend });
 
     // Insert 3 rows aged > 30 s by backdating created_at
     const past = new Date(Date.now() - 60_000);
@@ -49,7 +42,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)("outboxSweep integration", () => {
       );
     expect(processed).toHaveLength(3);
 
-    // Second sweep — no new rows, inngest.send not called again
+    // Second sweep — no new rows, send not called again
     const sendCallsAfterFirst = mockSend.mock.calls.length;
     await runSweep(mockStep as never);
     expect(mockSend.mock.calls.length).toBe(sendCallsAfterFirst);

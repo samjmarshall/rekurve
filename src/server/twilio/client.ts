@@ -1,3 +1,5 @@
+import "server-only";
+
 import twilio from "twilio";
 import { env } from "~/env";
 

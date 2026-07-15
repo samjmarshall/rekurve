@@ -1,7 +1,7 @@
 import "server-only";
 
-import { inngest } from "~/inngest/client";
 import { aiModule } from "~/server/ai/ai.module";
+import { inngest } from "~/server/inngest/client";
 import { leadsModule } from "~/server/leads/leads.module";
 import { messagingModule } from "~/server/messaging/messaging.module";
 import { makeNurturePlanRunner } from "./nurture.worker";
@@ -9,7 +9,7 @@ import { makeNurturePlanRunner } from "./nurture.worker";
 // Workers composition root (adr020): the nurture.worker.ts factory consumes
 // the leads read port, messaging's enqueueDraft write door, and the ai draft
 // port wired here. The Inngest adapter is built ONCE at module scope; the
-// functions registry (~/inngest/functions) serves it — the worker file
+// functions registry (~/server/inngest/functions) serves it — the worker file
 // exports only factories.
 //
 // Deliberately NO nurture.module.ts (adr020 collapse rule, recorded

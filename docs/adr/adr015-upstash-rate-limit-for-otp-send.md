@@ -111,8 +111,8 @@ matched to `ctx.path === "/email-otp/send-verification-otp"`.
   `ephemeralCache`).
 - Couples to better-auth 1.6.9 `ctx` shape — pin the version; re-verify the
   hook `ctx` accessors and the 429 body shape at implementation.
-- Follow-up work required: `/create_plan` against #267 drives implementation
-  (env wiring, `auth.ts` hook, `src/lib/rate-limit.ts`, the E2E spec); a
+- Follow-up work required: `/write-plan` against #267 drives implementation
+  (env wiring, `auth.ts` hook, `src/server/auth/rate-limit.ts`, the E2E spec); a
   correction comment on #267 is recommended (the wrong endpoint + non-existent
   plugin will otherwise mislead the implementer) — pending approval; revisit
   if a second pilot needs per-tenant limits (currently one constant set, per

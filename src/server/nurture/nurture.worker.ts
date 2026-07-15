@@ -1,22 +1,26 @@
 import "server-only";
 
-import { inngest } from "~/inngest/client";
 import type { DraftFn } from "~/server/ai/ai.module";
+import { inngest } from "~/server/inngest/client";
 import type {
   EventName,
   EventPayload,
   SendEvent,
 } from "~/server/inngest/events";
 import type { LeadRow } from "~/server/leads/leads.schema";
-import { OUTBOX_EVENTS } from "~/server/outbox";
 import { rhythmForStage } from "./rhythm";
 
 // `satisfies` pins each name to an EVENT_REGISTRY key (adr019 clause 7) —
 // type-only, so no runtime dep on the registry module. Module-private: the
-// only consumers are this file's emit steps (tests pin the raw wire strings).
+// only consumers are this file's emit steps, the trigger config, and the wait
+// match (tests + the registry golden pin the raw wire strings).
 const NURTURE_EVENTS = {
   FOLLOWUP_DRAFTED: "nurture.followup-message-drafted",
   PLAN_PAUSED: "nurture.plan-paused",
+} as const satisfies Record<string, EventName>;
+
+const LEAD_EVENTS = {
+  STAGE_CHANGED: "lead.stage-changed",
 } as const satisfies Record<string, EventName>;
 
 type Step = {
@@ -86,7 +90,7 @@ export function makeRunNurturePlan(deps: NurturePlanRunnerDeps) {
       if (!rhythm) return; // hot stage — no scheduling
 
       const changed = await step.waitForEvent(`wait-stage-change-${i}`, {
-        event: OUTBOX_EVENTS.LEAD_STAGE_CHANGED,
+        event: LEAD_EVENTS.STAGE_CHANGED,
         match: "data.leadId",
         timeout: rhythm.duration,
       });
@@ -134,7 +138,7 @@ export function makeNurturePlanRunner(deps: NurturePlanRunnerDeps) {
   return inngest.createFunction(
     {
       id: "nurture-plan-runner",
-      triggers: [{ event: OUTBOX_EVENTS.LEAD_STAGE_CHANGED }],
+      triggers: [{ event: LEAD_EVENTS.STAGE_CHANGED }],
       concurrency: [{ key: "event.data.leadId", limit: 1 }],
       retries: 8,
       onFailure: async ({ event }) => {
@@ -147,7 +151,7 @@ export function makeNurturePlanRunner(deps: NurturePlanRunnerDeps) {
         });
       },
     },
-    // The shared Inngest client is untyped (typed schemas are a PR-6 concern);
+    // The shared Inngest client is untyped (typed schemas deliberately deferred);
     // the trigger config pins the event name, so narrow `data` to the registry
     // payload (adr019 clause 7 — the single payload authority) once at the
     // boundary — no `as unknown as` double-cast.

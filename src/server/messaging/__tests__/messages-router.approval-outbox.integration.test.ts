@@ -13,7 +13,7 @@ import {
 // Integration: prove that messages.approve for the email channel writes the
 // status flip AND the message.approval-requested outbox row atomically against
 // real Neon (the db.batch path), and that no row is written twice. Mirrors the
-// outbox sweep integration idiom — mocks ~/inngest/client so post-commit send
+// outbox sweep integration idiom — mocks ~/server/inngest/client so post-commit send
 // is a no-op, but exercises the real outbox + batch logic end to end.
 
 describe.skipIf(!process.env.INTEGRATION_DB)(
@@ -30,13 +30,13 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       rs.resetModules();
 
       const mockSend = rs.fn().mockResolvedValue([]);
-      rs.doMock("~/inngest/client", () => ({
+      rs.doMock("~/server/inngest/client", () => ({
         inngest: {
           createFunction: rs.fn().mockReturnValue({}),
           send: mockSend,
         },
       }));
-      rs.doMock("~/lib/session", () => ({
+      rs.doMock("~/server/auth/session", () => ({
         getSession: rs.fn().mockResolvedValue({
           user: { id: userId, email, name: "Integration User" },
           session: { id: `int-session-${suffix}` },
@@ -44,7 +44,11 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       }));
 
       const { db } = await import("~/server/db");
-      const schema = await import("~/server/db/schema");
+      const schema = {
+        ...(await import("~/server/ms-graph/ms-graph.schema")),
+        ...(await import("~/server/messaging/messaging.schema")),
+        ...(await import("~/server/outbox/outbox.schema")),
+      };
       const { createCaller } = await import("~/server/api/root");
       const { createTRPCContext } = await import("~/server/api/trpc");
 

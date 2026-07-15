@@ -29,13 +29,6 @@ beforeEach(() => {
   rs.doMock("~/server/db", () => ({
     db: { update: mockUpdate },
   }));
-
-  rs.doMock("~/server/db/schema", () => ({
-    conversations: {
-      twilioMessageSid: "twilio_message_sid",
-      deliveryStatus: "delivery_status",
-    },
-  }));
 });
 
 function makeRequest(opts: {

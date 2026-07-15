@@ -1,3 +1,5 @@
+import "server-only";
+
 /**
  * Bounds the latency of a DB operation so a hung Neon HTTP request fails fast
  * with a catchable error instead of running until Vercel's function timeout

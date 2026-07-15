@@ -1,8 +1,8 @@
 import "server-only";
 
 import { env } from "~/env";
-import { inngest } from "~/inngest/client";
 import { hubspotModule } from "~/server/hubspot/hubspot.module";
+import { inngest } from "~/server/inngest/client";
 import { leadsModule } from "~/server/leads/leads.module";
 import { sendEmail } from "~/server/ms-graph";
 import { sendSmsToConsultant } from "~/server/twilio";
@@ -21,8 +21,8 @@ import { makeReconcileMissedEngagementWorker } from "./reconcile-engagement.work
 // client, the ms-graph/twilio adapter graphs, or the hubspot module graph
 // (messaging→hubspot flows through hubspotModule.service ports only; the
 // engagement flow back stays event-mediated). The four Inngest adapters are built
-// ONCE at module scope; the functions registry (~/inngest/functions) serves
-// them — worker files export only factories.
+// ONCE at module scope; the functions registry (~/server/inngest/functions)
+// serves them — worker files export only factories.
 const { service } = messagingModule;
 
 export const messagingWorkers = {

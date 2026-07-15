@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import { env } from "~/env";
-import { getSession } from "~/lib/session";
+import { getSession } from "~/server/auth/session";
 import { getMsalClient } from "~/server/ms-graph";
 
 export async function GET() {

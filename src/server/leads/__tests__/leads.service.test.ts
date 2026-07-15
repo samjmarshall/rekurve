@@ -26,7 +26,8 @@ function makeFakeRepo(overrides: Record<string, unknown> = {}) {
     listByStage: rs.fn().mockResolvedValue([]),
     firstUserCreated: rs.fn().mockResolvedValue({ id: "user-earliest" }),
     deleteById: rs.fn(),
-    commit: rs.fn().mockResolvedValue(leadRow),
+    // Plural door: resolves the positional results tuple — one entry per write.
+    commit: rs.fn().mockResolvedValue([leadRow]),
     ...overrides,
   };
 }
@@ -47,11 +48,12 @@ describe("captureLead", () => {
 
     expect(repo.findByEmail).not.toHaveBeenCalled();
     expect(repo.commit).toHaveBeenCalledOnce();
-    const [write, events] = repo.commit.mock.calls[0] as [
-      { kind: string },
+    const [writes, events] = repo.commit.mock.calls[0] as [
+      { kind: string }[],
       { name: string }[],
     ];
-    expect(write.kind).toBe("insert");
+    expect(writes).toHaveLength(1);
+    expect(writes[0]!.kind).toBe("insert");
     expect(events.map((e) => e.name)).toContain("lead.captured");
     expect(result).toEqual(leadRow);
   });
@@ -70,16 +72,16 @@ describe("captureLead", () => {
     );
 
     expect(repo.findByEmail).toHaveBeenCalledWith("john@test.com");
-    const [write] = repo.commit.mock.calls[0] as [
-      { kind: string; id?: string },
+    const [writes] = repo.commit.mock.calls[0] as [
+      { kind: string; id?: string }[],
     ];
-    expect(write.kind).toBe("update");
-    expect(write.id).toBe(LEAD_ID);
+    expect(writes[0]!.kind).toBe("update");
+    expect(writes[0]!.id).toBe(LEAD_ID);
   });
 
   test("returns the post-scoring row from commit (adr006)", async () => {
     const scored = { ...leadRow, leadScore: 50, leadStage: "nurture" as const };
-    const repo = makeFakeRepo({ commit: rs.fn().mockResolvedValue(scored) });
+    const repo = makeFakeRepo({ commit: rs.fn().mockResolvedValue([scored]) });
     const service = makeService(repo);
 
     const result = await service.captureLead(
@@ -105,12 +107,13 @@ describe("captureLeadFromHubspot", () => {
     );
 
     expect(repo.findByHubspotContactId).toHaveBeenCalledWith(HS_ID);
-    const [write, events] = repo.commit.mock.calls[0] as [
-      { kind: string; record?: { hubspotContactId: string } },
+    const [writes, events] = repo.commit.mock.calls[0] as [
+      { kind: string; record?: { hubspotContactId: string } }[],
       { name: string; data: Record<string, unknown> }[],
     ];
-    expect(write.kind).toBe("upsert");
-    expect(write.record?.hubspotContactId).toBe(HS_ID);
+    expect(writes).toHaveLength(1);
+    expect(writes[0]!.kind).toBe("upsert");
+    expect(writes[0]!.record?.hubspotContactId).toBe(HS_ID);
     expect(events[0]).toMatchObject({
       name: "lead.captured",
       data: { hubspotSync: false, userId: USER_ID },
@@ -119,7 +122,7 @@ describe("captureLeadFromHubspot", () => {
 
   test("returns the committed row", async () => {
     const hsRow = { ...leadRow, hubspotContactId: HS_ID };
-    const repo = makeFakeRepo({ commit: rs.fn().mockResolvedValue(hsRow) });
+    const repo = makeFakeRepo({ commit: rs.fn().mockResolvedValue([hsRow]) });
     const service = makeService(repo);
 
     const result = await service.captureLeadFromHubspot(
@@ -148,7 +151,7 @@ describe("updateLead", () => {
 
   test("throws LeadNotFoundError when commit returns no row (concurrent delete)", async () => {
     const repo = makeFakeRepo({
-      commit: rs.fn().mockResolvedValue(undefined),
+      commit: rs.fn().mockResolvedValue([undefined]),
     });
     const service = makeService(repo);
 
@@ -171,19 +174,20 @@ describe("updateLead", () => {
   test("loads existing, commits decide output, returns the updated row", async () => {
     const updated = { ...leadRow, notes: "updated" };
     const repo = makeFakeRepo({
-      commit: rs.fn().mockResolvedValue(updated),
+      commit: rs.fn().mockResolvedValue([updated]),
     });
     const service = makeService(repo);
 
     const result = await service.updateLead(LEAD_ID, { notes: "updated" }, CTX);
 
     expect(repo.findById).toHaveBeenCalledWith(LEAD_ID);
-    const [write, events] = repo.commit.mock.calls[0] as [
-      { kind: string; id: string },
+    const [writes, events] = repo.commit.mock.calls[0] as [
+      { kind: string; id: string }[],
       { name: string }[],
     ];
-    expect(write.kind).toBe("update");
-    expect(write.id).toBe(LEAD_ID);
+    expect(writes).toHaveLength(1);
+    expect(writes[0]!.kind).toBe("update");
+    expect(writes[0]!.id).toBe(LEAD_ID);
     expect(events.map((e) => e.name)).toContain("lead.updated");
     expect(result).toEqual(updated);
   });
@@ -302,7 +306,7 @@ describe("cross-domain ports", () => {
     await service.stampHubspotContactId(LEAD_ID, "hs-1");
 
     expect(repo.commit).toHaveBeenCalledWith(
-      { kind: "stamp", id: LEAD_ID, hubspotContactId: "hs-1" },
+      [{ kind: "stamp", id: LEAD_ID, hubspotContactId: "hs-1" }],
       [],
     );
   });

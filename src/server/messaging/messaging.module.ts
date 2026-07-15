@@ -9,11 +9,12 @@ import { makeMessagingService } from "./messaging.service";
 // repository is deliberately NOT exported — other code consumes messaging
 // through the service ports.
 //
-// Deliberately NO router here (same recorded deviation as leads.module.ts):
+// Deliberately NO router here (same settled convention as leads.module.ts):
 // the tRPC adapters are wired by their host registry (~/server/api/root.ts)
 // via makeMessagesRouter/makeConversationsRouter({ service }), so service-only
 // consumers — the Twilio status route — never import the trpc/auth graph.
-// Revisit in the PR-6 conventions sweep.
+// Settled per adr020's consequence update; see
+// .claude/rules/server-architecture.md.
 //
 // Deliberately NO workers here either (same split as PR 2's leads module fix):
 // the Inngest adapters are composed by messaging.workers.ts, so service-only

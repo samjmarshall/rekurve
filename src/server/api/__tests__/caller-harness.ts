@@ -2,7 +2,7 @@ import { rs } from "@rstest/core";
 import type { createCaller } from "~/server/api/root";
 
 /**
- * Shared tRPC router-test harness: the ~/env + ~/lib/session doMock scaffold
+ * Shared tRPC router-test harness: the ~/env + ~/server/auth/session doMock scaffold
  * every router test needs before importing the app router, plus the root
  * caller builder. Call mockTrpcContextDeps() inside beforeEach AFTER
  * rs.resetModules(); mock ~/server/db per file (its shape is test-specific).
@@ -33,7 +33,7 @@ const MOCK_ENV = {
   TWILIO_CONSULTANT_NUMBER: "+61400000000",
 };
 
-/** doMock ~/env and ~/lib/session. `session: null` ⇒ unauthenticated. */
+/** doMock ~/env and ~/server/auth/session. `session: null` ⇒ unauthenticated. */
 export function mockTrpcContextDeps({
   env = {},
   session = TEST_SESSION,
@@ -42,7 +42,7 @@ export function mockTrpcContextDeps({
   session?: typeof TEST_SESSION | null;
 } = {}): void {
   rs.doMock("~/env", () => ({ env: { ...MOCK_ENV, ...env } }));
-  rs.doMock("~/lib/session", () => ({
+  rs.doMock("~/server/auth/session", () => ({
     getSession: rs.fn().mockResolvedValue(session),
   }));
 }

@@ -46,4 +46,4 @@ Follow the skill's flow:
 Write the final approved roadmap prioritization to:
 `thoughts/roadmap/YYYY-MM-DD-roadmap-prioritization.md`
 
-**STOP after writing — make no GitHub changes.** The founder reviews, then directs the `github-project` agent to apply (close Removes, set/clear Start/Target dates, move milestones, drop iterations) and uses `/write_tickets` for Needs-investigation items.
+**STOP after writing — make no GitHub changes.** The founder reviews, then directs the `github-project` agent to apply (close Removes, set/clear Start/Target dates, move milestones, drop iterations) and uses `/write-tickets` for Needs-investigation items.

@@ -78,6 +78,11 @@ db_branch_status:
 hubspot_setup:
 	yarn tsx scripts/hubspot/setup.ts
 
+# Draft-message smoke script — the script imports `server-only` modules, so it
+# needs this Makefile's baked NODE_OPTIONS. Usage: make smoke_draft leadId=<uuid>
+smoke_draft:
+	yarn smoke:draft $(leadId)
+
 vercel_link:
 	yarn vercel link
 

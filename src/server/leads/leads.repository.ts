@@ -26,6 +26,12 @@ type LeadCommitResult<W extends LeadWrite> = W extends {
       ? Pick<LeadRow, "id"> | undefined
       : undefined;
 
+/** Positional result tuple of the plural write door: one entry per write, in
+ * write order (batch results align with statements; outbox inserts trail). */
+type LeadCommitResults<Ws extends readonly LeadWrite[]> = {
+  [K in keyof Ws]: LeadCommitResult<Ws[K]>;
+};
+
 // The one shared pipeline-filter builder (used by list + listByStage). The
 // FHOG business rule is stated here once: fhogEligible ⇒ propertyType =
 // 'first_home_buyer'.
@@ -45,7 +51,7 @@ function pipelineFilterConditions(filters: NonNullable<PipelineFilters>) {
 }
 
 // The only leads file that builds Drizzle statements (adr020): plain-data
-// reads plus the single atomic write door, `commit(write, events)`, which
+// reads plus the single atomic write door, `commit(writes, events)`, which
 // lands canonical rows and outbox rows in one db.batch via commitWithOutbox.
 // Statements target the domain-owned `leads` table, with one annotated
 // exception (`firstUserCreated` — see its MIGRATION SEAM note).
@@ -126,69 +132,71 @@ export function makeLeadsRepository({
 
   // Imperative CRUD — still terminates in the write door (adr020: commit is
   // the only write door); no outbox event today, keep it that way.
-  function deleteById(id: string) {
-    return commit({ kind: "delete", id }, []);
+  async function deleteById(id: string) {
+    const [deleted] = await commit([{ kind: "delete", id }], []);
+    return deleted;
   }
 
-  async function commit<W extends LeadWrite>(
-    write: W,
-    events: readonly OutboxEventDescriptor[],
-  ): Promise<LeadCommitResult<W>> {
-    const run = (stmt: BatchItem) => commitWithOutbox([stmt], events);
-    // Widen for discriminant narrowing; each branch casts its own honest
-    // result back to the per-variant type (no positional guessing on the
-    // batch results — a returning-less write never pretends to carry rows).
-    const w: LeadWrite = write;
-    type R = LeadCommitResult<W>;
-
-    switch (w.kind) {
-      case "insert": {
-        const [rows] = (await run(
-          db.insert(leads).values(w.record).returning(),
-        )) as [LeadRow[]];
-        return rows[0] as R;
-      }
-      case "upsert": {
-        const [rows] = (await run(
-          db
-            .insert(leads)
-            .values(w.record)
-            .onConflictDoUpdate({
-              target: leads.hubspotContactId,
-              set: w.record as Partial<LeadInsert>,
-            })
-            .returning(),
-        )) as [LeadRow[]];
-        return rows[0] as R;
-      }
-      case "update": {
-        const [rows] = (await run(
-          db.update(leads).set(w.set).where(eq(leads.id, w.id)).returning(),
-        )) as [LeadRow[]];
-        return rows[0] as R;
-      }
-      case "stamp": {
-        // Guarded stamp: only while still NULL, so a concurrently-stamped id
-        // is never overwritten (the lead-hubspot-sync worker's idempotency
-        // fence — src/server/hubspot/hubspot.worker.ts).
-        await run(
-          db
-            .update(leads)
-            .set({ hubspotContactId: w.hubspotContactId })
-            .where(and(eq(leads.id, w.id), isNull(leads.hubspotContactId))),
-        );
-        return undefined as R;
-      }
-      case "delete": {
-        const [rows] = (await run(
-          db
-            .delete(leads)
-            .where(eq(leads.id, w.id))
-            .returning({ id: leads.id }),
-        )) as [Pick<LeadRow, "id">[]];
-        return rows[0] as R;
-      }
+  /** One write descriptor → one Drizzle statement. insert/upsert/update carry
+   * `.returning()` (adr006 — mutations return the row), delete returns only
+   * `{ id }`; stamp is guarded on `hubspotContactId IS NULL`, so a
+   * concurrently-stamped id is never overwritten (the lead-hubspot-sync
+   * worker's idempotency fence — src/server/hubspot/hubspot.worker.ts). */
+  function toStatement(write: LeadWrite): BatchItem {
+    switch (write.kind) {
+      case "insert":
+        return db.insert(leads).values(write.record).returning();
+      case "upsert":
+        return db
+          .insert(leads)
+          .values(write.record)
+          .onConflictDoUpdate({
+            target: leads.hubspotContactId,
+            set: write.record as Partial<LeadInsert>,
+          })
+          .returning();
+      case "update":
+        return db
+          .update(leads)
+          .set(write.set)
+          .where(eq(leads.id, write.id))
+          .returning();
+      case "stamp":
+        return db
+          .update(leads)
+          .set({ hubspotContactId: write.hubspotContactId })
+          .where(and(eq(leads.id, write.id), isNull(leads.hubspotContactId)));
+      case "delete":
+        return db
+          .delete(leads)
+          .where(eq(leads.id, write.id))
+          .returning({ id: leads.id });
     }
+  }
+
+  /** The plural atomic write door (adr020's recorded signature): ALL mapped
+   * statements plus the outbox inserts land in ONE db.batch. Results map
+   * positionally onto `writes` — commitWithOutbox returns batch results
+   * aligned with its statements (outbox rows trail), so index i of the batch
+   * is write i, and only returning-carrying writes surface rows (a
+   * returning-less stamp never pretends to carry rows). */
+  async function commit<const Ws extends readonly LeadWrite[]>(
+    writes: Ws,
+    events: readonly OutboxEventDescriptor[],
+  ): Promise<LeadCommitResults<Ws>> {
+    const results = await commitWithOutbox(writes.map(toStatement), events);
+    return writes.map((write, i) => {
+      switch (write.kind) {
+        case "insert":
+        case "upsert":
+        case "update":
+          return (results[i] as LeadRow[])[0];
+        case "delete":
+          return (results[i] as Pick<LeadRow, "id">[])[0];
+        default:
+          return undefined;
+      }
+    }) as LeadCommitResults<Ws>;
   }
 
   return {

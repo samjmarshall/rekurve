@@ -76,16 +76,16 @@ These commands are invoked inside [Claude Code](https://claude.ai/code) via slas
 | Command | What it does | When to use |
 |---------|-------------|-------------|
 | `/brainstorm` | Socratic exploration of rough ideas into a design doc | Before writing code — refine what you're building |
-| `/write_tickets` | Collaborative ticket writing | Creating GitHub issues with clear scope |
+| `/write-tickets` | Collaborative ticket writing | Creating GitHub issues with clear scope |
 | `/review_roadmap` | GitHub Project prioritization review | Re-assessing milestone priorities |
-| `/create_plan` | Research-heavy plan creation → `thoughts/plans/`. Applies `frontend-design` skill for UI work | Starting a new feature or significant change |
-| `/iterate_plan` | Update existing plan with new feedback | Plan needs revision after code review or discovery |
-| `/implement_plan <path>` | Execute a plan phase-by-phase. Invokes `frontend-design` skill for UI phases | Working through an approved plan |
-| `/validate_plan <path>` | Verify implementation matches plan intent | After implementing — check nothing was missed |
+| `/write-plan` | Research-heavy plan creation → `thoughts/plans/`. Applies `frontend-design` skill for UI work | Starting a new feature or significant change |
+| `/iterate-plan` | Update existing plan with new feedback | Plan needs revision after code review or discovery |
+| `/implement <path>` | Execute a plan phase-by-phase. Invokes `frontend-design` skill for UI phases | Working through an approved plan |
+| `/validate <path>` | Verify implementation matches plan intent | After implementing — check nothing was missed |
 | `/plan-to-ralph-spec <path>` | Convert markdown plan to `.spec.json` for Ralph | Before running `ralph.sh` — produces the JSON spec Ralph reads |
 | `/commit` | Structured conventional commit | Ready to commit (follows repo conventions) |
-| `/design_review` | Visual/accessibility/brand review via Playwright | After UI/UX changes, before committing |
-| `/pull_request` | Create or update a PR — generates title (create) and description from diff + template | Before opening or updating a PR |
+| `/design-review` | Visual/accessibility/brand review via Playwright | After UI/UX changes, before committing |
+| `/pull-request` | Create or update a PR — generates title (create) and description from diff + template | Before opening or updating a PR |
 | `/document-feature <feature-name>` | Interview-driven living feature doc at `docs/feature/{slug}.md` — present-tense "what does this do today" | After a feature ships — keep the feature reference current |
 | `/domain-model <design-doc-path>` | Interview-driven domain modeling, sharpen terminology and update `CONTEXT.md`, align language before implementation. Write/update Architecture Decision Records (ADRs) | After brainstorm for drafting domain models / ADRs. After plan implementation for accepting/rejecting drafted ADRs or writing new ADRs when difficult to reverse decisions are made. |
 
@@ -134,11 +134,11 @@ Ralph auto-detects a sibling `.spec.json` when given a `.md` path. You can also 
 
 **Environment:** Set `NEON_PROJECT_ID` for automatic Neon branch provisioning.
 
-**When to use Ralph vs interactive `/implement_plan`:**
+**When to use Ralph vs interactive `/implement`:**
 - Use **Ralph** for well-defined plans where you want hands-off execution (e.g., overnight runs, large multi-section plans)
-  - Typically for tickets flagged as **AFK** by `/write_tickets`.
-- Use **`/implement_plan`** when you want to stay in the loop, review changes as they happen, or the plan requires judgment calls
-  - For tickets flagged as **HIITL** by `/write_tickets`.
+  - Typically for tickets flagged as **AFK** by `/write-tickets`.
+- Use **`/implement`** when you want to stay in the loop, review changes as they happen, or the plan requires judgment calls
+  - For tickets flagged as **HIITL** by `/write-tickets`.
 
 ### Configuration (`settings.json`)
 
@@ -169,7 +169,7 @@ We pin `default`. Switch at runtime with `/tui <default\|fullscreen>`.
 | Flag | Effect |
 |------|--------|
 | `CLAUDE_CODE_DISABLE_MOUSE=1` | Restores native terminal text selection and scroll |
-| `CLAUDE_CODE_DISABLE_1M_CONTEXT=1` | Caps context at 200K. Without it, an Opus session that switches to a `model: sonnet` skill (e.g. `/commit`, `/pull_request`) errors with "usage credits required for 1M context" |
+| `CLAUDE_CODE_DISABLE_1M_CONTEXT=1` | Caps context at 200K. Without it, an Opus session that switches to a `model: sonnet` skill (e.g. `/commit`, `/pull-request`) errors with "usage credits required for 1M context" |
 
 **Hooks** run guardrail and automation scripts from `.claude/scripts/` and `.claude/eval/`:
 

@@ -1,10 +1,11 @@
+import "server-only";
+
 import type { Faker } from "@faker-js/faker";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import type * as schema from "~/server/db/schema";
+import type { db } from "~/server/db";
 import type { leads } from "~/server/leads/leads.schema";
 import { messageQueue } from "~/server/messaging/messaging.schema";
 
-type DB = NeonHttpDatabase<typeof schema>;
+type DB = typeof db;
 type Lead = typeof leads.$inferSelect;
 
 const SMS_DRAFTS = [

@@ -1,9 +1,10 @@
+import "server-only";
+
 import type { Faker } from "@faker-js/faker";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import type * as schema from "~/server/db/schema";
+import type { db } from "~/server/db";
 import { user } from "~/server/db/shared.schema";
 
-type DB = NeonHttpDatabase<typeof schema>;
+type DB = typeof db;
 
 export async function seed(db: DB, _faker: Faker) {
   const [inserted] = await db

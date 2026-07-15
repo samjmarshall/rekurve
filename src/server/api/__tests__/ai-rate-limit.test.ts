@@ -31,7 +31,7 @@ function makeLimitResult(
 }
 
 async function buildCaller(aiLimiterMock: { limit: ReturnType<typeof rs.fn> }) {
-  rs.doMock("~/lib/rate-limit", () => ({
+  rs.doMock("~/server/auth/rate-limit", () => ({
     aiLimiter: aiLimiterMock,
   }));
 

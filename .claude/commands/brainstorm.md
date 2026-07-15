@@ -64,7 +64,7 @@ Interview me relentlessly about every aspect of this design until we reach a sha
 - Edit any existing source files
 - Proceed to implementation planning
 
-The user will use either `/write_tickets` separately to create tickets for more complex designs or `/create_plan` to immediately create an implementation plan for simple designs.
+The user will use either `/write-tickets` separately to create tickets for more complex designs or `/write-plan` to immediately create an implementation plan for simple designs.
 
 ## Key Principles
 

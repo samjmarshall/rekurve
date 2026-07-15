@@ -42,7 +42,7 @@ export function makeLeadsService({ repo }: { repo: LeadsRepository }) {
       decideCtx(ctx),
       new Date(),
     );
-    const row = await repo.commit(write, events);
+    const [row] = await repo.commit([write], events);
     return row!;
   }
 
@@ -59,7 +59,8 @@ export function makeLeadsService({ repo }: { repo: LeadsRepository }) {
       decideCtx(ctx),
       new Date(),
     );
-    return repo.commit(write, events);
+    const [row] = await repo.commit([write], events);
+    return row;
   }
 
   async function updateLead(
@@ -77,7 +78,7 @@ export function makeLeadsService({ repo }: { repo: LeadsRepository }) {
       ctx,
       new Date(),
     );
-    const updated = await repo.commit(write, events);
+    const [updated] = await repo.commit([write], events);
     if (!updated) {
       // ORDERING NOTE (accepted deviation from pre-split intake.ts): in the
       // concurrent-delete race the guarded UPDATE matches 0 rows but the
@@ -145,7 +146,7 @@ export function makeLeadsService({ repo }: { repo: LeadsRepository }) {
     leadId: string,
     hubspotContactId: string,
   ): Promise<void> {
-    await repo.commit({ kind: "stamp", id: leadId, hubspotContactId }, []);
+    await repo.commit([{ kind: "stamp", id: leadId, hubspotContactId }], []);
   }
 
   /** messaging dispatch port: contact details for an outbound send. */

@@ -54,14 +54,14 @@ beforeAll(async () => {
   // DATABASE_URL; and ~/env validates at import outside SKIP_ENV_VALIDATION.
   // Everything else is import-safe — leads.module no longer constructs the
   // tRPC router (root.ts wires the adapter), so the workers' graph never
-  // reaches ~/server/api/trpc / ~/lib/auth; "server-only" markers resolve to
+  // reaches ~/server/api/trpc / ~/server/auth/auth; "server-only" markers resolve to
   // the rstest alias stub and the schema barrel's drizzle pgTable defs are
   // side-effect-free.
   rs.doMock("~/env", () => ({ env: {} }));
   rs.doMock("~/server/db", () => ({ db: {} }));
 
   registry = (await import("~/server/inngest/events")).EVENT_REGISTRY;
-  functions = (await import("~/inngest/functions"))
+  functions = (await import("~/server/inngest/functions"))
     .functions as unknown as IntrospectedFn[];
 });
 

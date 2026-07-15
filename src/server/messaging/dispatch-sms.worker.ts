@@ -1,8 +1,15 @@
 import "server-only";
 
-import { inngest } from "~/inngest/client";
-import type { EventPayload } from "~/server/inngest/events";
-import { MESSAGE_EVENTS } from "~/server/outbox";
+import { inngest } from "~/server/inngest/client";
+import type { EventName, EventPayload } from "~/server/inngest/events";
+
+// `satisfies` pins the name to an EVENT_REGISTRY key (adr019 clause 7) —
+// type-only, so no runtime dep on the registry module. Module-private: the
+// only consumer is this file's trigger config (the registry golden pins the
+// raw wire string).
+const MESSAGE_EVENTS = {
+  APPROVAL_REQUESTED: "message.approval-requested",
+} as const satisfies Record<string, EventName>;
 
 type Step = {
   // biome-ignore lint/suspicious/noExplicitAny: Inngest serialises step results via JSON (Jsonify<T> ≠ T)
@@ -10,7 +17,7 @@ type Step = {
 };
 
 // Payload type comes from the EVENT_REGISTRY (adr019 clause 7) — the single
-// payload authority; the wire string stays the frozen ~/server/outbox const.
+// payload authority; the wire string stays the frozen module-private const.
 type DispatchSmsEvent = { data: EventPayload<"message.approval-requested"> };
 
 // Worker port surface (adr020): messaging ops come from
@@ -126,7 +133,7 @@ export function makeDispatchSmsWorker(deps: DispatchSmsWorkerDeps) {
       concurrency: [{ key: "event.data.messageId", limit: 1 }],
       retries: 4,
     },
-    // The shared Inngest client is untyped (typed schemas are a PR-6 concern);
+    // The shared Inngest client is untyped (typed schemas deliberately deferred);
     // the trigger config pins the event name, so narrow `data` to the registry
     // payload once at the boundary — no `as unknown as` double-cast.
     ({ event, step }) =>

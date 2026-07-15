@@ -117,6 +117,16 @@ The sibling project's shape verbatim: every service method returns a domain-obje
 - Bad, because every driver stays unsolved: `messages.ts` keeps its fused tiers, the boundary stays vigilance-only, and "where does this live?" stays unanswerable.
 - Bad, because the ambiguity compounds as domains and entry points multiply — each new worker deepens the `src/server` / `src/inngest` split.
 
+## Consequence update (2026-07-13, #330)
+
+The strangler migration (epic #323, PRs #325–#330) has executed. Three deviations from the specifics above are now the settled convention, recorded here rather than silently drifting:
+
+- **Module public surface is `{ service }` (plus `channels` where a realtime surface exists), not `{ router, workers, service }`.** Entry-point adapters are wired by their host registries instead of the module: tRPC routers in `src/server/api/root.ts` (`makeLeadsRouter({ service: leadsModule.service })`), Inngest workers in `<domain>.workers.ts` feeding the functions registry (`src/server/inngest/functions.ts`). The driver is import-graph hygiene: service-only consumers (webhook routes, cross-domain worker deps) must not load the trpc/auth graph or the inngest adapter graph as a side effect of touching a module. The "repository is never exported" clause is unchanged.
+- **The tier vocabulary grew four emergent suffixes** beyond the six named above: `*.decide.ts` (the pure decision cores the hybrid write path earns on lead capture/update and message approve/editAndApprove), `*.channels.ts` (realtime channel adapters, e.g. `leads.channels.ts`), `*.workers.ts` (the per-domain workers composition root), and `*-schemas.ts` (Zod validation schemas — dash-suffixed to stay distinct from the Drizzle `*.schema.ts` homes of adr021).
+- **The commit primitive landed plural: `commit(writes, outboxEvents)` takes a write-descriptor *list*.** Each domain repository switches on a discriminated union of write kinds (e.g. `LeadWrite`: insert/upsert/update/stamp/delete) and executes all writes plus the materialized outbox rows in one `db.batch` via `makeCommitWithOutbox` (`src/server/outbox/commit.ts`). Emit-only surfaces with no canonical rows use the outbox's write-less `publish` (`src/server/outbox/index.ts`).
+
+The operational statement of these conventions — including the frozen-external-identifier rule (Inngest function/step ids, event names) and its golden-test tripwires — lives in `.claude/rules/server-architecture.md`.
+
 ## Links
 
 - Enforces: [adr019](adr019-system-wide-transactional-outbox-posture.md) — `commit(writes, outboxEvents)` is the structural enforcement of the atomic write+outbox clause
@@ -125,3 +135,4 @@ The sibling project's shape verbatim: every service method returns a domain-obje
 - Preserves: [adr010](adr010-inngest-source-of-truth-for-followup-plan.md) — workers relocate into domain modules; the Inngest-owns-control-state contract is unchanged
 - Preserves: [adr005](adr005-deterministic-lead-scoring.md) — pure scoring relocates to the isomorphic kernel unchanged
 - Prior art (sibling ai-insurance-claims project, Accepted there — named for provenance, deliberately not cross-repo linked): its adr010 is the proven template this ADR adapts; deviations recorded above (hybrid write path in place of uniform `ClaimWriteSet`)
+- Executed by: refactor epic #323 (PRs #325–#330); executed deviations recorded in the consequence update above

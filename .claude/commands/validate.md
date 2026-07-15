@@ -69,7 +69,7 @@ The new plan template requires every code reference to include `file:line`. Vali
 
 **ADR & terminology backstop (do this once):**
 
-`/implement_plan` resolves Proposed ADRs as it builds, but validation is the last line of defence — no ADR tied to this work may remain unresolved once validation passes.
+`/implement` resolves Proposed ADRs as it builds, but validation is the last line of defence — no ADR tied to this work may remain unresolved once validation passes.
 
 - For every ADR cited by the plan (`## References` → `ADRs:`) or the design doc's `## Related ADRs` still in `Proposed`/`In Progress`: resolve it per `.claude/skills/domain-model/ADR-FORMAT.md`. Set `Accepted` if the shipped code reflects the decision; set `Rejected` (or `Superseded by [ADRNNN](...)`) if the code took another path. Cite the `file:line` evidence in the report.
 - Confirm each `## Terminology TODO` resolution actually landed in `CONTEXT.md` and that the code uses the canonical term, not the old/fuzzy one. Flag drift.
@@ -89,11 +89,11 @@ For each phase in the plan:
 3. **Assess manual criteria**:
    - Walk every item under the phase's `### Success` → `**Manual**` checklist
    - Tick items you've personally verified; leave the rest unchecked with a note on what's still needed
-   - If any phase invokes `/design_review` (required for UI phases), run it **once for the whole plan** as `/design_review <plan-path>` rather than per-phase — passing the plan path lets it decompose the branch into isolated per-surface reviews aligned with the plan's UI phases and Manual criteria, run them in parallel, and return one consolidated report. Fold each per-surface verdict into the validation report. A phase with UI changes is not validated until its surfaces are clean in that report
+   - If any phase invokes `/design-review` (required for UI phases), run it **once for the whole plan** as `/design-review <plan-path>` rather than per-phase — passing the plan path lets it decompose the branch into isolated per-surface reviews aligned with the plan's UI phases and Manual criteria, run them in parallel, and return one consolidated report. Fold each per-surface verdict into the validation report. A phase with UI changes is not validated until its surfaces are clean in that report
 
 4. **Run code review**:
    - Always run `/code-review <plan-path>` once over the whole branch and fold its findings into the validation report's "Code Review Findings" section. The built-in runs its own multi-agent review out-of-context, so this does not flood validation. Omit `--comment` here — the PR may not exist yet, and the CI "Claude Code Review" workflow posts inline PR comments once a PR is open.
-   - **Conditionally** run `/security-review` when the branch diff touches security-sensitive paths — `src/lib/**`, `src/env.js`, `next.config.ts`, `**/auth/**`, `**/*.env*` (mirrors how `/design_review` is conditional on `src/` UI changes). Fold its findings into the report. Check the diff with `git diff --name-only origin/HEAD...`.
+   - **Conditionally** run `/security-review` when the branch diff touches security-sensitive paths — `src/lib/**`, `src/env.js`, `next.config.ts`, `**/auth/**`, `**/*.env*` (mirrors how `/design-review` is conditional on `src/` UI changes). Fold its findings into the report. Check the diff with `git diff --name-only origin/HEAD...`.
 
 5. **Think deeply about edge cases**:
    - Were error conditions handled?
@@ -129,7 +129,7 @@ Create comprehensive validation summary:
 ✓ Lint + typecheck: `make check`
 ✓ Unit tests: `make test`
 ✗ E2E: `make test_e2e` (1 failing spec — see below)
-✓ Design review: `/design_review <plan-path>` — per-surface status (UI phases only)
+✓ Design review: `/design-review <plan-path>` — per-surface status (UI phases only)
   ✓ /claims/[id] workspace · ✓ clause slide-over · ⚠️ audit slide-over (see findings)
 ✓ Code review: `/code-review <plan-path>` — N findings folded below
 ✓ Security review: `/security-review` — run (security-sensitive paths changed) · no findings
@@ -203,12 +203,12 @@ Always verify:
 ## Relationship to Other Commands
 
 Recommended workflow:
-1. `/implement_plan` - Execute the implementation
+1. `/implement` - Execute the implementation
 2. `/commit` - Create atomic commits for changes
-3. `/validate_plan` - Verify implementation correctness (runs `/code-review`, and `/security-review` when security-sensitive paths changed)
+3. `/validate` - Verify implementation correctness (runs `/code-review`, and `/security-review` when security-sensitive paths changed)
 4. `/document-feature {slug}` - Run for user-visible features (new route, flow, or integration). Take `{slug}` from the ticket title. Skip for infra, refactors, bug fixes, or test-only changes.
 5. `/domain-model` - Run when the plan adds or restructures a domain concept or entity boundary. Skip otherwise.
-6. `/pull_request` - Generate a PR. The CI "Claude Code Review" workflow then reviews the PR automatically; for a substantial change, optionally run `/code-review ultra` as a deep pre-merge gate (paid — see CLAUDE.md).
+6. `/pull-request` - Generate a PR. The CI "Claude Code Review" workflow then reviews the PR automatically; for a substantial change, optionally run `/code-review ultra` as a deep pre-merge gate (paid — see CLAUDE.md).
 
 The validation works best after commits are made, as it can analyze the git history to understand what was implemented.
 

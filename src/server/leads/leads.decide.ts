@@ -27,8 +27,8 @@ type LeadDecideCtx = { userId: string; newId: () => string };
 
 /**
  * Write descriptors — the discriminated union the repository's single write
- * door, `commit(write, events)`, switches on to build the one Drizzle
- * statement per decision:
+ * door, `commit(writes, events)`, switches on to build one Drizzle
+ * statement per write:
  * - insert: plain insert (manual capture of a new lead)
  * - upsert: insert … onConflictDoUpdate(hubspotContactId) (HubSpot-origin ingest)
  * - update: update-by-id (existing-email capture, lead edit)

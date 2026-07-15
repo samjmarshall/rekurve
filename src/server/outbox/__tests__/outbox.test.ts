@@ -299,24 +299,30 @@ describe("publish", () => {
 
 describe("~/server/outbox (index)", () => {
   // The one remaining rs.doMock: proves index.ts constructs the helpers on
-  // the app db/inngest singletons (the exported fns are core's, bound once).
-  test("binds the app db singleton into buildOutboxEvent", async () => {
+  // the app db/inngest singletons (the exported publish is core's, bound
+  // once). buildOutboxEvent/sendPostCommit are no longer exported (#330) —
+  // publish and the repositories' commit primitive are the only emit doors.
+  test("binds the app db + inngest singletons into publish", async () => {
     rs.resetModules();
     const mocks = makeOutboxDbMocks();
-    rs.doMock("~/server/db", () => ({ db: { insert: mocks.insert } }));
-    rs.doMock("~/inngest/client", () => ({ inngest: { send: rs.fn() } }));
+    const send = rs.fn().mockResolvedValue(undefined);
+    rs.doMock("~/server/db", () => ({ db: mocks.db }));
+    rs.doMock("~/server/inngest/client", () => ({ inngest: { send } }));
 
-    const { buildOutboxEvent, publish } = await import("../index");
+    const { publish } = await import("../index");
     const { outbox: outboxTable } = await import("../outbox.schema");
 
-    const result = buildOutboxEvent("lead.captured", {
-      leadId: "abc",
-      userId: "user-1",
-    });
+    await publish([
+      { name: "lead.captured", data: { leadId: "abc", userId: "user-1" } },
+    ]);
 
     expect(mocks.insert).toHaveBeenCalledWith(outboxTable);
-    expect(result.query).toBe(mocks.queries[0]);
-    // The write-less publish is bound on the same singletons.
-    expect(typeof publish).toBe("function");
+    expect(mocks.batch).toHaveBeenCalledTimes(1);
+    expect(send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "lead.captured",
+        data: { leadId: "abc", userId: "user-1" },
+      }),
+    );
   });
 });

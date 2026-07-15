@@ -88,7 +88,7 @@ This plan may implement decisions captured as **Proposed** ADRs in `docs/adr/` (
 
 - **Decision held** — the implementation bears it out: set Status to `Accepted` and bump `Date`.
 - **Decision changed or dropped** — you took a different path: set the old ADR to `Rejected`, or write a replacement ADR and mark the old one `Superseded by [ADRNNN](adrNNN-slug.md)`. Never silently mutate an already-Accepted/Rejected decision.
-- Leave an ADR `Proposed` only if its phase is genuinely incomplete — `/validate_plan` backstops anything left unresolved.
+- Leave an ADR `Proposed` only if its phase is genuinely incomplete — `/validate` backstops anything left unresolved.
 
 Use canonical terms from `CONTEXT.md` in all code, identifiers, and comments.
 
@@ -97,11 +97,11 @@ Use canonical terms from `CONTEXT.md` in all code, identifiers, and comments.
 When a phase modifies UI components, pages, or styles in `src/`:
 - Use the `frontend-design` skill to guide implementation
 - Follow `.claude/skills/frontend-design/design-checklist.md`
-- Run `/design_review <plan-path> <phase-number>` after completing the phase — passing the plan path and the just-completed phase number as the focus hint scopes the parallel review to that phase's surfaces/overlays/states instead of re-reviewing the whole branch each phase
+- Run `/design-review <plan-path> <phase-number>` after completing the phase — passing the plan path and the just-completed phase number as the focus hint scopes the parallel review to that phase's surfaces/overlays/states instead of re-reviewing the whole branch each phase
 
 ## Security-Sensitive Phases
 
-When a phase touches security-sensitive paths — `src/lib/**`, `src/env.js`, `next.config.ts`, `**/auth/**`, `**/*.env*` — run `/security-review` after completing that phase. This is the security analogue of the per-phase `/design_review`: catch injection, authn/authz, secret-exposure, and misconfiguration issues while the change is fresh, rather than waiting for `/validate_plan` or CI. Fast `/code-review` is not run per-phase — it runs once over the whole branch in `/validate_plan`.
+When a phase touches security-sensitive paths — `src/lib/**`, `src/env.js`, `next.config.ts`, `**/auth/**`, `**/*.env*` — run `/security-review` after completing that phase. This is the security analogue of the per-phase `/design-review`: catch injection, authn/authz, secret-exposure, and misconfiguration issues while the change is fresh, rather than waiting for `/validate` or CI. Fast `/code-review` is not run per-phase — it runs once over the whole branch in `/validate`.
 
 ## Documentation
 

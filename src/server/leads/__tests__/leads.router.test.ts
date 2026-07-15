@@ -8,7 +8,7 @@ import { makeLead } from "./fixtures";
 // router + service + repository run over an injected fake db object literal
 // (no rs.doMock of the leads seams); create/update swap in service fakes to
 // assert delegation. rs.doMock survives only for the tRPC context deps
-// (~/env, ~/lib/session, ~/server/db) that trpc.ts imports at module scope.
+// (~/env, ~/server/auth/session, ~/server/db) that trpc.ts imports at module scope.
 // Envelope/bucketing math lives in leads.service.test.ts — here we assert the
 // transport seam: input validation, auth, delegation, domain-error mapping.
 

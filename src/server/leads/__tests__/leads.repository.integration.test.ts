@@ -43,7 +43,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)(
       }));
 
       // Mock inngest.send so the post-commit send doesn't actually send
-      rs.doMock("~/inngest/client", () => ({
+      rs.doMock("~/server/inngest/client", () => ({
         inngest: { send: rs.fn().mockResolvedValue(undefined) },
       }));
     });

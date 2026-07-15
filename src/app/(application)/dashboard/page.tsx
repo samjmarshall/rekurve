@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
-import { getSession } from "~/lib/session";
+import { getSession } from "~/server/auth/session";
 import { db } from "~/server/db";
-import { msGraphTokens } from "~/server/db/schema";
+import { msGraphTokens } from "~/server/ms-graph/ms-graph.schema";
 import { HydrateClient, prefetch, trpc } from "~/trpc/server";
 import { QuickCaptureButton } from "../_components/quick-capture/button";
 import { MsGraphConnectBanner } from "./_components/ms-graph-connect-banner";

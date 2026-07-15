@@ -2,10 +2,10 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { type NextRequest, NextResponse } from "next/server";
 import { env } from "~/env";
-import { getSession } from "~/lib/session";
+import { getSession } from "~/server/auth/session";
 import { db } from "~/server/db";
-import { msGraphTokens } from "~/server/db/schema";
 import { graphClientForUser } from "~/server/ms-graph";
+import { msGraphTokens } from "~/server/ms-graph/ms-graph.schema";
 
 interface MicrosoftTokenResponse {
   access_token: string;

@@ -25,7 +25,7 @@ related-prs: [122]
 - Pre-approval granularity — `seenBroker` is a boolean, so finance caps at **15/25** until the field becomes an enum.
 - Engagement signals — engagement is hardcoded to **0/5** until reply/open data exists.
 - Budget range parsing — `"500-700k"` matches the first number only.
-- Async/background scoring — scoring runs synchronously inside `leads.create`/`leads.update` because the function is sub-millisecond.
+- Async/background scoring — scoring runs synchronously inside the pure decide fns (`decideCaptureLead`/`decideUpdateLead` in `src/server/leads/leads.decide.ts`, called on the `leads.create`/`leads.update` write path before `commit`) because the function is sub-millisecond.
 - Score-driven UI beyond the lead profile and the pipeline-stage bucket — no other consumers today.
 
 ## Design
@@ -50,7 +50,7 @@ See [adr005 — Lead scoring is deterministic](../adr/adr005-deterministic-lead-
 
 **Rejected alternatives**:
 - **Claude Haiku scoring** — shipped first (commit `7dc57dc`) and ripped out hours later in the same PR (commit `25588bc`). The rubric is a set of lookup tables — no sentiment analysis, no unstructured interpretation. Haiku functioned as a `switch` statement with non-determinism, ~$0.001-0.003 per call, network latency, and a hard dependency on Anthropic's uptime. Pure TypeScript wins on every axis.
-- **Async/background scoring** — the original epic flagged "score asynchronously — don't block the form submission" as a hedge against API latency. Removing the API call cut scoring to sub-millisecond, so it runs synchronously inside `leads.create`/`leads.update` and the response carries the final score.
+- **Async/background scoring** — the original epic flagged "score asynchronously — don't block the form submission" as a hedge against API latency. Removing the API call cut scoring to sub-millisecond, so it runs synchronously inside the decide fns on the `leads.create`/`leads.update` write path and the mutation response carries the final score.
 - **Re-score on every update** — gating to the 12 `SCORING_FIELDS` keys lets name/phone/email edits skip a redundant DB write.
 - **Storing breakdown in a separate `lead_scores` table** — a single `score_metadata jsonb` column on `leads` keeps reads to one row.
 - **Engagement scoring from PostHog signals** — engagement returns 0/5 until reply/open data exists.

@@ -61,4 +61,4 @@ The type describes the **category** of change, not what the change does. The sco
 
 - Group related changes together
 - Keep commits focused and atomic when possible
-- Be extremely concise and sacrifice grammar for the sake of concision.
+- Be extremely concise and sacrifice grammar for the sake of concision

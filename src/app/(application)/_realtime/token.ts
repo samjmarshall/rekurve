@@ -15,9 +15,8 @@
 // token is { channel: "user:…", topics: ["lead.updated"], key, apiBaseUrl } —
 // fully serialisable, and complete enough for useRealtime to subscribe.
 import { getSubscriptionToken } from "inngest/realtime";
-
-import { inngest } from "~/inngest/client";
-import { getSession } from "~/lib/session";
+import { getSession } from "~/server/auth/session";
+import { inngest } from "~/server/inngest/client";
 // Channel definition only — not the composition root, which would drag the
 // db/outbox wiring into this server action.
 import { userChannel } from "~/server/leads/leads.channels";

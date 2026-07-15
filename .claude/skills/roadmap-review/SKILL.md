@@ -182,7 +182,7 @@ Turn the prioritized **Active Now** list into a real timeline. Inputs: the Activ
 Present in sections, validating each before continuing:
 
 1. **Remove candidates** — issue, `superseded-by #X` / `delivered-by PR #X`, one-line evidence, recommended close.
-2. **Needs-investigation** — issue, the gap (under-specified / too coarse / has unknowns), suggested next action (spike / split / add acceptance criteria), and a pointer to `/write_tickets`. (The skill drafts nothing — recommendation only.)
+2. **Needs-investigation** — issue, the gap (under-specified / too coarse / has unknowns), suggested next action (spike / split / add acceptance criteria), and a pointer to `/write-tickets`. (The skill drafts nothing — recommendation only.)
 3. **Deprioritize** — issues moving to Post-PMF / Post-Pilot: number, title, current milestone, one-line rationale.
 4. **Keep Active** — issue, proposed Priority, dependencies.
 5. **Schedule** — the Step-5 table (Start/End per Active-Now issue + epic envelopes).
@@ -203,7 +203,7 @@ Include: context/constraints discovered · strategic rationale · the 5-bucket r
 | Bucket | Board action |
 |---|---|
 | **Remove** | Close as `not_planned`; record the `superseded-by #X` / `delivered-by PR #X` evidence in a closing comment. |
-| **Needs-investigation** | Leave open in Backlog; **no date**; recommend `/write_tickets` to the founder. |
+| **Needs-investigation** | Leave open in Backlog; **no date**; recommend `/write-tickets` to the founder. |
 | **Active Now** | Set Priority; set Status → Ready/In progress; set **Start + Target dates** per the Schedule table. |
 | **Blocked** | Status → Blocked; note the dependency; no date until unblocked. |
 | **Deprioritize / Post-PMF / Post-Pilot** | Set milestone; **clear** Priority, Start date, Target date, Iteration. |
@@ -237,7 +237,7 @@ Include: context/constraints discovered · strategic rationale · the 5-bucket r
 - Make any GitHub changes (no close, no field edits, no date writes, no milestone moves)
 - Create implementation plans or tickets
 
-The founder reviews the doc, then explicitly directs the **`github-project` agent** to apply the changes (per [Applying the changes](#applying-the-changes)), and uses `/write_tickets` for Needs-investigation items.
+The founder reviews the doc, then explicitly directs the **`github-project` agent** to apply the changes (per [Applying the changes](#applying-the-changes)), and uses `/write-tickets` for Needs-investigation items.
 
 ## References
 

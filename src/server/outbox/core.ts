@@ -1,9 +1,8 @@
 import "server-only";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
-
-import type { inngest as defaultInngest } from "~/inngest/client";
 import type { db as defaultDb } from "~/server/db";
+import type { inngest as defaultInngest } from "~/server/inngest/client";
 import {
   EVENT_REGISTRY,
   type EventName,
@@ -32,14 +31,15 @@ export function createOutboxHelpers({
   db: Db;
   inngest: InngestClient;
 }) {
-  // Return shape keeps the legacy member names {id, eventName, payload, query}
-  // so every existing call site (evt.eventName/evt.payload/evt.query) is
-  // untouched in this zero-behavior-change PR; the adr019 clause 7 shape
-  // {id, name, data, insert} lands with the domain PRs (PR 6 retires this
-  // compat surface). Clause 7's write-less `publish(events)` landed with PR 5
-  // (see below): the webhook's engagement-created emission is its first
-  // caller, and the inline `await evt.query; sendPostCommit(...)` idiom is
-  // retired — do not copy it into new handlers.
+  // #330 resolution: buildOutboxEvent/sendPostCommit are now INTERNAL to this
+  // factory (and its direct tests) — the ~/server/outbox barrel exports only
+  // `publish`, and repositories go through commitWithOutbox. With no external
+  // call sites left, the legacy member names {id, eventName, payload, query}
+  // are a private detail; the adr019 clause 7 shape {id, name, data, insert}
+  // is a rename to take opportunistically if this file is ever touched for a
+  // real change. The inline `await evt.query; sendPostCommit(...)` idiom is
+  // retired — do not copy it into new handlers; emit through `publish` or a
+  // repository commit.
   function buildOutboxEvent<K extends EventName>(
     eventName: K,
     payload: EventPayload<K>,

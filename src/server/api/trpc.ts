@@ -1,9 +1,11 @@
+import "server-only";
+
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import { aiLimiter } from "~/lib/rate-limit";
-import { getSession } from "~/lib/session";
+import { aiLimiter } from "~/server/auth/rate-limit";
+import { getSession } from "~/server/auth/session";
 import { db } from "~/server/db";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {

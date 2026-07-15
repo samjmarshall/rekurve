@@ -47,9 +47,10 @@ test_integration:
 test_e2e:
 	yarn test:e2e $(if $(PLAYWRIGHT_SHARD),--shard=$(PLAYWRIGHT_SHARD),)
 
-# Security audit
+# Security audit — gate on real CVEs only; npm deprecation notices are dependency
+# maintenance, not vulnerabilities (--no-deprecations added w/ Yarn 4 bulk endpoint)
 audit:
-	yarn npm audit --environment production
+	yarn npm audit --environment production --no-deprecations
 
 db_generate: install
 	yarn db:generate
@@ -77,6 +78,11 @@ db_branch_status:
 
 hubspot_setup:
 	yarn tsx scripts/hubspot/setup.ts
+
+# Draft-message smoke script — the script imports `server-only` modules, so it
+# needs this Makefile's baked NODE_OPTIONS. Usage: make smoke_draft leadId=<uuid>
+smoke_draft:
+	yarn smoke:draft $(leadId)
 
 vercel_link:
 	yarn vercel link

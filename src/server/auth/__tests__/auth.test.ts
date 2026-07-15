@@ -20,7 +20,7 @@ rs.mock("../rate-limit", () => ({
     return first.length > 0 ? first : "unknown";
   },
 }));
-rs.mock("../../server/db", () => ({ db: {} }));
+rs.mock("../../db", () => ({ db: {} }));
 
 import { auth } from "../auth";
 import { emailLimiter, ipLimiter } from "../rate-limit";

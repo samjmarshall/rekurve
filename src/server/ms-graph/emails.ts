@@ -1,3 +1,5 @@
+import "server-only";
+
 import { formatCorrelationHeader } from "~/domain/messaging/correlation";
 import { env } from "~/env";
 import { graphClientForUser } from "./client";

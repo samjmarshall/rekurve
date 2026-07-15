@@ -30,9 +30,9 @@ related-prs: [104, 106, 107, 120]
 ## Design
 
 **Lives in**:
-- `src/lib/auth.ts` — better-auth server config: Drizzle adapter, `emailOTP` plugin, Resend send, `nextCookies()`
+- `src/server/auth/auth.ts` — better-auth server config: Drizzle adapter, `emailOTP` plugin, Resend send, `nextCookies()`
 - `src/lib/auth-client.ts` — `createAuthClient` + `emailOTPClient()` for the browser
-- `src/lib/session.ts` — `cache()`-wrapped `getSession()` for server components and layouts
+- `src/server/auth/session.ts` — `cache()`-wrapped `getSession()` for server components and layouts
 - `src/app/api/auth/[...all]/route.ts` — catch-all handler mounting better-auth's HTTP API
 - `src/app/(login)/login/page.tsx` — two-step UI: email form → 6-digit `InputOTP`
 - `src/app/(login)/layout.tsx` — redirects authed users to `/dashboard`, sets `noindex`
@@ -53,7 +53,7 @@ Layout-level checks (vs `middleware.ts`) keep auth logic next to the routes it p
 See [ADR-002: Layout-level auth gates instead of `middleware.ts`](../adr/adr002-layout-level-auth-gates-over-middleware.md) for the full rationale.
 
 **Trade-offs**:
-- **5-min cookie cache stale window**: a revoked session may stay valid on a cached client for up to 5 minutes (`src/lib/auth.ts:27`). Acceptable for the pilot. Reduce or disable `cookieCache.maxAge` if instant revocation becomes a requirement.
+- **5-min cookie cache stale window**: a revoked session may stay valid on a cached client for up to 5 minutes (`src/server/auth/auth.ts:31`). Acceptable for the pilot. Reduce or disable `cookieCache.maxAge` if instant revocation becomes a requirement.
 - **Open sign-up**: any email can request an OTP and create a `user` row. **Gate this before the pilot consultant onboards, and again before launch to other customers.**
 - **Plain-text OTP email**: minimal HTML, branded template pending. Fine for pilot; replace before launch.
 - **Resend lock-in**: a provider swap is a one-place code change (`auth.ts` send fn), but worth flagging.

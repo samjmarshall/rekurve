@@ -1,7 +1,7 @@
 import "server-only";
 
-import { inngest } from "~/inngest/client";
 import type { db as defaultDb } from "~/server/db";
+import { inngest } from "~/server/inngest/client";
 import { createOutboxHelpers } from "./core";
 
 type Db = typeof defaultDb;

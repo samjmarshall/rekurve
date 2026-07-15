@@ -1,9 +1,8 @@
-import type { Faker } from "@faker-js/faker";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import type * as schema from "~/server/db/schema";
-import { leads } from "~/server/leads/leads.schema";
+import "server-only";
 
-type DB = NeonHttpDatabase<typeof schema>;
+import type { Faker } from "@faker-js/faker";
+import { leads } from "~/server/leads/leads.schema";
+import type { DB } from "./types";
 
 const STAGES = [
   "unqualified",

@@ -1,4 +1,4 @@
-import { getSession } from "~/lib/session";
+import { getSession } from "~/server/auth/session";
 import { SignOutButton } from "./_components/sign-out-button";
 
 export default async function SettingsPage() {

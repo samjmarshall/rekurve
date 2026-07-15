@@ -3,9 +3,9 @@ import "~/styles/globals.css";
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import { redirect } from "next/navigation";
-import { getSession } from "~/lib/session";
 import { AnalyticsProvider } from "~/providers/AnalyticsProvider";
 import { ThemeProvider } from "~/providers/ThemeProvider";
+import { getSession } from "~/server/auth/session";
 
 export const metadata: Metadata = {
   title: "Login | Rekurve",

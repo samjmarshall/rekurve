@@ -1,5 +1,5 @@
 ---
-name: ticket-writer
+name: write-tickets
 description: Single entry point for turning a design, plan, PRD, or in-chat spec into either a single GitHub Issue or a parent epic with child issues. Use when the user wants to create, review, or improve any ticket destined for a coding agent or another developer to pick up. Covers atomic issues, bug reports, technical tasks, spikes, and epic breakdowns using tracer-bullet vertical slices. Output is AFK-ready by default — written so a coding agent days later can produce the right work without the original chat context.
 model: opus
 effort: high
@@ -12,7 +12,8 @@ Two shapes of work:
 
 Every ticket body must be **AFK-ready** by default — durable enough that a coding agent picking it up days later, with no access to the original chat context, can produce the right work. The principles are in **[references/agent-brief.md](references/agent-brief.md)** and they apply to atomic issues and epic children alike.
 
-Apply the `writing-clearly-and-concisely` skill if available, and run the workflow as a skeptical, iterative collaboration with the user.
+- Be extremely concise and sacrifice grammar for the sake of concision
+- Run the workflow as a skeptical, iterative collaboration with the user
 
 ---
 

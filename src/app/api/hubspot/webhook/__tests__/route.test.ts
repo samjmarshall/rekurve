@@ -62,21 +62,18 @@ beforeEach(() => {
   }));
 
   rs.doMock("~/server/outbox", () => ({
-    HUBSPOT_EMAIL_EVENTS: {
-      ENGAGEMENT_CREATED: "hubspot.email.engagement-created",
-      ENGAGEMENT_MISSED: "hubspot.engagement-missed",
-    },
     // The engagement emission goes through the write-less publish (adr017
-    // batch shape, adr019 clause 7); the legacy pair stays mocked so an
-    // accidental fallback to the inline buildOutboxEvent + sendPostCommit
-    // form is caught rather than crashing.
+    // batch shape, adr019 clause 7) — the barrel's only export since #330.
+    // The retired legacy pair stays mocked as a tripwire: a regression back
+    // to the inline buildOutboxEvent + sendPostCommit form is caught by the
+    // not-called assertions below rather than crashing on a missing export.
     publish: mockPublish,
     buildOutboxEvent: rs.fn(),
     sendPostCommit: mockSendPostCommit,
   }));
 
   // Defensive: nothing in the webhook graph may touch the real Inngest client.
-  rs.doMock("~/inngest/client", () => ({
+  rs.doMock("~/server/inngest/client", () => ({
     inngest: { send: rs.fn().mockResolvedValue(undefined) },
   }));
 

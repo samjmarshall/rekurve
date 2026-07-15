@@ -1,19 +1,26 @@
 import "server-only";
 
-import { inngest } from "~/inngest/client";
-import type { EventPayload } from "~/server/inngest/events";
+import { inngest } from "~/server/inngest/client";
+import type { EventName, EventPayload } from "~/server/inngest/events";
 import type { RealtimePublishStep } from "~/server/leads/leads.channels";
 import type { LeadRow } from "~/server/leads/leads.schema";
-import { OUTBOX_EVENTS } from "~/server/outbox";
 import type { HubspotSyncStep, SyncableLead } from "./hubspot.service";
+
+// `satisfies` pins each name to an EVENT_REGISTRY key (adr019 clause 7) —
+// type-only, so no runtime dep on the registry module. Module-private: the
+// only consumer is this file's trigger config (the registry golden pins the
+// raw wire strings).
+const LEAD_EVENTS = {
+  CAPTURED: "lead.captured",
+  UPDATED: "lead.updated",
+} as const satisfies Record<string, EventName>;
 
 type Step = RealtimePublishStep & HubspotSyncStep;
 
 // Payload type comes from the EVENT_REGISTRY (adr019 clause 7) — the single
 // payload authority. Typed as the honest union of both triggers — today the
 // two schemas are structurally identical ({ leadId, userId, hubspotSync? }),
-// and the union keeps this type truthful if one of them ever drifts. The wire
-// strings stay the frozen ~/server/outbox consts.
+// and the union keeps this type truthful if one of them ever drifts.
 type LeadHubspotSyncEvent = {
   data: EventPayload<"lead.captured"> | EventPayload<"lead.updated">;
 };
@@ -100,11 +107,11 @@ export function makeLeadHubspotSyncWorker(deps: LeadHubspotSyncWorkerDeps) {
       // golden test and recorded in #329.
       id: "lead-hubspot-sync",
       triggers: [
-        { event: OUTBOX_EVENTS.LEAD_CAPTURED },
-        { event: OUTBOX_EVENTS.LEAD_UPDATED },
+        { event: LEAD_EVENTS.CAPTURED },
+        { event: LEAD_EVENTS.UPDATED },
       ],
     },
-    // The shared Inngest client is untyped (typed schemas are a PR-6 concern);
+    // The shared Inngest client is untyped (typed schemas deliberately deferred);
     // the trigger config pins the event names, so narrow `data` to the
     // registry payload once at the boundary — no `as unknown as` double-cast.
     ({ event, step }) =>

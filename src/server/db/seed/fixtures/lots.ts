@@ -1,9 +1,8 @@
-import type { Faker } from "@faker-js/faker";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import type * as schema from "~/server/db/schema";
-import { lots } from "~/server/lots/lots.schema";
+import "server-only";
 
-type DB = NeonHttpDatabase<typeof schema>;
+import type { Faker } from "@faker-js/faker";
+import { lots } from "~/server/lots/lots.schema";
+import type { DB } from "./types";
 
 const ESTATES = [
   { name: "Creation Park", suburb: "Ripley" },

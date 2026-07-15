@@ -14,8 +14,8 @@ import { makeLeadsService } from "./leads.service";
 // (~/server/api/root.ts) via makeLeadsRouter({ service }), so service-only
 // consumers — Inngest workers, the HubSpot webhook, the realtime token action —
 // never import the trpc/auth graph (module-scope Resend + Upstash clients).
-// Recorded deviation from adr020's {router, workers, service} module surface;
-// revisit in the PR-6 conventions sweep.
+// Settled convention per adr020's consequence update (module surface is
+// { service }); operational statement in .claude/rules/server-architecture.md.
 const repo = makeLeadsRepository({
   db,
   commitWithOutbox: makeCommitWithOutbox(db),

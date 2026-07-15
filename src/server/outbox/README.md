@@ -25,7 +25,7 @@ Every write that needs a downstream side effect goes through a repository `commi
 
 ## Sweep backstop
 
-The hourly `outbox-sweep` cron (`0 * * * *`) re-sends any row with `processed_at IS NULL AND created_at < now() - interval '30 seconds'` — the backstop for the rare event whose post-commit send failed. It never re-parses payloads (a legacy in-flight row must not error-loop the backstop). Hourly, not per-minute, so Neon's compute can autosuspend between sweeps; worst-case recovery for a failed publish is bounded by the interval (ADR-014 — cadence is "a tunable knob, not a contract"). The daily `outbox-prune` cron (`0 3 * * *`) deletes processed rows older than 7 days.
+The `outbox-sweep` cron re-sends any unprocessed row older than a short grace window — the backstop for the rare event whose post-commit send failed. The cron schedules, grace window, and row filters live in `outbox.worker.ts` (the one source of truth — don't duplicate the literals here). It never re-parses payloads (a legacy in-flight row must not error-loop the backstop). The cadence is hourly-scale, not per-minute, so Neon's compute can autosuspend between sweeps; worst-case recovery for a failed publish is bounded by the interval (ADR-014 — cadence is "a tunable knob, not a contract"). The companion `outbox-prune` cron deletes processed rows past the retention window (also defined in `outbox.worker.ts`).
 
 ## neon-http batch caveat
 

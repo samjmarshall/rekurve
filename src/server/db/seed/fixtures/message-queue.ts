@@ -1,11 +1,10 @@
 import "server-only";
 
 import type { Faker } from "@faker-js/faker";
-import type { db } from "~/server/db";
 import type { leads } from "~/server/leads/leads.schema";
 import { messageQueue } from "~/server/messaging/messaging.schema";
+import type { DB } from "./types";
 
-type DB = typeof db;
 type Lead = typeof leads.$inferSelect;
 
 const SMS_DRAFTS = [

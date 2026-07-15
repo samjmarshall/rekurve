@@ -78,7 +78,7 @@ related-prs: [111]
 - User clicks a sidebar link or a bottom-nav tab → Next.js client navigation; `usePathname()` updates `aria-current` on the active item.
 - User submits the sidebar sign-out form **or** the Settings sign-out button → `signOutAction` server action runs → `auth.api.signOut()` clears the session cookie → `redirect("/login")`.
 
-**Data path**: cookie → `getSession()` (cached per-request, see `src/lib/session.ts`) → render shell with `session.user.name` and `session.user.email` → client nav components read `usePathname()` for active state.
+**Data path**: cookie → `getSession()` (cached per-request, see `src/server/auth/session.ts`) → render shell with `session.user.name` and `session.user.email` → client nav components read `usePathname()` for active state.
 
 ```mermaid
 flowchart LR

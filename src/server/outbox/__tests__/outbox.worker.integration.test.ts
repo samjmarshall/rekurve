@@ -4,6 +4,8 @@ import "dotenv/config";
 import { afterAll, describe, expect, rs, test } from "@rstest/core";
 import { and, eq, isNotNull } from "drizzle-orm";
 
+import { makeStep } from "~/server/inngest/__tests__/step-fake";
+
 const TEST_EVENT = `outbox.integration.sweep.${Date.now()}.${Math.random().toString(36).slice(2)}`;
 
 describe.skipIf(!process.env.INTEGRATION_DB)("outboxSweep integration", () => {
@@ -25,11 +27,7 @@ describe.skipIf(!process.env.INTEGRATION_DB)("outboxSweep integration", () => {
       { eventName: TEST_EVENT, payload: { n: 3 }, createdAt: past },
     ]);
 
-    const mockStep = {
-      run: rs
-        .fn()
-        .mockImplementation((_id: string, fn: () => Promise<unknown>) => fn()),
-    };
+    const mockStep = makeStep();
 
     // First sweep — should process all 3 rows
     await runSweep(mockStep as never);

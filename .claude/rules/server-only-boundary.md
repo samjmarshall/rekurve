@@ -8,7 +8,7 @@ paths:
 
 Every non-test `.ts` file under `src/server/**` carries `import "server-only";` as its first line. Any client-bundle path that transitively reaches a marked module fails `make build` ("This module cannot be imported from a Client Component module").
 
-When adding a module under `src/server/**`, prepend `import "server-only";`. Isomorphic code belongs in `src/domain/**` (the kernel — scoring, correlation, shared Zod schemas) and is **never** marked. Client-facing surfaces (better-auth React client, analytics, session helpers) live in `src/lib/**`, also unmarked.
+When adding a module under `src/server/**`, prepend `import "server-only";`. Isomorphic code belongs in `src/domain/**` (the kernel — scoring, correlation, shared Zod schemas) and is **never** marked. `src/lib/**` holds client surfaces (`auth-client.ts`, `posthog.ts`, `analytics.ts`) and isomorphic utils, all unmarked — with one exception: `src/lib/posthog-server.ts` is a server-side module (imported only from `src/instrumentation.ts`) that carries the `server-only` marker while it awaits relocation under `src/server/**`.
 
 ## The mechanism (rekurve-specific — read before "fixing" tooling)
 

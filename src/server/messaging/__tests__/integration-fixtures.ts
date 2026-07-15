@@ -24,6 +24,21 @@ export function makeSeedIds(prefix: string) {
 export type SeedIds = ReturnType<typeof makeSeedIds>;
 
 /**
+ * Single home for the db handle + 4-module schema spread both helpers need.
+ * Imports stay dynamic (see module doc) — this just deduplicates the list.
+ */
+async function loadDbAndSchema() {
+  const { db } = await import("~/server/db");
+  const schema = {
+    ...(await import("~/server/db/shared.schema")),
+    ...(await import("~/server/leads/leads.schema")),
+    ...(await import("~/server/messaging/messaging.schema")),
+    ...(await import("~/server/outbox/outbox.schema")),
+  };
+  return { db, schema };
+}
+
+/**
  * Seed lead + messageQueue rows (and, with `withUser`, the owning user so
  * resolveLeadOwnerUserId resolves). `approvedAt` is stamped only for approved
  * seeds — pending rows (approval-outbox) stay unapproved.
@@ -38,13 +53,7 @@ export async function seedLeadAndMessage(
   },
   opts: { withUser?: boolean } = {},
 ): Promise<void> {
-  const { db } = await import("~/server/db");
-  const schema = {
-    ...(await import("~/server/db/shared.schema")),
-    ...(await import("~/server/leads/leads.schema")),
-    ...(await import("~/server/messaging/messaging.schema")),
-    ...(await import("~/server/outbox/outbox.schema")),
-  };
+  const { db, schema } = await loadDbAndSchema();
   if (opts.withUser) {
     await db
       .insert(schema.user)
@@ -80,13 +89,7 @@ export async function cleanupSeededRows(
   ids: SeedIds,
   opts: { outbox?: boolean } = {},
 ): Promise<void> {
-  const { db } = await import("~/server/db");
-  const schema = {
-    ...(await import("~/server/db/shared.schema")),
-    ...(await import("~/server/leads/leads.schema")),
-    ...(await import("~/server/messaging/messaging.schema")),
-    ...(await import("~/server/outbox/outbox.schema")),
-  };
+  const { db, schema } = await loadDbAndSchema();
   if (opts.outbox) {
     await db
       .delete(schema.outbox)

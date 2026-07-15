@@ -1,10 +1,8 @@
 import "server-only";
 
 import type { Faker } from "@faker-js/faker";
-import type { db } from "~/server/db";
 import { lots } from "~/server/lots/lots.schema";
-
-type DB = typeof db;
+import type { DB } from "./types";
 
 const ESTATES = [
   { name: "Creation Park", suburb: "Ripley" },

@@ -10,7 +10,7 @@ Domain-oriented 3-tier under `src/server/<domain>/`, with an isomorphic kernel a
 
 ## Tier map — dotted suffixes
 
-Every file declares its tier in its name:
+Files declare their tier in their name, with two sanctioned exceptions: entry adapters named for their protocol surface (e.g. `hubspot.webhook.ts`), and module-private composition internals with plain names (e.g. hubspot's `contacts.ts` / `emails.ts` / `client.ts`), which are never imported outside their module:
 
 | Suffix | Tier | Notes |
 |---|---|---|
@@ -53,7 +53,8 @@ Every file declares its tier in its name:
 
 ## Collapse rule
 
-- **Worker-only domains** (`nurture/`, `outbox/`): no module file composing an empty `{service}` — the `<domain>.workers.ts` root is the domain's public artifact.
+- **Worker-only domains** (`nurture/`): no module file composing an empty `{service}` — the `<domain>.workers.ts` root is the domain's public artifact.
+- **Outbox** (`outbox/`) is write-path infrastructure, not a plain worker-only domain: alongside its `outbox.workers.ts` composition root it exports the write-door helpers every domain consumes — `publish` (`src/server/outbox/index.ts`) and `makeCommitWithOutbox` (`src/server/outbox/commit.ts`) — per the write path above.
 - **Adapter modules** (`ms-graph/`, `twilio/`, `ai/`): typed client surfaces injected into owning domains; no router/service/repository ceremony (ai keeps a thin `ai.module.ts` + rate-limited router for its draft endpoint).
 - **Stub domains** (`lots/`): router + schema only until real behavior lands (`lots.getAll` returns `[]`).
 

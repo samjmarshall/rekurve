@@ -1,10 +1,8 @@
 import "server-only";
 
 import type { Faker } from "@faker-js/faker";
-import type { db } from "~/server/db";
 import { leads } from "~/server/leads/leads.schema";
-
-type DB = typeof db;
+import type { DB } from "./types";
 
 const STAGES = [
   "unqualified",

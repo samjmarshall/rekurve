@@ -14,7 +14,7 @@ Technical Story: S1 (HIGH) + S2 (MEDIUM) of the deferred security remediation �
 ## Context and Problem Statement
 
 `POST /api/auth/email-otp/send-verification-otp` (better-auth `emailOTP`
-plugin, `src/lib/auth.ts`) has no rate limiting. Each call dispatches a Resend
+plugin, `src/server/auth/auth.ts`) has no rate limiting. Each call dispatches a Resend
 email. It is the only externally reachable, unauthenticated, cost-bearing
 endpoint — an attacker can loop it with arbitrary emails for cost
 amplification and inbox-flooding of third parties (S1). The verify endpoint's
@@ -70,7 +70,7 @@ under local `next start` — so #267's E2E acceptance test is deterministic — 
 $0 pre-PMF cost and with no `middleware.ts` (honouring ADR-002).
 
 Use `@upstash/ratelimit` + `@upstash/redis` on the Upstash free tier, invoked
-from a better-auth `createAuthMiddleware` **`before`** hook in `src/lib/auth.ts`
+from a better-auth `createAuthMiddleware` **`before`** hook in `src/server/auth/auth.ts`
 matched to `ctx.path === "/email-otp/send-verification-otp"`.
 
 - **Two fixed-window limiters**, checked before the email dispatches:
@@ -148,7 +148,7 @@ secondary-storage TTL/memory footgun, and open bug #1891. **Option 4
 
 ### 2026-05-25 — IP backstop raised 10 → 50 / 15 min
 
-`OTP_SEND_IP_MAX` in `src/lib/rate-limit.ts` raised from **10** to **50** per
+`OTP_SEND_IP_MAX` in `src/server/auth/rate-limit.ts` raised from **10** to **50** per
 15-min window. The email-keyed primary limiter (`OTP_SEND_EMAIL_MAX = 3`) is
 unchanged — the threat model is unaffected.
 

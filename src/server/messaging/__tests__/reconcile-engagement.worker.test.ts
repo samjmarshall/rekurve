@@ -7,7 +7,6 @@ import {
   test,
 } from "@rstest/core";
 
-import { neutraliseWorkerImports } from "~/server/__tests__/import-neutraliser";
 import { makeStep } from "~/server/inngest/__tests__/step-fake";
 import type { EventPayload } from "~/server/inngest/events";
 import type { ReconcileEngagementWorkerDeps } from "../reconcile-engagement.worker";
@@ -17,15 +16,14 @@ const LEAD_ID = "lead-0000-0000-0000-000000000001";
 const CORRELATION_ID = MSG_ID;
 
 // Factory seam (adr020): behaviour is asserted through a fake deps object, not
-// module mocks; neutraliseWorkerImports() handles the import-time env/db
-// graph (rationale documented on the helper).
+// module mocks. The worker import graph no longer reaches ~/env or
+// ~/server/db, so no import-time mocks are needed.
 let makeRunReconcileMissedEngagement: (
   deps: ReconcileEngagementWorkerDeps,
 ) => (event: unknown, step: unknown) => Promise<void>;
 let workerFn: { id: () => string; opts: Record<string, unknown> };
 
 beforeAll(async () => {
-  neutraliseWorkerImports();
   const mod = await import("../reconcile-engagement.worker");
   makeRunReconcileMissedEngagement =
     mod.makeRunReconcileMissedEngagement as never;

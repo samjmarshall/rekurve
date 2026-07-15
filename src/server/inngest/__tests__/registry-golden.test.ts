@@ -55,8 +55,8 @@ beforeAll(async () => {
   // Everything else is import-safe — leads.module no longer constructs the
   // tRPC router (root.ts wires the adapter), so the workers' graph never
   // reaches ~/server/api/trpc / ~/server/auth/auth; "server-only" markers resolve to
-  // the rstest alias stub and the schema barrel's drizzle pgTable defs are
-  // side-effect-free.
+  // the rstest alias stub and the per-domain *.schema.ts drizzle pgTable defs
+  // (adr021 — there is no schema barrel) are side-effect-free.
   rs.doMock("~/env", () => ({ env: {} }));
   rs.doMock("~/server/db", () => ({ db: {} }));
 

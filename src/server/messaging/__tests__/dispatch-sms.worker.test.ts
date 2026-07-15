@@ -1,6 +1,5 @@
 import { beforeAll, describe, expect, rs, test } from "@rstest/core";
 
-import { neutraliseWorkerImports } from "~/server/__tests__/import-neutraliser";
 import { makeStep } from "~/server/inngest/__tests__/step-fake";
 import type { EventPayload } from "~/server/inngest/events";
 import type { DispatchSmsWorkerDeps } from "../dispatch-sms.worker";
@@ -18,15 +17,14 @@ const approvedSms = {
 };
 
 // Factory seam (adr020): behaviour is asserted through a fake deps object, not
-// module mocks; neutraliseWorkerImports() handles the import-time env/db
-// graph (rationale documented on the helper).
+// module mocks. The worker import graph no longer reaches ~/env or
+// ~/server/db, so no import-time mocks are needed.
 let makeRunDispatchSms: (
   deps: DispatchSmsWorkerDeps,
 ) => (event: unknown, step: unknown) => Promise<void>;
 let workerFn: { id: () => string; opts: Record<string, unknown> };
 
 beforeAll(async () => {
-  neutraliseWorkerImports();
   const mod = await import("../dispatch-sms.worker");
   makeRunDispatchSms = mod.makeRunDispatchSms as never;
   workerFn = mod.makeDispatchSmsWorker(makeDeps() as never) as never;

@@ -93,6 +93,7 @@ For each phase in the plan:
 
 4. **Run code review**:
    - Always run `/code-review <plan-path>` once over the whole branch and fold its findings into the validation report's "Code Review Findings" section. The built-in runs its own multi-agent review out-of-context, so this does not flood validation. Omit `--comment` here — the PR may not exist yet, and the CI "Claude Code Review" workflow posts inline PR comments once a PR is open.
+   - Run `/quality-control` over the branch diff (fixed point: the plan's base, same as `origin/HEAD` unless stated otherwise). Fold its smell findings into "Code Review Findings" as a "Design smells (judgement calls)" subsection — never merge them into hard findings.
    - **Conditionally** run `/security-review` when the branch diff touches security-sensitive paths — `src/lib/**`, `src/env.js`, `next.config.ts`, `**/auth/**`, `**/*.env*` (mirrors how `/design-review` is conditional on `src/` UI changes). Fold its findings into the report. Check the diff with `git diff --name-only origin/HEAD...`.
 
 5. **Think deeply about edge cases**:
@@ -191,6 +192,7 @@ Always verify:
 - [ ] All phases marked complete are actually done
 - [ ] Automated tests pass
 - [ ] `/code-review` run over the branch; findings triaged
+- [ ] `/quality-control` design smell review run over the branch; judgement calls noted
 - [ ] `/security-review` run when security-sensitive paths changed; findings triaged
 - [ ] Code follows existing patterns
 - [ ] No regressions introduced

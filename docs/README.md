@@ -82,6 +82,8 @@ These commands are invoked inside [Claude Code](https://claude.ai/code) via slas
 | `/iterate-plan` | Update existing plan with new feedback | Plan needs revision after code review or discovery |
 | `/implement <path>` | Execute a plan phase-by-phase. Invokes `frontend-design` skill for UI phases | Working through an approved plan |
 | `/validate <path>` | Verify implementation matches plan intent | After implementing — check nothing was missed |
+| `/quality-control [ref]` | Design-smell review of a diff against a fixed Fowler baseline (_Refactoring_ ch.3) | Design-quality lens beyond `/code-review` — after a change, before committing |
+| `/code-comment` | Writes terse, why-only code comments to house standard, and judges the comments in a diff | While writing/editing a comment, or reviewing the comments in a change |
 | `/plan-to-ralph-spec <path>` | Convert markdown plan to `.spec.json` for Ralph | Before running `ralph.sh` — produces the JSON spec Ralph reads |
 | `/commit` | Structured conventional commit | Ready to commit (follows repo conventions) |
 | `/design-review` | Visual/accessibility/brand review via Playwright | After UI/UX changes, before committing |

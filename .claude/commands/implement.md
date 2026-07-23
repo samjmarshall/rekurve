@@ -1,5 +1,5 @@
 ---
-skills: tdd
+skills: tdd, code-comment
 model: sonnet
 effort: high
 ---
@@ -91,6 +91,15 @@ This plan may implement decisions captured as **Proposed** ADRs in `docs/adr/` (
 - Leave an ADR `Proposed` only if its phase is genuinely incomplete — `/validate` backstops anything left unresolved.
 
 Use canonical terms from `CONTEXT.md` in all code, identifiers, and comments.
+
+## Comments
+
+Write and update code comments to the `code-comment` skill's writer standard as
+you code: a comment must carry *why* the code can't (intent, constraint, external
+reference); never restate *what* the code does; make the code self-explain
+(rename / extract) before reaching for a comment; keep what remains ELI5-terse.
+`/validate` runs the same skill's judge over the branch, so comments written
+off-standard get flagged there — write them tight the first time.
 
 ## UI/Frontend Phases
 

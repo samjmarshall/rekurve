@@ -94,6 +94,7 @@ For each phase in the plan:
 4. **Run code review**:
    - Always run `/code-review <plan-path>` once over the whole branch and fold its findings into the validation report's "Code Review Findings" section. The built-in runs its own multi-agent review out-of-context, so this does not flood validation. Omit `--comment` here — the PR may not exist yet, and the CI "Claude Code Review" workflow posts inline PR comments once a PR is open.
    - Run `/quality-control` over the branch diff (fixed point: the plan's base, same as `origin/HEAD` unless stated otherwise). Fold its smell findings into "Code Review Findings" as a "Design smells (judgement calls)" subsection — never merge them into hard findings.
+   - Run the `/code-comment` skill's judge mode over the same branch diff (same fixed point). It spawns an isolated sub-agent that verdicts the changed comments (`PASS`/`REWRITE`/`REMOVE`/`FIX_CODE`); fold its findings into "Code Review Findings" as a "Comment quality (judgement calls)" subsection, kept separate from hard findings like the smell subsection. Apply the suggested `REWRITE`/`REMOVE`/`FIX_CODE` fixes, or note why not.
    - **Conditionally** run `/security-review` when the branch diff touches security-sensitive paths — `src/lib/**`, `src/env.js`, `next.config.ts`, `**/auth/**`, `**/*.env*` (mirrors how `/design-review` is conditional on `src/` UI changes). Fold its findings into the report. Check the diff with `git diff --name-only origin/HEAD...`.
 
 5. **Think deeply about edge cases**:
@@ -133,6 +134,7 @@ Create comprehensive validation summary:
 ✓ Design review: `/design-review <plan-path>` — per-surface status (UI phases only)
   ✓ /claims/[id] workspace · ✓ clause slide-over · ⚠️ audit slide-over (see findings)
 ✓ Code review: `/code-review <plan-path>` — N findings folded below
+✓ Comment quality: `/code-comment` judge — N verdicts folded below (PASS/REWRITE/REMOVE/FIX_CODE)
 ✓ Security review: `/security-review` — run (security-sensitive paths changed) · no findings
 
 ### ADR & Terminology
@@ -193,6 +195,7 @@ Always verify:
 - [ ] Automated tests pass
 - [ ] `/code-review` run over the branch; findings triaged
 - [ ] `/quality-control` design smell review run over the branch; judgement calls noted
+- [ ] `/code-comment` judge run over the branch; comment verdicts noted and fixes applied
 - [ ] `/security-review` run when security-sensitive paths changed; findings triaged
 - [ ] Code follows existing patterns
 - [ ] No regressions introduced

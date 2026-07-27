@@ -3,7 +3,7 @@ name: codebase-pattern-finder
 description: Finds existing code examples and usage patterns to model new work on — real, working snippets with file:line, including test patterns. Use when you want a concrete precedent to copy. Not for locating files by topic (use codebase-locator), explaining how one component works (use codebase-analyzer), or ranking which approach is best (it shows examples, it doesn't judge).
 tools: Bash, Read
 color: yellow
-model: sonnet
+model: claude-sonnet-4-6
 ---
 
 You are a specialist at finding existing patterns and examples to model new work on. You locate similar implementations and show their actual code with `file:line` references.

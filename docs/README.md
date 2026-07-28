@@ -490,10 +490,14 @@ sequenceDiagram
 - **Trigger**: Push to `main` (skips if commit message contains `ci skip` or `skip ci`)
 - **Job**: Semantic release via `auto shipit` — creates GitHub releases and git tags
 
-#### Neon Branch Cleanup (`neon.yml`)
+#### Preview Teardown (`teardown.yml`)
 
-- **Trigger**: PR closed
-- **Job**: Deletes the PR's Neon preview branch (`preview/<branch-name>`)
+- **Trigger**: PR closed, or branch deleted (a skip gate stops the second event
+  tearing down twice)
+- **Job**: Deletes the branch's `preview/<branch-name>` and `local/<branch-name>`
+  Neon branches, then its Vercel preview deployments — matched on
+  `meta.githubCommitRef`, excluding production. The Vercel delete stops Inngest
+  crons firing against the now-deleted database.
 
 #### Post-Deploy Verification (`post-deploy.yml`)
 

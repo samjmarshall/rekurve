@@ -62,12 +62,12 @@ jobs:
 
       # Delete this branch's Vercel preview deployments. The preview/<branch>
       # Neon database is deleted above, so any preview deployment left running
-      # keeps getting its Inngest crons (e.g. outbox-sweep) invoked against a
-      # database that no longer exists — failing every minute with
-      # "password authentication failed". Removing the deployment stops that
-      # immediately. (Inngest itself has no archival API; its branch
-      # environments auto-archive 3 days after the last deploy, which is the
-      # backstop — see the note at the end of this job.)
+      # keeps getting its Inngest crons invoked against a database that no
+      # longer exists — outbox-sweep hourly and outbox-prune daily at 03:00,
+      # each failing with "password authentication failed". Removing the
+      # deployment stops that immediately. (Inngest itself has no archival
+      # API; its branch environments auto-archive 3 days after the last
+      # deploy, which is the backstop — see the note at the end of this job.)
       - name: Delete Vercel preview deployments
         if: steps.skip.outputs.skip != 'true'
         env:
